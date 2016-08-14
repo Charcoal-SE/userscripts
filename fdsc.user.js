@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.2.6
+// @version     0.2.7
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -77,10 +77,11 @@
                         }
                     })
                     .error(function(jqXHR, textStatus, errorThrown) {
-                        StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred fetching post ID from metasmoke.", {
+                        StackExchange.helpers.showrMessage($(".topbar"), "An error occurred fetching post ID from metasmoke - has the post been reported by Smokey?", {
                             'position': 'toast',
                             'transient': true,
-                            'transientTimeout': 10000
+                            'transientTimeout': 10000,
+                            'type': 'warning'
                         });
                         console.error(jqXHR.status, jqXHR.responseText);
                     });
