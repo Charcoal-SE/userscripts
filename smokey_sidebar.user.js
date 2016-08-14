@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name        Longer Sidebar
+// @name        Smokey Sidebar
 // @desc        Makes the sidebar longer for symmetry by using recent Smokey reports.
 // @author      ArtOfCode
-// @version     0.6.1
+// @version     0.6.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/smokey_sidebar.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/smokey_sidebar.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -36,6 +36,11 @@ var userscript = function($) {
         })
         .error(function(jqXHR, textStatus, errorThrown) {
             callback(false, jqXHR);
+            StackExchange.helpers.showErrorMessage($('.topbar'), "An error occurred retrieving posts from metasmoke.", {
+                'position': 'toast',
+                'transient': true,
+                'transientTimeout': 10000
+            });
             console.error("XMLHttpRequest to metasmoke failed. Details follow.");
             console.log({
                 type: 'IncompleteXhrException',
