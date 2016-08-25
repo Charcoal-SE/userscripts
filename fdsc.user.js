@@ -16,6 +16,7 @@
 // @exclude     *://chat.stackexchange.com/*
 // @exclude     *://chat.meta.stackexchange.com/*
 // @exclude     *://chat.stackoverflow.com/*
+// @exclude     *://blog.stackoverflow.com/*
 // ==/UserScript==
 
 (function() {
