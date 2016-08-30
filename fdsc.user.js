@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.6.1
+// @version     0.7.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -58,6 +58,7 @@
          * have to see how much of a problem that is.
          */
         fdsc.getWriteToken = function() {
+			console.log("getWriteToken");
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
             setTimeout(function() {
 				var code = window.prompt("Once you've authorized FDSC with metasmoke, you'll be given a code. Enter that here:", "");
@@ -95,6 +96,7 @@
          * can be obtained using `fdsc.getWriteToken()`.
          */
         fdsc.sendFeedback = function(feedbackType, postId) {
+			console.log("sendFeedback");
             $.ajax({
                 'type': 'POST',
                 'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + postId + '/feedback',
