@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.9.1
+// @version     0.10.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -48,12 +48,15 @@
         };
 		
 		/*!
-		 * 
+		 * Given a blurb and a callback method, will prompt the user for input using an SE native prompt and the
+		 * text of the blurb. The callback will be invoked once the input is submitted, and the first parameter
+		 * will contain the submitted data.
 		 */
 		fdsc.input = function(blurb, callback) {
 			function loaded() {
 				$("#fdsc-popup-submit").on("click", function() {
 					callback($("#fdsc-popup-input").val());
+					StackExchange.helpers.closePopups();
 					$("#fdsc-popup-submit").off("click");
 				});
 			}
