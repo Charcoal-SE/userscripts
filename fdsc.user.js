@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.7.1
+// @version     0.9.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -46,6 +46,25 @@
                 return "";
             }
         };
+		
+		/*!
+		 * 
+		 */
+		fdsc.input = function(blurb, callback) {
+			function loaded() {
+				$("#fdsc-popup-submit").on("click", function() {
+					callback($("#fdsc-popup-input").val());
+					$("#fdsc-popup-submit").off("click");
+				});
+			}
+			
+			$("body").loadPopup({
+				'lightbox': false,
+				'target': $("body"),
+				'html': '<div class="popup fdsc-popup"><p>' + blurb + '</p><input type="text" id="fdsc-popup-input" /><br/><button id="fdsc-popup-submit">OK</button></div>',
+				'loaded': loaded
+			});
+		};
         
         /*!
          * The token that allows us to perform write operations using the metasmoke API. Obtained via MicrOAuth.
@@ -60,8 +79,7 @@
         fdsc.getWriteToken = function() {
 			console.log("getWriteToken");
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
-            setTimeout(function() {
-				var code = window.prompt("Once you've authorized FDSC with metasmoke, you'll be given a code. Enter that here:", "");
+			fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function(code) {
 				$.ajax({
 					'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
 					'method': 'GET'
@@ -87,7 +105,7 @@
 						console.log(jqXHR.status, jqXHR.responseText);
 					}
 				});
-			}, 1000);
+			});
         };
         
         /*!
@@ -116,9 +134,13 @@
             })
             .error(function(jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 401) {
-                    fdsc.getWriteToken();
-                    fdsc.sendFeedback(feedbackType, postId);
-                }
+					StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
+						'position': 'toast',
+						'transient': true,
+						'transientTimeout': 10000
+					});
+					console.error("fdsc.sendFeedback was called without having a valid write token");
+				}
                 else {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
                         'position': 'toast',
