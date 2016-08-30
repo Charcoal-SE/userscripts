@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.4.1
+// @version     0.5.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -61,32 +61,34 @@
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
             $(window).on("blur", function() {
                 $(window).on("focus", function() {
-                    var code = window.prompt("Once you've authorized FDSC with metasmoke, you'll be given a code. Enter that here:", "");
-                    $.ajax({
-                        'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
-                        'method': 'GET'
-                    })
-                    .done(function(data) {
-                        fdsc.msWriteToken = data['token'];
-                        localStorage.setItem("fdsc_msWriteToken", data['token']);
-                    })
-                    .error(function(jqXHR, textStatus, errorThrown) {
-                        if (jqXHR.status == 404) {
-                            StackExchange.helpers.showErrorMessage($(".topbar"), "metasmoke could not find a write token - did you authorize the app?", {
-                                'position': 'toast',
-                                'transient': true,
-                                'transientTimeout': 10000
-                            });
-                        }
-                        else {
-                            StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
-                                'position': 'toast',
-                                'transient': true,
-                                'transientTimeout': 10000
-                            });
-                            console.log(jqXHR.status, jqXHR.responseText);
-                        }
-                    });
+					if (!fdsc.msWriteToken) {
+						var code = window.prompt("Once you've authorized FDSC with metasmoke, you'll be given a code. Enter that here:", "");
+						$.ajax({
+							'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
+							'method': 'GET'
+						})
+						.done(function(data) {
+							fdsc.msWriteToken = data['token'];
+							localStorage.setItem("fdsc_msWriteToken", data['token']);
+						})
+						.error(function(jqXHR, textStatus, errorThrown) {
+							if (jqXHR.status == 404) {
+								StackExchange.helpers.showErrorMessage($(".topbar"), "metasmoke could not find a write token - did you authorize the app?", {
+									'position': 'toast',
+									'transient': true,
+									'transientTimeout': 10000
+								});
+							}
+							else {
+								StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
+									'position': 'toast',
+									'transient': true,
+									'transientTimeout': 10000
+								});
+								console.log(jqXHR.status, jqXHR.responseText);
+							}
+						});
+					}
                     $(window).off("focus");
                 });
                 $(window).off("blur");
