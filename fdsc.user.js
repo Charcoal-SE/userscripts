@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.10.1
+// @version     0.11.5
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -46,28 +46,28 @@
                 return "";
             }
         };
-		
-		/*!
-		 * Given a blurb and a callback method, will prompt the user for input using an SE native prompt and the
-		 * text of the blurb. The callback will be invoked once the input is submitted, and the first parameter
-		 * will contain the submitted data.
-		 */
-		fdsc.input = function(blurb, callback) {
-			function loaded() {
-				$("#fdsc-popup-submit").on("click", function() {
-					callback($("#fdsc-popup-input").val());
-					StackExchange.helpers.closePopups();
-					$("#fdsc-popup-submit").off("click");
-				});
-			}
-			
-			$("body").loadPopup({
-				'lightbox': false,
-				'target': $("body"),
-				'html': '<div class="popup fdsc-popup"><p>' + blurb + '</p><input type="text" id="fdsc-popup-input" /><br/><button id="fdsc-popup-submit">OK</button></div>',
-				'loaded': loaded
-			});
-		};
+        
+        /*!
+         * Given a blurb and a callback method, will prompt the user for input using an SE native prompt and the
+         * text of the blurb. The callback will be invoked once the input is submitted, and the first parameter
+         * will contain the submitted data.
+         */
+        fdsc.input = function(blurb, callback) {
+            function loaded() {
+                $("#fdsc-popup-submit").on("click", function() {
+                    callback($("#fdsc-popup-input").val());
+                    StackExchange.helpers.closePopups();
+                    $("#fdsc-popup-submit").off("click");
+                });
+            }
+            
+            $("body").loadPopup({
+                'lightbox': false,
+                'target': $("body"),
+                'html': '<div class="popup fdsc-popup"><p>' + blurb + '</p><input type="text" id="fdsc-popup-input" /><br/><button id="fdsc-popup-submit">OK</button></div>',
+                'loaded': loaded
+            });
+        };
         
         /*!
          * The token that allows us to perform write operations using the metasmoke API. Obtained via MicrOAuth.
@@ -79,36 +79,40 @@
          * _May_ cause problems with popup blockers, because the window opening isn't triggered by a click... we'll
          * have to see how much of a problem that is.
          */
-        fdsc.getWriteToken = function() {
-			console.log("getWriteToken");
+        fdsc.getWriteToken = function(callback) {
+            console.log("getWriteToken");
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
-			fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function(code) {
-				$.ajax({
-					'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
-					'method': 'GET'
-				})
-				.done(function(data) {
-					fdsc.msWriteToken = data['token'];
-					localStorage.setItem("fdsc_msWriteToken", data['token']);
-				})
-				.error(function(jqXHR, textStatus, errorThrown) {
-					if (jqXHR.status == 404) {
-						StackExchange.helpers.showErrorMessage($(".topbar"), "metasmoke could not find a write token - did you authorize the app?", {
-							'position': 'toast',
-							'transient': true,
-							'transientTimeout': 10000
-						});
-					}
-					else {
-						StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
-							'position': 'toast',
-							'transient': true,
-							'transientTimeout': 10000
-						});
-						console.log(jqXHR.status, jqXHR.responseText);
-					}
-				});
-			});
+            setTimeout(function() {
+                fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function(code) {
+                    console.log("input callback: " + code);
+                    $.ajax({
+                        'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
+                        'method': 'GET'
+                    })
+                    .done(function(data) {
+                        fdsc.msWriteToken = data['token'];
+                        localStorage.setItem("fdsc_msWriteToken", data['token']);
+                        callback();
+                    })
+                    .error(function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.status == 404) {
+                            StackExchange.helpers.showErrorMessage($(".topbar"), "metasmoke could not find a write token - did you authorize the app?", {
+                                'position': 'toast',
+                                'transient': true,
+                                'transientTimeout': 10000
+                            });
+                        }
+                        else {
+                            StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
+                                'position': 'toast',
+                                'transient': true,
+                                'transientTimeout': 10000
+                            });
+                            console.log(jqXHR.status, jqXHR.responseText);
+                        }
+                    });
+                });
+            }, 100);
         };
         
         /*!
@@ -117,7 +121,7 @@
          * can be obtained using `fdsc.getWriteToken()`.
          */
         fdsc.sendFeedback = function(feedbackType, postId) {
-			console.log("sendFeedback");
+            console.log("sendFeedback");
             $.ajax({
                 'type': 'POST',
                 'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + postId + '/feedback',
@@ -137,13 +141,18 @@
             })
             .error(function(jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 401) {
-					StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
-						'position': 'toast',
-						'transient': true,
-						'transientTimeout': 10000
-					});
-					console.error("fdsc.sendFeedback was called without having a valid write token");
-				}
+                    StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
+                        'position': 'toast',
+                        'transient': true,
+                        'transientTimeout': 10000
+                    });
+                    console.error("fdsc.sendFeedback was called without having a valid write token");
+                    if (confirm("Write token invalid. Attempt re-authentication?")) {
+                        fdsc.getWriteToken(function() {
+                            fdsc.sendFeedback(feedbackType, postId);
+                        });
+                    }
+                }
                 else {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
                         'position': 'toast',
@@ -198,7 +207,7 @@
                         }
                     })
                     .error(function(jqXHR, textStatus, errorThrown) {
-                        StackExchange.helpers.showrMessage($(".topbar"), "An error occurred fetching post ID from metasmoke - has the post been reported by Smokey?", {
+                        StackExchange.helpers.showMessage($(".topbar"), "An error occurred fetching post ID from metasmoke - has the post been reported by Smokey?", {
                             'position': 'toast',
                             'transient': true,
                             'transientTimeout': 10000,
@@ -224,9 +233,13 @@
 
                     if (feedbackType && $('#smokey-report').length > 0) {
                         if (!fdsc.msWriteToken) {
-                            fdsc.getWriteToken();
+                            fdsc.getWriteToken(function() {
+                                fdsc.sendFeedback(feedbackType, postId);
+                            });
                         }
-                        fdsc.sendFeedback(feedbackType, postId);
+                        else {
+                            fdsc.sendFeedback(feedbackType, postId);
+                        }
                     }
 
                     // Likewise, remove this handler when it's finished to avoid multiple fires.
