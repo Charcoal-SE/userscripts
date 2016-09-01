@@ -2,7 +2,7 @@
 // @name        Flag Dialog Smokey Controls
 // @desc        Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
-// @version     0.11.5
+// @version     0.12.5
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -69,6 +69,28 @@
             });
         };
         
+        fdsc.confirm = function(blurb, callback) {
+            function loaded() {
+                $("#fdsc-popup-ok").on("click", function() {
+                    callback(true);
+                    StackExchange.helpers.closePopups();
+                    $("#fdsc-popup-ok").off("click");
+                });
+                $("#fdsc-popup-cnl").on("click", function() {
+                    callback(false);
+                    StackExchange.helpers.closePopups();
+                    $("#fdsc-popup-cnl").off("click");
+                });
+            }
+            
+            $("body").loadPopup({
+                'lightbox': false,
+                'target': $("body"),
+                'html': '<div class="popup fdsc-popup"><p>' + blurb + '</p><button style="margin:5px;" id="fdsc-popup-ok">OK</button><button style="margin:5px;" id="fdsc-popup-cnl">Cancel</button></div>',
+                'loaded': loaded
+            });
+        };
+        
         /*!
          * The token that allows us to perform write operations using the metasmoke API. Obtained via MicrOAuth.
          */
@@ -79,10 +101,11 @@
          * _May_ cause problems with popup blockers, because the window opening isn't triggered by a click... we'll
          * have to see how much of a problem that is.
          */
-        fdsc.getWriteToken = function(callback) {
+        fdsc.getWriteToken = function(afterFlag, callback) {
             console.log("getWriteToken");
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
-            setTimeout(function() {
+            
+            function getInput() {
                 fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function(code) {
                     console.log("input callback: " + code);
                     $.ajax({
@@ -112,7 +135,19 @@
                         }
                     });
                 });
-            }, 100);
+            }
+            
+            if (afterFlag) {
+                $(document).on("DOMNodeRemoved", function(ev) {
+                    if ($(ev.target).attr("id") == "popup-flag-post") {
+                        getInput();
+                        $(document).off("DOMNodeRemoved");
+                    }
+                });
+            }
+            else {
+                getInput();
+            }
         };
         
         /*!
@@ -147,11 +182,13 @@
                         'transientTimeout': 10000
                     });
                     console.error("fdsc.sendFeedback was called without having a valid write token");
-                    if (confirm("Write token invalid. Attempt re-authentication?")) {
-                        fdsc.getWriteToken(function() {
-                            fdsc.sendFeedback(feedbackType, postId);
-                        });
-                    }
+                    fdsc.confirm("Write token invalid. Attempt re-authentication?", function(result) {
+                        if (result) {
+                            fdsc.getWriteToken(false, function() {
+                                fdsc.sendFeedback(feedbackType, postId);
+                            });
+                        }
+                    });
                 }
                 else {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
@@ -233,7 +270,7 @@
 
                     if (feedbackType && $('#smokey-report').length > 0) {
                         if (!fdsc.msWriteToken) {
-                            fdsc.getWriteToken(function() {
+                            fdsc.getWriteToken(true, function() {
                                 fdsc.sendFeedback(feedbackType, postId);
                             });
                         }
