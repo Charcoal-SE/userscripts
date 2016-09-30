@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CHQ Spam Reporter
 // @namespace    https://github.com/Charcoal-SE
-// @version      1.0.0
+// @version      1.1.0
 // @description  Allows you to report a spam/abusive post to Charcoal HQ from the post page
 // @author       @TinyGiant, @angussidney
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/spam_reporter.user.js
