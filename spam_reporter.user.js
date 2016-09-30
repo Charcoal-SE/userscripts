@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CHQ Spam Reporter
 // @namespace    https://github.com/Charcoal-SE
-// @version      1.1.0
+// @version      1.1.1
 // @description  Allows you to report a spam/abusive post to Charcoal HQ from the post page
 // @author       @TinyGiant, @angussidney
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/spam_reporter.user.js
@@ -94,17 +94,17 @@
             GM_xmlhttpRequest(options);
         };
 
+        var sep = document.createElement('span');
+        sep.className = 'lsep';
+        sep.textContent = '|';
+        scope.insertBefore(sep, scope.getElementsByClassName('lsep')[0]);
+
         var link = document.createElement('a');
         link.href = '#';
         link.textContent = 'report';
         link.title = 'report this post as spam/abusive to Charcoal HQ';
         link.addEventListener('click', report, false);
-        scope.insertBefore(link, scope.getElementsByClassName('edit-post')[0]);
-
-        var sep = document.createElement('span');
-        sep.className = 'lsep';
-        sep.textContent = '|';
-        scope.insertBefore(sep, scope.getElementsByClassName('edit-post')[0]);
+        scope.insertBefore(link, scope.getElementsByClassName('lsep')[1]);
     };
 
     var menus = document.querySelectorAll('.post-menu');
