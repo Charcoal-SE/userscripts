@@ -94,17 +94,17 @@
             GM_xmlhttpRequest(options);
         };
 
-        var sep = document.createElement('span');
-        sep.className = 'lsep';
-        sep.textContent = '|';
-        scope.appendChild(sep);
-
         var link = document.createElement('a');
         link.href = '#';
         link.textContent = 'report';
         link.title = 'report this post as spam/abusive to Charcoal HQ';
         link.addEventListener('click', report, false);
-        scope.appendChild(link);
+        scope.insertBefore(link, scope.getElementsByClassName('edit-post')[0]);
+
+        var sep = document.createElement('span');
+        sep.className = 'lsep';
+        sep.textContent = '|';
+        scope.insertBefore(sep, scope.getElementsByClassName('edit-post')[0]);
     };
 
     var menus = document.querySelectorAll('.post-menu');
