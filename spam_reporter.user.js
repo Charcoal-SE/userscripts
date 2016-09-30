@@ -4,6 +4,9 @@
 // @version      1.0.0
 // @description  Allows you to report a spam/abusive post to Charcoal HQ from the post page
 // @author       @TinyGiant, @angussidney
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/spam_reporter.user.js
+// @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/spam_reporter.user.js
+// @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @include      /^https?:\/\/\w*.?(stackexchange.com|stackoverflow.com|serverfault.com|superuser.com|askubuntu.com|stackapps.com|mathoverflow.net)\/q(uestions)?\/\d+/
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
@@ -99,6 +102,7 @@
         var link = document.createElement('a');
         link.href = '#';
         link.textContent = 'report';
+        link.title = 'report this post as spam/abusive to Charcoal HQ';
         link.addEventListener('click', report, false);
         scope.appendChild(link);
     };
