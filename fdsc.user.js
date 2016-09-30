@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Flag Dialog Smokey Controls
-// @desc        Adds Smokey status of a post and feedback options to flag dialogs.
+// @description Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
 // @version     0.14.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
@@ -47,7 +47,7 @@
                 return "";
             }
         };
-        
+
         /*!
          * Given a blurb and a callback method, will prompt the user for input using an SE native prompt and the
          * text of the blurb. The callback will be invoked once the input is submitted, and the first parameter
@@ -61,7 +61,7 @@
                     $("#fdsc-popup-submit").off("click");
                 });
             }
-            
+
             $("body").loadPopup({
                 'lightbox': false,
                 'target': $("body"),
@@ -69,7 +69,7 @@
                 'loaded': loaded
             });
         };
-        
+
         fdsc.confirm = function(blurb, callback) {
             function loaded() {
                 $("#fdsc-popup-ok").on("click", function() {
@@ -83,7 +83,7 @@
                     $("#fdsc-popup-cnl").off("click");
                 });
             }
-            
+
             $("body").loadPopup({
                 'lightbox': false,
                 'target': $("body"),
@@ -91,13 +91,13 @@
                 'loaded': loaded
             });
         };
-        
+
         /*!
          * The token that allows us to perform write operations using the metasmoke API. Obtained via MicrOAuth.
          * `localStorage` call is left in for backwards compatibility. It's overwritten later.
          */
         fdsc.msWriteToken = localStorage.getItem("fdsc_msWriteToken");
-        
+
         /*!
          * Obtains a write token and stores it both in `fdsc.msWriteToken` and `xdLocalStorage['fdsc_msWriteToken']`.
          * _May_ cause problems with popup blockers, because the window opening isn't triggered by a click... we'll
@@ -106,7 +106,7 @@
         fdsc.getWriteToken = function(afterFlag, callback) {
             console.log("getWriteToken");
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
-            
+
             function getInput() {
                 fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function(code) {
                     console.log("input callback: " + code);
@@ -139,7 +139,7 @@
                     });
                 });
             }
-            
+
             if (afterFlag) {
                 $(document).on("DOMNodeRemoved", function(ev) {
                     if ($(ev.target).attr("id") == "popup-flag-post") {
@@ -152,7 +152,7 @@
                 getInput();
             }
         };
-        
+
         /*!
          * Given a Smokey-recognized feedback type, sends that feedback to metasmoke via the API. Requires a valid
          * API key and write token; if you don't have these before this is called, get hold of them. A write token
@@ -168,7 +168,7 @@
             else {
                 token = fdsc.msWriteToken;
             }
-            
+
             $.ajax({
                 'type': 'POST',
                 'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + postId + '/feedback',
@@ -223,7 +223,7 @@
                     fdsc.msWriteToken = data['value'];
                     console.log("fdsc.msWriteToken: ", data['value']);
                 });
-                
+
                 $(".flag-post-link").on("click", function(clickEvent) {
                     $(document).on("DOMNodeInserted", function(nodeEvent) {
                         var postId;
@@ -309,7 +309,7 @@
             }
         });
     };
-    
+
     /*!
      * This is here because since we're injecting the userscript into the page, we also need to inject
      * any libraries we need.
