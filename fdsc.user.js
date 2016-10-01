@@ -290,17 +290,15 @@
         };
 
         reporter.report = function() {
-            fdsc.confirm('Do you really want to report this post as spam/offensive?', function(result) {
-                if (result) {
-                    var options = {
-                        method: 'GET',
-                        url: 'http://chat.stackexchange.com/rooms/' + room,
-                        onload: reporter.sendReport
-                    };
+            if (confirm('Do you really want to report this post as spam/offensive?')) {
+                var options = {
+                    method: 'GET',
+                    url: 'http://chat.stackexchange.com/rooms/' + room,
+                    onload: reporter.sendReport
+                };
 
-                    GM_xmlhttpRequest(options);
-                }
-            });
+                GM_xmlhttpRequest(options);
+            }
         };
 
         /*!
