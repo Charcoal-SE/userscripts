@@ -16,8 +16,6 @@
 // Original source: https://git.io/vPt8S
 // Permission to redistribute: http://chat.stackoverflow.com/transcript/message/33107648#33107648
 
-// TESTING
-
 (function(){
     'use strict';
 
@@ -40,7 +38,7 @@
             return false;
         }
 
-        var room = 11540; // Charcoal HQ
+        var room = 46145; //testing, 11540; // Charcoal HQ
 
         var postLink = scope.querySelector('.short-link').href;
 
