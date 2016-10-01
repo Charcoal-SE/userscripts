@@ -18,12 +18,29 @@
 // @exclude     *://chat.stackoverflow.com/*
 // @exclude     *://blog.stackoverflow.com/*
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
+// @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
 (function() {
     'use strict';
 
     var userscript = function($) {
+        // For spam reporter
+        window.reporter = {}
+
+        reporter.notify = (function(){
+            var count = 0, timeout;
+            return function(m,t) {
+                console.log(m,t);
+                if($('#notify-' + count).length) {
+                    clearTimeout(timeout);
+                    StackExchange.notify.close(count);
+                }
+                StackExchange.notify.show(m,++count);
+                if(t) timeout = setTimeout(StackExchange.notify.close.bind(null,count), t);
+            };
+        })();
+
         window.fdsc = {};
         fdsc.metasmokeKey = "070f26ebb71c5e6cfca7893fe1139460cf23f30d686566f5707a4acfd50c";
 
@@ -214,6 +231,79 @@
         };
 
         /*!
+         * Spam reporter code (modified and inserted by angussidney)
+         * Original script written by @TinyGiant (https://github.com/Tiny-Giant/)
+         * Original source: https://git.io/vPt8S
+         * Permission to redistribute: http://chat.stackoverflow.com/transcript/message/33107648#33107648
+         */
+        reporter.room = 46145; //testing, 11540; // Charcoal HQ
+
+        reporter.reportSent = function(response) {
+            console.log(response);
+
+            if (response.status !== 200) {
+                StackExchange.helpers.showErrorMessage($(".topbar"), "Error sending request: " + resp.responseText, {
+                    'position': 'toast',
+                    'transient': true,
+                    'transientTimeout': 10000
+                });
+                return false;
+            }
+
+            notify('Spam report sent.',1000);
+        };
+
+        reporter.sendReport = function(response) {
+            console.log(response);
+
+            if (response.status !== 200) {
+                StackExchange.helpers.showErrorMessage($(".topbar"), "Failed sending report, check the console for more information." + resp.responseText, {
+                    'position': 'toast',
+                    'transient': true,
+                    'transientTimeout': 10000
+                });
+                return false;
+            }
+
+            var fkey = response.responseText.match(/hidden" value="([\dabcdef]{32})/)[1];
+
+            if (!fkey) {
+                StackExchange.helpers.showErrorMessage($(".topbar"), "Failed retrieving key, is the room URL valid?" + resp.responseText, {
+                    'position': 'toast',
+                    'transient': true,
+                    'transientTimeout': 10000
+                });
+                return false;
+            }
+
+            var reportStr = '!!/report ' + reporter.postLink;
+
+            var options = {
+                method: 'POST',
+                url: 'http://chat.stackexchange.com/chats/' + room + '/messages/new',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                data: 'text=' + encodeURIComponent(reportStr) + '&fkey=' + fkey,
+                onload: reporter.reportSent
+            };
+
+            GM_xmlhttpRequest(options);
+        };
+
+        reporter.report = function() {
+            fdsc.confirm('Do you really want to report this post as spam/offensive?', function(result) {
+                if (result) {
+                    var options = {
+                        method: 'GET',
+                        url: 'http://chat.stackexchange.com/rooms/' + room,
+                        onload: reporter.sendReport
+                    };
+
+                    GM_xmlhttpRequest(options);
+                }
+            });
+        };
+
+        /*!
          * Well this is a mess.
          */
         xdLocalStorage.init({
@@ -299,6 +389,9 @@
                                 else {
                                     fdsc.sendFeedback(feedbackType, postId);
                                 }
+                            } else if (feedbackType === "tpu-") {
+                                reporter.postLink = fdsc.constructUrl(container); // <-- that may just work
+                                reporter.report()
                             }
 
                             // Likewise, remove this handler when it's finished to avoid multiple fires.
