@@ -280,7 +280,7 @@
 
             var options = {
                 method: 'POST',
-                url: 'http://chat.stackexchange.com/chats/' + room + '/messages/new',
+                url: 'http://chat.stackexchange.com/chats/' + reporter.room + '/messages/new',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 data: 'text=' + encodeURIComponent(reportStr) + '&fkey=' + fkey,
                 onload: reporter.reportSent
@@ -293,7 +293,7 @@
             if (confirm('Do you really want to report this post as spam/offensive?')) {
                 var options = {
                     method: 'GET',
-                    url: 'http://chat.stackexchange.com/rooms/' + room,
+                    url: 'http://chat.stackexchange.com/rooms/' + reporter.room,
                     onload: reporter.sendReport
                 };
 
