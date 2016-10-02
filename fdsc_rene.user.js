@@ -208,13 +208,16 @@
     };
 
     /*!
-     * Spam reporter code (modified and inserted by angussidney)
+     * Spam reporter code (modified and inserted by angussidney, made working by Rene)
      * Original script written by @TinyGiant (https://github.com/Tiny-Giant/)
      * Original source: https://git.io/vPt8S
      * Permission to redistribute: http://chat.stackoverflow.com/transcript/message/33107648#33107648
      */
     reporter.room = 46145; //testing, 11540; // Charcoal HQ
 
+    /*!
+     * Given a response from reporter.sendReport, show a success or error message.
+     */
     reporter.reportSent = function (response) {
         console.log(response);
 
@@ -234,6 +237,10 @@
         });
     };
 
+    /*!
+     * Given a response from reporter.report, chech for any errors. On success, report the selected post to
+     * the current room. On completion of request, call reporter.reportSent
+     */
     reporter.sendReport = function (response) {
         console.log(response);
 
@@ -269,6 +276,11 @@
         GM_xmlhttpRequest(options);
     };
 
+    /*!
+     * When called, the user is prompted to make sure that they still want to report the post. If this is
+     * confirmed, a request is sent to the specified chatroom to download the entire page, so that the fkey
+     * can be retrieved by reporter.sendReport. Once the request has been sent, call reporter.sendReport.
+     */
     reporter.report = function () {
         if (confirm('Do you really want to report this post as spam/offensive?')) {
             var options = {
@@ -345,11 +357,9 @@
                     }
 
                     // use this for testing
-                    $(".popup-submit").parent().append($('<a href="#">test</a>').
-                    // un comment this when testing is over
-                    //$(".popup-submit").
-                      on("click", function (ev) {
-                        ev.preventDefault(); // !!!!!!!!!!!!!!! remove when testing is over, otherwise you might not be actually flagging
+                    //$(".popup-submit").parent().append($('<a href="#">test</a>').
+                    $(".popup-submit").on("click", function (ev) {
+                        //ev.preventDefault(); // !!!!!!!!!!!!!!! remove when testing is over, otherwise you might not be actually flagging
                         var selected = $("input[name=top-form]").filter(":checked");
                         var feedbackType;
                         if (selected.val() == "PostSpam" || selected.val() == "PostOffensive") {
@@ -369,15 +379,13 @@
                                 fdsc.sendFeedback(feedbackType, postId);
                             }
                         } else if (feedbackType === "tpu-") {
-                            reporter.postLink = fdsc.constructUrl(container); // <-- that may just work
+                            reporter.postLink = fdsc.constructUrl(container); // container variable defined on line 299
                             reporter.report()
                         }
 
                         // Likewise, remove this handler when it's finished to avoid multiple fires.
                         $(".popup-submit").off("click");
-                    })
-                    ) // !!!!!!!!!!!!!!!!! comment  this line after test
-                    ;
+                    });
                 });
             });
         }
