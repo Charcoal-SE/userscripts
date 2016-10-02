@@ -58,7 +58,7 @@
     fdsc.input = function (blurb, callback) {
         function loaded() {
             $("#fdsc-popup-submit").on("click", function () {
-                StackExchange.helpers.closePopups('#fdsc-popup-prompt');
+                StackExchange.helpers.closePopups("#fdsc-popup-prompt");
                 callback($("#fdsc-popup-input").val());
                 $("#fdsc-popup-submit").off("click");
             });
@@ -75,12 +75,12 @@
     fdsc.confirm = function (blurb, callback) {
         function loaded() {
             $("#fdsc-popup-ok").on("click", function () {
-                StackExchange.helpers.closePopups('#fdsc-popup-confirm');
+                StackExchange.helpers.closePopups("#fdsc-popup-confirm");
                 callback(true);
                 $("#fdsc-popup-ok").off("click");
             });
             $("#fdsc-popup-cnl").on("click", function () {
-                StackExchange.helpers.closePopups('#fdsc-popup-confirm');
+                StackExchange.helpers.closePopups("#fdsc-popup-confirm");
                 callback(false);
                 $("#fdsc-popup-cnl").off("click");
             });
@@ -230,7 +230,7 @@
             return false;
         }
 
-        StackExchange.helpers.showSuccessMessage($(".topbar"), 'Spam report sent.', {
+        StackExchange.helpers.showSuccessMessage($(".topbar"), "Spam report sent.", {
             'position': 'toast',
             'transient': true,
             'transientTimeout': 10000
@@ -264,7 +264,7 @@
             return false;
         }
 
-        var reportStr = '!!/report ' + reporter.postLink;
+        var reportStr = "!!/report " + reporter.postLink;
 
         var options = {
             method: 'POST',
@@ -282,7 +282,7 @@
      * can be retrieved by reporter.sendReport. Once the request has been sent, call reporter.sendReport.
      */
     reporter.report = function () {
-        if (confirm('Do you really want to report this post as spam/offensive?')) {
+        if (confirm("Do you really want to report this post as spam/offensive?")) {
             var options = {
                 method: 'GET',
                 url: 'http://chat.stackexchange.com/rooms/' + reporter.room,
@@ -372,9 +372,9 @@
                             feedbackType = "naa-";
                         }
 
-                        if (feedbackType && $('#smokey-report').length > 0) {
+                        if (feedbackType && $("#smokey-report").length > 0) {
                             // because it looks like xdls returns null as a string for some reason
-                            if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                            if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                                 fdsc.getWriteToken(true, function() {
                                     fdsc.sendFeedback(feedbackType, postId);
                                 });
@@ -394,7 +394,7 @@
                     $("#feedback-fp").on("click", function (ev) {
                         ev.preventDefault()
                         feedbackType = "fp-";
-                        if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                        if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                             fdsc.getWriteToken(false, function() { // Check that using false is correct?
                                 fdsc.sendFeedback(feedbackType, postId);
                             });
