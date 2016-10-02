@@ -17,7 +17,7 @@
 // @exclude     *://chat.meta.stackexchange.com/*
 // @exclude     *://chat.stackoverflow.com/*
 // @exclude     *://blog.stackoverflow.com/*
-// @require    https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
+// @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
@@ -30,22 +30,6 @@
     var reporter = {},
         fdsc = {};
 
-    // For spam reporter
-    console.log('at start');
-
-    reporter.notify = (function () {
-        var count = 0, timeout;
-        return function (m, t) {
-            console.log(m, t);
-            if ($('#notify-' + count).length) {
-                clearTimeout(timeout);
-                StackExchange.notify.close(count);
-            }
-            StackExchange.notify.show(m, ++count);
-            if (t) { timeout = setTimeout(StackExchange.notify.close.bind(null, count), t); }
-        };
-    }());
-
     fdsc.metasmokeKey = "070f26ebb71c5e6cfca7893fe1139460cf23f30d686566f5707a4acfd50c";
 
     /*!
@@ -54,7 +38,6 @@
      *
      *     //stackoverflow.com/questions/12345
      *     //stackoverflow.com/a/12345
-     *
      */
     fdsc.constructUrl = function (postContainer) {
         var base = "//" + location.host + "/";
@@ -224,7 +207,6 @@
         });
     };
 
-    console.log('at start 4');
     /*!
      * Spam reporter code (modified and inserted by angussidney)
      * Original script written by @TinyGiant (https://github.com/Tiny-Giant/)
@@ -245,7 +227,11 @@
             return false;
         }
 
-        reporter.notify('Spam report sent.', 1000);
+        StackExchange.helpers.showSuccessMessage($(".topbar"), 'Spam report sent.', {
+            'position': 'toast',
+            'transient': true,
+            'transientTimeout': 10000
+        });
     };
 
     reporter.sendReport = function (response) {
@@ -300,7 +286,6 @@
     xdLocalStorage.init({
         'iframeUrl': 'https://metasmoke.erwaysoftware.com/xdom_storage.html',
         'initCallback': function () {
-            console.log('at star init callback');
 
             xdLocalStorage.getItem("fdsc_msWriteToken", function (data) {
                 fdsc.msWriteToken = data['value'];
@@ -308,7 +293,6 @@
             });
 
             $(".flag-post-link").on("click", function (clickEvent) {
-                console.log('at start click');
                 $(document).on("DOMNodeInserted", function (nodeEvent) {
                     var postId;
                     if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") == "popup-flag-post") {
@@ -360,13 +344,11 @@
                         $(document).off("DOMNodeInserted");
                     }
 
-                    console.log('adding?');
                     // use this for testing
                     $(".popup-submit").parent().append($('<a href="#">test</a>').
                     // un comment this when testing is over
                     //$(".popup-submit").
                       on("click", function (ev) {
-                        console.log('hello');
                         ev.preventDefault(); // !!!!!!!!!!!!!!! remove when testing is over, otherwise you might not be actually flagging
                         var selected = $("input[name=top-form]").filter(":checked");
                         var feedbackType;
@@ -387,7 +369,6 @@
                                 fdsc.sendFeedback(feedbackType, postId);
                             }
                         } else if (feedbackType === "tpu-") {
-                            console.log('blah');
                             reporter.postLink = fdsc.constructUrl(container); // <-- that may just work
                             reporter.report()
                         }
