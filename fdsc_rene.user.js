@@ -331,7 +331,7 @@
                                     var tps = data.filter(function (el) { return el.feedback_type.indexOf('t') === 0; }).length;
                                     var fps = data.filter(function (el) { return el.feedback_type.indexOf('f') === 0; }).length;
                                     var naa = data.filter(function (el) { return el.feedback_type.indexOf('n') === 0; }).length;
-                                    $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong></div>");
+                                    $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong> - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,0.5)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>");
                                 }).error(function (jqXHR, textStatus, errorThrown) {
                                     StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred fetching post feedback from metasmoke.", {
                                         'position': 'toast',
@@ -374,8 +374,7 @@
                                 fdsc.getWriteToken(true, function() {
                                     fdsc.sendFeedback(feedbackType, postId);
                                 });
-                            }
-                            else {
+                            } else {
                                 fdsc.sendFeedback(feedbackType, postId);
                             }
                         } else if (feedbackType === "tpu-") {
@@ -385,6 +384,18 @@
 
                         // Likewise, remove this handler when it's finished to avoid multiple fires.
                         $(".popup-submit").off("click");
+                    });
+
+                    // On click of the flase positive button
+                    $("#feedback-fp").on("click", function (ev) {
+                        feedbackType = "fp-";
+                        if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                            fdsc.getWriteToken(false, function() { // Check that using flase is correct?
+                                fdsc.sendFeedback(feedbackType, postId);
+                            });
+                        } else {
+                            fdsc.sendFeedback(feedbackType, postId);
+                        }
                     });
                 });
             });
