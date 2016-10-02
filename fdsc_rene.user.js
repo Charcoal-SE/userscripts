@@ -391,13 +391,13 @@
                         ev.preventDefault()
                         feedbackType = "fp-";
                         if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
-                            fdsc.getWriteToken(false, function() { // Check that using flase is correct?
+                            fdsc.getWriteToken(false, function() { // Check that using false is correct?
                                 fdsc.sendFeedback(feedbackType, postId);
                             });
                         } else {
                             fdsc.sendFeedback(feedbackType, postId);
                         }
-                        $(".popup-submit").off("click");
+                        $("#feedback-fp").off("click");
                     });
                 });
             });
