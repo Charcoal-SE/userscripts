@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        Flag Dialog Smokey Controls
 // @description Adds Smokey status of a post and feedback options to flag dialogs.
-// @author      ArtOfCode
-// @version     0.14.1
+// @author      ArtOfCode (see source for contributors)
+// @version     0.15.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -21,6 +21,14 @@
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
+
+/*
+ * CONTRIBUTORS
+ * ArtOfCode - author and maintainer (https://github.com/ArtOfCode-)
+ * angussidney (https://github.com/angussidney)
+ * Rene        (https://github.com/rschrieken)
+ * TinyGiant   (https://github.com/Tiny-Giant/)
+ */
 
 /*global StackExchange, console, reporter, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
 /*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
@@ -209,7 +217,7 @@
     };
 
     /*!
-     * Spam reporter code (modified and inserted by angussidney, made working by Rene)
+     * Spam reporter code (modified by angussidney)
      * Original script written by @TinyGiant (https://github.com/Tiny-Giant/)
      * Original source: https://git.io/vPt8S
      * Permission to redistribute: http://chat.stackoverflow.com/transcript/message/33107648#33107648
@@ -335,7 +343,7 @@
                                     if (tps == 0) {
                                         $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong> - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>");
                                     } else {
-                                        // If someone else has already marked as tp, you should mark it as fp in chat were you can discuss with others.
+                                        // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
                                         // Hence, do not display the false positive button
                                         $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong></div>");
                                     }
@@ -376,10 +384,7 @@
                         $(document).off("DOMNodeInserted");
                     }
 
-                    // use this for testing
-                    //$(".popup-submit").parent().append($('<a href="#">test</a>').
                     $(".popup-submit").on("click", function (ev) {
-                        //ev.preventDefault(); // !!!!!!!!!!!!!!! remove when testing is over, otherwise you might not be actually flagging
                         var selected = $("input[name=top-form]").filter(":checked");
                         var feedbackType;
                         if (selected.val() == "PostSpam" || selected.val() == "PostOffensive") {
