@@ -334,8 +334,23 @@
                                     if (tps == 0) {
                                         $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong> - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>");
                                     } else {
+                                        // If someone else has already marked as tp, you should mark it as fp in chat were you can discuss with others.
+                                        // Hence, do not display the false positive button
                                         $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong></div>");
                                     }
+                                    // On click of the false positive button
+                                    $("#feedback-fp").on("click", function (ev) {
+                                        ev.preventDefault()
+                                        feedbackType = "fp-";
+                                        if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
+                                            fdsc.getWriteToken(false, function() { // Check that using false is correct?
+                                                fdsc.sendFeedback(feedbackType, postId);
+                                            });
+                                        } else {
+                                            fdsc.sendFeedback(feedbackType, postId);
+                                        }
+                                        $("#feedback-fp").off("click");
+                                    });
                                 }).error(function (jqXHR, textStatus, errorThrown) {
                                     StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred fetching post feedback from metasmoke.", {
                                         'position': 'toast',
@@ -388,20 +403,6 @@
 
                         // Likewise, remove this handler when it's finished to avoid multiple fires.
                         $(".popup-submit").off("click");
-                    });
-
-                    // On click of the flase positive button
-                    $("#feedback-fp").on("click", function (ev) {
-                        ev.preventDefault()
-                        feedbackType = "fp-";
-                        if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
-                            fdsc.getWriteToken(false, function() { // Check that using false is correct?
-                                fdsc.sendFeedback(feedbackType, postId);
-                            });
-                        } else {
-                            fdsc.sendFeedback(feedbackType, postId);
-                        }
-                        $("#feedback-fp").off("click");
                     });
                 });
             });
