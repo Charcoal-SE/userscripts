@@ -165,7 +165,8 @@
         } else {
             token = fdsc.msWriteToken;
         }
-
+        console.log("Feedback type: ", feedbackType);
+        console.log("PostID: ", postId);
         $.ajax({
             'type': 'POST',
             'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + postId + '/feedback',
@@ -340,14 +341,14 @@
                                     }
                                     // On click of the false positive button
                                     $("#feedback-fp").on("click", function (ev) {
+                                        console.log("Reporting as false positive");
                                         ev.preventDefault()
-                                        feedbackType = "fp-";
                                         if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                                             fdsc.getWriteToken(false, function() { // Check that using false is correct?
-                                                fdsc.sendFeedback(feedbackType, postId);
+                                                fdsc.sendFeedback("fp-", postId);
                                             });
                                         } else {
-                                            fdsc.sendFeedback(feedbackType, postId);
+                                            fdsc.sendFeedback("fp-", postId);
                                         }
                                         $("#feedback-fp").off("click");
                                     });
