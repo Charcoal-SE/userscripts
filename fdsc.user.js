@@ -222,7 +222,7 @@
      * Original source: https://git.io/vPt8S
      * Permission to redistribute: http://chat.stackoverflow.com/transcript/message/33107648#33107648
      */
-    reporter.room = 46145; //testing, 11540; // Charcoal HQ
+    reporter.room = 11540; // Charcoal HQ, 46145 for testing
 
     /*!
      * Given a response from reporter.sendReport, show a success or error message.
