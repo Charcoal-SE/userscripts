@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CHQ Spam Reporter
 // @namespace    https://github.com/Charcoal-SE
-// @version      1.1.1
+// @version      1.2.1
 // @description  Allows you to report a spam/abusive post to Charcoal HQ from the post page
 // @author       @TinyGiant, @angussidney
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/spam_reporter.user.js
@@ -18,6 +18,7 @@
 
 (function(){
     'use strict';
+    alert('spam_reporter.user.js has been deprecated. All functionality can now be found in fdsc.user.js. Please uninstall this script to prevent this message.')
 
     var notify = (function(){
         var count = 0, timeout;
@@ -38,7 +39,7 @@
             return false;
         }
 
-        var room = 11540; // Charcoal HQ
+        var room = 46145; //testing, 11540; // Charcoal HQ
 
         var postLink = scope.querySelector('.short-link').href;
 
