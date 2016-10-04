@@ -1,8 +1,11 @@
 // ==UserScript==
 // @name        Flag Dialog Smokey Controls
 // @description Adds Smokey status of a post and feedback options to flag dialogs.
-// @author      ArtOfCode (see source for contributors)
-// @version     0.15.1
+// @author      ArtOfCode
+// @contributor angussidney
+// @contributor rene
+// @attribution TinyGiant
+// @version     1.0.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -21,14 +24,6 @@
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
-
-/*
- * CONTRIBUTORS
- * ArtOfCode - author and maintainer (https://github.com/ArtOfCode-)
- * angussidney (https://github.com/angussidney)
- * Rene        (https://github.com/rschrieken)
- * TinyGiant   (https://github.com/Tiny-Giant/)
- */
 
 /*global StackExchange, console, reporter, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
 /*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
@@ -114,12 +109,10 @@
      * have to see how much of a problem that is.
      */
     fdsc.getWriteToken = function (afterFlag, callback) {
-        console.log("getWriteToken");
         var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
 
         function getInput() {
             fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function (code) {
-                console.log("input callback: " + code);
                 $.ajax({
                     'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
                     'method': 'GET'
@@ -141,7 +134,6 @@
                             'transient': true,
                             'transientTimeout': 10000
                         });
-                        console.log(jqXHR.status, jqXHR.responseText);
                     }
                 });
             });
@@ -165,16 +157,12 @@
      * can be obtained using `fdsc.getWriteToken()`.
      */
     fdsc.sendFeedback = function (feedbackType, postId) {
-        console.log("sendFeedback");
-        console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
         var token;
         if (typeof (fdsc.msWriteToken) === "object") {
             token = fdsc.msWriteToken['value'];
         } else {
             token = fdsc.msWriteToken;
         }
-        console.log("Feedback type: ", feedbackType);
-        console.log("PostID: ", postId);
         $.ajax({
             'type': 'POST',
             'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + postId + '/feedback',
@@ -189,7 +177,6 @@
                 'transient': true,
                 'transientTimeout': 10000
             });
-            console.log(data);
         }).error(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 401) {
                 StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
@@ -211,7 +198,6 @@
                     'transient': true,
                     'transientTimeout': 10000
                 });
-                console.log(jqXHR.status, jqXHR.responseText);
             }
         });
     };
@@ -228,8 +214,6 @@
      * Given a response from reporter.sendReport, show a success or error message.
      */
     reporter.reportSent = function (response) {
-        console.log(response);
-
         if (response.status !== 200) {
             StackExchange.helpers.showErrorMessage($(".topbar"), "Error sending request: " + response.responseText, {
                 'position': 'toast',
@@ -251,8 +235,6 @@
      * the current room. On completion of request, call reporter.reportSent
      */
     reporter.sendReport = function (response) {
-        console.log(response);
-
         if (response.status !== 200) {
             StackExchange.helpers.showErrorMessage($(".topbar"), "Failed sending report, check the console for more information." + response.responseText, {
                 'position': 'toast',
