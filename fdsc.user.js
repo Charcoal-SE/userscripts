@@ -5,7 +5,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution TinyGiant
-// @version     1.0.0
+// @version     1.1.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -297,7 +297,6 @@
 
             $(".flag-post-link").on("click", function (clickEvent) {
                 $(document).on("DOMNodeInserted", function (nodeEvent) {
-                    var postId;
                     if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") == "popup-flag-post") {
                         var container = $(clickEvent.target).parents(".question, .answer").first();
 
@@ -310,10 +309,10 @@
                             }
                         }).done(function (data) {
                             if (data.length > 0 && data[0].id) {
-                                postId = data[0].id;
+                                fdsc.currentPostId = data[0].id;
                                 $.ajax({
                                     'type': 'GET',
-                                    'url': 'https://metasmoke.erwaysoftware.com/api/post/' + postId + '/feedback',
+                                    'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostId + '/feedback',
                                     'data': {
                                         'key': fdsc.metasmokeKey
                                     }
@@ -335,10 +334,10 @@
                                         ev.preventDefault()
                                         if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                                             fdsc.getWriteToken(false, function() { // Check that using false is correct?
-                                                fdsc.sendFeedback("fp-", postId);
+                                                fdsc.sendFeedback("fp-", fdsc.currentPostId);
                                             });
                                         } else {
-                                            fdsc.sendFeedback("fp-", postId);
+                                            fdsc.sendFeedback("fp-", fdsc.currentPostId);
                                         }
                                         $("#feedback-fp").off("click");
                                     });
@@ -375,14 +374,14 @@
                             feedbackType = "naa-";
                         }
 
-                        if (feedbackType && $("#smokey-report").length > 0) {
+                        if (feedbackType && fdsc.currentPostId) {
                             // because it looks like xdls returns null as a string for some reason
                             if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                                 fdsc.getWriteToken(true, function() {
-                                    fdsc.sendFeedback(feedbackType, postId);
+                                    fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
                                 });
                             } else {
-                                fdsc.sendFeedback(feedbackType, postId);
+                                fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
                             }
                         } else if (feedbackType === "tpu-") {
                             reporter.postLink = fdsc.constructUrl(container); // container variable defined on line 299
