@@ -273,8 +273,7 @@
      * can be retrieved by reporter.sendReport. Once the request has been sent, call reporter.sendReport.
      */
     reporter.report = function () {
-        confirmation = confirm("Do you really want to report this post as spam/offensive?");
-        if (confirmation) {
+        if (confirm("Do you really want to report this post as spam/offensive?")) {
             var options = {
                 method: 'GET',
                 url: 'http://chat.stackexchange.com/rooms/' + reporter.room,
@@ -311,7 +310,6 @@
                         }).done(function (data) {
                             if (data.length > 0 && data[0].id) {
                                 fdsc.currentPostId = data[0].id;
-                                fdsc.postFound = True
                                 $.ajax({
                                     'type': 'GET',
                                     'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostId + '/feedback',
@@ -351,8 +349,6 @@
                                     });
                                     console.log(jqXHR.status, jqXHR.responseText);
                                 });
-                            } else {
-                                fdsc.postFound = False
                             }
                         }).error(function (jqXHR, textStatus, errorThrown) {
                             StackExchange.helpers.showMessage($(".topbar"), "An error occurred fetching post ID from metasmoke - has the post been reported by Smokey?", {
@@ -378,7 +374,7 @@
                             feedbackType = "naa-";
                         }
 
-                        if (feedbackType && fdsc.postFound === True) {
+                        if (feedbackType && fdsc.currentPostId) {
                             // because it looks like xdls returns null as a string for some reason
                             if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                                 fdsc.getWriteToken(true, function() {
@@ -387,7 +383,7 @@
                             } else {
                                 fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
                             }
-                        } else if (feedbackType === "tpu-" && fdsc.postFound === False) {
+                        } else if (feedbackType === "tpu-") {
                             reporter.postLink = fdsc.constructUrl(container); // container variable defined on line 299
                             reporter.report()
                         }
