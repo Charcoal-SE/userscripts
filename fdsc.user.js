@@ -310,6 +310,7 @@
                         }).done(function (data) {
                             if (data.length > 0 && data[0].id) {
                                 fdsc.currentPostId = data[0].id;
+                                fdsc.postFound = true;
                                 $.ajax({
                                     'type': 'GET',
                                     'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostId + '/feedback',
@@ -349,6 +350,8 @@
                                     });
                                     console.log(jqXHR.status, jqXHR.responseText);
                                 });
+                            } else {
+                                fdsc.postFound = false;
                             }
                         }).error(function (jqXHR, textStatus, errorThrown) {
                             StackExchange.helpers.showMessage($(".topbar"), "An error occurred fetching post ID from metasmoke - has the post been reported by Smokey?", {
@@ -383,7 +386,7 @@
                             } else {
                                 fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
                             }
-                        } else if (feedbackType === "tpu-") {
+                        } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
                             reporter.postLink = fdsc.constructUrl(container); // container variable defined on line 299
                             reporter.report()
                         }
