@@ -23,6 +23,7 @@
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
+// ==/UserScript==
 
 /*global StackExchange, console, reporter, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
 /*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
