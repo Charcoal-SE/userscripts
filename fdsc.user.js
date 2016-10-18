@@ -2,6 +2,9 @@
 // @name        Flag Dialog Smokey Controls
 // @description Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
+// @contributor angussidney
+// @contributor rene
+// @attribution TinyGiant
 // @version     1.2.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
@@ -20,10 +23,13 @@
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // ==/UserScript==
 
-(function() {
+/*global StackExchange, console, reporter, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
+/*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
+
+(function () {
     'use strict';
 
-    var userscript = function($) {
+    var userscript = function ($) {
         window.fdsc = {};
         fdsc.metasmokeKey = "070f26ebb71c5e6cfca7893fe1139460cf23f30d686566f5707a4acfd50c";
 
@@ -35,15 +41,13 @@
          *     //stackoverflow.com/a/12345
          *
          */
-        fdsc.constructUrl = function(postContainer) {
+        fdsc.constructUrl = function (postContainer) {
             var base = "//" + location.host + "/";
             if ($(postContainer).hasClass("answer")) {
                 return base + "a/" + $(postContainer).data("answerid");
-            }
-            else if ($(postContainer).hasClass("question")) {
+            } else if ($(postContainer).hasClass("question")) {
                 return base + "questions/"  + $(postContainer).data("questionid");
-            }
-            else {
+            } else {
                 return "";
             }
         };
@@ -53,9 +57,9 @@
          * text of the blurb. The callback will be invoked once the input is submitted, and the first parameter
          * will contain the submitted data.
          */
-        fdsc.input = function(blurb, callback) {
+        fdsc.input = function (blurb, callback) {
             function loaded() {
-                $("#fdsc-popup-submit").on("click", function() {
+                $("#fdsc-popup-submit").on("click", function () {
                     StackExchange.helpers.closePopups('#fdsc-popup-prompt');
                     callback($("#fdsc-popup-input").val());
                     $("#fdsc-popup-submit").off("click");
@@ -70,14 +74,14 @@
             });
         };
 
-        fdsc.confirm = function(blurb, callback) {
+        fdsc.confirm = function (blurb, callback) {
             function loaded() {
-                $("#fdsc-popup-ok").on("click", function() {
+                $("#fdsc-popup-ok").on("click", function () {
                     StackExchange.helpers.closePopups('#fdsc-popup-confirm');
                     callback(true);
                     $("#fdsc-popup-ok").off("click");
                 });
-                $("#fdsc-popup-cnl").on("click", function() {
+                $("#fdsc-popup-cnl").on("click", function () {
                     StackExchange.helpers.closePopups('#fdsc-popup-confirm');
                     callback(false);
                     $("#fdsc-popup-cnl").off("click");
@@ -103,32 +107,29 @@
          * _May_ cause problems with popup blockers, because the window opening isn't triggered by a click... we'll
          * have to see how much of a problem that is.
          */
-        fdsc.getWriteToken = function(afterFlag, callback) {
+        fdsc.getWriteToken = function (afterFlag, callback) {
             console.log("getWriteToken");
             var w = window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
 
             function getInput() {
-                fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function(code) {
+                fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function (code) {
                     console.log("input callback: " + code);
                     $.ajax({
                         'url': 'https://metasmoke.erwaysoftware.com/oauth/token?key=' + fdsc.metasmokeKey + '&code=' + code,
                         'method': 'GET'
-                    })
-                    .done(function(data) {
+                    }).done(function (data) {
                         fdsc.msWriteToken = data['token'];
-                        xdLocalStorage.setItem("fdsc_msWriteToken", data['token'], function() {
+                        xdLocalStorage.setItem("fdsc_msWriteToken", data['token'], function () {
                             callback();
                         });
-                    })
-                    .error(function(jqXHR, textStatus, errorThrown) {
-                        if (jqXHR.status == 404) {
+                    }).error(function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.status === 404) {
                             StackExchange.helpers.showErrorMessage($(".topbar"), "metasmoke could not find a write token - did you authorize the app?", {
                                 'position': 'toast',
                                 'transient': true,
                                 'transientTimeout': 10000
                             });
-                        }
-                        else {
+                        } else {
                             StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
                                 'position': 'toast',
                                 'transient': true,
@@ -141,14 +142,13 @@
             }
 
             if (afterFlag) {
-                $(document).on("DOMNodeRemoved", function(ev) {
-                    if ($(ev.target).attr("id") == "popup-flag-post") {
+                $(document).on("DOMNodeRemoved", function (ev) {
+                    if ($(ev.target).attr("id") === "popup-flag-post") {
                         getInput();
                         $(document).off("DOMNodeRemoved");
                     }
                 });
-            }
-            else {
+            } else {
                 getInput();
             }
         };
@@ -158,14 +158,13 @@
          * API key and write token; if you don't have these before this is called, get hold of them. A write token
          * can be obtained using `fdsc.getWriteToken()`.
          */
-        fdsc.sendFeedback = function(feedbackType, postId) {
+        fdsc.sendFeedback = function (feedbackType, postId) {
             console.log("sendFeedback");
             console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
             var token;
-            if (typeof(fdsc.msWriteToken) == "object") {
+            if (typeof (fdsc.msWriteToken) === "object") {
                 token = fdsc.msWriteToken['value'];
-            }
-            else {
+            } else {
                 token = fdsc.msWriteToken;
             }
 
@@ -177,32 +176,29 @@
                     'key': fdsc.metasmokeKey,
                     'token': token
                 }
-            })
-            .done(function(data) {
+            }).done(function (data) {
                 StackExchange.helpers.showSuccessMessage($(".topbar"), "Fed back " + feedbackType + " to metasmoke.", {
                     'position': 'toast',
                     'transient': true,
                     'transientTimeout': 10000
                 });
                 console.log(data);
-            })
-            .error(function(jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status == 401) {
+            }).error(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 401) {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
                         'position': 'toast',
                         'transient': true,
                         'transientTimeout': 10000
                     });
                     console.error("fdsc.sendFeedback was called without having a valid write token");
-                    fdsc.confirm("Write token invalid. Attempt re-authentication?", function(result) {
+                    fdsc.confirm("Write token invalid. Attempt re-authentication?", function (result) {
                         if (result) {
-                            fdsc.getWriteToken(false, function() {
+                            fdsc.getWriteToken(false, function () {
                                 fdsc.sendFeedback(feedbackType, postId);
                             });
                         }
                     });
-                }
-                else {
+                } else {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
                         'position': 'toast',
                         'transient': true,
@@ -218,16 +214,15 @@
          */
         xdLocalStorage.init({
             'iframeUrl': 'https://metasmoke.erwaysoftware.com/xdom_storage.html',
-            'initCallback': function() {
-                xdLocalStorage.getItem("fdsc_msWriteToken", function(data) {
+            'initCallback': function () {
+                xdLocalStorage.getItem("fdsc_msWriteToken", function (data) {
                     fdsc.msWriteToken = data['value'];
                     console.log("fdsc.msWriteToken: ", data['value']);
                 });
 
-                $(".flag-post-link").on("click", function(clickEvent) {
-                    $(document).on("DOMNodeInserted", function(nodeEvent) {
-                        var postId;
-                        if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") == "popup-flag-post") {
+                $(".flag-post-link").on("click", function (clickEvent) {
+                    $(document).on("DOMNodeInserted", function (nodeEvent) {
+                        if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") === "popup-flag-post") {
                             var container = $(clickEvent.target).parents(".question, .answer").first();
                             $.ajax({
                                 'type': 'GET',
@@ -236,25 +231,42 @@
                                     'url': fdsc.constructUrl(container),
                                     'key': fdsc.metasmokeKey
                                 }
-                            })
-                            .done(function(data) {
+                            }).done(function (data) {
                                 if (data.length > 0 && data[0].id) {
-                                    postId = data[0].id;
+                                    fdsc.currentPostId = data[0].id;
+                                    fdsc.postFound = true;
                                     $.ajax({
                                         'type': 'GET',
-                                        'url': 'https://metasmoke.erwaysoftware.com/api/post/' + postId + '/feedback',
+                                        'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostIdpostId + '/feedback',
                                         'data': {
                                             'key': fdsc.metasmokeKey
                                         }
-                                    })
-                                    .done(function(data) {
+                                    }).done(function (data) {
                                         // We use the first char of feedback to identify its type because that's what metasmoke does.
-                                        var tps = data.filter(function(el) { return el.feedback_type.indexOf('t') === 0; }).length;
-                                        var fps = data.filter(function(el) { return el.feedback_type.indexOf('f') === 0; }).length;
-                                        var naa = data.filter(function(el) { return el.feedback_type.indexOf('n') === 0; }).length;
-                                        $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong></div>");
-                                    })
-                                    .error(function(jqXHR, textStatus, errorThrown) {
+                                        var tps = data.filter(function (el) { return el.feedback_type.indexOf('t') === 0; }).length;
+                                        var fps = data.filter(function (el) { return el.feedback_type.indexOf('f') === 0; }).length;
+                                        var naa = data.filter(function (el) { return el.feedback_type.indexOf('n') === 0; }).length;
+                                        if (tps === 0) {
+                                            $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong> - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>");
+                                        } else {
+                                            // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
+                                            // Hence, do not display the false positive button
+                                            $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span></strong></div>");
+                                        }
+                                        // On click of the false positive button
+                                        $("#feedback-fp").on("click", function (ev) {
+                                            console.log("Reporting as false positive");
+                                            ev.preventDefault();
+                                            if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
+                                                fdsc.getWriteToken(false, function () {
+                                                    fdsc.sendFeedback("fp-", fdsc.currentPostId);
+                                                });
+                                            } else {
+                                                fdsc.sendFeedback("fp-", fdsc.currentPostId);
+                                            }
+                                            $("#feedback-fp").off("click");
+                                        });
+                                    }).error(function (jqXHR, textStatus, errorThrown) {
                                         StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred fetching post feedback from metasmoke.", {
                                             'position': 'toast',
                                             'transient': true,
@@ -262,9 +274,10 @@
                                         });
                                         console.log(jqXHR.status, jqXHR.responseText);
                                     });
+                                } else {
+                                    fdsc.postFound = false;
                                 }
-                            })
-                            .error(function(jqXHR, textStatus, errorThrown) {
+                            }).error(function (jqXHR, textStatus, errorThrown) {
                                 StackExchange.helpers.showMessage($(".topbar"), "An error occurred fetching post ID from metasmoke - has the post been reported by Smokey?", {
                                     'position': 'toast',
                                     'transient': true,
@@ -279,25 +292,25 @@
                             $(document).off("DOMNodeInserted");
                         }
 
-                        $(".popup-submit").on("click", function(ev) {
+                        $(".popup-submit").on("click", function (ev) {
                             var selected = $("input[name=top-form]").filter(":checked");
                             var feedbackType;
-                            if (selected.val() == "PostSpam" || selected.val() == "PostOffensive") {
+                            if (selected.val() === "PostSpam" || selected.val() === "PostOffensive") {
                                 feedbackType = "tpu-";
-                            }
-                            else if (selected.val() == "AnswerNotAnAnswer") {
+                            } else if (selected.val() === "AnswerNotAnAnswer") {
                                 feedbackType = "naa-";
                             }
 
-                            if (feedbackType && $('#smokey-report').length > 0) {
+                            if (feedbackType && fdsc.currentPostId) {
                                 // because it looks like xdls returns null as a string for some reason
-                                if (!fdsc.msWriteToken || fdsc.msWriteToken == 'null') {
-                                    fdsc.getWriteToken(true, function() {
-                                        fdsc.sendFeedback(feedbackType, postId);
+                                if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                                    fdsc.getWriteToken(true, function () {
+                                        fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
                                     });
-                                }
-                                else {
-                                    fdsc.sendFeedback(feedbackType, postId);
+                                } else {
+                                    fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
+                                } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
+                                    // reporter stuff goes here
                                 }
                             }
 
@@ -317,7 +330,7 @@
     var sourceEl = document.createElement("script");
     sourceEl.type = "application/javascript";
     sourceEl.src = "https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js";
-    sourceEl.onload = function() {
+    sourceEl.onload = function () {
         var el = document.createElement("script");
         el.type = "application/javascript";
         el.text = "(" + userscript + ")(jQuery);";
