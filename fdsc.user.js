@@ -1,4 +1,3 @@
-
 // ==UserScript==
 // @name        Flag Dialog Smokey Controls
 // @description Adds Smokey status of a post and feedback options to flag dialogs.
@@ -25,6 +24,8 @@
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @grant       GM_xmlhttpRequest
 
+/*global StackExchange, console, reporter, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
+/*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
 
 (function() {
     'use strict';
