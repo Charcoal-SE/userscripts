@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name        Flag Dialog Smokey Controls
+// @namespace   https://github.com/Charcoal-SE/
 // @description Adds Smokey status of a post and feedback options to flag dialogs.
 // @author      ArtOfCode
 // @contributor angussidney
@@ -214,7 +215,6 @@
          * API key and write token; if you don't have these before this is called, get hold of them. A write token
          * can be obtained using `fdsc.getWriteToken()`.
          */
-
         fdsc.reportPost = function (postUrl) {
             console.log("reportPost");
             console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
