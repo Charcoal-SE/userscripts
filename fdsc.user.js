@@ -367,7 +367,13 @@
                                     });
                                 } else {
                                     fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
-                                } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
+                                }
+                            } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
+                                if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                                    fdsc.getWriteToken(true, function () {
+                                        fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
+                                    });
+                                } else {
                                     fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
                                 }
                             }
