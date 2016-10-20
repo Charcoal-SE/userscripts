@@ -294,7 +294,7 @@
                                     fdsc.postFound = true;
                                     $.ajax({
                                         'type': 'GET',
-                                        'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostIdpostId + '/feedback',
+                                        'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostId + '/feedback',
                                         'data': {
                                             'key': fdsc.metasmokeKey
                                         }
