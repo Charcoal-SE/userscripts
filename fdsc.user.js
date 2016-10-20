@@ -387,12 +387,13 @@
      */
     var sourceEl = document.createElement("script");
     sourceEl.type = "application/javascript";
-    sourceEl.src = "https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js";
+    sourceEl.id = "fdsc-script";
     sourceEl.onload = function () {
         var el = document.createElement("script");
         el.type = "application/javascript";
         el.text = "(" + userscript + ")(jQuery);";
         document.body.appendChild(el);
     };
+    sourceEl.src = "https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js";
     document.body.appendChild(sourceEl);
 })();
