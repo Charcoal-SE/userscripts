@@ -23,7 +23,7 @@
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // ==/UserScript==
 
-/*global StackExchange, console, reporter, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
+/*global StackExchange, console, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
 /*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
 
 (function () {
@@ -210,6 +210,63 @@
         };
 
         /*!
+         * Given the URL to a post not yet reported by Smokey, reports that post via the metasmoke API. Requires a valid
+         * API key and write token; if you don't have these before this is called, get hold of them. A write token
+         * can be obtained using `fdsc.getWriteToken()`.
+         */
+
+        fdsc.reportPost = function (postUrl) {
+            console.log("reportPost");
+            console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
+            var token;
+            if (typeof (fdsc.msWriteToken) === "object") {
+                token = fdsc.msWriteToken['value'];
+            } else {
+                token = fdsc.msWriteToken;
+            }
+
+            $.ajax({
+                'type': 'POST',
+                'url': 'https://metasmoke.erwaysoftware.com/api/w/post/report',
+                'data': {
+                    'post_link': postUrl,
+                    'key': fdsc.metasmokeKey,
+                    'token': token
+                }
+            }).done(function (data) {
+                StackExchange.helpers.showSuccessMessage($(".topbar"), "Reported post to metasmoke.", {
+                    'position': 'toast',
+                    'transient': true,
+                    'transientTimeout': 10000
+                });
+                console.log(data);
+            }).error(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 401) {
+                    StackExchange.helpers.showErrorMessage($(".topbar"), "Can't report post to metasmoke - not authenticated.", {
+                        'position': 'toast',
+                        'transient': true,
+                        'transientTimeout': 10000
+                    });
+                    console.error("fdsc.reportPost was called without having a valid write token");
+                    fdsc.confirm("Write token invalid. Attempt re-authentication?", function (result) {
+                        if (result) {
+                            fdsc.getWriteToken(false, function () {
+                                fdsc.sendFeedback(feedbackType, postId);
+                            });
+                        }
+                    });
+                } else {
+                    StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred while reporting the post to metasmoke.", {
+                        'position': 'toast',
+                        'transient': true,
+                        'transientTimeout': 10000
+                    });
+                    console.log(jqXHR.status, jqXHR.responseText);
+                }
+            });
+        };
+
+        /*!
          * Well this is a mess.
          */
         xdLocalStorage.init({
@@ -264,6 +321,7 @@
                                             } else {
                                                 fdsc.sendFeedback("fp-", fdsc.currentPostId);
                                             }
+                                            StackExchange.helpers.closePopups('#popup-flag-post');
                                             $("#feedback-fp").off("click");
                                         });
                                     }).error(function (jqXHR, textStatus, errorThrown) {
@@ -310,7 +368,7 @@
                                 } else {
                                     fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
                                 } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
-                                    // reporter stuff goes here
+                                    fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
                                 }
                             }
 
