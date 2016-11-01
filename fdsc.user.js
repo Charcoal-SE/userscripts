@@ -315,7 +315,7 @@
                                             console.log("Reporting as false positive");
                                             ev.preventDefault();
                                             if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
-                                                fdsc.getWriteToken(false, function () {
+                                                fdsc.getWriteToken(true, function () {
                                                     fdsc.sendFeedback("fp-", fdsc.currentPostId);
                                                 });
                                             } else {
