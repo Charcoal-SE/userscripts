@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution TinyGiant
-// @version     1.4.1
+// @version     1.4.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
