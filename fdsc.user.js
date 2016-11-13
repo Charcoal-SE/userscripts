@@ -184,6 +184,8 @@
                     'transientTimeout': 10000
                 });
                 console.log(data);
+                fdsc.currentPostId = Null;
+                fdsc.postFound = Null;
             }).error(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 401) {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
@@ -207,6 +209,8 @@
                     });
                     console.log(jqXHR.status, jqXHR.responseText);
                 }
+                fdsc.currentPostId = Null;
+                fdsc.postFound = Null;
             });
         };
 
@@ -382,6 +386,10 @@
                             $(".popup-submit").off("click");
                         });
                     });
+                });
+                $(".popup-close").on("click", function (clickEvent) {
+                    fdsc.currentPostId = Null;
+                    fdsc.postFound = Null;
                 });
             }
         });
