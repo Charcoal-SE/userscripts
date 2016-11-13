@@ -5,7 +5,7 @@
 // @author      ArtOfCode
 // @contributor angussidney
 // @contributor rene
-// @attribution TinyGiant
+// @attribution Brock Adams (https://github.com/BrockA)
 // @version     1.6.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
@@ -393,6 +393,22 @@
                 });
             }
         });
+        
+        /*!
+         * Show an error message if the answer has already been deleted.
+         */
+        var qstMtch = location.pathname.match(/\/questions\/(\d+)\/.+?\/(\d+)\/?$/);
+        if (qstMtch && qstMtch.length > 2) {
+            var ansId = qstMtch[2];
+            var ansPost = $("#answer-" + ansId);
+            if (ansPost.length === 0) {
+                StackExchange.helpers.showErrorMessage($(".topbar"), "The answer you are trying to find has been deleted.", {
+                    'position': 'toast',
+                    'transient': true,
+                    'transientTimeout': 10000
+                });
+            }
+        }
     };
 
     /*!
