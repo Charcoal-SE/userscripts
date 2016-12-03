@@ -22,6 +22,7 @@
 // @exclude     *://chat.stackoverflow.com/*
 // @exclude     *://blog.stackoverflow.com/*
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
+// @grant       none
 // ==/UserScript==
 
 /*global StackExchange, console, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
@@ -393,39 +394,39 @@
                     fdsc.postFound = null;
                 });
 
-                xdLocalStorage.getItem("fdsc_del_ans_preference", function (data) {
-                    fdsc.delAnsPreference = data['value'];
-                    console.log("fdsc.delAnsPreference: ", data['value']);
-                });
-
-                if (fdsc.delAnsPreference === null) {
-                    fdsc.confirm("Would you like to see a notification if an answer has already been deleted? (Press cancel if you already have Brock Adams' flagging tweaks.user.js installed to avoid duplicate notifications). ", function (result) {
-                        if (result) {
-                            fdsc.delAnsPreference = true;
-                            xdLocalStorage.setItem(fdsc_del_ans_preference, true);
-                        } else {
-                            fdsc.delAnsPreference = false;
-                            xdLocalStorage.setItem(fdsc_del_ans_preference, false);
-                        }
-                    });
-                }
-
                 /*!
                  * Show an error message if the answer has already been deleted.
                  */
 
-                var qstMtch = location.pathname.match(/\/questions\/(\d+)\/.+?\/(\d+)\/?$/);
-                if (qstMtch && qstMtch.length > 2 && fdsc.delAnsPreference === true) {
-                    var ansId = qstMtch[2];
-                    var ansPost = $("#answer-" + ansId);
-                    if (ansPost.length === 0) {
-                        StackExchange.helpers.showErrorMessage($(".topbar"), "The answer you are trying to find has been deleted.", {
-                            'position': 'toast',
-                            'transient': true,
-                            'transientTimeout': 10000
+                xdLocalStorage.getItem("fdsc_del_ans_preference", function (data) {
+                    fdsc.delAnsPreference = data['value'];
+                    console.log("fdsc.delAnsPreference: ", data['value']);
+
+                    if (fdsc.delAnsPreference == null) {
+                        fdsc.confirm("Would you like to see a notification if an answer has already been deleted? (Press cancel if you already have Brock Adams' flagging tweaks.user.js installed to avoid duplicate notifications). ", function (result) {
+                            if (result) {
+                                fdsc.delAnsPreference = true;
+                                xdLocalStorage.setItem("fdsc_del_ans_preference", true);
+                            } else {
+                                fdsc.delAnsPreference = false;
+                                xdLocalStorage.setItem("fdsc_del_ans_preference", false);
+                            }
                         });
                     }
-                }
+
+                    var questionMatch = location.pathname.match(/\/questions\/(\d+)\/.+?\/(\d+)\/?$/);
+                    if (questionMatch && questionMatch.length > 2 && fdsc.delAnsPreference) {
+                        var ansId = qstMtch[2];
+                        var ansPost = $("#answer-" + ansId);
+                        if (ansPost.length === 0) {
+                            StackExchange.helpers.showErrorMessage($(".topbar"), "The answer you are trying to find has been deleted.", {
+                                'position': 'toast',
+                                'transient': true,
+                                'transientTimeout': 10000
+                            });
+                        }
+                    }
+                });
             }
         });
     };
