@@ -27,7 +27,7 @@
 /*global StackExchange, console, fdsc, $, xdLocalStorage, GM_xmlhttpRequest, confirm */
 /*jslint indent: 4, maxerr: 50, browser: true, plusplus: true,  vars: true */
 
-(function() {
+(function () {
     'use strict';
 
     var userscript = function ($) {
@@ -184,8 +184,8 @@
                     'transientTimeout': 10000
                 });
                 console.log(data);
-                fdsc.currentPostId = Null;
-                fdsc.postFound = Null;
+                $(nodeEvent.target).attr("data-fdsc-ms-id", null)
+                fdsc.postFound = null;
             }).error(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 401) {
                     StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
@@ -209,8 +209,8 @@
                     });
                     console.log(jqXHR.status, jqXHR.responseText);
                 }
-                fdsc.currentPostId = Null;
-                fdsc.postFound = Null;
+                $(nodeEvent.target).attr("data-fdsc-ms-id", null);
+                fdsc.postFound = null;
             });
         };
 
@@ -294,11 +294,12 @@
                                 }
                             }).done(function (data) {
                                 if (data.length > 0 && data[0].id) {
-                                    fdsc.currentPostId = data[0].id;
+                                    $(nodeEvent.target).attr("data-fdsc-ms-id", data[0].id);
+                                    // fdsc.currentPostId = data[0].id;
                                     fdsc.postFound = true;
                                     $.ajax({
                                         'type': 'GET',
-                                        'url': 'https://metasmoke.erwaysoftware.com/api/post/' + fdsc.currentPostId + '/feedback',
+                                        'url': 'https://metasmoke.erwaysoftware.com/api/post/' + $(nodeEvent.target).attr("data-fdsc-ms-id") + '/feedback',
                                         'data': {
                                             'key': fdsc.metasmokeKey
                                         }
@@ -320,10 +321,10 @@
                                             ev.preventDefault();
                                             if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                                                 fdsc.getWriteToken(true, function () {
-                                                    fdsc.sendFeedback("fp-", fdsc.currentPostId);
+                                                    fdsc.sendFeedback("fp-", $(nodeEvent.target).attr("data-fdsc-ms-id"));
                                                 });
                                             } else {
-                                                fdsc.sendFeedback("fp-", fdsc.currentPostId);
+                                                fdsc.sendFeedback("fp-", $(nodeEvent.target).attr("data-fdsc-ms-id"));
                                             }
                                             StackExchange.helpers.closePopups('#popup-flag-post');
                                             $("#feedback-fp").off("click");
@@ -363,14 +364,14 @@
                                 feedbackType = "naa-";
                             }
 
-                            if (feedbackType && fdsc.currentPostId) {
+                            if (feedbackType && $(nodeEvent.target).attr("data-fdsc-ms-id")) {
                                 // because it looks like xdls returns null as a string for some reason
                                 if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
                                     fdsc.getWriteToken(true, function () {
-                                        fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
+                                        fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
                                     });
                                 } else {
-                                    fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
+                                    fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
                                 }
                             } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
                                 if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
@@ -388,27 +389,45 @@
                     });
                 });
                 $(".popup-close").on("click", function (clickEvent) {
-                    fdsc.currentPostId = Null;
-                    fdsc.postFound = Null;
+                    // fdsc.currentPostId = null;
+                    fdsc.postFound = null;
                 });
+
+                xdLocalStorage.getItem("fdsc_del_ans_preference", function (data) {
+                    fdsc.delAnsPreference = data['value'];
+                    console.log("fdsc.delAnsPreference: ", data['value']);
+                });
+
+                if (fdsc.delAnsPreference === null) {
+                    fdsc.confirm("Would you like to see a notification if an answer has already been deleted? (Press cancel if you already have Brock Adams' flagging tweaks.user.js installed to avoid duplicate notifications). ", function (result) {
+                        if (result) {
+                            fdsc.delAnsPreference = true;
+                            xdLocalStorage.setItem(fdsc_del_ans_preference, true);
+                        } else {
+                            fdsc.delAnsPreference = false;
+                            xdLocalStorage.setItem(fdsc_del_ans_preference, false);
+                        }
+                    });
+                }
+
+                /*!
+                 * Show an error message if the answer has already been deleted.
+                 */
+
+                var qstMtch = location.pathname.match(/\/questions\/(\d+)\/.+?\/(\d+)\/?$/);
+                if (qstMtch && qstMtch.length > 2 && fdsc.delAnsPreference === true) {
+                    var ansId = qstMtch[2];
+                    var ansPost = $("#answer-" + ansId);
+                    if (ansPost.length === 0) {
+                        StackExchange.helpers.showErrorMessage($(".topbar"), "The answer you are trying to find has been deleted.", {
+                            'position': 'toast',
+                            'transient': true,
+                            'transientTimeout': 10000
+                        });
+                    }
+                }
             }
         });
-        
-        /*!
-         * Show an error message if the answer has already been deleted.
-         */
-        var qstMtch = location.pathname.match(/\/questions\/(\d+)\/.+?\/(\d+)\/?$/);
-        if (qstMtch && qstMtch.length > 2) {
-            var ansId = qstMtch[2];
-            var ansPost = $("#answer-" + ansId);
-            if (ansPost.length === 0) {
-                StackExchange.helpers.showErrorMessage($(".topbar"), "The answer you are trying to find has been deleted.", {
-                    'position': 'toast',
-                    'transient': true,
-                    'transientTimeout': 10000
-                });
-            }
-        }
     };
 
     /*!
