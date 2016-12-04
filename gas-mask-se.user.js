@@ -4,17 +4,18 @@
 // @description   Automatically hides images from new users.
 // @run-at        document-start
 // @grant         none
-// @include       http://*stackexchange.com/*
-// @include       http://*stackoverflow.com/*
-// @include       http://*mathoverflow.com/*
-// @include       http://*serverfault.com/*
-// @include       http://*superuser.com/*
-// @include       http://*stackapps.com/*
-// @include       http://*askubuntu.com/*
-// @version       1.1
+// @include       *://*stackexchange.com/*
+// @include       *://*stackoverflow.com/*
+// @include       *://*mathoverflow.com/*
+// @include       *://*serverfault.com/*
+// @include       *://*superuser.com/*
+// @include       *://*stackapps.com/*
+// @include       *://*askubuntu.com/*
+// @version       1.2
 // ==/UserScript==
 
-if(~location.search.indexOf("smokeypost=true")){
+if(true || location.search.indexOf("smokeypost=true") !== -1){
+  console.log("gas mask engaging");
   var style = document.createElement("style");
   style.textContent = ".post-text img:not(.gasmask-treated){visibility:hidden}";
   document.head.append(style);
@@ -24,13 +25,15 @@ if(~location.search.indexOf("smokeypost=true")){
     var newImgs = document.querySelectorAll(".post-text img:not(.gasmask-treated)");
     [].forEach.call(newImgs, function(img){
       var origSrc = img.src;
-      img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Gas_mask.svg/200px-Gas_mask.svg.png"
+      img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Gas_mask.svg/200px-Gas_mask.svg.png";
       img.addEventListener("click", function handler(event){
         img.src = origSrc;
         img.removeEventListener("click", handler);
         event.preventDefault();
-      })
-      img.classList.add("gasmask-treated");
+      });
+      setTimeout(function(){
+        img.classList.add("gasmask-treated");
+      }, 1000);
     });
   }, 100);
 }
