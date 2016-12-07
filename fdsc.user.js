@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution TinyGiant
-// @version     1.5.1
+// @version     1.6.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -283,12 +283,13 @@
                             var container = $(clickEvent.target).parents(".question, .answer").first();
                             $.ajax({
                                 'type': 'GET',
-                                'url': 'https://metasmoke.erwaysoftware.com/api/posts/url',
+                                'url': 'https://metasmoke.erwaysoftware.com/api/posts/urls',
                                 'data': {
-                                    'url': fdsc.constructUrl(container),
+                                    'urls': fdsc.constructUrl(container),
                                     'key': fdsc.metasmokeKey
                                 }
                             }).done(function (data) {
+                                data = data['items'];
                                 if (data.length > 0 && data[0].id) {
                                     fdsc.currentPostId = data[0].id;
                                     fdsc.postFound = true;
