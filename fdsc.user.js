@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution TinyGiant
-// @version     1.6.1
+// @version     1.6.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -300,6 +300,8 @@
                                             'key': fdsc.metasmokeKey
                                         }
                                     }).done(function (data) {
+                                        data = data['items'];
+                                        
                                         // We use the first char of feedback to identify its type because that's what metasmoke does.
                                         var tps = data.filter(function (el) { return el.feedback_type.indexOf('t') === 0; }).length;
                                         var fps = data.filter(function (el) { return el.feedback_type.indexOf('f') === 0; }).length;
