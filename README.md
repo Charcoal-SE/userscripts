@@ -9,4 +9,5 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
  - [Gas Mask](https://github.com/Charcoal-SE/Userscripts/raw/master/gas-mask-se.user.js)
  - [Smokey Sidebar](https://github.com/Charcoal-SE/Userscripts/raw/master/smokey_sidebar.user.js) (currently broken, needs an update to work with OAuth)
  - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms_dark_theme.user.js)
- - [Spam Reporter](https://github.com/Charcoal-SE/Userscripts/raw/master/spam_reporter.user.js) (obselete, now integrated into FDSC. No longer maintained)
+ 
+ Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
