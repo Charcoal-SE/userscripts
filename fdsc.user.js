@@ -281,7 +281,7 @@
                     $(document).on("DOMNodeInserted", function (nodeEvent) {
                         if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") === "popup-flag-post") {
                             var container = $(clickEvent.target).parents(".question, .answer").first();
-                            $.ajax({
+                            fdsc.ajaxPromise = $.ajax({
                                 'type': 'GET',
                                 'url': 'https://metasmoke.erwaysoftware.com/api/posts/urls',
                                 'data': {
@@ -362,24 +362,26 @@
                                 feedbackType = "naa-";
                             }
 
-                            if (feedbackType && fdsc.currentPostId) {
-                                // because it looks like xdls returns null as a string for some reason
-                                if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
-                                    fdsc.getWriteToken(true, function () {
+                            fdsc.ajaxPromise.then(function() {
+                                if (feedbackType && fdsc.currentPostId) {
+                                    // because it looks like xdls returns null as a string for some reason
+                                    if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                                        fdsc.getWriteToken(true, function () {
+                                            fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
+                                        });
+                                    } else {
                                         fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
-                                    });
-                                } else {
-                                    fdsc.sendFeedback(feedbackType, fdsc.currentPostId);
-                                }
-                            } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
-                                if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
-                                    fdsc.getWriteToken(true, function () {
+                                    }
+                                } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
+                                    if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                                        fdsc.getWriteToken(true, function () {
+                                            fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
+                                        });
+                                    } else {
                                         fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
-                                    });
-                                } else {
-                                    fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
+                                    }
                                 }
-                            }
+                            });
 
                             // Likewise, remove this handler when it's finished to avoid multiple fires.
                             $(".popup-submit").off("click");
