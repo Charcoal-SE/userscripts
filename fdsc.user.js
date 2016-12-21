@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.6.1
+// @version     1.7.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -185,7 +185,7 @@
                     'transientTimeout': 10000
                 });
                 console.log(data);
-                $(nodeEvent.target).attr("data-fdsc-ms-id", null)
+                $(nodeEvent.target).attr("data-fdsc-ms-id", null);
                 fdsc.postFound = null;
             }).error(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 401) {
@@ -256,7 +256,7 @@
                     fdsc.confirm("Write token invalid. Attempt re-authentication?", function (result) {
                         if (result) {
                             fdsc.getWriteToken(false, function () {
-                                fdsc.sendFeedback(feedbackType, postId);
+                                fdsc.reportPost(postUrl);
                             });
                         }
                     });
@@ -286,17 +286,17 @@
                     $(document).on("DOMNodeInserted", function (nodeEvent) {
                         if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") === "popup-flag-post") {
                             var container = $(clickEvent.target).parents(".question, .answer").first();
-                            $.ajax({
+                            fdsc.ajaxPromise = $.ajax({
                                 'type': 'GET',
-                                'url': 'https://metasmoke.erwaysoftware.com/api/posts/url',
+                                'url': 'https://metasmoke.erwaysoftware.com/api/posts/urls',
                                 'data': {
-                                    'url': fdsc.constructUrl(container),
+                                    'urls': fdsc.constructUrl(container),
                                     'key': fdsc.metasmokeKey
                                 }
                             }).done(function (data) {
+                                data = data['items'];
                                 if (data.length > 0 && data[0].id) {
                                     $(nodeEvent.target).attr("data-fdsc-ms-id", data[0].id);
-                                    // fdsc.currentPostId = data[0].id;
                                     fdsc.postFound = true;
                                     $.ajax({
                                         'type': 'GET',
@@ -305,6 +305,8 @@
                                             'key': fdsc.metasmokeKey
                                         }
                                     }).done(function (data) {
+                                        data = data['items'];
+
                                         // We use the first char of feedback to identify its type because that's what metasmoke does.
                                         var tps = data.filter(function (el) { return el.feedback_type.indexOf('t') === 0; }).length;
                                         var fps = data.filter(function (el) { return el.feedback_type.indexOf('f') === 0; }).length;
@@ -365,24 +367,26 @@
                                 feedbackType = "naa-";
                             }
 
-                            if (feedbackType && $(nodeEvent.target).attr("data-fdsc-ms-id")) {
-                                // because it looks like xdls returns null as a string for some reason
-                                if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
-                                    fdsc.getWriteToken(true, function () {
+                            fdsc.ajaxPromise.then(function () {
+                                if (feedbackType && $(nodeEvent.target).attr("data-fdsc-ms-id")) {
+                                    // because it looks like xdls returns null as a string for some reason
+                                    if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                                        fdsc.getWriteToken(true, function () {
+                                            fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
+                                        });
+                                    } else {
                                         fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
-                                    });
-                                } else {
-                                    fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
-                                }
-                            } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
-                                if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
-                                    fdsc.getWriteToken(true, function () {
+                                    }
+                                } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
+                                    if (!fdsc.msWriteToken || fdsc.msWriteToken === 'null') {
+                                        fdsc.getWriteToken(true, function () {
+                                            fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
+                                        });
+                                    } else {
                                         fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
-                                    });
-                                } else {
-                                    fdsc.reportPost(fdsc.constructUrl(container)); // container variable defined on line 299
+                                    }
                                 }
-                            }
+                            });
 
                             // Likewise, remove this handler when it's finished to avoid multiple fires.
                             $(".popup-submit").off("click");
@@ -390,42 +394,7 @@
                     });
                 });
                 $(".popup-close").on("click", function (clickEvent) {
-                    // fdsc.currentPostId = null;
                     fdsc.postFound = null;
-                });
-
-                /*!
-                 * Show an error message if the answer has already been deleted.
-                 */
-
-                xdLocalStorage.getItem("fdsc_del_ans_preference", function (data) {
-                    fdsc.delAnsPreference = data['value'];
-                    console.log("fdsc.delAnsPreference: ", data['value']);
-
-                    if (fdsc.delAnsPreference == null) {
-                        fdsc.confirm("Would you like to see a notification if an answer has already been deleted? (Press cancel if you already have Brock Adams' flagging tweaks.user.js installed to avoid duplicate notifications). ", function (result) {
-                            if (result) {
-                                fdsc.delAnsPreference = true;
-                                xdLocalStorage.setItem("fdsc_del_ans_preference", true);
-                            } else {
-                                fdsc.delAnsPreference = false;
-                                xdLocalStorage.setItem("fdsc_del_ans_preference", false);
-                            }
-                        });
-                    }
-
-                    var questionMatch = location.pathname.match(/\/questions\/(\d+)\/.+?\/(\d+)\/?$/);
-                    if (questionMatch && questionMatch.length > 2 && fdsc.delAnsPreference) {
-                        var ansId = qstMtch[2];
-                        var ansPost = $("#answer-" + ansId);
-                        if (ansPost.length === 0) {
-                            StackExchange.helpers.showErrorMessage($(".topbar"), "The answer you are trying to find has been deleted.", {
-                                'position': 'toast',
-                                'transient': true,
-                                'transientTimeout': 10000
-                            });
-                        }
-                    }
                 });
             }
         });
