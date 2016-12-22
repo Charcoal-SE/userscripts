@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.8.1
+// @version     1.8.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -317,11 +317,11 @@
                                         var fps = data.filter(function (el) { return el.feedback_type.indexOf('f') === 0; }).length;
                                         var naa = data.filter(function (el) { return el.feedback_type.indexOf('n') === 0; }).length;
                                         if (tps === 0) {
-                                            $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + autoflagged + "</strong> - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>");
+                                            $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong> - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>");
                                         } else {
                                             // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
                                             // Hence, do not display the false positive button
-                                            $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + autoflagged + "</strong></div>");
+                                            $(".popup-actions").prepend("<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong></div>");
                                         }
                                         // On click of the false positive button
                                         $("#feedback-fp").on("click", function (ev) {
