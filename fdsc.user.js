@@ -222,8 +222,9 @@
          * can be obtained using `fdsc.getWriteToken()`.
          */
         fdsc.reportPost = function (postUrl) {
-            return if StackExchange.options.user.isModerator;
-            
+            if (StackExchange.options.user.isModerator) {
+                return;
+            }
             console.log("reportPost");
             console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
             var token;
