@@ -302,7 +302,7 @@
                                 if (data.length > 0 && data[0].id) {
                                     $(nodeEvent.target).attr("data-fdsc-ms-id", data[0].id);
                                     fdsc.postFound = true;
-                                    if (data[0].autoflagged === true) {
+                                    if (data[0].autoflagged['flagged'] === true) {
                                         fdsc.autoflagged = "autoflagged";
                                     } else {
                                         fdsc.autoflagged = "not autoflagged";
