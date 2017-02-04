@@ -29,7 +29,8 @@ if(true || location.search.indexOf("smokeypost=true") !== -1){
       var repElem = post.querySelector(".post-signature:last-child .reputation-score");
       if(repElem.textContent === "1"){
         var origSrc = img.src;
-        img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Gas_mask.svg/200px-Gas_mask.svg.png";
+        img.src = "https://upload.wikimedia.org/wikipedia/commons/5/57/Gas_mask.svg";
+        img.width = 200;
         img.addEventListener("click", function handler(event){
           img.src = origSrc;
           img.removeEventListener("click", handler);
