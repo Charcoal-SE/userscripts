@@ -10,7 +10,7 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
  - [Smokey Sidebar](https://github.com/Charcoal-SE/Userscripts/raw/master/smokey_sidebar.user.js) (currently broken, needs an update to work with OAuth)
  - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms_dark_theme.user.js)
  - [Hide topbar ads](https://github.com/Charcoal-SE/Userscripts/raw/master/hideads.user.js)
- - [Autoflagging information for Charcoal HQ](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging.user.js) (still in alpha)
+ - [Autoflagging information for Charcoal HQ](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging.user.js)
 
 
 Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
