@@ -4,6 +4,7 @@
 // @description Adds autoflagging information to Charcoal HQ
 // @author      Glorfindel
 // @contributor angussidney
+// @contributor J F
 // @version     0.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
