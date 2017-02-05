@@ -58,8 +58,7 @@
     // }
     if (data.autoflagged.flagged) {
       var count = data.autoflagged.names.length
-      if (count === 1) count = ''
-			html += count + " 🔥"
+			html += count + " ⚑"
 		}
     html = html.replace(/, $/, "")
 		html += " </span>";
