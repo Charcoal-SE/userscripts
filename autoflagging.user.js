@@ -46,6 +46,11 @@
 		// Remove previous information (like a spinner)
 		element.find(".ai-information").remove();
 
+    var currentUser = $("#active-user img").attr("title")
+    var iFlagged = data.autoflagged.names.filter(function (username) {
+      return username === currentUser
+    }).length
+
 		var html = "<span class=\"ai-information\">";
     // if (data.count_tp) {
     //   html += data.count_tp.toLocaleString() + " ✓, "
@@ -58,6 +63,9 @@
     // }
     if (data.autoflagged.flagged) {
       var count = data.autoflagged.names.length
+      if (iFlagged) {
+        html += '<strong>You autoflagged.</strong> '
+      }
 			html += count + " ⚑"
 		}
     html = html.replace(/, $/, "")
