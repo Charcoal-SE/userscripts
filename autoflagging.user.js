@@ -20,7 +20,7 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px } .ai-flag, .ai-spinner { height: 1.5em; }';
+	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px } .ai-information { -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
