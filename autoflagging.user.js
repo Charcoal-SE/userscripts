@@ -21,7 +21,7 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px } .ai-information { -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
+	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 2px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
@@ -52,7 +52,7 @@
       return username === currentUser
     }).length
 
-		var html = "<span class=\"ai-information\">";
+		var html = "<span class=\"ai-information\">&nbsp;";
     // if (data.count_tp) {
     //   html += data.count_tp.toLocaleString() + " ✓, "
     // }
@@ -63,11 +63,12 @@
     //   html += data.count_fp.toLocaleString() + " ✗, "
     // }
     if (data.autoflagged.flagged) {
-      var count = data.autoflagged.names.length
       if (iFlagged) {
-        html += '<strong>You autoflagged.</strong> '
+        html += "<strong>You autoflagged.</strong> "
       }
-			html += count + " ⚑"
+			html += data.autoflagged.names.length + " ⚑"
+    } else {
+      html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>"
 		}
     html = html.replace(/, $/, "")
 		html += " </span>";
