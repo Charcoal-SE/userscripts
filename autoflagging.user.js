@@ -20,7 +20,11 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information { position: absolute; bottom: 1px; right: 3px; } .ai-flag, .ai-spinner { height: 1.5em; }';
+	link.href = 'data:text/css, ' +
+    '.ai-information { position: absolute; bottom: 1px; right: -25px; }' +
+    '.ai-information>span { display: inline-block; width: 0; position: absolute; transform: rotate(90deg); transform-origin: bottom; }' +
+    '.ai-information>span>span { display: inline-block; margin-left: -1.5em }' +
+    '.ai-flag, .ai-spinner { height: 1.5em; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
@@ -49,17 +53,16 @@
 		var html = "<span class=\"ai-information\">";
 		if (data.flagged) {
 			// TODO: ensure that this is nicely displayed when more than one flag is cast
-			html += data.names + " <img class=\"ai-flag\" src=\"//i.stack.imgur.com/CpHts.png\" title=\"This post has been autoflagged\"/>";
+			html += "<img class=\"ai-flag\" src=\"//i.stack.imgur.com/CpHts.png\" title=\"This post has been autoflagged\"/><span style=\"display: none\"><span>" + data.names + "</span></span>";
 		} else {
 			html += "<img class=\"ai-flag\" src=\"//i.stack.imgur.com/djVc2.png\" title=\"This post has not been autoflagged\"/>";
 		}
 		html += "</span>";
 		element.append(html);
 		element.parents(".message").on("mouseenter", function () {
-			var $meta = $(this).find(".meta")
-			$(this).find(".ai-information").css("margin-right", $meta.width() + +$meta.css("padding-left").slice(0, -2))
+			$(this).find(".ai-information>span").css('display', '')
 		}).on("mouseleave", function () {
-			$(this).find(".ai-information").css("margin-right", 0)
+      $(this).find(".ai-information>span").css('display', 'none ')
 		});
 	};
 
