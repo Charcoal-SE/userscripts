@@ -46,12 +46,11 @@
 		element.find(".ai-information").remove();
 		
 		var html = "<span class=\"ai-information\">";
-		html += "<img class=\"ai-flag\" src=\"";
 		if (data.flagged) {
 			// TODO: ensure that this is nicely displayed when more than one flag is cast
-			html += "//i.stack.imgur.com/CpHts.png\" title=\"This post has been autoflagged\"/>" + ": " + data.names;
+			html += data.names + " <img class=\"ai-flag\" src=\"//i.stack.imgur.com/CpHts.png\" title=\"This post has been autoflagged\"/>";
 		} else {
-			html += "//i.stack.imgur.com/djVc2.png\" title=\"This post has not been autoflagged\"/>";
+			html += "<img class=\"ai-flag\" src=\"//i.stack.imgur.com/djVc2.png\" title=\"This post has not been autoflagged\"/>";
 		}
 		html += "</span>";
 		element.append(html);
