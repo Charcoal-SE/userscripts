@@ -5,7 +5,7 @@
 // @author      Glorfindel
 // @contributor angussidney
 // @contributor J F
-// @version     0.3
+// @version     0.4
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -47,34 +47,34 @@
 		// Remove previous information (like a spinner)
 		element.find(".ai-information").remove();
 
-    var currentUser = $("#active-user img").attr("title")
-    var iFlagged = data.autoflagged.names.filter(function (username) {
-      return username === currentUser
-    }).length
+		var currentUser = $("#active-user img").attr("title")
+		var iFlagged = data.autoflagged.names.filter(function (username) {
+			return username === currentUser
+		}).length
 
 		var html = "<span class=\"ai-information\">&nbsp;";
-    // if (data.count_tp) {
-    //   html += data.count_tp.toLocaleString() + " ✓, "
-    // }
-    // if (data.count_naa) {
-    //   html += data.count_naa.toLocaleString() + " 💩, "
-    // }
-    // if (data.count_fp) {
-    //   html += data.count_fp.toLocaleString() + " ✗, "
-    // }
-    if (data.autoflagged.flagged) {
-      if (iFlagged) {
-        html += "<strong>You autoflagged.</strong> "
-      }
+		// if (data.count_tp) {
+		//   html += data.count_tp.toLocaleString() + " ✓, "
+		// }
+		// if (data.count_naa) {
+		//   html += data.count_naa.toLocaleString() + " 💩, "
+		// }
+		// if (data.count_fp) {
+		//   html += data.count_fp.toLocaleString() + " ✗, "
+		// }
+		if (data.autoflagged.flagged) {
+			if (iFlagged) {
+				html += "<strong>You autoflagged.</strong> "
+			}
 			html += data.autoflagged.names.length + " ⚑"
-    } else {
-      html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>"
+		} else {
+			html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>"
 		}
-    html = html.replace(/, $/, "")
+		html = html.replace(/, $/, "")
 		html += " </span>";
 		element.append(html);
-    element.parents(".message").find(".meta .ai-information").remove()
-    element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.names.join(", ")))
+		element.parents(".message").find(".meta .ai-information").remove()
+		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.names.join(", ")))
 	};
 
 	/*!
