@@ -64,7 +64,7 @@
 		// }
 		if (data.autoflagged.flagged) {
 			if (iFlagged) {
-				html += "<strong>You autoflagged.</strong> "
+				html += "<strong class=\"you-flagged\">You autoflagged.</strong> "
 			}
 			html += data.autoflagged.names.length + " ⚑"
 		} else {
