@@ -31,6 +31,7 @@
 	autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
 	autoflagging.prefix = "//m.erwaysoftware.com/posts/by-url?url=";
 	autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
+  autoflagging.notify = Notifier().notify
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
 	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004
 
@@ -92,7 +93,6 @@
 	 */
 	autoflagging.callAPI = function (urls, page) {
 		//console.log("Call API");
-		// TODO: error handling
 		var autoflagData = {};
 		var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
 		//console.log("URL: " + url);
@@ -115,7 +115,9 @@
 				// There are more items on the next 'page'
 				autoflagging.callAPI(urls, ++page);
 			}
-		});
+		}).fail(function(err) {
+      autoflagging.notify('Failed to load data!')
+    });
 	};
 
 	// Wait for the chat messages to be loaded.
