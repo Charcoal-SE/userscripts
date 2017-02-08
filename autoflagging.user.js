@@ -21,7 +21,7 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 2px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
+	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
@@ -33,7 +33,7 @@
 	autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
 	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004
-	
+
 	// Username substitutions - for some users, their MS username is different from the chat username
 	// Format: <chat username>: <MS username>
 	autoflagging.usernameSubstitutions = {
