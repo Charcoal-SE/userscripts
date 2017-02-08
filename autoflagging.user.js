@@ -34,14 +34,6 @@
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
 	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004
 
-	// Username substitutions - for some users, their MS username is different from the chat username
-	// Format: <chat username>: <MS username>
-	autoflagging.usernameSubstitutions = {
-		"M.A.R.": "MAR",
-		"Thomas Ward": "teward"
-	};
-	// NICETOHAVE: replace this with an MS authentication, so that the MS username can be stored locally
-
 	// Error handling
 	autoflagging.notify = Notifier().notify;
 
@@ -63,8 +55,22 @@
 		if (typeof autoflagging.usernameSubstitutions[currentUser] != 'undefined') {
 			currentUser = autoflagging.usernameSubstitutions[currentUser];
 		}
-		var youFlagged = data.autoflagged.names.filter(function (username) {
-			return username === currentUser;
+    var site
+    switch (location.hostname) {
+      case "chat.stackexchange.com":
+        site = "stackexchange"
+        break;
+      case "chat.meta.stackexchange.com":
+        site = "meta_stackexchange"
+        break;
+      case "chat.stackoverflow.com":
+        site = "stackoverflow"
+        break;
+      default:
+        console.error("Invalid site for autoflagging: " + location.hostname)
+    }
+		var youFlagged = data.autoflagged.users.filter(function (user) {
+			return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
 		}).length;
 
 		// Construct HTML to add to chat message
@@ -82,7 +88,7 @@
 			if (youFlagged) {
 				html += "<strong class=\"you-flagged\">You autoflagged.</strong> ";
 			}
-			html += data.autoflagged.names.length + " ⚑";
+			html += data.autoflagged.users.length + " ⚑";
 		} else {
 			html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>";
 		}
@@ -90,7 +96,7 @@
 		html += " </span>";
 		element.append(html);
 		element.parents(".message").find(".meta .ai-information").remove();
-		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.names.join(", ")));
+		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.users.map(function (user) { return user.username }).join(", ")));
 	};
 
 	/*!
