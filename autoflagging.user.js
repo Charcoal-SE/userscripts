@@ -52,9 +52,6 @@
 
 		// Determine if you (i.e. the current user) autoflagged this post.
 		var currentUser = $("#active-user img").attr("title");
-		if (typeof autoflagging.usernameSubstitutions[currentUser] != 'undefined') {
-			currentUser = autoflagging.usernameSubstitutions[currentUser];
-		}
     var site
     switch (location.hostname) {
       case "chat.stackexchange.com":
