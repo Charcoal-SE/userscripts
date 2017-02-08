@@ -5,7 +5,7 @@
 // @author      Glorfindel
 // @contributor angussidney
 // @contributor J F
-// @version     0.4
+// @version     0.4.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -31,9 +31,19 @@
 	autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
 	autoflagging.prefix = "//m.erwaysoftware.com/posts/by-url?url=";
 	autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
-  autoflagging.notify = Notifier().notify
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
 	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004
+	
+	// Username substitutions - for some users, their MS username is different from the chat username
+	// Format: <chat username>: <MS username>
+	autoflagging.usernameSubstitutions = {
+		"M.A.R.": "MAR",
+		"Thomas Ward": "teward"
+	};
+	// NICETOHAVE: replace this with an MS authentication, so that the MS username can be stored locally
+
+	// Error handling
+	autoflagging.notify = Notifier().notify;
 
 	// TODO: Sometimes, Smokey reports don't contain an MS link (because of the chat message limit length).
 	// We either need to find a work-around, e.g. by using the direct link in the chat message,
@@ -48,11 +58,16 @@
 		// Remove previous information (like a spinner)
 		element.find(".ai-information").remove();
 
-		var currentUser = $("#active-user img").attr("title")
-		var iFlagged = data.autoflagged.names.filter(function (username) {
-			return username === currentUser
-		}).length
+		// Determine if you (i.e. the current user) autoflagged this post.
+		var currentUser = $("#active-user img").attr("title");
+		if (typeof autoflagging.usernameSubstitutions[currentUser] != 'undefined') {
+			currentUser = autoflagging.usernameSubstitutions[currentUser];
+		}
+		var youFlagged = data.autoflagged.names.filter(function (username) {
+			return username === currentUser;
+		}).length;
 
+		// Construct HTML to add to chat message
 		var html = "<span class=\"ai-information\">&nbsp;";
 		// if (data.count_tp) {
 		//   html += data.count_tp.toLocaleString() + " ✓, "
@@ -64,18 +79,18 @@
 		//   html += data.count_fp.toLocaleString() + " ✗, "
 		// }
 		if (data.autoflagged.flagged) {
-			if (iFlagged) {
-				html += "<strong class=\"you-flagged\">You autoflagged.</strong> "
+			if (youFlagged) {
+				html += "<strong class=\"you-flagged\">You autoflagged.</strong> ";
 			}
-			html += data.autoflagged.names.length + " ⚑"
+			html += data.autoflagged.names.length + " ⚑";
 		} else {
-			html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>"
+			html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>";
 		}
-		html = html.replace(/, $/, "")
+		html = html.replace(/, $/, "");
 		html += " </span>";
 		element.append(html);
-		element.parents(".message").find(".meta .ai-information").remove()
-		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.names.join(", ")))
+		element.parents(".message").find(".meta .ai-information").remove();
+		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.names.join(", ")));
 	};
 
 	/*!
@@ -115,9 +130,9 @@
 				// There are more items on the next 'page'
 				autoflagging.callAPI(urls, ++page);
 			}
-		}).fail(function(err) {
-      autoflagging.notify('Failed to load data!')
-    });
+		}).fail(function(error) {
+			autoflagging.notify('Failed to load data: ' + error);
+		});
 	};
 
 	// Wait for the chat messages to be loaded.
@@ -164,8 +179,9 @@
 					$.get(url, function(data) {
 						// Decorate report
 						autoflagging.decorate(anchor.parent(), data.items[0]);
+					}).fail(function(error) {
+						autoflagging.notify('Failed to load data: ' + error);
 					});
-					// TODO: error handling; if the call fails (because autoflagging hasn't completed), try again after waiting a little while
 				}, 5000);
 			}, 500);
 		}
