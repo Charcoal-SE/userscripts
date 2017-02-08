@@ -44,7 +44,7 @@ $.get('https://api.github.com/repos/charcoal-se/userscripts/git/trees/master?rec
               .append($('<summary></summary>').append(
                 $('<a></a>')
                   .text(meta.name.join(', ') + authorInfo)
-                  .attr('href', file.path)
+                  .attr('href', 'https://github.com/Charcoal-SE/userscripts/raw/master/' + file.path)
                   .css({
                     marginLeft: '0.5em'
                   })
