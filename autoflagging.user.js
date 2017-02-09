@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Autoflagging Information
+// @name        Autoflagging Information & More
 // @namespace   https://github.com/Charcoal-SE/
 // @description Adds autoflagging information to Charcoal HQ
 // @author      Glorfindel
