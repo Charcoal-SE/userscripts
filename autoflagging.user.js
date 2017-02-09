@@ -33,7 +33,7 @@
 	autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
 	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
-	
+
 	// Error handling
 	autoflagging.notify = Notifier().notify;
 
@@ -113,6 +113,9 @@
 	 */
 	autoflagging.callAPI = function (urls, page) {
 		//console.log("Call API");
+    if (page == null) {
+      page = 1;
+    }
 		var autoflagData = {};
 		var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
 		//console.log("URL: " + url);
@@ -157,10 +160,10 @@
 			});
 
 			// MS API call
-			autoflagging.callAPI(urls, 1);
+			autoflagging.callAPI(urls);
 		}
 	});
-	
+
 	// Listen to MS events
 	autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
 	autoflagging.socket.onmessage = function(message) {
@@ -189,7 +192,7 @@
 				autoflagging.decorate($(selector).parent(), data);
 			} else if (typeof deletionLog != 'undefined') {
 				// Deletion log
-				//console.log(deletionLog.post_link + ' deleted');	    	
+				//console.log(deletionLog.post_link + ' deleted');
 				var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + deletionLog.post_link + "']";
 				$(selector).parents('.message').toggleClass('ai-deleted');
 			} else if (typeof feedback != 'undefined') {
