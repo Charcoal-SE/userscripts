@@ -5,7 +5,7 @@
 // @author      Glorfindel
 // @contributor angussidney
 // @contributor J F
-// @version     0.4.1
+// @version     0.5
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -32,16 +32,14 @@
 	autoflagging.prefix = "//m.erwaysoftware.com/posts/by-url?url=";
 	autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
-	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004
+	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
 	
-	// Username substitutions - for some users, their MS username is different from the chat username
-	// Format: <chat username>: <MS username>
-	autoflagging.usernameSubstitutions = {
-		"M.A.R.": "MAR",
-		"Thomas Ward": "teward"
-	};
-	// NICETOHAVE: replace this with an MS authentication, so that the MS username can be stored locally
-
+	// Determine active user ID
+	autoflagging.activeUserID = /\buser-(\d+)\b/.exec($("#active-user").attr("class"));
+	if (autoflagging.activeUserID != null) {
+		autoflagging.activeUserID = autoflagging.activeUserID[1];
+	}
+	
 	// Error handling
 	autoflagging.notify = Notifier().notify;
 
@@ -52,20 +50,16 @@
 	/*!
 	 * Decorates a jQuery DOM element with autoflagging information from the data.
 	 *
-	 * The parameter 'data' is supposed to have a boolean property 'flagged', and a property 'names' that will be displayed.
+	 * The parameter 'data' is supposed to have a boolean property 'flagged', and a property 'users' with user information.
 	 */
 	autoflagging.decorate = function (element, data) {
 		// Remove previous information (like a spinner)
 		element.find(".ai-information").remove();
 
-		// Determine if you (i.e. the current user) autoflagged this post.
-		var currentUser = $("#active-user img").attr("title");
-		if (typeof autoflagging.usernameSubstitutions[currentUser] != 'undefined') {
-			currentUser = autoflagging.usernameSubstitutions[currentUser];
-		}
-		var youFlagged = data.autoflagged.names.filter(function (username) {
-			return username === currentUser;
-		}).length;
+		// Determine if you (i.e. the active user) autoflagged this post.
+		var youFlagged = data.users.filter(function (user) {
+			return user.stackexchange_chat_id == autoflagging.activeUserID;
+		}).length == 1;
 
 		// Construct HTML to add to chat message
 		var html = "<span class=\"ai-information\">&nbsp;";
@@ -78,11 +72,11 @@
 		// if (data.count_fp) {
 		//   html += data.count_fp.toLocaleString() + " ✗, "
 		// }
-		if (data.autoflagged.flagged) {
+		if (data.flagged) {
 			if (youFlagged) {
 				html += "<strong class=\"you-flagged\">You autoflagged.</strong> ";
 			}
-			html += data.autoflagged.names.length + " ⚑";
+			html += data.names.length + " ⚑";
 		} else {
 			html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>";
 		}
@@ -90,7 +84,7 @@
 		html += " </span>";
 		element.append(html);
 		element.parents(".message").find(".meta .ai-information").remove();
-		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.autoflagged.names.join(", ")));
+		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.names.join(", ")));
 	};
 
 	/*!
@@ -123,7 +117,7 @@
 				// TODO: show flag weight - first, the API needs to be changed
 				if (typeof autoflagData[postURL] == 'undefined')
 					return;
-				autoflagging.decorate($(this).parent(), autoflagData[postURL]);
+				autoflagging.decorate($(this).parent(), autoflagData[postURL].autoflagged);
 			});
 
 			if (data.has_more) {
@@ -155,7 +149,52 @@
 			autoflagging.callAPI(urls, 1);
 		}
 	});
+	
+	// Listen to MS events
+	autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
+	autoflagging.socket.onmessage = function(message) {
+		// Parse message
+		var jsonData = JSON.parse(message.data);
+		switch (jsonData.type) {
+		case "confirm_subscription":
+		case "ping":
+		case "welcome":
+			break;
+		default:
+			// Analyze socket message
+			var flagLog = jsonData.message.flag_log;
+			var deletionLog = jsonData.message.deletion_log;
+			var feedback = jsonData.message.feedback;
+			if (typeof flagLog != 'undefined') {
+				// Autoflagging information
+				//console.log(flagLog.user_name + ' autoflagged ' + flagLog.post_link);
+				var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + flagLog.post_link + "']";
+				var data = {};
+				data.flagged = true;
+				data.names = [flagLog.user_name];
+				data.users = [flagLog.user];
+				console.log("Decorating from socket");
+				// TODO: this is going to overwrite previous autoflags when we start flagging multiple times
+				autoflagging.decorate($(selector).parent(), data);
+			} else if (typeof deletionLog != 'undefined') {
+				// Deletion log
+				//console.log(deletionLog.post_link + ' deleted');	    	
+				var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + deletionLog.post_link + "']";
+				$(selector).parent().css('opacity', '0.5');
+			} else if (typeof feedback != 'undefined') {
+				// Feedback
+				// TODO: show realtime feedback
+				//console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link); // feedback_type
+			}
+			break;
+		}
+	};
+	autoflagging.socket.onopen = function() {
+		// Send authentication
+		autoflagging.socket.send('{"identifier": "{\\"channel\\":\\"ApiChannel\\",\\"key\\":\\"' + autoflagging.key + '\\"}", "command": "subscribe"}');
+	};
 
+	/* TODO: the spinner is still nice to display
 	// Subscribe to chat events
 	CHAT.addEventHandlerHook(function(e, n, s) {
 		if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
@@ -178,7 +217,7 @@
 					//console.log("URL: " + url);
 					$.get(url, function(data) {
 						// Decorate report
-						autoflagging.decorate(anchor.parent(), data.items[0]);
+						autoflagging.decorate(anchor.parent(), data.items[0].autoflagged);
 					}).fail(function(error) {
 						autoflagging.notify('Failed to load data: ' + error);
 					});
@@ -186,4 +225,5 @@
 			}, 500);
 		}
 	});
+	*/
 })();
