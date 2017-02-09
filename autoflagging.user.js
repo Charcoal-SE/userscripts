@@ -21,7 +21,7 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted:not(:hover) { opacity: 0.5; }';
+	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted { transition: opacity 0.4s; } .ai-deleted:not(:hover) { opacity: 0.5; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
@@ -191,7 +191,7 @@
 				// Deletion log
 				//console.log(deletionLog.post_link + ' deleted');	    	
 				var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + deletionLog.post_link + "']";
-				$(selector).parent().toggleClass('ai-deleted');
+				$(selector).parents('.message').toggleClass('ai-deleted');
 			} else if (typeof feedback != 'undefined') {
 				// Feedback
 				// TODO: show realtime feedback
