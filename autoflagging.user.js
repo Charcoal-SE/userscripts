@@ -21,7 +21,7 @@
   var link = window.document.createElement('link');
   link.rel = 'stylesheet';
   link.type = 'text/css';
-  link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted { transition: opacity 0.4s; } .ai-deleted:not(:hover) { opacity: 0.5; }';
+  link.href = 'data:text/css, .ai-information:not(.inline) { position: absolute; right: 3px; bottom: 0 } .ai-information { font-size: 11px; -webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted { transition: opacity 0.4s; } .ai-deleted:not(:hover) { opacity: 0.5; }';
   document.getElementsByTagName("head")[0].appendChild(link);
 
   // Constants
@@ -45,6 +45,7 @@
    * Decorates a jQuery DOM element with autoflagging information from the data.
    *
    * The parameter 'data' is supposed to have a boolean property 'flagged', and a property 'users' with user information.
+   * `element` is a message (i.e. has the message class)
    */
   autoflagging.decorate = function (element, data) {
     // Remove previous information (like a spinner)
@@ -92,8 +93,8 @@
     html = html.replace(/, $/, "");
     html += " </span>";
     element.append(html);
-    element.parents(".message").find(".meta .ai-information").remove();
-    element.parents(".message").find(".meta").append(
+    element.find(".meta .ai-information").remove();
+    element.find(".meta").append(
       $(html).addClass("inline").attr("title", data.users.map(function (user) { return user.username }).join(", "))
     );
   };
@@ -131,11 +132,9 @@
         // TODO: show flag weight - first, the API needs to be changed
         if (typeof autoflagData[postURL] == 'undefined')
           return;
-        autoflagging.decorate($(this).parent(), autoflagData[postURL].autoflagged);
+        autoflagging.decorate($(this).parents(".message"), autoflagData[postURL].autoflagged);
         // Post deleted?
         if (autoflagData[postURL].deleted_at != null) {
-          // TODO: right now, the icon for a successful autoflag on a deleted post looks
-          // the same as the icon for no autoflags. It would be nice to keep it black.
           $(this).parents('.content').toggleClass('ai-deleted');
         }
       });
@@ -169,7 +168,7 @@
       autoflagging.callAPI(urls);
     }
   });
-  
+
   // Add autoflagging information to older messages as they are loaded
   $("#getmore, #getmore-mine").click(function () {
     $(this).one("DOMSubtreeModified", function () {
@@ -242,7 +241,7 @@
     // Send authentication
     autoflagging.socket.send('{"identifier": "{\\"channel\\":\\"ApiChannel\\",\\"key\\":\\"' + autoflagging.key + '\\"}", "command": "subscribe"}');
   };
-  
+
   // Sometimes, autoflagging information arrives before the chat message.
   // The code below makes sure the queued decorations are executed.
   CHAT.addEventHandlerHook(function (e) {
@@ -260,7 +259,7 @@
   // TODO: the code below is obsolete thanks to the MS websocket. However, the spinner can
   // still be displayed for new chat messages. Also, we need a realtime update for posts
   // which *aren't* autoflagged.
-  /* 
+  /*
   // Subscribe to chat events
   CHAT.addEventHandlerHook(function(e, n, s) {
     if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
