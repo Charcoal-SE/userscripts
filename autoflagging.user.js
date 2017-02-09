@@ -5,7 +5,7 @@
 // @author      Glorfindel
 // @contributor angussidney
 // @contributor J F
-// @version     0.5
+// @version     0.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -21,7 +21,7 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 2px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
+	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
@@ -33,12 +33,6 @@
 	autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
 	// MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
 	// Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
-	
-	// Determine active user ID
-	autoflagging.activeUserID = /\buser-(\d+)\b/.exec($("#active-user").attr("class"));
-	if (autoflagging.activeUserID != null) {
-		autoflagging.activeUserID = autoflagging.activeUserID[1];
-	}
 	
 	// Error handling
 	autoflagging.notify = Notifier().notify;
@@ -56,10 +50,26 @@
 		// Remove previous information (like a spinner)
 		element.find(".ai-information").remove();
 
-		// Determine if you (i.e. the active user) autoflagged this post.
+		// Determine if you (i.e. the current user) autoflagged this post.
+		var currentUser = $("#active-user img").attr("title");
+		var site = "";
+		switch (location.hostname) {
+			case "chat.stackexchange.com":
+				site = "stackexchange";
+				break;
+			case "chat.meta.stackexchange.com":
+				site = "meta_stackexchange":
+				break;
+			case "chat.stackoverflow.com":
+				site = "stackoverflow":
+				break;
+			default:
+				console.error("Invalid site for autoflagging: " + location.hostname);
+				break;
+		}
 		var youFlagged = data.users.filter(function (user) {
-			return user.stackexchange_chat_id == autoflagging.activeUserID;
-		}).length == 1;
+			return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
+		}).length;
 
 		// Construct HTML to add to chat message
 		var html = "<span class=\"ai-information\">&nbsp;";
@@ -76,7 +86,7 @@
 			if (youFlagged) {
 				html += "<strong class=\"you-flagged\">You autoflagged.</strong> ";
 			}
-			html += data.names.length + " ⚑";
+			html += data.users.length + " ⚑";
 		} else {
 			html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>";
 		}
@@ -84,7 +94,9 @@
 		html += " </span>";
 		element.append(html);
 		element.parents(".message").find(".meta .ai-information").remove();
-		element.parents(".message").find(".meta").append($(html).addClass("inline").attr("title", data.names.join(", ")));
+		element.parents(".message").find(".meta").append(
+			$(html).addClass("inline").attr("title", data.users.map(function (user) { return user.username }).join(", "))
+		);
 	};
 
 	/*!
