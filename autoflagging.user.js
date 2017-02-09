@@ -164,7 +164,7 @@
     }
   });
   $("#getmore, #getmore-mine").click(function () {
-    setTimeout(function () {
+    $(this).one("DOMSubtreeModified", function () {
       var urls = "";
       $(autoflagging.selector).filter(function () {
         return !$(this).parents('.message').find('.ai-information').length
@@ -176,7 +176,7 @@
       });
       // MS API call
       autoflagging.callAPI(urls);
-    }, 1000)
+    })
   })
 
   // Listen to MS events
