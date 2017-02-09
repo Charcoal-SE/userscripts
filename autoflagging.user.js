@@ -21,7 +21,30 @@
   var link = window.document.createElement('link');
   link.rel = 'stylesheet';
   link.type = 'text/css';
-  link.href = 'data:text/css, .ai-information:not(.inline) { position: absolute; right: 3px; bottom: 0 } .ai-information { font-size: 11px; -webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted { transition: opacity 0.4s; } .ai-deleted:not(:hover) { opacity: 0.5; }';
+  link.href = 'data:text/css,' + [
+    '.ai-information:not(.inline) {',
+      'position: absolute',
+      'right: 3px',
+      'bottom: 0',
+    '}',
+    '.ai-information {',
+      'font-size: 11px',
+      '-webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none',
+      'cursor: default',
+    '}',
+    '.ai-spinner {',
+      'height: 1.5em',
+    '}',
+    '.ai-deleted, .ai-flag-count.ai-not-autoflagged {',
+      'transition: opacity 0.4s',
+    '}',
+    '.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {',
+      'opacity: 0.5',
+    '}',
+    '.ai-flag-count::after {',
+      'content: " ⚑"',
+    '}'
+  ].join(';\n').replace(/([{}]);/, "$1");
   document.getElementsByTagName("head")[0].appendChild(link);
 
   // Constants
@@ -47,9 +70,12 @@
    * The parameter 'data' is supposed to have a boolean property 'flagged', and a property 'users' with user information.
    * `element` is a message (i.e. has the message class)
    */
+  autoflagging.decorateMessage = function (message, data) {
+    autoflagging.decorate(message.children(".ai-information"), data)
+    autoflagging.decorate(message.find(".meta .ai-information"), data)
+  }
   autoflagging.decorate = function (element, data) {
-    // Remove previous information (like a spinner)
-    element.find(".ai-information").remove();
+    element.find(".ai-spinner").remove();
 
     // Determine if you (i.e. the current user) autoflagged this post.
     var site = "";
@@ -67,46 +93,62 @@
         console.error("Invalid site for autoflagging: " + location.hostname);
         break;
     }
-    var youFlagged = data.users.filter(function (user) {
+    data.youFlagged = data.users.filter(function (user) {
       return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
     }).length == 1;
 
-    // Construct HTML to add to chat message
-    var html = "<span class=\"ai-information\">&nbsp;";
-    // if (data.count_tp) {
-    //   html += data.count_tp.toLocaleString() + " ✓, "
-    // }
-    // if (data.count_naa) {
-    //   html += data.count_naa.toLocaleString() + " 💩, "
-    // }
-    // if (data.count_fp) {
-    //   html += data.count_fp.toLocaleString() + " ✗, "
-    // }
-    if (data.flagged) {
-      if (youFlagged) {
-        html += "<strong class=\"you-flagged\">You autoflagged.</strong> ";
-      }
-      html += data.users.length + " ⚑";
-    } else {
-      html += "<span style=\"opacity: 0.5\" title=\"Not autoflagged\">⚑</span>";
+    var names = {
+      before: "prepend",
+      after: "append"
     }
-    html = html.replace(/, $/, "");
-    html += " </span>";
-    element.append(html);
-    element.find(".meta .ai-information").remove();
-    element.find(".meta").append(
-      $(html).addClass("inline").attr("title", data.users.map(function (user) { return user.username }).join(", "))
-    );
+
+    Object.keys(autoflagging.decorate).forEach(function (key) {
+      var f = autoflagging.decorate[key]
+      if (!element.find(".ai-" + key).length) {
+        element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key))
+      }
+      autoflagging.decorate[key](element.find(".ai-" + key), data)
+    })
+
   };
+  /* “Spec” for methods of autoflagging.decorate:
+   * Takes an element to update.
+   * data is from the API.
+   * Properties:
+   * * location [required] ("before" | "after") Where to add the element if it
+   *   doesn’t exist
+   * * el [optional] the name of the element to create.
+  **/
+
+  autoflagging.decorate.autoflag = function ($autoflag, data) {
+    if (!$autoflag.find(".ai-you-flagged").length) {
+      $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
+    }
+    if (!$autoflag.find(".ai-flag-count")) {
+      $autoflag.append($("<span/>").addClass("ai-flag-count"));
+    }
+    $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
+    $autoflag.find(".ai-flag-count")
+             .text(data.flagged ? "" + data.users.length : "")
+             .toggleClass("ai-not-autoflagged", !data.flagged)
+             .attr("title", data.flagged
+               ? "Flagged by " + data.users.map(function (user) { return user.username }).join(", ")
+               : "Not Autoflagged");
+  };
+  autoflagging.decorate.autoflag.location = "after"
 
   /*!
    * Decorates a jQuery DOM element with a spinner.
    */
-  autoflagging.addSpinner = function (element) {
-    element.append("<span class=\"ai-information\">" +
+  autoflagging.addSpinner = function (element, inline) {
+    element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
   };
+  autoflagging.addSpinnerToMessage = function (element) {
+    autoflagging.addSpinner(element)
+    autoflagging.addSpinner(element.find(".meta"), true)
+  }
 
   /*!
    * Calls the API to get information about multiple posts at once, considering the paging system of the API.
@@ -132,7 +174,7 @@
         // TODO: show flag weight - first, the API needs to be changed
         if (typeof autoflagData[postURL] == 'undefined')
           return;
-        autoflagging.decorate($(this).parents(".message"), autoflagData[postURL].autoflagged);
+        autoflagging.decorateMessage($(this).parents(".message"), autoflagData[postURL].autoflagged);
         // Post deleted?
         if (autoflagData[postURL].deleted_at != null) {
           $(this).parents('.content').toggleClass('ai-deleted');
@@ -161,7 +203,7 @@
         if (urls != "") { urls += "%3B"; }
         urls += $(this).attr('href').substring(autoflagging.prefix.length);
         // Show spinner
-        autoflagging.addSpinner($(this).parent());
+        autoflagging.addSpinnerToMessage($(this).parent());
       });
 
       // MS API call
@@ -182,7 +224,7 @@
           if (urls != "") { urls += "%3B"; }
           urls += $(this).attr('href').substring(autoflagging.prefix.length);
           // Show spinner
-          autoflagging.addSpinner($(this).parent());
+          autoflagging.addSpinnerToMessage($(this).parent());
         });
         // MS API call
         autoflagging.callAPI(urls);
@@ -276,7 +318,7 @@
 
         // Show spinner
         var anchor = $(anchors[0]);
-        autoflagging.addSpinner(anchor.parent());
+        autoflagging.addSpinnerToMessage(anchor.parent());
         // Wait a couple of seconds for autoflagging to complete
         setTimeout(function() {
           // MS API call
@@ -284,7 +326,7 @@
           //console.log("URL: " + url);
           $.get(url, function(data) {
             // Decorate report
-            autoflagging.decorate(anchor.parent(), data.items[0].autoflagged);
+            autoflagging.decorateMessage(anchor.parent(), data.items[0].autoflagged);
           }).fail(function(error) {
             autoflagging.notify('Failed to load data: ' + error);
           });
