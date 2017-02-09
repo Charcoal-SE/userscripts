@@ -163,6 +163,21 @@
 			autoflagging.callAPI(urls);
 		}
 	});
+  $("#getmore, #getmore-mine").click(function () {
+    setTimeout(function () {
+      var urls = "";
+			$(autoflagging.selector).filter(function () {
+        return !$(this).parents('.message').find('.ai-information').length
+      }).each(function() {
+				if (urls != "") { urls += "%3B"; }
+				urls += $(this).attr('href').substring(autoflagging.prefix.length);
+				// Show spinner
+				autoflagging.addSpinner($(this).parent());
+			});
+      // MS API call
+			autoflagging.callAPI(urls);
+    }, 1000)
+  })
 
 	// Listen to MS events
 	autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
