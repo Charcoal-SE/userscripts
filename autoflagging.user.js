@@ -216,14 +216,15 @@
         data.users = [flagLog.user];
         // TODO: this is going to overwrite previous autoflags when we start flagging multiple times
         var decorate = function () {
-          autoflagging.decorate($(selector).parent(), data);
+          if ($(selector).length) {
+            decorate();
+          } else {
+            // MS is faster than chat; add the decorate operation to the queue
+            autoflagging.msgQueue.push(decorate);
+          }
+          autoflagging.decorateMessage($(selector).parent(), data);
         };
-        if ($(selector).length) {
-          decorate();
-        } else {
-          // MS is faster than chat; add the decorate operation to the queue
-          autoflagging.msgQueue.push(decorate);
-        }
+        decorate();
       } else if (typeof deletionLog != 'undefined') {
         // Deletion log
         //console.log(deletionLog.post_link + ' deleted');
@@ -247,12 +248,13 @@
   CHAT.addEventHandlerHook(function (e) {
     if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
       var self = this;
-      autoflagging.msgQueue.forEach(function (f) {
+      var q = autoflagging.msgQueue;
+      autoflagging.msgQueue = [];
+      q.forEach(function (f) {
         setTimeout(function () {
           f.apply(self, arguments);
         })
       })
-      autoflagging.msgQueue = [];
     }
   })
 
