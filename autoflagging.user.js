@@ -14,8 +14,8 @@
 // ==/UserScript==
 
 (function () {
-    'use strict';
-	//console.log("Autoflagging Information started.");
+	'use strict';
+    //console.log("Autoflagging Information started.");
 
 	// Inject CSS
 	var link = window.document.createElement('link');
@@ -51,17 +51,16 @@
 		element.find(".ai-information").remove();
 
 		// Determine if you (i.e. the current user) autoflagged this post.
-		var currentUser = $("#active-user img").attr("title");
 		var site = "";
 		switch (location.hostname) {
 			case "chat.stackexchange.com":
 				site = "stackexchange";
 				break;
 			case "chat.meta.stackexchange.com":
-				site = "meta_stackexchange":
+				site = "meta_stackexchange";
 				break;
 			case "chat.stackoverflow.com":
-				site = "stackoverflow":
+				site = "stackoverflow";
 				break;
 			default:
 				console.error("Invalid site for autoflagging: " + location.hostname);
@@ -69,7 +68,7 @@
 		}
 		var youFlagged = data.users.filter(function (user) {
 			return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
-		}).length;
+		}).length == 1;
 
 		// Construct HTML to add to chat message
 		var html = "<span class=\"ai-information\">&nbsp;";
