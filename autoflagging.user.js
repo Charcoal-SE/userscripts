@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name        Autoflagging Information & More
 // @namespace   https://github.com/Charcoal-SE/
-// @description Adds autoflagging information to Charcoal HQ
+// @description AIM adds autoflagging information and post deletion information to Charcoal HQ.
 // @author      Glorfindel
+// @author      J F
 // @contributor angussidney
-// @contributor J F
-// @version     0.6
+// @version     0.7
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -132,6 +132,12 @@
         if (typeof autoflagData[postURL] == 'undefined')
           return;
         autoflagging.decorate($(this).parent(), autoflagData[postURL].autoflagged);
+        // Post deleted?
+        if (autoflagData[postURL].deleted_at != null) {
+          // TODO: right now, the icon for a successful autoflag on a deleted post looks
+          // the same as the icon for no autoflags. It would be nice to keep it black.
+          $(this).parents('.content').toggleClass('ai-deleted');
+        }
       });
 
       if (data.has_more) {
@@ -145,10 +151,10 @@
 
   // Wait for the chat messages to be loaded.
   var chat = $("#chat");
-  chat.bind("DOMSubtreeModified", function() {
+  chat.on("DOMSubtreeModified", function() {
     if (chat.html().length != 0) {
       // Chat messages loaded
-      chat.unbind("DOMSubtreeModified");
+      chat.off("DOMSubtreeModified");
 
       // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
       var urls = "";
@@ -163,19 +169,25 @@
       autoflagging.callAPI(urls);
     }
   });
+  
+  // Add autoflagging information to older messages as they are loaded
   $("#getmore, #getmore-mine").click(function () {
     $(this).one("DOMSubtreeModified", function () {
-      var urls = "";
-      $(autoflagging.selector).filter(function () {
-        return !$(this).parents('.message').find('.ai-information').length
-      }).each(function() {
-        if (urls != "") { urls += "%3B"; }
-        urls += $(this).attr('href').substring(autoflagging.prefix.length);
-        // Show spinner
-        autoflagging.addSpinner($(this).parent());
-      });
-      // MS API call
-      autoflagging.callAPI(urls);
+      // We need another timeout here, because the first modification occurs before
+      // the new (old) chat messages are loaded.
+      setTimeout(function () {
+        var urls = "";
+        $(autoflagging.selector).filter(function () {
+          return !$(this).parents('.message').find('.ai-information').length
+        }).each(function() {
+          if (urls != "") { urls += "%3B"; }
+          urls += $(this).attr('href').substring(autoflagging.prefix.length);
+          // Show spinner
+          autoflagging.addSpinner($(this).parent());
+        });
+        // MS API call
+        autoflagging.callAPI(urls);
+      }, 500);
     })
   })
 
@@ -204,24 +216,24 @@
         data.names = [flagLog.user_name];
         data.users = [flagLog.user];
         // TODO: this is going to overwrite previous autoflags when we start flagging multiple times
-        var f = function () {
-          console.log("Decorating from socket");
+        var decorate = function () {
           autoflagging.decorate($(selector).parent(), data);
-        }
+        };
         if ($(selector).length) {
-          f()
+          decorate();
         } else {
-          autoflagging.msgQueue.push(f)
+          // MS is faster than chat; add the decorate operation to the queue
+          autoflagging.msgQueue.push(decorate);
         }
       } else if (typeof deletionLog != 'undefined') {
         // Deletion log
         //console.log(deletionLog.post_link + ' deleted');
         var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + deletionLog.post_link + "']";
-        $(selector).parents('.message').toggleClass('ai-deleted');
+        $(selector).parents('.content').toggleClass('ai-deleted');
       } else if (typeof feedback != 'undefined') {
         // Feedback
-        // TODO: show realtime feedback
         //console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link); // feedback_type
+        // TODO: show realtime feedback
       }
       break;
     }
@@ -230,19 +242,25 @@
     // Send authentication
     autoflagging.socket.send('{"identifier": "{\\"channel\\":\\"ApiChannel\\",\\"key\\":\\"' + autoflagging.key + '\\"}", "command": "subscribe"}');
   };
+  
+  // Sometimes, autoflagging information arrives before the chat message.
+  // The code below makes sure the queued decorations are executed.
   CHAT.addEventHandlerHook(function (e) {
     if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
-      var self = this
+      var self = this;
       autoflagging.msgQueue.forEach(function (f) {
         setTimeout(function () {
-          f.apply(self, arguments)
+          f.apply(self, arguments);
         })
       })
-      autoflagging.msgQueue = []
+      autoflagging.msgQueue = [];
     }
   })
 
-  /* TODO: the spinner is still nice to display
+  // TODO: the code below is obsolete thanks to the MS websocket. However, the spinner can
+  // still be displayed for new chat messages. Also, we need a realtime update for posts
+  // which *aren't* autoflagged.
+  /* 
   // Subscribe to chat events
   CHAT.addEventHandlerHook(function(e, n, s) {
     if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
