@@ -21,7 +21,7 @@
 	var link = window.document.createElement('link');
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted {opacity: 0.5} .ai-deleted:hover {opacity: 1}';
+	link.href = 'data:text/css, .ai-information:not(.inline) { float: right; margin-right: 3px; position: relative; top: 1px } .ai-information { font-size: 11px; -webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none; cursor: default; } .ai-spinner { height: 1.5em; } .ai-deleted { opacity: 0.5; } .ai-deleted:hover { opacity: 1; }';
 	document.getElementsByTagName("head")[0].appendChild(link);
 
 	// Constants
