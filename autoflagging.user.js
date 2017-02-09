@@ -42,9 +42,9 @@
       'opacity: 0.5',
     '}',
     '.ai-flag-count::after {',
-      'content: " ⚑"',
+      'content: " \\2691"',
     '}'
-  ].join(';\n').replace(/([{}]);/, "$1");
+  ].join('; ').replace(/([\{\}]);/g, "$1");
   document.getElementsByTagName("head")[0].appendChild(link);
 
   // Constants
@@ -71,6 +71,7 @@
    * `element` is a message (i.e. has the message class)
    */
   autoflagging.decorateMessage = function (message, data) {
+    console.log(message, data);
     autoflagging.decorate(message.children(".ai-information"), data)
     autoflagging.decorate(message.find(".meta .ai-information"), data)
   }
@@ -124,7 +125,7 @@
     if (!$autoflag.find(".ai-you-flagged").length) {
       $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
     }
-    if (!$autoflag.find(".ai-flag-count")) {
+    if (!$autoflag.find(".ai-flag-count").length) {
       $autoflag.append($("<span/>").addClass("ai-flag-count"));
     }
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
@@ -203,7 +204,7 @@
         if (urls != "") { urls += "%3B"; }
         urls += $(this).attr('href').substring(autoflagging.prefix.length);
         // Show spinner
-        autoflagging.addSpinnerToMessage($(this).parent());
+        autoflagging.addSpinnerToMessage($(this).parents('.message'));
       });
 
       // MS API call
@@ -224,7 +225,7 @@
           if (urls != "") { urls += "%3B"; }
           urls += $(this).attr('href').substring(autoflagging.prefix.length);
           // Show spinner
-          autoflagging.addSpinnerToMessage($(this).parent());
+          autoflagging.addSpinnerToMessage($(this).parents('.message'));
         });
         // MS API call
         autoflagging.callAPI(urls);
