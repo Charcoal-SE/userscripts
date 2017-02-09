@@ -180,6 +180,7 @@
   })
 
   // Listen to MS events
+  autoflagging.msgQueue = []
   autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
   autoflagging.socket.onmessage = function(message) {
     // Parse message
@@ -202,9 +203,16 @@
         data.flagged = true;
         data.names = [flagLog.user_name];
         data.users = [flagLog.user];
-        console.log("Decorating from socket");
         // TODO: this is going to overwrite previous autoflags when we start flagging multiple times
-        autoflagging.decorate($(selector).parent(), data);
+        var f = function () {
+          console.log("Decorating from socket");
+          autoflagging.decorate($(selector).parent(), data);
+        }
+        if ($(selector).length) {
+          f()
+        } else {
+          autoflagging.msgQueue.push(f)
+        }
       } else if (typeof deletionLog != 'undefined') {
         // Deletion log
         //console.log(deletionLog.post_link + ' deleted');
@@ -222,6 +230,17 @@
     // Send authentication
     autoflagging.socket.send('{"identifier": "{\\"channel\\":\\"ApiChannel\\",\\"key\\":\\"' + autoflagging.key + '\\"}", "command": "subscribe"}');
   };
+  CHAT.addEventHandlerHook(function (e) {
+    if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
+      var self = this
+      autoflagging.msgQueue.forEach(function (f) {
+        setTimeout(function () {
+          f.apply(self, arguments)
+        })
+      })
+      autoflagging.msgQueue = []
+    }
+  })
 
   /* TODO: the spinner is still nice to display
   // Subscribe to chat events
