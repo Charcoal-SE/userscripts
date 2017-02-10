@@ -79,7 +79,6 @@
    * `element` is a message (i.e. has the message class)
    */
   autoflagging.decorateMessage = function (message, data) {
-    console.log(message, data);
     autoflagging.decorate(message.children(".ai-information"), data)
     autoflagging.decorate(message.find(".meta .ai-information"), data)
   }
