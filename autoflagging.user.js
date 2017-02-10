@@ -61,7 +61,8 @@
   autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
   autoflagging.prefix = "//m.erwaysoftware.com/posts/by-url?url=";
-  autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + "']";
+  autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message";
+  autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? ] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/
   // MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
   // Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
 
@@ -178,14 +179,14 @@
 
       // Loop over all Smokey reports and decorate them
       $(autoflagging.selector).each(function() {
-        var postURL = $(this).attr('href').substring(autoflagging.prefix.length);
+        var postURL = autoflagging.getPostURL(this);
         // TODO: show flag weight - first, the API needs to be changed
         if (typeof autoflagData[postURL] == 'undefined')
           return;
-        autoflagging.decorateMessage($(this).parents(".message"), autoflagData[postURL].autoflagged);
+        autoflagging.decorateMessage($(this), autoflagData[postURL].autoflagged);
         // Post deleted?
         if (autoflagData[postURL].deleted_at != null) {
-          $(this).parents('.content').toggleClass('ai-deleted');
+          $(this).find('.content').toggleClass('ai-deleted');
         }
       });
 
@@ -197,6 +198,10 @@
       autoflagging.notify('Failed to load data: ' + error);
     });
   };
+  autoflagging.getPostURL = function (el) {
+    var matches = autoflagging.messageRegex.exec($(el).html())
+    return matches && matches[2]
+  }
 
   // Wait for the chat messages to be loaded.
   var chat = $("#chat");
@@ -209,9 +214,12 @@
       var urls = "";
       $(autoflagging.selector).each(function() {
         if (urls != "") { urls += "%3B"; }
-        urls += $(this).attr('href').substring(autoflagging.prefix.length);
+        var url = autoflagging.getPostURL(this);
         // Show spinner
-        autoflagging.addSpinnerToMessage($(this).parents('.message'));
+        if (url != null) {
+          autoflagging.addSpinnerToMessage($(this));
+          urls += url
+        }
       });
 
       // MS API call
@@ -227,12 +235,12 @@
       setTimeout(function () {
         var urls = "";
         $(autoflagging.selector).filter(function () {
-          return !$(this).parents('.message').find('.ai-information').length
+          return !$(this).find('.ai-information').length
         }).each(function() {
           if (urls != "") { urls += "%3B"; }
           urls += $(this).attr('href').substring(autoflagging.prefix.length);
           // Show spinner
-          autoflagging.addSpinnerToMessage($(this).parents('.message'));
+          autoflagging.addSpinnerToMessage($(this));
         });
         // MS API call
         autoflagging.callAPI(urls);
@@ -259,7 +267,7 @@
       if (typeof flagLog != 'undefined') {
         // Autoflagging information
         //console.log(flagLog.user_name + ' autoflagged ' + flagLog.post_link);
-        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + flagLog.post_link + "']";
+        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + flagLog.post_link + "']";
         var data = {};
         data.flagged = true;
         data.names = [flagLog.user_name];
@@ -272,13 +280,13 @@
             // MS is faster than chat; add the decorate operation to the queue
             autoflagging.msgQueue.push(decorate);
           }
-          autoflagging.decorateMessage($(selector).parent(), data);
+          autoflagging.decorateMessage($(selector).parents(".message"), data);
         };
         decorate();
       } else if (typeof deletionLog != 'undefined') {
         // Deletion log
         //console.log(deletionLog.post_link + ' deleted');
-        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + autoflagging.prefix + deletionLog.post_link + "']";
+        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + deletionLog.post_link + "']";
         $(selector).parents('.content').toggleClass('ai-deleted');
       } else if (typeof feedback != 'undefined') {
         // Feedback
