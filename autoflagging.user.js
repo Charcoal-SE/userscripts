@@ -69,10 +69,6 @@
   // Error handling
   autoflagging.notify = Notifier().notify;
 
-  // TODO: Sometimes, Smokey reports don't contain an MS link (because of the chat message limit length).
-  // We either need to find a work-around, e.g. by using the direct link in the chat message,
-  // or wait until this feature request is implemented: https://github.com/Charcoal-SE/SmokeDetector/issues/488
-
   /*!
    * Decorates a jQuery DOM element with autoflagging information from the data.
    *
