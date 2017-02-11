@@ -273,12 +273,11 @@
         // TODO: this is going to overwrite previous autoflags when we start flagging multiple times
         var decorate = function () {
           if ($(selector).length) {
-            decorate();
+            autoflagging.decorateMessage($(selector).parents(".message"), data);
           } else {
             // MS is faster than chat; add the decorate operation to the queue
             autoflagging.msgQueue.push(decorate);
           }
-          autoflagging.decorateMessage($(selector).parents(".message"), data);
         };
         decorate();
       } else if (typeof deletionLog != 'undefined') {
