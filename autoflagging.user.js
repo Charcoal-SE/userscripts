@@ -194,8 +194,8 @@
       autoflagging.notify('Failed to load data: ' + error);
     });
   };
-  autoflagging.getPostURL = function (el) {
-    var matches = autoflagging.messageRegex.exec($(el).html())
+  autoflagging.getPostURL = function (message) {
+    var matches = autoflagging.messageRegex.exec($(message).html())
     return matches && matches[2]
   }
 
@@ -209,10 +209,10 @@
       // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
       var urls = "";
       $(autoflagging.selector).each(function() {
-        if (urls != "") { urls += "%3B"; }
         var url = autoflagging.getPostURL(this);
         // Show spinner
         if (url != null) {
+          if (urls != "") { urls += "%3B"; }
           autoflagging.addSpinnerToMessage($(this));
           urls += url
         }
@@ -233,10 +233,12 @@
         $(autoflagging.selector).filter(function () {
           return !$(this).find('.ai-information').length
         }).each(function() {
-          if (urls != "") { urls += "%3B"; }
-          urls += $(this).attr('href').substring(autoflagging.prefix.length);
-          // Show spinner
-          autoflagging.addSpinnerToMessage($(this));
+          var url = autoflagging.getPostURL(this);
+          if (url != null) {
+            if (urls != "") { urls += "%3B"; }
+            autoflagging.addSpinnerToMessage($(this));
+            urls += url
+          }
         });
         // MS API call
         autoflagging.callAPI(urls);
