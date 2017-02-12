@@ -50,6 +50,9 @@
     '.ai-flag-count::after {',
       'content: " ⚑"',
     '}',
+    '.ai-flag-count.ai-not-autoflagged::after {',
+      'content: "⚑"',
+    '}',
 
     '.ai-feedback-info-tpu {',
       'color: #3c763d;',
