@@ -18,10 +18,8 @@
   //console.log("Autoflagging Information started.");
 
   // Inject CSS
-  var link = window.document.createElement('link');
-  link.rel = 'stylesheet';
-  link.type = 'text/css';
-  link.href = 'data:text/css,' + [
+  var style = window.document.createElement('style');
+  style.textContent = [
     '.ai-information:not(.inline) {',
       'position: absolute',
       'right: 3px',
@@ -37,10 +35,10 @@
     '.ai-spinner {',
       'height: 1.5em',
     '}',
-    '.ai-information > * > * {',
+    '.ai-information > * > *, .ai-feedback-info {',
       'margin: 0 0.25em',
     '}',
-    '.ai-information > * > :last-child {',
+    '.ai-information > :last-child > :last-child {',
       'margin-right: 0',
     '}',
     '.ai-deleted, .ai-flag-count.ai-not-autoflagged {',
@@ -50,10 +48,30 @@
       'opacity: 0.5',
     '}',
     '.ai-flag-count::after {',
-      'content: " \\2691"',
+      'content: " ⚑"',
+    '}',
+
+    '.ai-feedback-info-tpu {',
+      'color: #3c763d;',
+    '}',
+    '.ai-feedback-info-fp {',
+      'color: #a94442;',
+    '}',
+    '.ai-feedback-info-naa {',
+      'color: #825325;',
+    '}',
+
+    '.ai-feedback-info-tpu::after {',
+      'content: " ✓";',
+    '}',
+    '.ai-feedback-info-fp::after {',
+      'content: " ✗";',
+    '}',
+    '.ai-feedback-info-naa::after {',
+      'content: " 💩";',
     '}'
   ].join('; ').replace(/([\{\}]);/g, "$1");
-  document.getElementsByTagName("head")[0].appendChild(link);
+  document.getElementsByTagName("head")[0].appendChild(style);
 
   // Constants
   window.autoflagging = {};
@@ -82,6 +100,36 @@
   autoflagging.decorate = function (element, data) {
     element.find(".ai-spinner").remove();
 
+    var names = {
+      before: "prepend",
+      after: "append"
+    }
+
+    Object.keys(autoflagging.decorate).forEach(function (key) {
+      var f = autoflagging.decorate[key]
+      if (!element.find(".ai-" + key).length) {
+        element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key))
+      }
+      if (!f.key) {
+        f(element.find(".ai-" + key), data)
+      } else if (data.hasOwnProperty(f.key)) {
+        f(element.find(".ai-" + key), data[f.key])
+      }
+    })
+
+  };
+  /* “Spec” for methods of autoflagging.decorate:
+   * Takes an element to update.
+   * data is from the API.
+   * Properties:
+   * * location [required] ("before" | "after") Where to add the element if it
+   *   doesn’t exist
+   * * key [optional] The key that must be present on the data. The value of
+   *   this key is passed as the second parameter.
+   * * el [optional] the name of the element to create.
+  **/
+
+  autoflagging.decorate.autoflag = function ($autoflag, data) {
     // Determine if you (i.e. the current user) autoflagged this post.
     var site = "";
     switch (location.hostname) {
@@ -102,35 +150,14 @@
       return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
     }).length == 1;
 
-    var names = {
-      before: "prepend",
-      after: "append"
-    }
-
-    Object.keys(autoflagging.decorate).forEach(function (key) {
-      var f = autoflagging.decorate[key]
-      if (!element.find(".ai-" + key).length) {
-        element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key))
-      }
-      autoflagging.decorate[key](element.find(".ai-" + key), data)
-    })
-
-  };
-  /* “Spec” for methods of autoflagging.decorate:
-   * Takes an element to update.
-   * data is from the API.
-   * Properties:
-   * * location [required] ("before" | "after") Where to add the element if it
-   *   doesn’t exist
-   * * el [optional] the name of the element to create.
-  **/
-
-  autoflagging.decorate.autoflag = function ($autoflag, data) {
     if (!$autoflag.find(".ai-you-flagged").length) {
       $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
     }
     if (!$autoflag.find(".ai-flag-count").length) {
       $autoflag.append($("<span/>").addClass("ai-flag-count"));
+    }
+    if ($autoflag.data("users")) {
+      data.users = $autoflag.data("users").concat(data.users)
     }
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
     $autoflag.find(".ai-flag-count")
@@ -139,8 +166,66 @@
              .attr("title", data.flagged
                ? "Flagged by " + data.users.map(function (user) { return user.username }).join(", ")
                : "Not Autoflagged");
+    $autoflag.data("users", data.users)
   };
   autoflagging.decorate.autoflag.location = "after"
+  autoflagging.decorate.autoflag.key = "autoflagged"
+
+  autoflagging.decorate.feedback = function ($feedback, data) {
+    data.forEach(function (item) {
+      autoflagging.decorate.feedback._each($feedback, item)
+    })
+  }
+  autoflagging.decorate.feedback.location = "before"
+  autoflagging.decorate.feedback.key = "feedbacks"
+
+  autoflagging.decorate.feedback._each = function ($feedback, data) {
+    var allFeedbacks = $feedback.data("feedbacks") || {}
+    allFeedbacks[data.feedback_type] = (allFeedbacks[data.feedback_type] || []).concat(data)
+    $feedback.data("feedbacks", allFeedbacks)
+
+    var simpleFeedbacks = {
+      k: {},
+      f: {},
+      n: {}
+    }
+    for (var type in allFeedbacks) {
+      if (allFeedbacks.hasOwnProperty(type) && allFeedbacks[type] instanceof Array) {
+        var users = allFeedbacks[type].map(function (user) {
+          return user.user_name
+        })
+
+        if (type.indexOf("t") !== -1) {
+          simpleFeedbacks.k[type] = users
+        } else if (type.indexOf("f") !== -1) {
+          simpleFeedbacks.f[type] = users
+        } else if (type.indexOf("naa") !== -1) {
+          simpleFeedbacks.n[type] = users
+        }
+      }
+    }
+
+    $feedback.empty()
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.k, $feedback, "tpu-")
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.f, $feedback, "fp-")
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.n, $feedback, "naa-")
+  }
+  autoflagging.decorate.feedback.addFeedback = function (items, $el, defaultKey) {
+    var count = Object.keys(items)
+                      .map(function (key) { return items[key].length })
+                      .reduce(function (a, b) { return a + b }, 0)
+    if (count) {
+      var title = (items[defaultKey] || []).join(", ")
+      var titles = Object.keys(items)
+                         .map(function (key) {
+                           if (key === defaultKey) return
+                           return key + ": " + items[key].join(", ")
+                         })
+                         .filter(function (x) { return !!x })
+      titles.unshift(title)
+      $el.append($("<span/>").addClass("ai-feedback-info").addClass("ai-feedback-info-" + defaultKey.replace(/-$/, "")).text(count).attr("title", titles.join("; ")))
+    }
+  }
 
   /*!
    * Decorates a jQuery DOM element with a spinner.
@@ -179,7 +264,7 @@
         // TODO: show flag weight - first, the API needs to be changed
         if (typeof autoflagData[postURL] == 'undefined')
           return;
-        autoflagging.decorateMessage($(this), autoflagData[postURL].autoflagged);
+        autoflagging.decorateMessage($(this), autoflagData[postURL]);
         // Post deleted?
         if (autoflagData[postURL].deleted_at != null) {
           $(this).find('.content').toggleClass('ai-deleted');
@@ -270,10 +355,11 @@
         data.flagged = true;
         data.names = [flagLog.user_name];
         data.users = [flagLog.user];
-        // TODO: this is going to overwrite previous autoflags when we start flagging multiple times
         var decorate = function () {
           if ($(selector).length) {
-            autoflagging.decorateMessage($(selector).parents(".message"), data);
+            autoflagging.decorateMessage($(selector).parents(".message"), {
+              autoflagged: data,
+            });
           } else {
             // MS is faster than chat; add the decorate operation to the queue
             autoflagging.msgQueue.push(decorate);
@@ -287,8 +373,19 @@
         $(selector).parents('.content').toggleClass('ai-deleted');
       } else if (typeof feedback != 'undefined') {
         // Feedback
-        //console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link); // feedback_type
-        // TODO: show realtime feedback
+        console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link, feedback); // feedback_type
+        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + feedback.post_link + "']";
+        var decorate = function () {
+          if ($(selector).length) {
+            autoflagging.decorateMessage($(selector).parents(".message"), {
+              feedbacks: [feedback]
+            });
+          } else {
+            // MS is faster than chat; add the decorate operation to the queue
+            autoflagging.msgQueue.push(decorate);
+          }
+        };
+        decorate();
       }
       break;
     }
@@ -312,40 +409,4 @@
       })
     }
   })
-
-  // TODO: the code below is obsolete thanks to the MS websocket. However, the spinner can
-  // still be displayed for new chat messages. Also, we need a realtime update for posts
-  // which *aren't* autoflagged.
-  /*
-  // Subscribe to chat events
-  CHAT.addEventHandlerHook(function(e, n, s) {
-    if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
-      //console.log("Smokey message " + e.message_id);
-      // New message posted by Smokey - note that the corresponding <div> element isn't created yet.
-      // Therefore, we wait a little while.
-      setTimeout(function() {
-        // Find MS link - if it doesn't exist, we don't need to do anything
-        var anchors = $("#message-" + e.message_id).find("a[href^='" + autoflagging.prefix + "']");
-        if (anchors.length == 0)
-          return;
-
-        // Show spinner
-        var anchor = $(anchors[0]);
-        autoflagging.addSpinnerToMessage(anchor.parent());
-        // Wait a couple of seconds for autoflagging to complete
-        setTimeout(function() {
-          // MS API call
-          var url = autoflagging.baseURL + "&urls=" + anchor.attr('href').substring(autoflagging.prefix.length);
-          //console.log("URL: " + url);
-          $.get(url, function(data) {
-            // Decorate report
-            autoflagging.decorateMessage(anchor.parent(), data.items[0].autoflagged);
-          }).fail(function(error) {
-            autoflagging.notify('Failed to load data: ' + error);
-          });
-        }, 5000);
-      }, 500);
-    }
-  });
-  */
 })();
