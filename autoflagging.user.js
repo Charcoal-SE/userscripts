@@ -22,7 +22,7 @@
   style.textContent = [
     '.ai-information:not(.inline) {',
       'position: absolute',
-      'right: 3px',
+      'right: 4px',
       'bottom: 0',
     '}',
     '.ai-information {',
