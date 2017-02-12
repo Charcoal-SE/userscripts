@@ -350,13 +350,13 @@
       var flagLog = jsonData.message.flag_log;
       var deletionLog = jsonData.message.deletion_log;
       var feedback = jsonData.message.feedback;
+      var notFlagged = jsonData.message.not_flagged
       if (typeof flagLog != 'undefined') {
         // Autoflagging information
         //console.log(flagLog.user_name + ' autoflagged ' + flagLog.post_link);
         var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + flagLog.post_link + "']";
         var data = {};
         data.flagged = true;
-        data.names = [flagLog.user_name];
         data.users = [flagLog.user];
         var decorate = function () {
           if ($(selector).length) {
@@ -376,12 +376,28 @@
         $(selector).parents('.content').toggleClass('ai-deleted');
       } else if (typeof feedback != 'undefined') {
         // Feedback
-        console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link, feedback); // feedback_type
+        // console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link, feedback); // feedback_type
         var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + feedback.post_link + "']";
         var decorate = function () {
           if ($(selector).length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               feedbacks: [feedback]
+            });
+          } else {
+            // MS is faster than chat; add the decorate operation to the queue
+            autoflagging.msgQueue.push(decorate);
+          }
+        };
+        decorate();
+      } else if (typeof notFlagged != 'undefined') {
+        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + not_flagged.post_link + "']";
+        var decorate = function () {
+          if ($(selector).length) {
+            autoflagging.decorateMessage($(selector).parents(".message"), {
+              autoflagged: {
+                flagged: false,
+                users: []
+              },
             });
           } else {
             // MS is faster than chat; add the decorate operation to the queue
