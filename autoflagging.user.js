@@ -5,7 +5,7 @@
 // @author      Glorfindel
 // @author      J F
 // @contributor angussidney
-// @version     0.8
+// @version     0.9
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
