@@ -81,8 +81,7 @@
   autoflagging.smokeyID = "120914"; // this is Smokey's user ID
   autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
-  autoflagging.prefix = "//m.erwaysoftware.com/posts/by-url?url=";
-  autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message";
+  autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? ] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/
   // MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
   // Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
@@ -354,12 +353,12 @@
       if (typeof flagLog != 'undefined') {
         // Autoflagging information
         //console.log(flagLog.user_name + ' autoflagged ' + flagLog.post_link);
-        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + flagLog.post_link + "']";
+        var selector = autoflagging.selector + "a[href^='" + flagLog.post_link + "']";
         var data = {};
         data.flagged = true;
         data.users = [flagLog.user];
         var decorate = function () {
-          if ($(selector).length) {
+          if ($(selector).parents(".message").find(".ai-spinner").length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               autoflagged: data,
             });
@@ -372,14 +371,14 @@
       } else if (typeof deletionLog != 'undefined') {
         // Deletion log
         //console.log(deletionLog.post_link + ' deleted');
-        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + deletionLog.post_link + "']";
+        var selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
         $(selector).parents('.content').toggleClass('ai-deleted');
       } else if (typeof feedback != 'undefined') {
         // Feedback
         // console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link, feedback); // feedback_type
-        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + feedback.post_link + "']";
+        var selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
         var decorate = function () {
-          if ($(selector).length) {
+          if ($(selector).parents(".message").find(".ai-spinner").length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               feedbacks: [feedback]
             });
@@ -390,9 +389,9 @@
         };
         decorate();
       } else if (typeof notFlagged != 'undefined') {
-        var selector = ".user-" + autoflagging.smokeyID + " .message a[href^='" + not_flagged.post_link + "']";
+        var selector = autoflagging.selector + "a[href^='" + notFlagged.post_link + "']";
         var decorate = function () {
-          if ($(selector).length) {
+          if ($(selector).parents(".message").find(".ai-spinner").length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               autoflagged: {
                 flagged: false,
@@ -426,6 +425,12 @@
           f.apply(self, arguments);
         })
       })
+      autoflagging.msgQueue.unshift(function() {
+        var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
+        if (!matches) return;
+        // Show spinner
+        autoflagging.addSpinnerToMessage($("#message-" + e.message_id));
+      });
     }
   })
 })();
