@@ -239,6 +239,12 @@
     element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
+    if (element.parent().children(':first-child').hasClass('timestamp') && element.is(':nth-child(2)')) {
+      // don’t overlap the timestamp
+      element.css({
+        minHeight: '3em'
+      })
+    }
   };
   autoflagging.addSpinnerToMessage = function (element) {
     autoflagging.addSpinner(element)
