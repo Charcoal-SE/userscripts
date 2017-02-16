@@ -276,8 +276,8 @@
         // There are more items on the next 'page'
         autoflagging.callAPI(urls, ++page);
       }
-    }).fail(function(error) {
-      autoflagging.notify('Failed to load data: ' + error);
+    }).fail(function(xhr, textStatus, error) {
+      autoflagging.notify('Failed to load data: ' + xhr.statusText);
     });
   };
   autoflagging.getPostURL = function (message) {
