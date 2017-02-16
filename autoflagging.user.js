@@ -101,6 +101,7 @@
   }
   autoflagging.decorate = function (element, data) {
     element.find(".ai-spinner").remove();
+    element.addClass("ai-loaded")
 
     var names = {
       before: "prepend",
@@ -349,7 +350,7 @@
       var flagLog = jsonData.message.flag_log;
       var deletionLog = jsonData.message.deletion_log;
       var feedback = jsonData.message.feedback;
-      var notFlagged = jsonData.message.not_flagged
+      var notFlagged = jsonData.message.not_flagged;
       if (typeof flagLog != 'undefined') {
         // Autoflagging information
         //console.log(flagLog.user_name + ' autoflagged ' + flagLog.post_link);
@@ -358,7 +359,7 @@
         data.flagged = true;
         data.users = [flagLog.user];
         var decorate = function () {
-          if ($(selector).parents(".message").find(".ai-spinner").length) {
+          if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               autoflagged: data,
             });
@@ -378,7 +379,7 @@
         // console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link, feedback); // feedback_type
         var selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
         var decorate = function () {
-          if ($(selector).parents(".message").find(".ai-spinner").length) {
+          if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               feedbacks: [feedback]
             });
@@ -391,7 +392,7 @@
       } else if (typeof notFlagged != 'undefined') {
         var selector = autoflagging.selector + "a[href^='" + notFlagged.post_link + "']";
         var decorate = function () {
-          if ($(selector).parents(".message").find(".ai-spinner").length) {
+          if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length) {
             autoflagging.decorateMessage($(selector).parents(".message"), {
               autoflagged: {
                 flagged: false,
@@ -425,12 +426,12 @@
           f.apply(self, arguments);
         })
       })
-      autoflagging.msgQueue.unshift(function() {
+      setTimeout(function() {
         var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
         if (!matches) return;
         // Show spinner
         autoflagging.addSpinnerToMessage($("#message-" + e.message_id));
-      });
+      }, 1000);
     }
   })
 })();
