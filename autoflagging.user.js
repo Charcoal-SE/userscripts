@@ -47,6 +47,10 @@
     '.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {',
       'opacity: 0.5',
     '}',
+    '.ai-flag-count {',
+      'color: inherit',
+      'text-decoration: none !important',
+    '}',
     '.ai-flag-count::after {',
       'content: " ⚑"',
     '}',
@@ -116,7 +120,7 @@
       if (!f.key) {
         f(element.find(".ai-" + key), data)
       } else if (data.hasOwnProperty(f.key)) {
-        f(element.find(".ai-" + key), data[f.key])
+        f(element.find(".ai-" + key), data[f.key], data)
       }
     })
 
@@ -132,7 +136,7 @@
    * * el [optional] the name of the element to create.
   **/
 
-  autoflagging.decorate.autoflag = function ($autoflag, data) {
+  autoflagging.decorate.autoflag = function ($autoflag, data, allData) {
     // Determine if you (i.e. the current user) autoflagged this post.
     var site = "";
     switch (location.hostname) {
@@ -157,7 +161,7 @@
       $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
     }
     if (!$autoflag.find(".ai-flag-count").length) {
-      $autoflag.append($("<span/>").addClass("ai-flag-count"));
+      $autoflag.append($("<a/>").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs").addClass("ai-flag-count"));
     }
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
