@@ -6,7 +6,7 @@
 // @author      J F
 // @contributor angussidney
 // @contributor ArtOfCode
-// @version     0.10-beta.2
+// @version     0.10-beta.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -25,9 +25,6 @@
       'position: absolute',
       'right: 4px',
       'bottom: 0',
-    '}',
-    '.ai-message {',
-      'min-height: 3em',
     '}',
     '.ai-information {',
       'font-size: 11px',
@@ -50,6 +47,10 @@
     '}',
     '.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {',
       'opacity: 0.5',
+    '}',
+    '.ai-flag-count {',
+      'color: inherit',
+      'text-decoration: none !important',
     '}',
     '.ai-flag-count::after {',
       'content: " ⚑"',
@@ -121,7 +122,7 @@
       if (!f.key) {
         f(element.find(".ai-" + key), data);
       } else if (data.hasOwnProperty(f.key)) {
-        f(element.find(".ai-" + key), data[f.key]);
+        f(element.find(".ai-" + key), data[f.key], data);
       }
     });
   };
@@ -137,7 +138,7 @@
    *   this key is passed as the second parameter.
    * * el [optional] the name of the element to create.
    */
-  autoflagging.decorate.autoflag = function ($autoflag, data) {
+  autoflagging.decorate.autoflag = function ($autoflag, data, allData) {
     // Determine if you (i.e. the current user) autoflagged this post.
     var site = "";
     switch (location.hostname) {
@@ -162,7 +163,7 @@
       $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
     }
     if (!$autoflag.find(".ai-flag-count").length) {
-      $autoflag.append($("<span/>").addClass("ai-flag-count"));
+      $autoflag.append($("<a/>").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs").addClass("ai-flag-count"));
     }
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
@@ -242,6 +243,12 @@
     element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
+    if (element.parent().children(':first-child').hasClass('timestamp') && element.is(':nth-child(2)')) {
+      // don’t overlap the timestamp
+      element.css({
+        minHeight: '3em'
+      })
+    }
   };
 
   autoflagging.addSpinnerToMessage = function (element) {
@@ -255,7 +262,7 @@
    */
   autoflagging.callAPI = function (urls, page) {
     //console.log("Call API");
-    if (page === null) {
+    if (page == null) {
       page = 1;
     }
     var autoflagData = {};
@@ -275,7 +282,7 @@
           return;
         autoflagging.decorateMessage($(this), autoflagData[postURL]);
         // Post deleted?
-        if (autoflagData[postURL].deleted_at !== null) {
+        if (autoflagData[postURL].deleted_at != null) {
           $(this).find('.content').toggleClass('ai-deleted');
         }
       });
@@ -284,8 +291,8 @@
         // There are more items on the next 'page'
         autoflagging.callAPI(urls, ++page);
       }
-    }).fail(function(error) {
-      autoflagging.notify('Failed to load data: ' + error);
+    }).fail(function(xhr, textStatus, error) {
+      autoflagging.notify('Failed to load data: ' + xhr.statusText);
     });
   };
 
@@ -443,7 +450,5 @@
         autoflagging.addSpinnerToMessage($("#message-" + e.message_id));
       }, 1000);
     }
-
-    $(".message:has(.ai-information)").addClass("ai-message");
   });
 })();
