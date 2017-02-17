@@ -11,6 +11,7 @@
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq
+// @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers
 // @grant       none
 // ==/UserScript==
 
@@ -83,7 +84,13 @@
 
   // Constants
   window.autoflagging = {};
-  autoflagging.smokeyID = "120914"; // this is Smokey's user ID
+  
+  autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
+    "chat.stackexchange.com" : "120914",
+    "chat.stackoverflow.com" : "3735529"
+  };
+  
+  autoflagging.smokeyID = autoflagging.smokeyIds[location.host]; 
   autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
