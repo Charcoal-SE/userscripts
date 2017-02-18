@@ -13,6 +13,7 @@
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers
+// @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
 // @grant       none
 // ==/UserScript==
 
@@ -87,8 +88,9 @@
   window.autoflagging = {};
 
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
-    "chat.stackexchange.com" : "120914",
-    "chat.stackoverflow.com" : "3735529"
+    "chat.stackexchange.com":      "120914",
+    "chat.stackoverflow.com":      "3735529",
+    "chat.meta.stackexchange.com": "266345",
   };
 
   autoflagging.smokeyID = autoflagging.smokeyIds[location.host];
