@@ -256,7 +256,7 @@
         // There are more items on the next 'page'
         autoflagging.callAPI(urls, ++page);
       }
-    }).fail(function (xhr, /* textStatus, error */) {
+    }).fail(function (xhr) {
       autoflagging.notify("Failed to load data: " + xhr.statusText);
     });
   };

@@ -14,39 +14,37 @@
 // @version       1.3
 // ==/UserScript==
 
-if (true || location.search.indexOf("smokeypost=true") !== -1) { // eslint-disable-line no-constant-condition
-  var style = document.createElement("style");
-  style.textContent = ".post-text img:not(.gasmask-treated){visibility:hidden}" +
-                      ".post-text img{cursor:pointer}";
-  document.head.appendChild(style);
+var style = document.createElement("style");
+style.textContent = ".post-text img:not(.gasmask-treated){visibility:hidden}" +
+                    ".post-text img{cursor:pointer}";
+document.head.appendChild(style);
 
-  var timer = setInterval(function () {
-    if (document.readyState === "complete") {
-      clearInterval(timer);
+var timer = setInterval(function () {
+  if (document.readyState === "complete") {
+    clearInterval(timer);
+  }
+  var newImgs = document.querySelectorAll(".post-text img:not(.gasmask-treating)");
+  [].forEach.call(newImgs, function (img) {
+    var post = img;
+    while (!post.classList.contains("postcell") && !post.classList.contains("answercell")) {
+      post = post.parentElement;
     }
-    var newImgs = document.querySelectorAll(".post-text img:not(.gasmask-treating)");
-    [].forEach.call(newImgs, function (img) {
-      var post = img;
-      while (!post.classList.contains("postcell") && !post.classList.contains("answercell")) {
-        post = post.parentElement;
-      }
-      var repElem = post.querySelector(".post-signature:last-child .reputation-score");
-      if (repElem.textContent === "1") {
-        var origSrc = img.src;
-        img.src = "https://upload.wikimedia.org/wikipedia/commons/5/57/Gas_mask.svg";
-        img.width = 200;
-        img.addEventListener("click", function handler(event) {
-          img.src = origSrc;
-          img.removeEventListener("click", handler);
-          event.preventDefault();
-        });
-        img.classList.add("gasmask-treating");
-        setTimeout(function () {
-          img.classList.add("gasmask-treated");
-        }, 1000);
-      } else {
-        img.classList.add("gasmask-treating", "gasmask-treated");
-      }
-    });
-  }, 100);
-}
+    var repElem = post.querySelector(".post-signature:last-child .reputation-score");
+    if (repElem.textContent === "1") {
+      var origSrc = img.src;
+      img.src = "https://upload.wikimedia.org/wikipedia/commons/5/57/Gas_mask.svg";
+      img.width = 200;
+      img.addEventListener("click", function handler(event) {
+        img.src = origSrc;
+        img.removeEventListener("click", handler);
+        event.preventDefault();
+      });
+      img.classList.add("gasmask-treating");
+      setTimeout(function () {
+        img.classList.add("gasmask-treated");
+      }, 1000);
+    } else {
+      img.classList.add("gasmask-treating", "gasmask-treated");
+    }
+  });
+}, 100);
