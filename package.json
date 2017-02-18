@@ -1,0 +1,22 @@
+{
+  "name": "charcoal-userscripts",
+  "version": "0.0.0",
+  "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
+  "scripts": {
+    "test": "jshint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Charcoal-SE/userscripts.git"
+  },
+  "author": "Charcoal",
+  "license": "UNLICENSED",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/Charcoal-SE/userscripts/issues"
+  },
+  "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
+  "devDependencies": {
+    "jshint": "^2.9.4"
+  }
+}
