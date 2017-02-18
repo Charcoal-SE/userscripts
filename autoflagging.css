@@ -1,0 +1,58 @@
+.ai-information:not(.inline) {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  background: white;
+}
+.ai-information {
+  font-size: 11px;
+  -webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none;
+  cursor: default;
+  padding-left: 0.25em;
+  padding-right: 1px;
+}
+.ai-spinner {
+  height: 1.5em;
+}
+.ai-information > * > *, .ai-feedback-info {
+  margin: 0 0.25em;
+}
+.ai-information > :last-child > :last-child {
+  margin-right: 0;
+}
+.ai-deleted, .ai-flag-count.ai-not-autoflagged {
+  transition: opacity 0.4s;
+}
+.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {
+  opacity: 0.5;
+}
+.ai-flag-count {
+  color: inherit;
+  text-decoration: none !important;
+}
+.ai-flag-count::after {
+  content: " ⚑";
+}
+.ai-flag-count.ai-not-autoflagged::after {
+  content: "⚑";
+}
+
+.ai-feedback-info-tpu {
+  color: #3c763d;
+}
+.ai-feedback-info-fp {
+  color: #a94442;
+}
+.ai-feedback-info-naa {
+  color: #825325;
+}
+
+.ai-feedback-info-tpu::after {
+  content: " ✓";
+}
+.ai-feedback-info-fp::after {
+  content: " ✗";
+}
+.ai-feedback-info-naa::after {
+  content: " 💩";
+}
