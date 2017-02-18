@@ -4,6 +4,9 @@
   bottom: 0;
   background: white;
 }
+.reply-parent .ai-information:not(.inline) {
+  background: silver;
+}
 .ai-information {
   font-size: 11px;
   -webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none;
