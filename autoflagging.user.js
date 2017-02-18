@@ -24,11 +24,12 @@
 
   // Inject CSS
   var css = window.document.createElement("link");
+  css.rel = "stylesheet";
   css.href = "//charcoal-se.org/userscripts/autoflagging.css";
   document.head.appendChild(css);
 
   // Constants
-  var hOP = Object.prototype.hasOwnProperty.call;
+  var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
   window.autoflagging = {};
 
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
@@ -117,8 +118,25 @@
       $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
     }
     if ($autoflag.find(".ai-flag-count").length === 0) {
-      $autoflag.append($("<a/>").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs").addClass("ai-flag-count"));
+      $autoflag.append($("<a/>").addClass("ai-flag-count"));
     }
+    if (allData.id) {
+      $autoflag.find(".ai-flag-count").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs");
+    }
+
+    if ($autoflag.data("users")) {
+      data.users = $autoflag.data("users").concat(data.users);
+      console.log(data.users);
+      var uniqUsers = {};
+      data.users.forEach(function (user) {
+        uniqUsers[user.stackexchange_chat_id] = user;
+      });
+      console.log(uniqUsers);
+      data.users = Object.keys(uniqUsers).map(function (key) {
+        return uniqUsers[key];
+      });
+    }
+    $autoflag.data("users", data.users);
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
     $autoflag.find(".ai-flag-count")
