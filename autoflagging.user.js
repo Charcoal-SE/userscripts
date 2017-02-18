@@ -28,6 +28,7 @@
       'position: absolute',
       'right: 4px',
       'bottom: 0',
+      'background: white',
     '}',
     '.ai-information {',
       'font-size: 11px',
