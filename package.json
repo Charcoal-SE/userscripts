@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
-    "test": "jshint"
+    "test": "xo"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,25 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "jshint": "^2.9.4"
+    "xo": "^0.17.1"
+  },
+  "xo": {
+    "space": true,
+    "envs": [
+      "browser",
+      "jquery"
+    ],
+    "rules": {
+      "quotes": ["error", "double"],
+      "comma-dangle": "off",
+      "no-eq-null": "off",
+      "eqeqeq": ["error", "smart"],
+      "unicorn/filename-case": "off"
+    },
+    "globals": [
+      "CHAT",
+      "Notifier",
+      "StackExchange"
+    ]
   }
 }

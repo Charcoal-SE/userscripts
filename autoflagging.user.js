@@ -16,81 +16,24 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
 // @grant       none
 // ==/UserScript==
+/* global autoflagging */
 
 (function () {
-  'use strict';
-  //console.log("Autoflagging Information started.");
+  "use strict";
+  // console.log("Autoflagging Information started.");
 
   // Inject CSS
-  var style = window.document.createElement('style');
-  style.textContent = [
-    '.ai-information:not(.inline) {',
-      'position: absolute',
-      'right: 4px',
-      'bottom: 0',
-      'background: white',
-    '}',
-    '.ai-information {',
-      'font-size: 11px',
-      '-webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none',
-      'cursor: default',
-      'padding-left: 0.25em',
-      'padding-right: 1px',
-    '}',
-    '.ai-spinner {',
-      'height: 1.5em',
-    '}',
-    '.ai-information > * > *, .ai-feedback-info {',
-      'margin: 0 0.25em',
-    '}',
-    '.ai-information > :last-child > :last-child {',
-      'margin-right: 0',
-    '}',
-    '.ai-deleted, .ai-flag-count.ai-not-autoflagged {',
-      'transition: opacity 0.4s',
-    '}',
-    '.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {',
-      'opacity: 0.5',
-    '}',
-    '.ai-flag-count {',
-      'color: inherit',
-      'text-decoration: none !important',
-    '}',
-    '.ai-flag-count::after {',
-      'content: " ⚑"',
-    '}',
-    '.ai-flag-count.ai-not-autoflagged::after {',
-      'content: "⚑"',
-    '}',
-
-    '.ai-feedback-info-tpu {',
-      'color: #3c763d;',
-    '}',
-    '.ai-feedback-info-fp {',
-      'color: #a94442;',
-    '}',
-    '.ai-feedback-info-naa {',
-      'color: #825325;',
-    '}',
-
-    '.ai-feedback-info-tpu::after {',
-      'content: " ✓";',
-    '}',
-    '.ai-feedback-info-fp::after {',
-      'content: " ✗";',
-    '}',
-    '.ai-feedback-info-naa::after {',
-      'content: " 💩";',
-    '}'
-  ].join('; ').replace(/([\{\}]);/g, "$1");
-  document.getElementsByTagName("head")[0].appendChild(style);
+  var css = window.document.createElement("link");
+  css.href = "//charcoal-se.org/userscripts/autoflagging.css";
+  document.head.appendChild(css);
 
   // Constants
+  var hOP = Object.prototype.hasOwnProperty.call;
   window.autoflagging = {};
 
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
-    "chat.stackexchange.com":      "120914",
-    "chat.stackoverflow.com":      "3735529",
+    "chat.stackexchange.com": "120914",
+    "chat.stackoverflow.com": "3735529",
     "chat.meta.stackexchange.com": "266345",
   };
 
@@ -103,7 +46,7 @@
   // Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
 
   // Error handling
-  autoflagging.notify = Notifier().notify;
+  autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
 
   /*!
    * Decorates a jQuery DOM element with autoflagging information from the data.
@@ -127,12 +70,12 @@
 
     Object.keys(autoflagging.decorate).forEach(function (key) {
       var f = autoflagging.decorate[key];
-      if (!element.find(".ai-" + key).length) {
+      if (element.find(".ai-" + key).length === 0) {
         element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key));
       }
       if (!f.key) {
         f(element.find(".ai-" + key), data);
-      } else if (data.hasOwnProperty(f.key)) {
+      } else if (hOP(data, f.key)) {
         f(element.find(".ai-" + key), data[f.key], data);
       }
     });
@@ -168,22 +111,24 @@
     }
     data.youFlagged = data.users.filter(function (user) {
       return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
-    }).length == 1;
+    }).length === 1;
 
-    if (!$autoflag.find(".ai-you-flagged").length) {
+    if ($autoflag.find(".ai-you-flagged").length === 0) {
       $autoflag.prepend($("<strong/>").text("You autoflagged.").addClass("ai-you-flagged"));
     }
-    if (!$autoflag.find(".ai-flag-count").length) {
+    if ($autoflag.find(".ai-flag-count").length === 0) {
       $autoflag.append($("<a/>").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs").addClass("ai-flag-count"));
     }
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
     $autoflag.find(".ai-flag-count")
-             .text(data.flagged ? "" + data.users.length : "")
+             .text(data.flagged ? String(data.users.length) : "")
              .toggleClass("ai-not-autoflagged", !data.flagged)
-             .attr("title", data.flagged
-               ? "Flagged by " + data.users.map(function (user) { return user.username || user.user_name; }).join(", ")
-               : "Not Autoflagged");
+             .attr("title", data.flagged ?
+               "Flagged by " + data.users.map(function (user) {
+                 return user.username || user.user_name;
+               }).join(", ") :
+               "Not Autoflagged");
     $autoflag.data("users", data.users);
   };
 
@@ -209,7 +154,7 @@
       n: {}
     };
     for (var type in allFeedbacks) {
-      if (allFeedbacks.hasOwnProperty(type) && allFeedbacks[type] instanceof Array) {
+      if (hOP(allFeedbacks, type) && allFeedbacks[type] instanceof Array) {
         var users = allFeedbacks[type].map(function (user) {
           return user.user_name;
         });
@@ -232,17 +177,25 @@
 
   autoflagging.decorate.feedback.addFeedback = function (items, $el, defaultKey) {
     var count = Object.keys(items)
-                      .map(function (key) { return items[key].length; })
-                      .reduce(function (a, b) { return a + b; }, 0);
+                      .map(function (key) {
+                        return items[key].length;
+                      })
+                      .reduce(function (a, b) {
+                        return a + b;
+                      }, 0);
     if (count) {
       var title = (items[defaultKey] || []).join(", ");
       var titles = Object.keys(items)
                          .map(function (key) {
-                           if (key === defaultKey) return;
+                           if (key === defaultKey) {
+                             return undefined;
+                           }
                            return key + ": " + items[key].join(", ");
                          });
       titles.unshift(title);
-      titles = titles.filter(function (x) { return !!x });
+      titles = titles.filter(function (x) {
+        return x;
+      });
       $el.append($("<span/>").addClass("ai-feedback-info").addClass("ai-feedback-info-" + defaultKey.replace(/-$/, "")).text(count).attr("title", titles.join("; ")));
     }
   };
@@ -254,11 +207,11 @@
     element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
-    if (element.parent().children(':first-child').hasClass('timestamp') && element.is(':nth-child(2)')) {
+    if (element.parent().children(":first-child").hasClass("timestamp") && element.is(":nth-child(2)")) {
       // don’t overlap the timestamp
       element.css({
-        minHeight: '3em'
-      })
+        minHeight: "3em"
+      });
     }
   };
 
@@ -272,29 +225,30 @@
    * It will use the results to decorate the Smokey reports which are already on the page.
    */
   autoflagging.callAPI = function (urls, page) {
-    //console.log("Call API");
+    // console.log("Call API");
     if (page == null) {
       page = 1;
     }
     var autoflagData = {};
     var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
-    //console.log("URL: " + url);
-    $.get(url, function(data) {
+    // console.log("URL: " + url);
+    $.get(url, function (data) {
       // Group information by link
       for (var i = 0; i < data.items.length; i++) {
         autoflagData[data.items[i].link] = data.items[i];
       }
 
       // Loop over all Smokey reports and decorate them
-      $(autoflagging.selector).each(function() {
+      $(autoflagging.selector).each(function () {
         var postURL = autoflagging.getPostURL(this);
         // TODO: show flag weight - first, the API needs to be changed
-        if (typeof autoflagData[postURL] == 'undefined')
+        if (typeof autoflagData[postURL] == "undefined") {
           return;
+        }
         autoflagging.decorateMessage($(this), autoflagData[postURL]);
         // Post deleted?
         if (autoflagData[postURL].deleted_at != null) {
-          $(this).find('.content').toggleClass('ai-deleted');
+          $(this).find(".content").toggleClass("ai-deleted");
         }
       });
 
@@ -302,8 +256,8 @@
         // There are more items on the next 'page'
         autoflagging.callAPI(urls, ++page);
       }
-    }).fail(function(xhr, textStatus, error) {
-      autoflagging.notify('Failed to load data: ' + xhr.statusText);
+    }).fail(function (xhr, /* textStatus, error */) {
+      autoflagging.notify("Failed to load data: " + xhr.statusText);
     });
   };
 
@@ -314,18 +268,20 @@
 
   // Wait for the chat messages to be loaded.
   var chat = $("#chat");
-  chat.on("DOMSubtreeModified", function() {
+  chat.on("DOMSubtreeModified", function () {
     if (chat.html().length !== 0) {
       // Chat messages loaded
       chat.off("DOMSubtreeModified");
 
       // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
       var urls = "";
-      $(autoflagging.selector).each(function() {
+      $(autoflagging.selector).each(function () {
         var url = autoflagging.getPostURL(this);
         // Show spinner
         if (url !== null) {
-          if (urls !== "") { urls += "%3B"; }
+          if (urls !== "") {
+            urls += "%3B";
+          }
           autoflagging.addSpinnerToMessage($(this));
           urls += url;
         }
@@ -346,11 +302,13 @@
       setTimeout(function () {
         var urls = "";
         $(autoflagging.selector).filter(function () {
-          return !$(this).find('.ai-information').length;
-        }).each(function() {
+          return !$(this).find(".ai-information").length;
+        }).each(function () {
           var url = autoflagging.getPostURL(this);
           if (url !== null) {
-            if (urls !== "") { urls += "%3B"; }
+            if (urls !== "") {
+              urls += "%3B";
+            }
             autoflagging.addSpinnerToMessage($(this));
             urls += url;
           }
@@ -364,88 +322,82 @@
   // Listen to MS events
   autoflagging.msgQueue = [];
   autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
-  autoflagging.socket.onmessage = function(message) {
+  autoflagging.socket.onmessage = function (message) {
+    function decorate(selector, data) {
+      return function _deco() {
+        if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
+          autoflagging.decorateMessage($(selector).parents(".message"), data);
+        } else {
+          // MS is faster than chat; add the decorate operation to the queue
+          autoflagging.msgQueue.push(_deco);
+        }
+      };
+    }
+
     // Parse message
     var jsonData = JSON.parse(message.data);
     switch (jsonData.type) {
-    case "confirm_subscription":
-    case "ping":
-    case "welcome":
-      break;
-    default:
-      // Analyze socket message
-      var flagLog = jsonData.message.flag_log;
-      var deletionLog = jsonData.message.deletion_log;
-      var feedback = jsonData.message.feedback;
-      var notFlagged = jsonData.message.not_flagged;
-      if (typeof flagLog != 'undefined') {
-        // Autoflagging information
-        //console.log(flagLog.user_name + ' autoflagged ' + flagLog.post_link);
-        var selector = autoflagging.selector + "a[href^='" + flagLog.post_link + "']";
-        var data = {};
-        data.flagged = true;
-        data.users = [flagLog.user];
-        var decorate = function () {
-          if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length) {
-            autoflagging.decorateMessage($(selector).parents(".message"), {
-              autoflagged: data,
-            });
-          } else {
-            // MS is faster than chat; add the decorate operation to the queue
-            autoflagging.msgQueue.push(decorate);
-          }
-        };
-        decorate();
-      } else if (typeof deletionLog != 'undefined') {
-        // Deletion log
-        //console.log(deletionLog.post_link + ' deleted');
-        var selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
-        $(selector).parents('.content').toggleClass('ai-deleted');
-      } else if (typeof feedback != 'undefined') {
-        // Feedback
-        // console.log(feedback.user_name + ' posted ' + feedback.symbol + ' on ' + feedback.post_link, feedback); // feedback_type
-        var selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
-        var decorate = function () {
-          if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length) {
-            autoflagging.decorateMessage($(selector).parents(".message"), {
-              feedbacks: [feedback]
-            });
-          } else {
-            // MS is faster than chat; add the decorate operation to the queue
-            autoflagging.msgQueue.push(decorate);
-          }
-        };
-        decorate();
-      } else if (typeof notFlagged != 'undefined') {
-        var selector = autoflagging.selector + "a[href^='" + notFlagged.post_link + "']";
-        var decorate = function () {
-          if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length) {
-            autoflagging.decorateMessage($(selector).parents(".message"), {
-              autoflagged: {
-                flagged: false,
-                users: []
-              },
-            });
-          } else {
-            // MS is faster than chat; add the decorate operation to the queue
-            autoflagging.msgQueue.push(decorate);
-          }
-        };
-        decorate();
+      case "confirm_subscription":
+      case "ping":
+      case "welcome":
+        break;
+      default: {
+        // Analyze socket message
+        var flagLog = jsonData.message.flag_log;
+        var deletionLog = jsonData.message.deletion_log;
+        var feedback = jsonData.message.feedback;
+        var notFlagged = jsonData.message.not_flagged;
+        if (typeof flagLog != "undefined") {
+          // Autoflagging information
+          // console.log(flagLog.user_name + " autoflagged " + flagLog.post_link);
+          let selector = autoflagging.selector + "a[href^='" + flagLog.post_link + "']";
+          let data = {};
+          data.flagged = true;
+          data.users = [flagLog.user];
+          decorate(selector, {
+            autoflagged: data,
+          });
+        } else if (typeof deletionLog != "undefined") {
+          // Deletion log
+          // console.log(deletionLog.post_link + " deleted");
+          let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
+          $(selector).parents(".content").toggleClass("ai-deleted");
+        } else if (typeof feedback != "undefined") {
+          // Feedback
+          // console.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
+          let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
+          decorate(selector, {
+            feedbacks: [feedback]
+          });
+        } else if (typeof notFlagged != "undefined") {
+          let selector = autoflagging.selector + "a[href^='" + notFlagged.post_link + "']";
+          decorate(selector, {
+            autoflagged: {
+              flagged: false,
+              users: []
+            },
+          });
+        }
+        break;
       }
-      break;
     }
   };
 
-  autoflagging.socket.onopen = function() {
+  autoflagging.socket.onopen = function () {
     // Send authentication
-    autoflagging.socket.send('{"identifier": "{\\"channel\\":\\"ApiChannel\\",\\"key\\":\\"' + autoflagging.key + '\\"}", "command": "subscribe"}');
+    autoflagging.socket.send(JSON.stringify({
+      identifier: JSON.stringify({
+        channel: "ApiChannel",
+        key: autoflagging.key
+      }),
+      command: "subscribe"
+    }));
   };
 
   // Sometimes, autoflagging information arrives before the chat message.
   // The code below makes sure the queued decorations are executed.
   CHAT.addEventHandlerHook(function (e) {
-    if (e.event_type == 1 && e.user_id == autoflagging.smokeyID) {
+    if (e.event_type === 1 && e.user_id === autoflagging.smokeyID) {
       var self = this;
       var q = autoflagging.msgQueue;
       autoflagging.msgQueue = [];
@@ -454,9 +406,11 @@
           f.apply(self, arguments);
         });
       });
-      setTimeout(function() {
+      setTimeout(function () {
         var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
-        if (!matches) return;
+        if (!matches) {
+          return;
+        }
         // Show spinner
         autoflagging.addSpinnerToMessage($("#message-" + e.message_id));
       }, 1000);
