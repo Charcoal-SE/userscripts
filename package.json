@@ -10,7 +10,7 @@
     "url": "git+https://github.com/Charcoal-SE/userscripts.git"
   },
   "author": "Charcoal",
-  "license": "UNLICENSED",
+  "license": "(MIT OR Apache-2.0)",
   "private": true,
   "bugs": {
     "url": "https://github.com/Charcoal-SE/userscripts/issues"
