@@ -59,7 +59,7 @@ $.get("https://api.github.com/repos/charcoal-se/userscripts/git/trees/master?rec
   });
 }).fail(fail);
 
-function getMeta(meta, file, /* blob */) {
+function getMeta(meta, file /* blob */) {
   var joiner = " • ";
   return [
     meta.version.length && meta.version.map(function (v) {
