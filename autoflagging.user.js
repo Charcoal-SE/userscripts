@@ -120,9 +120,6 @@
     if ($autoflag.find(".ai-flag-count").length === 0) {
       $autoflag.append($("<a/>").addClass("ai-flag-count"));
     }
-    if (allData.id) {
-      $autoflag.find(".ai-flag-count").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs");
-    }
 
     if ($autoflag.data("users")) {
       data.users = $autoflag.data("users").concat(data.users);
@@ -135,6 +132,10 @@
       });
     }
     $autoflag.data("users", data.users);
+
+    if (allData.id && data.users.length > 0) {
+      $autoflag.find(".ai-flag-count").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs");
+    }
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
     $autoflag.find(".ai-flag-count")
@@ -359,6 +360,7 @@
         break;
       default: {
         // Analyze socket message
+        console.log(jsonData.message);
         var flagLog = jsonData.message.flag_log;
         var deletionLog = jsonData.message.deletion_log;
         var feedback = jsonData.message.feedback;
