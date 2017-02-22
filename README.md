@@ -1,6 +1,4 @@
-# Userscripts
-
-[![Travis](https://img.shields.io/travis/Charcoal-SE/userscripts.svg)](https://travis-ci.org/Charcoal-SE/userscripts)
+# Userscripts [![Travis](https://img.shields.io/travis/Charcoal-SE/userscripts.svg)](https://travis-ci.org/Charcoal-SE/userscripts)
 
 A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).
 
