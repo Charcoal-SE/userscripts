@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.10-beta.3
+// @version     0.10-beta.4
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -33,9 +33,9 @@
   window.autoflagging = {};
 
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
-    "chat.stackexchange.com": "120914",
-    "chat.stackoverflow.com": "3735529",
-    "chat.meta.stackexchange.com": "266345",
+    "chat.stackexchange.com": 120914,
+    "chat.stackoverflow.com": 3735529,
+    "chat.meta.stackexchange.com": 266345,
   };
 
   autoflagging.smokeyID = autoflagging.smokeyIds[location.host];
@@ -126,12 +126,10 @@
 
     if ($autoflag.data("users")) {
       data.users = $autoflag.data("users").concat(data.users);
-      console.log(data.users);
       var uniqUsers = {};
       data.users.forEach(function (user) {
         uniqUsers[user.stackexchange_chat_id] = user;
       });
-      console.log(uniqUsers);
       data.users = Object.keys(uniqUsers).map(function (key) {
         return uniqUsers[key];
       });
@@ -342,14 +340,14 @@
   autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
   autoflagging.socket.onmessage = function (message) {
     function decorate(selector, data) {
-      return function _deco() {
+      (function _deco() {
         if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
           autoflagging.decorateMessage($(selector).parents(".message"), data);
         } else {
           // MS is faster than chat; add the decorate operation to the queue
           autoflagging.msgQueue.push(_deco);
         }
-      };
+      })();
     }
 
     // Parse message
@@ -375,6 +373,9 @@
           decorate(selector, {
             autoflagged: data,
           });
+          autoflagging.callAPI([
+            flagLog.post_link
+          ]);
         } else if (typeof deletionLog != "undefined") {
           // Deletion log
           // console.log(deletionLog.post_link + " deleted");
@@ -419,9 +420,10 @@
       var self = this;
       var q = autoflagging.msgQueue;
       autoflagging.msgQueue = [];
+      var args = arguments;
       q.forEach(function (f) {
         setTimeout(function () {
-          f.apply(self, arguments);
+          f.apply(self, args);
         });
       });
       setTimeout(function () {
