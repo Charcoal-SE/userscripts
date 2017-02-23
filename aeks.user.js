@@ -26,22 +26,23 @@
 (function () {
   "use strict";
 
-  var userscript = function ($) {    
-    if(localStorage['aeksFinished'])   
+  var userscript = function ($) {
+    if (localStorage.aeksFinished) {
       return;
-    
+    }
+
     var params = [
-      { name: 'fkey', value: localStorage['se:fkey'].split(',')[0] },
-      { name: 'key', value: '85' },   // 85 is the id for the keyboard shortcuts setting.
-      { name: 'value', value: 'true' }, // Enable that setting
-      { name: 'forUserId', value: $('.my-profile, .profile-me').attr('href').match(/\d+/)[0] }
+      {name: "fkey", value: localStorage["se:fkey"].split(",")[0]},
+      {name: "key", value: "85"},     // 85 is the id for the keyboard shortcuts setting.
+      {name: "value", value: "true"}, // Enable that setting
+      {name: "forUserId", value: $(".my-profile, .profile-me").attr("href").match(/\d+/)[0]}
     ];
 
     $.post(
-      '/users/save-preference',
+      "/users/save-preference",
       params,
-      function(){
-        localStorage['aeksFinished'] = true;
+      function () {
+        localStorage.aeksFinished = true;
       }
     );
   };
