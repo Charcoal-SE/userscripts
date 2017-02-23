@@ -358,10 +358,9 @@
   autoflagging.msgQueue = [];
   autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
   autoflagging.socket.onmessage = function (message) {
-    function decorate(selector, data, postURL) {
+    function decorate(selector, data) {
       (function _deco() {
         if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
-          $(selector).parents(".message").find(".ai-information").data("post-url", postURL);
           autoflagging.decorateMessage($(selector).parents(".message"), data);
         } else {
           // MS is faster than chat; add the decorate operation to the queue
@@ -393,7 +392,7 @@
           data.users = [flagLog.user];
           decorate(selector, {
             autoflagged: data,
-          }, flagLog.post_link);
+          });
           autoflagging.callAPI([
             flagLog.post_link
           ]);
@@ -408,7 +407,7 @@
           let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
           decorate(selector, {
             feedbacks: [feedback]
-          }, feedback.post_link);
+          });
         } else if (typeof notFlagged != "undefined") {
           let selector = autoflagging.selector + "a[href^='" + notFlagged.post_link + "']";
           decorate(selector, {
@@ -416,7 +415,7 @@
               flagged: false,
               users: []
             },
-          }, notFlagged.post_link);
+          });
         }
         break;
       }
