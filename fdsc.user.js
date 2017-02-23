@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.11.1
+// @version     1.12.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -318,6 +318,8 @@
                   $(nodeEvent.target).attr("data-fdsc-ms-id", data[0].id);
                   fdsc.postFound = true;
                   var isAutoflagged = data[0].autoflagged.flagged === true;
+                  var isFlagged = $(".popup .already-flagged").length > 0;
+
                   if (isAutoflagged) {
                     fdsc.autoflagged = "autoflagged";
                   } else {
@@ -326,12 +328,15 @@
                   var tps = data[0].count_tp;
                   var fps = data[0].count_fp;
                   var naa = data[0].count_naa;
+                  var buttonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
                   var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
-                  if (isAutoflagged) {
-                    status += " - <a href='#' id='autoflag-tp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>confirm autoflag</a></div>";
+
+                  if (isFlagged || isAutoflagged) {
+                    status += " - <a href='#' id='autoflag-tp' " + buttonStyle + ">tpu-</a></div>";
                   }
+
                   if (tps === 0) {
-                    status += " - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>";
+                    status += " - <a href='#' id='feedback-fp' " + buttonStyle + ">false positive?</a></div>";
                   } else {
                     // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
                     // Hence, do not display the false positive button
@@ -341,7 +346,7 @@
                   // On click of the false positive button
                   registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
                   // On click of the confirm autoflag
-                  registerFeedbackButton("#autoflag-tp", "tpu-", "Confirming autoflag feedback");
+                  registerFeedbackButton("#autoflag-tp", "tpu-", "Reporting as true positive");
                 } else {
                   fdsc.postFound = false;
                 }
