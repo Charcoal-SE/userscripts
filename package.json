@@ -27,6 +27,7 @@
     ],
     "rules": {
       "quotes": ["error", "double"],
+      "linebreak-style": "off",
       "comma-dangle": "off",
       "no-eq-null": "off",
       "eqeqeq": ["error", "smart"],
