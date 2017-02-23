@@ -10,7 +10,7 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
  - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms_dark_theme.user.js)
  - [Hide topbar ads](https://github.com/Charcoal-SE/Userscripts/raw/master/hideads.user.js)
  - [Autoflagging information for Charcoal HQ](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging.user.js)
- - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks.user.js)
+ - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks.user.js) ([Info](https://github.com/Charcoal-SE/userscripts/wiki/AEKS))
 
 Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
 
