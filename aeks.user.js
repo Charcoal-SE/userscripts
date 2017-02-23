@@ -4,7 +4,7 @@
 // @description Automatically enable keyboard shortcuts for any SE site you're on. This may require a reload for the setting to take effect.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0
+// @version     1.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -27,7 +27,17 @@
   "use strict";
 
   var userscript = function ($) {
-    if (localStorage.aeksFinished) {
+    function log(message) {
+      if (console && console.log) {
+        console.log(message);
+      }
+    }
+
+    var userLink = $(".my-profile, .profile-me").attr("href");
+
+    // AEKS has already ran on this site, or the user doesn't have an account here.
+    if (!userLink || localStorage.aeksFinished) {
+      log("AEKS cancelled: User has no account or AEKS already finished on this site.");
       return;
     }
 
@@ -35,7 +45,7 @@
       {name: "fkey", value: localStorage["se:fkey"].split(",")[0]},
       {name: "key", value: "85"},     // 85 is the id for the keyboard shortcuts setting.
       {name: "value", value: "true"}, // Enable that setting
-      {name: "forUserId", value: $(".my-profile, .profile-me").attr("href").match(/\d+/)[0]}
+      {name: "forUserId", value: userLink.match(/\d+/)[0]}
     ];
 
     $.post(
@@ -43,6 +53,7 @@
       params,
       function () {
         localStorage.aeksFinished = true;
+        log("AEKS finished on this site.");
       }
     );
   };
