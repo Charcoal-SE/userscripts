@@ -27,8 +27,8 @@
   "use strict";
 
   var userscript = function ($) {
-    function log (message) {
-      if(console && console.log) {
+    function log(message) {
+      if (console && console.log) {
         console.log(message);
       }
     }
