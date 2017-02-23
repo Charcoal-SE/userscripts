@@ -26,28 +26,28 @@
 (function () {
   "use strict";
 
-    var userscript = function ($) {        
-        if(localStorage['aeksFinished'])     
-            return;
-        
-        var params = [
-            { name: 'fkey', value: localStorage['se:fkey'].split(',')[0] },
-            { name: 'key', value: '85' },     // 85 is the id for the keyboard shortcuts setting.
-            { name: 'value', value: 'true' }, // Enable that setting
-            { name: 'forUserId', value: $('.my-profile, .profile-me').attr('href').match(/\d+/)[0] }
-        ];
+  var userscript = function ($) {    
+    if(localStorage['aeksFinished'])   
+      return;
+    
+    var params = [
+      { name: 'fkey', value: localStorage['se:fkey'].split(',')[0] },
+      { name: 'key', value: '85' },   // 85 is the id for the keyboard shortcuts setting.
+      { name: 'value', value: 'true' }, // Enable that setting
+      { name: 'forUserId', value: $('.my-profile, .profile-me').attr('href').match(/\d+/)[0] }
+    ];
 
-        $.post(
-            '/users/save-preference',
-            params,
-            function(){
-                localStorage['aeksFinished'] = true;
-            }
-        );
-    };
+    $.post(
+      '/users/save-preference',
+      params,
+      function(){
+        localStorage['aeksFinished'] = true;
+      }
+    );
+  };
 
-    var aeksScript = document.createElement("script");
-    aeksScript.type = "application/javascript";
-    aeksScript.text = "(" + userscript + ")(jQuery);";
-    document.body.appendChild(aeksScript);
+  var aeksScript = document.createElement("script");
+  aeksScript.type = "application/javascript";
+  aeksScript.text = "(" + userscript + ")(jQuery);";
+  document.body.appendChild(aeksScript);
 })();
