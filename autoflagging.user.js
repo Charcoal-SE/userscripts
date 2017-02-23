@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.10
+// @version     0.10.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -63,6 +63,24 @@
   autoflagging.decorate = function (element, data) {
     element.find(".ai-spinner").remove();
     element.addClass("ai-loaded");
+
+    // Insert reason weight
+    if (typeof data.reason_weight != "undefined") {
+      element.siblings(".content").contents().each(function (index, node) {
+        // Text node?
+        if (node.nodeType !== 3) {
+          return;
+        }
+        var text = node.textContent;
+        // Text node with reasons?
+        if (!text.startsWith(" ]") || !text.endsWith(": ")) {
+          return;
+        }
+        // Insert weight
+        node.textContent = text.substr(0, text.length - 2) +
+          " (" + data.reason_weight + "): ";
+      });
+    }
 
     var names = {
       before: "prepend",
@@ -258,7 +276,6 @@
       // Loop over all Smokey reports and decorate them
       $(autoflagging.selector).each(function () {
         var postURL = autoflagging.getPostURL(this);
-        // TODO: show flag weight - first, the API needs to be changed
         if (typeof autoflagData[postURL] == "undefined") {
           return;
         }
@@ -337,6 +354,7 @@
   });
 
   // Listen to MS events
+  // TODO: show flag weight for realtime posts - first, the API needs to be changed
   autoflagging.msgQueue = [];
   autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
   autoflagging.socket.onmessage = function (message) {
