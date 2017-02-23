@@ -4,7 +4,7 @@
 // @description Automatically enable keyboard shortcuts for any SE site you're on. This may require a reload for the setting to take effect.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0
+// @version     1.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
