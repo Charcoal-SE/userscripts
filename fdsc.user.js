@@ -327,11 +327,9 @@
                   var fps = data[0].count_fp;
                   var naa = data[0].count_naa;
                   var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
-
                   if (isAutoflagged) {
                     status += " - <a href='#' id='autoflag-tp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>confirm autoflag</a></div>";
                   }
-
                   if (tps === 0) {
                     status += " - <a href='#' id='feedback-fp' style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'>false positive?</a></div>";
                   } else {
@@ -339,7 +337,6 @@
                     // Hence, do not display the false positive button
                     status += "</div>";
                   }
-
                   $(".popup-actions").prepend(status);
                   // On click of the false positive button
                   registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
