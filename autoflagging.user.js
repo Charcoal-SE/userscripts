@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.10.1
+// @version     0.11
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -17,6 +17,9 @@
 // @grant       none
 // ==/UserScript==
 /* global autoflagging */
+
+// To enable/disable trace information, type autoflagging.trace(true) resp.
+// autoflagging.trace(false) in your browser's console.
 
 (function () {
   "use strict";
@@ -31,18 +34,36 @@
   // Constants
   var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
   window.autoflagging = {};
-
+  autoflagging.traceKey = "autoflagging-trace";
+  autoflagging.trace = function (enable) {
+    // Enable/disable trace
+    if (enable) {
+      console.log("Autoflagging trace enabled.");
+      window.localStorage.setItem(autoflagging.traceKey, "true");
+    } else {
+      console.log("Autoflagging trace disabled.");
+      window.localStorage.removeItem(autoflagging.traceKey);
+    }
+    return enable;
+  };
+  autoflagging.log = function (object) {
+    // Trace enabled?
+    if (window.localStorage.getItem(autoflagging.traceKey) !== "true") {
+      return;
+    }
+    console.log(object);
+  };
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
     "chat.stackexchange.com": 120914,
     "chat.stackoverflow.com": 3735529,
     "chat.meta.stackexchange.com": 266345,
   };
-
   autoflagging.smokeyID = autoflagging.smokeyIds[location.host];
   autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? ] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
+  autoflagging.reasonsRegex = /^ ].*(?!\)): $/;
   // MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
   // Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
 
@@ -71,9 +92,9 @@
         if (node.nodeType !== 3) {
           return;
         }
+        // Text node with reasons (but no weight added yet)?
         var text = node.textContent;
-        // Text node with reasons?
-        if (!text.startsWith(" ]") || !text.endsWith(": ")) {
+        if (!text.match(autoflagging.reasonsRegex)) {
           return;
         }
         // Insert weight
@@ -260,13 +281,13 @@
    * It will use the results to decorate the Smokey reports which are already on the page.
    */
   autoflagging.callAPI = function (urls, page) {
-    // console.log("Call API");
+    autoflagging.log("Call API");
     if (page == null) {
       page = 1;
     }
     var autoflagData = {};
     var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
-    // console.log("URL: " + url);
+    autoflagging.log("URL: " + url);
     $.get(url, function (data) {
       // Group information by link
       for (var i = 0; i < data.items.length; i++) {
@@ -377,24 +398,24 @@
         break;
       default: {
         // Analyze socket message
-        console.log(jsonData.message);
+        autoflagging.log(jsonData.message);
         var flagLog = jsonData.message.flag_log;
         var deletionLog = jsonData.message.deletion_log;
         var feedback = jsonData.message.feedback;
         var notFlagged = jsonData.message.not_flagged;
         if (typeof flagLog != "undefined") {
           // Autoflagging information
-          // console.log(flagLog.user_name + " autoflagged " + flagLog.post.link);
+          autoflagging.log(flagLog.user_name + " autoflagged " + flagLog.post.link);
           let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
           decorate(selector, flagLog.post);
         } else if (typeof deletionLog != "undefined") {
           // Deletion log
-          // console.log(deletionLog.post_link + " deleted");
+          autoflagging.log(deletionLog.post_link + " deleted");
           let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
           $(selector).parents(".content").toggleClass("ai-deleted");
         } else if (typeof feedback != "undefined") {
           // Feedback
-          // console.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
+          autoflagging.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
           let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
           decorate(selector, {
             feedbacks: [feedback]
