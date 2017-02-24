@@ -354,7 +354,6 @@
   });
 
   // Listen to MS events
-  // TODO: show flag weight for realtime posts - first, the API needs to be changed
   autoflagging.msgQueue = [];
   autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
   autoflagging.socket.onmessage = function (message) {
@@ -385,17 +384,9 @@
         var notFlagged = jsonData.message.not_flagged;
         if (typeof flagLog != "undefined") {
           // Autoflagging information
-          // console.log(flagLog.user_name + " autoflagged " + flagLog.post_link);
-          let selector = autoflagging.selector + "a[href^='" + flagLog.post_link + "']";
-          let data = {};
-          data.flagged = true;
-          data.users = [flagLog.user];
-          decorate(selector, {
-            autoflagged: data,
-          });
-          autoflagging.callAPI([
-            flagLog.post_link
-          ]);
+          // console.log(flagLog.user_name + " autoflagged " + flagLog.post.link);
+          let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
+          decorate(selector, flagLog.post);
         } else if (typeof deletionLog != "undefined") {
           // Deletion log
           // console.log(deletionLog.post_link + " deleted");
@@ -409,13 +400,8 @@
             feedbacks: [feedback]
           });
         } else if (typeof notFlagged != "undefined") {
-          let selector = autoflagging.selector + "a[href^='" + notFlagged.post_link + "']";
-          decorate(selector, {
-            autoflagged: {
-              flagged: false,
-              users: []
-            },
-          });
+          let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
+          decorate(selector, notFlagged.post);
         }
         break;
       }
