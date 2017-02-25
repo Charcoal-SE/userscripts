@@ -33,6 +33,7 @@
   var userscript = function ($) {
     window.fdsc = {};
     fdsc.metasmokeKey = "070f26ebb71c5e6cfca7893fe1139460cf23f30d686566f5707a4acfd50c";
+    fdsc.ready = false;
 
     /*!
     * Given a DOM element containing the post in question, will construct the URL to that post in the form
@@ -282,6 +283,9 @@
           fdsc.msWriteToken = data.value;
           console.log("fdsc.msWriteToken: ", data.value);
         });
+
+        $(document).trigger("fdsc:ready");
+        fdsc.ready = true;
 
         $(".flag-post-link").on("click", function (clickEvent) {
           $(document).on("DOMNodeInserted", function (nodeEvent) {
