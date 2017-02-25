@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.11
+// @version     0.11.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -51,6 +51,7 @@
     if (window.localStorage.getItem(autoflagging.traceKey) !== "true") {
       return;
     }
+    console.log("Time: " + new Date().toISOString().substring(11, 23));
     console.log(object);
   };
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
@@ -63,7 +64,6 @@
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? ] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
-  autoflagging.reasonsRegex = /^ ].*(?!\)): $/;
   // MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
   // Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
 
@@ -93,8 +93,10 @@
           return;
         }
         // Text node with reasons (but no weight added yet)?
+        // I'd like to test it with this regex: ^ ].*(?>!\)): $
+        // but it doesn't compile in JS.
         var text = node.textContent;
-        if (!text.match(autoflagging.reasonsRegex)) {
+        if (!text.startsWith(" ]") || !text.endsWith(": ") || text.endsWith("): ")) {
           return;
         }
         // Insert weight
