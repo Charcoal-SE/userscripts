@@ -116,7 +116,7 @@
       .append(createFeedbackButton(d, 49, "tpu-", "tpu-")) // "True positive"
       .append(createFeedbackButton(d, 50, "tp-", "tp-"))   // "Vandalism"
       .append(createFeedbackButton(d, 51, "fp-", "fp-"))   // "False positive"
-      .append(createFeedbackButton(d, 53, "naa-", "naa-")) // "Not an Answer / VLQ"
+      .append(createFeedbackButton(d, 52, "naa-", "naa-")) // "Not an Answer / VLQ"
       .append(closeButton);
 
     var body = element("div", "ai-fire-popup-body")
