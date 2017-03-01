@@ -29,19 +29,21 @@
 
   if (wip) {
     // This userscript is still work in progress. It's probably broken, useless or otherwise dangerous.
-    var style = $("<style />", {type: "text/css"});
-    $.get("https://raw.githubusercontent.com/Charcoal-SE/userscripts/FIRE/fire/fire.css",
-      function (response) {
-        style.text(response);
-        document.head.appendChild(style[0]);
-        console.log(style);
-      });
+    $.get(
+      "https://api.github.com/repos/Charcoal-SE/Userscripts/commits/FIRE",
+      function (commitData) {
+        var css = window.document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = "https://cdn.rawgit.com/Charcoal-SE/Userscripts/" + commitData.sha + "/fire/fire.css";
+        document.head.appendChild(css);
+      }
+    );
   } else {
     // Release
     // Inject CSS
     var css = window.document.createElement("link");
     css.rel = "stylesheet";
-    css.href = "//charcoal-se.org/userscripts/fire.css";
+    css.href = "//charcoal-se.org/userscripts/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
     document.head.appendChild(css);
   }
 
@@ -60,11 +62,10 @@
 
   function openPopup(data) {
     var w = window.innerWidth / 2;
-    var h = window.innerHeight / 2;
     var d = data;
 
     var popup = $("<div />", {class: "ai-fire-popup"})
-      .css({top: window.pageYOffset + h - 400, left: w - 600});
+      .css({top: 100, left: w - 600});
 
     var tpuButton = $("<a />", {
       class: "button",
@@ -120,6 +121,7 @@
         class: "ai-fire-button",
         text: "🛠️",
         click: function () {
+          data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
           openPopup(data);
         }
       });
@@ -127,5 +129,6 @@
       $fire.prepend(fireButton);
     }
   };
+
   autoflagging.decorate.fire.location = "after";
 })();
