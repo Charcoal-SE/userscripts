@@ -36,7 +36,7 @@
   // Inject CSS
   var css = window.document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "//raw.githubusercontent.com/Charcoal-SE/userscripts/" + branch + "/fire/fire.css";
+  css.href = "//cdn.rawgit.com/Charcoal-SE/userscripts/" + branch + "/fire/fire.css";
   document.head.appendChild(css);
 
   function closePopup() {
