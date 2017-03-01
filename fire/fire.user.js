@@ -77,6 +77,7 @@
     var top = element("p", "ai-fire-popup-header")
       .append(createFeedbackButton(d, "tpu-", "tpu-"))
       .append(createFeedbackButton(d, "fp", "fp"))
+      .append(createFeedbackButton(d, "naa-", "naa-"))
       .append(closeButton);
 
     var body = element("div", "ai-fire-popup-body")
