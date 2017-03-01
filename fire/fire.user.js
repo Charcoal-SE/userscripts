@@ -29,6 +29,9 @@
     return;
   }
 
+  var buttonKeyCodes = [];
+  var isOpen = false;
+
   var wip = true;
   injectCSS(wip);
 
@@ -53,16 +56,36 @@
       .fadeOut("fast", function () {
         $(this).remove();
       });
+
+    $(document).off("keydown", keyboardShortcuts);
+    isOpen = false;
   }
 
-  function closePopupOnEsc(e) {
-    if (e.keyCode === 27) { // escape key
-      closePopup();
-      $(document).off("keyup", closePopupOnEsc);
+  function keyboardShortcuts(e) {
+    if (e.keyCode === 13) { // Enter key
+      $(".ai-fire-popup-header a.button.focus").click();
+    } else if (buttonKeyCodes.indexOf(e.keyCode) >= 0) {
+      e.preventDefault();
+
+      $(".ai-fire-popup-header a.button").removeClass("focus");
+
+      var button = $(".ai-fire-popup-header a.button[data-key=" + e.keyCode + "]");
+
+      if (e.keyCode === 27) { // Esc key
+        button.click();
+      } else {
+        button.addClass("focus");
+      }
     }
   }
 
   function openPopup(data) {
+    if (isOpen) {
+      return; // Don't open the popup twice.
+    }
+
+    isOpen = true;
+
     var w = window.innerWidth / 2;
     var d = data;
 
@@ -71,13 +94,15 @@
 
     var closeButton = element("a", "button ai-fire-close-button", {
       text: "Close",
-      click: closePopup
+      click: closePopup,
+      "data-key": 27 // escape key code
     });
+    buttonKeyCodes.push(27);
 
     var top = element("p", "ai-fire-popup-header")
-      .append(createFeedbackButton(d, "tpu-", "tpu-"))
-      .append(createFeedbackButton(d, "fp", "fp"))
-      .append(createFeedbackButton(d, "naa-", "naa-"))
+      .append(createFeedbackButton(d, 49, "tpu-", "tpu-"))
+      .append(createFeedbackButton(d, 50, "fp", "fp"))
+      .append(createFeedbackButton(d, 51, "naa-", "naa-"))
       .append(closeButton);
 
     var body = element("div", "ai-fire-popup-body")
@@ -94,7 +119,7 @@
 
     expandLinksOnHover();
 
-    $(document).keyup(closePopupOnEsc);
+    $(document).keydown(keyboardShortcuts);
   }
 
   // Provide feedback / flag
@@ -107,12 +132,14 @@
   }
 
   // DOM helpers
-  function createFeedbackButton(data, text, verdict) {
+  function createFeedbackButton(data, keyCode, text, verdict) {
+    buttonKeyCodes.push(keyCode);
     return element("a", "button ai-fire-feedback-button", {
       text: text,
       click: function () {
         feedback(data, verdict);
-      }
+      },
+      "data-key": keyCode
     });
   }
 

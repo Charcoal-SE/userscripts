@@ -52,3 +52,11 @@
 .ai-fire-popup-body a:hover .text {
   display: none;
 }
+
+.ai-fire-popup-header a.button.focus {
+  background-color: #f98e11;
+  background: -webkit-gradient(linear,left top,left bottom,from(#f88813),to(#f9940f));
+  background: -moz-linear-gradient(top,#f88813,#f9940f);
+  background: linear-gradient(top,#f88813,#f9940f);
+  font-style: italic;
+}
