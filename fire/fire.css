@@ -38,3 +38,15 @@
   padding: 10px;
   border-radius: 5px;
 }
+
+.ai-fire-popup-body a .href {
+  display: none;
+}
+
+.ai-fire-popup-body a:hover .href {
+  display: inline;
+}
+
+.ai-fire-popup-body a:hover .text {
+  display: none;
+}

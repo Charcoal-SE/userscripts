@@ -91,6 +91,8 @@
       .appendTo("body")
       .fadeIn("fast");
 
+    expandLinksOnHover();
+
     $(document).keyup(closePopupOnEsc);
   }
 
@@ -118,6 +120,18 @@
     options = options || {};
     options.class = cssClass;
     return $("<" + tagName + "/>", options);
+  }
+
+  // Expands anchor elements in the report's body on hover, to show the href.
+  function expandLinksOnHover() {
+    $(".ai-fire-popup-body a")
+      .each(function () {
+        var that = $(this);
+        var text = that.text();
+        $(this).empty()
+          .append(element("span", "text", {text: text}))
+          .append(element("span", "href", {text: this.href}));
+      });
   }
 
   // Handle CSS injection
