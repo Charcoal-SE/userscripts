@@ -62,10 +62,10 @@
   }
 
   function keyboardShortcuts(e) {
-    if (e.keyCode === 13) { // Enter key
+    if (e.keyCode === 13 || e.keyCode === 32) { // Enter key or spacebar
       $(".ai-fire-popup-header a.button.focus")
-        .fadeOut(200) // Flash to indicate which button was selected.
-        .fadeIn(200, function () {
+        .fadeOut(100) // Flash to indicate which button was selected.
+        .fadeIn(100, function () {
           $(this).click();
         });
     } else if (buttonKeyCodes.indexOf(e.keyCode) >= 0) {
