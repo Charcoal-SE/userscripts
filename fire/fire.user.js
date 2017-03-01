@@ -19,9 +19,11 @@
   "use strict";
 
   var wip = true;
+  var branch = "master";
 
   if (wip) {
-    return; // This userscript shouldn't be used yet.
+    // This userscript is still work in progress. It's probably broken, useless or otherwise dangerous.
+    branch = "FIRE";
   }
 
   if (!autoflagging) {
@@ -32,35 +34,10 @@
   }
 
   // Inject CSS
-  // var css = window.document.createElement("link");
-  // css.rel = "stylesheet";
-  // css.href = "//raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.css";
-  // document.head.appendChild(css);
-
-  var css = {
-    "ai-fire-button": {cursor: "pointer"},
-    "ai-fire-close-button": {float: "right"},
-    "ai-fire-popup-header": {height: 40},
-    "ai-fire-popup-header a.button": {margin: 0},
-    "ai-fire-popup-body": {
-      height: 520,
-      overflowY: "scroll",
-      border: "1px solid #ccc",
-      padding: 10,
-      borderRadius: 5,
-    },
-    "ai-fire-popup": {
-      width: 600,
-      height: 600,
-      overflow: "hidden",
-      position: "absolute",
-      zIndex: 1,
-      background: "white",
-      padding: 20,
-      borderRadius: 10,
-      "box-shadow": "0px 0px 20px 2px #646464"
-    }
-  };
+  var css = window.document.createElement("link");
+  css.rel = "stylesheet";
+  css.href = "//raw.githubusercontent.com/Charcoal-SE/userscripts/" + branch + "/fire/fire.css";
+  document.head.appendChild(css);
 
   function closePopup() {
     $(".ai-fire-popup").fadeOut("fast", function () {
@@ -80,12 +57,11 @@
     var h = window.innerHeight / 2;
     var d = data;
 
-    var popup = $("<div />", {class: "ai-fire-popup", css: css["ai-fire-popup"]})
+    var popup = $("<div />", {class: "ai-fire-popup"})
       .css({top: window.pageYOffset + h - 400, left: w - 600});
 
     var tpuButton = $("<a />", {
       class: "button",
-      css: css["ai-fire-popup-header a.button"],
       text: "tpu-",
       click: function () {
         feedback(d, "tpu-");
@@ -93,7 +69,6 @@
     });
     var fpButton = $("<a />", {
       class: "button",
-      css: css["ai-fire-popup-header a.button"],
       text: "fp",
       click: function () {
         feedback(d, "fp");
@@ -101,18 +76,17 @@
     });
     var closeButton = $("<a />", {
       class: "button ai-fire-close-button",
-      css: css["ai-fire-close-button"],
       text: "Close",
       click: closePopup
     })
     .css(css["ai-fire-popup-header a.button"]);
 
-    var top = $("<p/>", {class: "ai-fire-popup-header", css: css["ai-fire-popup-header"]})
+    var top = $("<p/>", {class: "ai-fire-popup-header"})
       .append(tpuButton)
       .append(fpButton)
       .append(closeButton);
 
-    var body = $("<div/>", {class: "ai-fire-popup-body", css: css["ai-fire-popup-body"]})
+    var body = $("<div/>", {class: "ai-fire-popup-body"})
       .append($("<h3 />", {text: d.title}))
       .append($("<hr />"))
       .append(d.body);
