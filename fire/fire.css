@@ -2,10 +2,6 @@
   cursor: pointer;
 }
 
-.ai-fire-close-button {
-  float: right;
-}
-
 .ai-fire-popup {
   width: 600px;
   height: 600px;
@@ -24,6 +20,15 @@
 
 .ai-fire-popup-header a.button {
   margin: 0;
+}
+
+.ai-fire-close-button {
+  float: right;
+}
+
+.ai-fire-feedback-button {
+  float: left;
+  margin-right: 5px;
 }
 
 .ai-fire-popup-body {
