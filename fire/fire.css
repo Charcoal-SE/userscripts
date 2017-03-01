@@ -41,6 +41,7 @@
 
 .ai-fire-popup-body a .href {
   display: none;
+  word-break: break-all;
 }
 
 .ai-fire-popup-body a:hover .href {
