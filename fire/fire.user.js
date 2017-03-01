@@ -16,9 +16,9 @@
 /* global autoflagging */
 
 /*
-  TODO: 
+  TODO:
   * Make clicking outside the popup close it.
-  * Showing link URLs on hover breaks when the URL is shorter than the link text 
+  * Showing link URLs on hover breaks when the URL is shorter than the link text
       Make it a tooltip instead.
   * Show the site's header image above the post title/text.
   * Show if it's a question or answer.
