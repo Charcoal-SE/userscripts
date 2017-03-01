@@ -18,14 +18,6 @@
 (function () {
   "use strict";
 
-  var wip = true;
-  var branch = "master";
-
-  if (wip) {
-    // This userscript is still work in progress. It's probably broken, useless or otherwise dangerous.
-    branch = "FIRE";
-  }
-
   if (!autoflagging) {
     console.error("FIRE dependency missing: The AIM userscript isn't loaded.");
     console.warn("AIM GitHub url: https://github.com/Charcoal-SE/userscripts/blob/master/autoflagging.user.js");
@@ -33,11 +25,25 @@
     return;
   }
 
-  // Inject CSS
-  var css = window.document.createElement("link");
-  css.rel = "stylesheet";
-  css.href = "//cdn.rawgit.com/Charcoal-SE/userscripts/" + branch + "/fire/fire.css";
-  document.head.appendChild(css);
+  var wip = true;
+
+  if (wip) {
+    // This userscript is still work in progress. It's probably broken, useless or otherwise dangerous.
+    var style = $("<style />", {type: "text/css"});
+    $.get("https://raw.githubusercontent.com/Charcoal-SE/userscripts/FIRE/fire/fire.css",
+      function (response) {
+        style.text(response);
+        document.head.appendChild(style[0]);
+        console.log(style);
+      });
+  } else {
+    // Release
+    // Inject CSS
+    var css = window.document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "//charcoal-se.org/userscripts/fire.css";
+    document.head.appendChild(css);
+  }
 
   function closePopup() {
     $(".ai-fire-popup").fadeOut("fast", function () {
