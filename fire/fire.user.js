@@ -15,6 +15,15 @@
 // ==/UserScript==
 /* global autoflagging */
 
+/*
+  TODO: 
+  * Make clicking outside the popup close it.
+  * Showing link URLs on hover breaks when the URL is shorter than the link text 
+      Make it a tooltip instead.
+  * Show the site's header image above the post title/text.
+  * Show if it's a question or answer.
+*/
+
 (function () {
   "use strict";
 
@@ -39,7 +48,7 @@
   function onSmokeDetectorReport($fire, data) {
     if ($fire.find(".ai-fire-button").length === 0) {
       var fireButton = element("span", "ai-fire-button", {
-        text: "🛠️",
+        text: "🛠️", // http://graphemica.com/%F0%9F%9B%A0
         click: function () {
           data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
           openPopup(data);
@@ -104,9 +113,10 @@
     buttonKeyCodes.push(27);
 
     var top = element("p", "ai-fire-popup-header")
-      .append(createFeedbackButton(d, 49, "tpu-", "tpu-"))
-      .append(createFeedbackButton(d, 50, "fp", "fp"))
-      .append(createFeedbackButton(d, 51, "naa-", "naa-"))
+      .append(createFeedbackButton(d, 49, "tpu-", "tpu-")) // "True positive"
+      .append(createFeedbackButton(d, 50, "tp-", "tp-"))   // "Vandalism"
+      .append(createFeedbackButton(d, 51, "fp-", "fp-"))   // "False positive"
+      .append(createFeedbackButton(d, 53, "naa-", "naa-")) // "Not an Answer / VLQ"
       .append(closeButton);
 
     var body = element("div", "ai-fire-popup-body")
