@@ -78,8 +78,7 @@
       class: "button ai-fire-close-button",
       text: "Close",
       click: closePopup
-    })
-    .css(css["ai-fire-popup-header a.button"]);
+    });
 
     var top = $("<p/>", {class: "ai-fire-popup-header"})
       .append(tpuButton)
@@ -113,7 +112,6 @@
     if ($fire.find(".ai-fire-button").length === 0) {
       var fireButton = $("<span/>", {
         class: "ai-fire-button",
-        css: css["ai-fire-button"],
         text: "🛠️",
         click: function () {
           openPopup(data);
