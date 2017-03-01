@@ -72,6 +72,7 @@
 
   function keyboardShortcuts(e) {
     if (e.keyCode === 13 || e.keyCode === 32) { // Enter key or spacebar
+      e.preventDefault();
       $(".ai-fire-popup-header a.button.focus")
         .fadeOut(100) // Flash to indicate which button was selected.
         .fadeIn(100, function () {
