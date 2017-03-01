@@ -1,6 +1,4 @@
-.ai-fire-button {
-  cursor: pointer;
-}
+
 
 .ai-fire-popup {
   width: 600px;
@@ -14,24 +12,35 @@
   box-shadow: 0 0 20px 2px #646464;
 }
 
-.ai-fire-popup-header {
+.ai-fire-popup .ai-fire-button {
+  cursor: pointer;
+}
+
+.ai-fire-popup .ai-fire-popup-header {
   height: 40px;
 }
 
-.ai-fire-popup-header a.button {
+.ai-fire-popup .ai-fire-popup-header a.button {
   margin: 0;
 }
 
-.ai-fire-close-button {
+.ai-fire-popup .ai-fire-popup-header a.button.ai-fire-close-button {
   float: right;
 }
 
-.ai-fire-feedback-button {
+.ai-fire-popup .ai-fire-popup-header a.button.ai-fire-feedback-button {
   float: left;
-  margin-right: 5px;
+  margin-right: 2px;
+}
+.ai-fire-popup .ai-fire-popup-header a.button.focus {
+  border: 1px solid #43c407;
+  background-color: #43c407;
+  background: -webkit-gradient(linear,left top,left bottom,from(#54fc07),to(#43c407));
+  background: -moz-linear-gradient(top,#54fc07,#43c407);
+  background: linear-gradient(top,#54fc07,#43c407);
 }
 
-.ai-fire-popup-body {
+.ai-fire-popup .ai-fire-popup-body {
   height: 520px;
   overflow-y: scroll;
   border: 1px solid #ccc;
@@ -40,23 +49,15 @@
   box-shadow: inset 0 0 10px -3px #646464;
 }
 
-.ai-fire-popup-body a .href {
+.ai-fire-popup .ai-fire-popup-body a .href {
   display: none;
   word-break: break-all;
 }
 
-.ai-fire-popup-body a:hover .href {
+.ai-fire-popup .ai-fire-popup-body a:hover .href {
   display: inline;
 }
 
-.ai-fire-popup-body a:hover .text {
+.ai-fire-popup .ai-fire-popup-body a:hover .text {
   display: none;
-}
-
-.ai-fire-popup-header a.button.focus {
-  border: 1px solid #43c407;
-  background-color: #43c407;
-  background: -webkit-gradient(linear,left top,left bottom,from(#54fc07),to(#43c407));
-  background: -moz-linear-gradient(top,#54fc07,#43c407);
-  background: linear-gradient(top,#54fc07,#43c407);
 }
