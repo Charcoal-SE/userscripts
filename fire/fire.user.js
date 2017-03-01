@@ -63,7 +63,11 @@
 
   function keyboardShortcuts(e) {
     if (e.keyCode === 13) { // Enter key
-      $(".ai-fire-popup-header a.button.focus").click();
+      $(".ai-fire-popup-header a.button.focus")
+        .fadeOut(200) // Flash to indicate which button was selected.
+        .fadeIn(200, function () {
+          $(this).click();
+        });
     } else if (buttonKeyCodes.indexOf(e.keyCode) >= 0) {
       e.preventDefault();
 
