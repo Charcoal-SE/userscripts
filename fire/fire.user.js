@@ -126,11 +126,12 @@
   function expandLinksOnHover() {
     $(".ai-fire-popup-body a")
       .each(function () {
-        var that = $(this);
-        var text = that.text();
-        $(this).empty()
-          .append(element("span", "text", {text: text}))
-          .append(element("span", "href", {text: this.href}));
+        var text = $(this).text();
+        if (this.href !== text) {
+          $(this).empty()
+            .append(element("span", "text", {text: text}))
+            .append(element("span", "href", {text: this.href}));
+        }
       });
   }
 
