@@ -140,7 +140,9 @@
       .append($("<hr />"))
       .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
       .append($("<br />"))
-      .append($("<div />", {text: d.body}));
+      .append($("<div />")
+        .append(d.body)
+      );
 
     modal.appendTo("body")
       .click(closePopup);
