@@ -17,7 +17,7 @@
 
 /*
   TODO:
-  * Show the site's header image above the post title/text.
+  * Refine Site's header image
 */
 
 (function () {
@@ -47,7 +47,12 @@
       var fireButton = element("span", "ai-fire-button", {
         text: "🛠️", // http://graphemica.com/%F0%9F%9B%A0
         click: function () {
-          data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
+          if (data.link) {
+            data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
+            data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+          } else {
+            console.log(data);
+          }
           openPopup(data);
         }
       });
@@ -129,7 +134,12 @@
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "fp-", "fp-", "False Positive"))
       .append(createFeedbackButton(d, 52, "naa-", "naa-", "Not an Answer / VLQ"))
+      .append(element("span", "ai-site-logo")
+        .css("background-image", "url(//cdn.sstatic.net/Sites/" + d.site + "/img/sprites.png)")
+      )
       .append(closeButton);
+
+    console.log(d.link);
 
     var modal = element("div", "ai-fire-popup-modal");
 

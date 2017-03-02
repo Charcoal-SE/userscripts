@@ -48,12 +48,24 @@
   float: left;
   margin-right: 2px;
 }
+
 .ai-fire-popup .ai-fire-popup-header a.button.focus {
   border: 1px solid #43c407;
   background-color: #43c407;
   background: -webkit-gradient(linear,left top,left bottom,from(#54fc07),to(#43c407));
   background: -moz-linear-gradient(top,#54fc07,#43c407);
   background: linear-gradient(top,#54fc07,#43c407);
+}
+
+.ai-fire-popup .ai-fire-popup-header .ai-site-logo {
+  background-position: top left;
+  background-repeat: no-repeat;
+  display: inline-block;
+  width: 360px;
+  height: 60px;
+  position: relative;
+  top: -10px;
+  left: 16px;
 }
 
 .ai-fire-popup .ai-fire-popup-body {
