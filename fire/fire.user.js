@@ -17,7 +17,7 @@
 
 /*
   TODO:
-  * Refine Site's header image
+  * Site name is parsed from the post URL. This has to be done.
 */
 
 (function () {
@@ -51,7 +51,7 @@
             data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
             data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
           } else {
-            console.log(data);
+            console.log(data); // No link. Something went FOOBAR
           }
           openPopup(data);
         }
@@ -134,12 +134,11 @@
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "fp-", "fp-", "False Positive"))
       .append(createFeedbackButton(d, 52, "naa-", "naa-", "Not an Answer / VLQ"))
-      .append(element("span", "ai-site-logo", {text: d.site})
-        .css("background-image", "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)")
-      )
+      .append(element("span", "ai-site-logo", {
+        text: d.site,
+        css: {"background-image": "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)"}
+      }))
       .append(closeButton);
-
-    console.log(d.link);
 
     var modal = element("div", "ai-fire-popup-modal");
 
