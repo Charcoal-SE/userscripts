@@ -53,7 +53,6 @@
 
       $fire.prepend(fireButton);
     } else if (data) {
-      debugger;
       if (data.feedbacks) {
         console.log("New feedback: ", data);
         var button = $fire.find(".ai-fire-button");
