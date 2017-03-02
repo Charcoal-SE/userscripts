@@ -15,11 +15,6 @@
 // ==/UserScript==
 /* global autoflagging */
 
-/*
-  TODO:
-  * Site name is parsed from the post URL. This has to be done.
-*/
-
 (function () {
   "use strict";
 
