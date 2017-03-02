@@ -64,6 +64,8 @@
       });
 
     $(document).off("keydown", keyboardShortcuts);
+    $("#container").removeClass("ai-blur");
+
     isOpen = false;
   }
 
@@ -149,6 +151,8 @@
       .hide()
       .appendTo("body")
       .fadeIn("fast");
+
+    $("#container").addClass("ai-blur");
 
     expandLinksOnHover();
 
