@@ -17,7 +17,6 @@
 
 /*
   TODO:
-  * Make clicking outside the popup close it.
   * Showing link URLs on hover breaks when the URL is shorter than the link text
       Make it a tooltip instead.
   * Show the site's header image above the post title/text.
@@ -61,7 +60,7 @@
 
   // Popup methods
   function closePopup() {
-    $(".ai-fire-popup")
+    $(".ai-fire-popup, .ai-fire-popup-modal")
       .fadeOut("fast", function () {
         $(this).remove();
       });
@@ -120,10 +119,15 @@
       .append(createFeedbackButton(d, 52, "naa-", "naa-")) // "Not an Answer / VLQ"
       .append(closeButton);
 
+    var modal = element("div", "ai-fire-popup-modal");
+
     var body = element("div", "ai-fire-popup-body")
       .append($("<h3 />", {text: d.title}))
       .append($("<hr />"))
       .append(d.body);
+
+    modal.appendTo("body")
+      .click(closePopup);
 
     popup
       .append(top)

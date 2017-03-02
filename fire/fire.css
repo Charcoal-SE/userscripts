@@ -3,7 +3,6 @@
   height: 600px;
   overflow: hidden;
   position: fixed;
-  z-index: 1;
   background: white;
   padding: 20px;
   border-radius: 10px;
@@ -58,4 +57,13 @@
 
 .ai-fire-popup .ai-fire-popup-body a:hover .text {
   display: none;
+}
+
+.ai-fire-popup .ai-fire-popup-modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
 }
