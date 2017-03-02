@@ -28,9 +28,9 @@
     autoflagging.decorate.fire = onSmokeDetectorReport;
     autoflagging.decorate.fire.location = "after";
   } else {
-    console.error("FIRE dependency missing: The AIM userscript isn't loaded.");
-    console.warn("AIM GitHub url: https://github.com/Charcoal-SE/userscripts/blob/master/autoflagging.user.js");
-    console.warn("AIM Download url: https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js");
+    console.error("\nFIRE dependency missing: The AIM userscript isn't loaded." +
+      "\nAIM GitHub url: https://github.com/Charcoal-SE/userscripts/blob/master/autoflagging.user.js" +
+      "\nAIM Download url: https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js");
     return;
   }
 
