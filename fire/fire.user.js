@@ -134,8 +134,8 @@
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "fp-", "fp-", "False Positive"))
       .append(createFeedbackButton(d, 52, "naa-", "naa-", "Not an Answer / VLQ"))
-      .append(element("span", "ai-site-logo")
-        .css("background-image", "url(//cdn.sstatic.net/Sites/" + d.site + "/img/sprites.png)")
+      .append(element("span", "ai-site-logo", {text: d.site})
+        .css("background-image", "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)")
       )
       .append(closeButton);
 

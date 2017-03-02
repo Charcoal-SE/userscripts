@@ -60,12 +60,18 @@
 .ai-fire-popup .ai-fire-popup-header .ai-site-logo {
   background-position: top left;
   background-repeat: no-repeat;
+  background-size: contain;
   display: inline-block;
-  width: 360px;
+  width: 60px;
   height: 60px;
   position: relative;
-  top: -10px;
-  left: 16px;
+  top: -18px;
+  left: 4px;
+  font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-size: 30px;
+  padding: 0 0 0 60px;
+  line-height: 60px;
+  text-transform: capitalize;
 }
 
 .ai-fire-popup .ai-fire-popup-body {
