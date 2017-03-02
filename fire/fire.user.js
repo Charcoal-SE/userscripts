@@ -99,11 +99,11 @@
 
     isOpen = true;
 
-    var w = window.innerWidth / 2;
+    var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var d = data;
 
     var popup = element("div", "ai-fire-popup")
-      .css({top: 100, left: w - 600});
+      .css({top: 100, left: w - 300});
 
     var closeButton = element("a", "button ai-fire-close-button", {
       text: "Close",
