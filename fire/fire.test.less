@@ -1,0 +1,115 @@
+// out: ./fire.css, sourcemap: true, compress: true
+@blur: blur(2px);
+
+.ai-blur {
+  -webkit-filter: @blur;
+  -moz-filter: @blur;
+  -ms-filter: @blur;
+  -o-filter: @blur;
+  filter: @blur;
+}
+
+.ai-fire-popup-modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.ai-fire-button {
+  cursor: pointer;
+}
+
+// Popup container
+.ai-fire-popup {
+  width: 600px;
+  max-height: 600px;
+  overflow: hidden;
+  position: fixed;
+  z-index: 100;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px 2px #646464;
+
+  // Header
+  .ai-fire-popup-header {
+    height: 40px;
+
+    a.button {
+      margin: 0;
+      &.ai-fire-close-button {
+        float: right;
+      }
+      &.ai-fire-feedback-button {
+        float: left;
+        margin-right: 2px;
+      }
+      &.focus {
+        border: 1px solid #43c407;
+        background-color: #43c407;
+        background: -webkit-gradient(linear,left top,left bottom,from(#54fc07),to(#43c407));
+        background: -moz-linear-gradient(top,#54fc07,#43c407);
+        background: linear-gradient(top,#54fc07,#43c407);
+      }
+    }
+
+    .ai-site-logo {
+      background-position: top left;
+      background-repeat: no-repeat;
+      background-size: contain;
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      position: relative;
+      top: -18px;
+      left: 4px;
+      font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+      font-size: 30px;
+      padding: 0 0 0 60px;
+      line-height: 60px;
+      text-transform: capitalize;
+    }
+  } // End Header
+
+  // Body
+  .ai-fire-popup-body {
+    max-height: 520px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: inset 0 0 10px -3px #646464;
+    position: relative;
+
+    a {
+      .href {
+        display: none;
+        word-break: break-all;
+      }
+
+      &:hover {
+        .href {
+          display: inline;
+        }
+        .text {
+          display: none;
+        }
+      }
+    }
+  } // End body
+
+  .ai-fire-tooltip {
+    position: fixed;
+    background: #eee;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px 0 #888;
+    border: 1px solid #bbb;
+    pointer-events: none;
+    z-index: 100;
+  }
+} // End Popup container
