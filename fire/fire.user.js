@@ -29,12 +29,58 @@
     return;
   }
 
-  var buttonKeyCodes = [];
-  var isOpen = false;
+  var fire = {
+    wip: true,
+    metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
+    metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
+    buttonKeyCodes: [],
+    isOpen: false
+  };
 
-  var wip = true;
-  injectCSS(wip);
+  fire.baseUrl = "https://metasmoke.erwaysoftware.com/api/posts?key=" + fire.metasmokeKey;
+
+  injectCSS();
   registerAnchorHover();
+
+  getReportInfo(59354);
+
+  function getReportInfo(ids, page) {
+    // var autoflagData = {};
+    var url = fire.metasmokeUrl + "posts/" + ids + "?key=" + fire.metasmokeKey;// + "&page=" + page || 1;
+
+    autoflagging.log("URL: " + url);
+    $.get(url, function (data) {
+      // Handle returned data.
+      console.log(page, data);
+
+      /*
+      // Group information by link
+      for (var i = 0; i < data.items.length; i++) {
+        autoflagData[data.items[i].link] = data.items[i];
+      }
+
+      // Loop over all Smokey reports and decorate them
+      $(autoflagging.selector).each(function () {
+        var postURL = autoflagging.getPostURL(this);
+        if (typeof autoflagData[postURL] == "undefined") {
+          return;
+        }
+        autoflagging.decorateMessage($(this), autoflagData[postURL]);
+        // Post deleted?
+        if (autoflagData[postURL].deleted_at != null) {
+          $(this).find(".content").toggleClass("ai-deleted");
+        }
+      });
+
+      if (data.has_more) {
+        // There are more items on the next 'page'
+        autoflagging.callAPI(urls, ++page);
+      }
+      */
+    }).fail(function (xhr) {
+      autoflagging.notify("Failed to load data: " + xhr.statusText);
+    });
+  }
 
   // Smoke Detector Report handler
   function onSmokeDetectorReport($fire, data) {
@@ -75,7 +121,7 @@
     $(document).off("keydown", keyboardShortcuts);
     $("#container").removeClass("ai-blur");
 
-    isOpen = false;
+    fire.isOpen = false;
   }
 
   function keyboardShortcuts(e) {
@@ -86,7 +132,7 @@
         .fadeIn(100, function () {
           $(this).click();
         });
-    } else if (buttonKeyCodes.indexOf(e.keyCode) >= 0) {
+    } else if (fire.buttonKeyCodes.indexOf(e.keyCode) >= 0) {
       e.preventDefault();
 
       $(".ai-fire-popup-header a.button")
@@ -114,11 +160,11 @@
   }
 
   function openPopup() {
-    if (isOpen) {
+    if (fire.isOpen) {
       return; // Don't open the popup twice.
     }
 
-    isOpen = true;
+    fire.isOpen = true;
 
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var d = $(this).data("report");
@@ -131,7 +177,7 @@
       click: closePopup,
       "fire-key": 27 // escape key code
     });
-    buttonKeyCodes.push(27);
+    fire.buttonKeyCodes.push(27);
 
     var top = element("p", "ai-fire-popup-header")
       .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
@@ -185,7 +231,7 @@
 
   // DOM helpers
   function createFeedbackButton(data, keyCode, text, verdict, tooltip) { // eslint-disable-line max-params
-    buttonKeyCodes.push(keyCode);
+    fire.buttonKeyCodes.push(keyCode);
     return element("a", "button ai-fire-feedback-button", {
       text: text,
       click: function () {
@@ -231,8 +277,8 @@
   }
 
   // Handle CSS injection
-  function injectCSS(wip) {
-    if (wip) {
+  function injectCSS() {
+    if (fire.wip) {
       // This userscript is still work in progress. It's probably broken, useless or otherwise dangerous.
       $.get(
         "https://api.github.com/repos/Charcoal-SE/Userscripts/commits/FIRE",
