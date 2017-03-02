@@ -4,6 +4,7 @@ This is still a "work in progress". As of this moment, the userscript does not s
 
 # TODO:
 * ___Update report data on WS message instead of overriding it___
+  *  Make it a MS api call?
 * ___Implement MS feedback___
 * ___Implement SE flags___
 * Store user configuration (API keys?)
