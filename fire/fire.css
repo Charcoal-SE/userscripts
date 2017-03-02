@@ -55,6 +55,7 @@
   padding: 10px;
   border-radius: 5px;
   box-shadow: inset 0 0 10px -3px #646464;
+  position: relative;
 }
 
 .ai-fire-popup .ai-fire-popup-body a .href {
@@ -68,4 +69,14 @@
 
 .ai-fire-popup .ai-fire-popup-body a:hover .text {
   display: none;
+}
+
+.ai-fire-popup .ai-fire-tooltip {
+  position: fixed;
+  background: #eee;
+  padding: 5px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px 0 #888;
+  border: 1px solid #bbb;
+  pointer-events: none;
 }

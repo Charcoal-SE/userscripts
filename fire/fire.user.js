@@ -17,8 +17,6 @@
 
 /*
   TODO:
-  * Showing link URLs on hover breaks when the URL is shorter than the link text
-      Make it a tooltip instead.
   * Show the site's header image above the post title/text.
   * Show if it's a question or answer.
 */
@@ -42,6 +40,7 @@
 
   var wip = true;
   injectCSS(wip);
+  registerAnchorHover();
 
   // Smoke Detector Report handler
   function onSmokeDetectorReport($fire, data) {
@@ -82,7 +81,7 @@
 
       $(".ai-fire-popup-header a.button").removeClass("focus");
 
-      var button = $(".ai-fire-popup-header a.button[data-key=" + e.keyCode + "]");
+      var button = $(".ai-fire-popup-header a.button[fire-key=" + e.keyCode + "]");
 
       if (e.keyCode === 27) { // Esc key
         button.click();
@@ -113,10 +112,10 @@
     buttonKeyCodes.push(27);
 
     var top = element("p", "ai-fire-popup-header")
-      .append(createFeedbackButton(d, 49, "tpu-", "tpu-")) // "True positive"
-      .append(createFeedbackButton(d, 50, "tp-", "tp-"))   // "Vandalism"
-      .append(createFeedbackButton(d, 51, "fp-", "fp-"))   // "False positive"
-      .append(createFeedbackButton(d, 52, "naa-", "naa-")) // "Not an Answer / VLQ"
+      .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
+      .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
+      .append(createFeedbackButton(d, 51, "fp-", "fp-", "False Positive"))
+      .append(createFeedbackButton(d, 52, "naa-", "naa-", "Not an Answer / VLQ"))
       .append(closeButton);
 
     var modal = element("div", "ai-fire-popup-modal");
@@ -151,14 +150,15 @@
   }
 
   // DOM helpers
-  function createFeedbackButton(data, keyCode, text, verdict) {
+  function createFeedbackButton(data, keyCode, text, verdict, tooltip) { // eslint-disable-line max-params
     buttonKeyCodes.push(keyCode);
     return element("a", "button ai-fire-feedback-button", {
       text: text,
       click: function () {
         feedback(data, verdict);
       },
-      "data-key": keyCode
+      "fire-key": keyCode,
+      "fire-tooltip": tooltip
     });
   }
 
@@ -173,12 +173,27 @@
   function expandLinksOnHover() {
     $(".ai-fire-popup-body a")
       .each(function () {
-        var text = $(this).text();
-        if (this.href !== text) {
-          $(this).empty()
-            .append(element("span", "text", {text: text}))
-            .append(element("span", "href", {text: this.href}));
-        }
+        $(this).attr("fire-tooltip", this.href);
+      });
+  }
+
+  function registerAnchorHover() {
+    var anchorSelector = "a[fire-tooltip]";
+    $("body")
+      .on("mouseenter", anchorSelector, function (e) {
+        var that = $(this);
+        console.log(e);
+        that.after(element("span", "ai-fire-tooltip", {
+          text: that.attr("fire-tooltip")
+        }));
+      }).on("mousemove", anchorSelector, function (e) {
+        $(".ai-fire-tooltip").css({
+          left: e.clientX + 20,
+          top: e.clientY + 5
+        });
+      })
+      .on("mouseleave", anchorSelector, function () {
+        $(".ai-fire-tooltip").remove();
       });
   }
 
