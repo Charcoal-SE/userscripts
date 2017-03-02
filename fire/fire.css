@@ -79,4 +79,5 @@
   box-shadow: 0 0 10px 0 #888;
   border: 1px solid #bbb;
   pointer-events: none;
+  z-index: 100;
 }

@@ -18,7 +18,6 @@
 /*
   TODO:
   * Show the site's header image above the post title/text.
-  * Show if it's a question or answer.
 */
 
 (function () {
@@ -79,14 +78,26 @@
     } else if (buttonKeyCodes.indexOf(e.keyCode) >= 0) {
       e.preventDefault();
 
-      $(".ai-fire-popup-header a.button").removeClass("focus");
+      $(".ai-fire-popup-header a.button")
+        .removeClass("focus")
+        .trigger("mouseleave");
 
-      var button = $(".ai-fire-popup-header a.button[fire-key=" + e.keyCode + "]");
+      var $button = $(".ai-fire-popup-header a.button[fire-key=" + e.keyCode + "]");
+      var button = $button[0];
 
-      if (e.keyCode === 27) { // Esc key
-        button.click();
-      } else {
-        button.addClass("focus");
+      if (button) {
+        if (e.keyCode === 27) { // Esc key
+          $button.click();
+        } else {
+          var pos = button.getBoundingClientRect();
+          $button
+            .addClass("focus")
+            .trigger("mouseenter")
+            .trigger($.Event("mousemove", { // eslint-disable-line new-cap
+              clientX: pos.right - (button.offsetWidth + 20),
+              clientY: pos.top + 20
+            }));
+        }
       }
     }
   }
@@ -107,7 +118,7 @@
     var closeButton = element("a", "button ai-fire-close-button", {
       text: "Close",
       click: closePopup,
-      "data-key": 27 // escape key code
+      "fire-key": 27 // escape key code
     });
     buttonKeyCodes.push(27);
 
@@ -121,8 +132,12 @@
     var modal = element("div", "ai-fire-popup-modal");
 
     var body = element("div", "ai-fire-popup-body")
-      .append($("<h3 />", {text: d.title}))
+      .append($("<h2 />", {text: "Question Title: "})
+        .append($("<em />", {text: d.title}))
+      )
       .append($("<hr />"))
+      .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
+      .append($("<br />"))
       .append(d.body);
 
     modal.appendTo("body")
@@ -180,9 +195,8 @@
   function registerAnchorHover() {
     var anchorSelector = "a[fire-tooltip]";
     $("body")
-      .on("mouseenter", anchorSelector, function (e) {
+      .on("mouseenter", anchorSelector, function () {
         var that = $(this);
-        console.log(e);
         that.after(element("span", "ai-fire-tooltip", {
           text: that.attr("fire-tooltip")
         }));
