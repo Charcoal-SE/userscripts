@@ -1,5 +1,6 @@
 // out: ./fire.css, sourcemap: true, compress: true
 @blur: blur(2px);
+@zIndex: 100;
 
 .ai-blur {
   -webkit-filter: @blur;
@@ -29,7 +30,7 @@
   max-height: 600px;
   overflow: hidden;
   position: fixed;
-  z-index: 100;
+  z-index: @zIndex;
   background: white;
   padding: 20px;
   border-radius: 10px;
@@ -110,6 +111,6 @@
     box-shadow: 0 0 10px 0 #888;
     border: 1px solid #bbb;
     pointer-events: none;
-    z-index: 100;
+    z-index: @zIndex;
   }
 } // End Popup container
