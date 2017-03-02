@@ -22,7 +22,7 @@
 
 .ai-fire-popup {
   width: 600px;
-  height: 600px;
+  max-height: 600px;
   overflow: hidden;
   position: fixed;
   z-index: 100;
@@ -57,7 +57,7 @@
 }
 
 .ai-fire-popup .ai-fire-popup-body {
-  height: 520px;
+  max-height: 520px;
   overflow-y: scroll;
   border: 1px solid #ccc;
   padding: 10px;

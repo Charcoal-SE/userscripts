@@ -115,7 +115,7 @@
     var d = data;
 
     var popup = element("div", "ai-fire-popup")
-      .css({top: 100, left: w - 300});
+      .css({top: "5%", left: w - 300});
 
     var closeButton = element("a", "button ai-fire-close-button", {
       text: "Close",
@@ -140,7 +140,7 @@
       .append($("<hr />"))
       .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
       .append($("<br />"))
-      .append(d.body);
+      .append($("<div />", {text: d.body}));
 
     modal.appendTo("body")
       .click(closePopup);
