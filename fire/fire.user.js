@@ -52,6 +52,17 @@
       }).data("report", data);
 
       $fire.prepend(fireButton);
+    } else if (data) {
+      debugger;
+      if (data.feedbacks) {
+        console.log("New feedback: ", data);
+        var button = $fire.find(".ai-fire-button");
+        var report = button.data("report");
+        report.feedbacks = (report.feedbacks || []).concat(data.feedbacks); // Add new feedback to data
+        button.data("report", report);
+      } else {
+        console.log("Unfamiliar message: ", data);
+      }
     }
   }
 
