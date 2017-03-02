@@ -3,6 +3,7 @@
 This is still a "work in progress". As of this moment, the userscript does not send any feedback, so it's safe to click around a bit.
 
 # TODO:
+* ___Update report data on WS message instead of overriding it___
 * ___Implement MS feedback___
 * ___Implement SE flags___
 * Store user configuration (API keys?)

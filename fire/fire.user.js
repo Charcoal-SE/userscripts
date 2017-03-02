@@ -39,18 +39,17 @@
   // Smoke Detector Report handler
   function onSmokeDetectorReport($fire, data) {
     if ($fire.find(".ai-fire-button").length === 0) {
+      if (data.link) {
+        data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
+        data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+      } else {
+        console.error("No link found:", data); // No link. Something went FOOBAR
+      }
+
       var fireButton = element("span", "ai-fire-button", {
         text: "🛠️", // http://graphemica.com/%F0%9F%9B%A0
-        click: function () {
-          if (data.link) {
-            data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
-            data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
-          } else {
-            console.log(data); // No link. Something went FOOBAR
-          }
-          openPopup(data);
-        }
-      });
+        click: openPopup
+      }).data("report", data);
 
       $fire.prepend(fireButton);
     }
@@ -104,7 +103,7 @@
     }
   }
 
-  function openPopup(data) {
+  function openPopup() {
     if (isOpen) {
       return; // Don't open the popup twice.
     }
@@ -112,7 +111,7 @@
     isOpen = true;
 
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
-    var d = data;
+    var d = $(this).data("report");
 
     var popup = element("div", "ai-fire-popup")
       .css({top: "5%", left: w - 300});
