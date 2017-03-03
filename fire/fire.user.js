@@ -29,8 +29,16 @@
     scope.fire = {
       buttonText: useEmoji ? "??" : "Fire",
       buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
-      metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
-      metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
+      api: {
+        ms: {
+          key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
+          url: "https://metasmoke.erwaysoftware.com/api/"
+        },
+        se: {
+          key: "", // this script's Stack Exchange API key
+          url: "https://api.stackexchange.com/2.2/"
+        }
+      },
       buttonKeyCodes: [],
       isOpen: false,
       smokeDetectorId: smokeDetectorId,
@@ -48,7 +56,8 @@
   })(window);
 
   function getDataForUrl(reportedUrl, callback) {
-    var url = fire.metasmokeUrl + "posts/urls?key=" + fire.metasmokeKey + "&page=1&urls=" + reportedUrl;
+    var ms = fire.api.ms;
+    var url = ms.url + "posts/urls?key=" + ms.key + "&page=1&urls=" + reportedUrl;
     $.get(url, function (data) {
       if (data && data.items) {
         callback(data.items[0]);
@@ -59,7 +68,7 @@
   // getReportInfo(59354);
   // function getReportInfo(ids, page) {
   //   // var autoflagData = {};
-  //   var url = fire.metasmokeUrl + "posts/" + ids + "?key=" + fire.metasmokeKey;// + "&page=" + page || 1;
+  //   var url = fire.api.ms.url + "posts/" + ids + "?key=" + fire.api.ms.key;// + "&page=" + page || 1;
   // }
 
   // Loads a report's data when you hover over the FIRE button.
@@ -78,7 +87,7 @@
     var afterGetToken = callback;
     writeTokenPopup(function (metaSmokeCode) {
       $.ajax({
-        url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.metasmokeKey + "&code=" + metaSmokeCode,
+        url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.api.ms.key + "&code=" + metaSmokeCode,
         method: "GET"
       }).done(function (data) {
         fire.msWriteToken = data.token;
@@ -230,7 +239,7 @@
     var requestButton = element("a", "button", {
       text: "Request Token",
       click: function () {
-        window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.metasmokeKey, "_blank");
+        window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank");
       }
     });
 
