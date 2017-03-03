@@ -3,10 +3,27 @@
 
 $blur: blur(2px);
 $zIndex: 100;
+$button-gradient:;
+
 $button-gradient-light: #54fc07;
 $button-gradient-dark: #43c407;
+
+$button-green: #390;
+$button-red: #f00;
+$button-orange: #ff8c00;
+
 $shadow-color: #646464;
 $transitionTime: 0.4s;
+
+@mixin linear-gradient($color) {
+  $light: lighten($color, 20%);
+  $dark: darken($color, 20%);
+  border: 1px solid $dark;
+  background-color: $dark;
+  background: -webkit-gradient(linear, left top, left bottom, from($light), to($dark));
+  background: -moz-linear-gradient(top, $light, $dark);
+  background: linear-gradient(top, $light, $dark);
+}
 
 .fire-blur {
   -webkit-filter: $blur;
@@ -60,19 +77,28 @@ $transitionTime: 0.4s;
 
     a.button {
       margin: 0;
+
       &.fire-close-button {
         float: right;
       }
+
       &.fire-feedback-button {
         float: left;
         margin-right: 2px;
-      }
-      &.focus {
-        border: 1px solid $button-gradient-dark;
-        background-color: $button-gradient-dark;
-        background: -webkit-gradient(linear, left top, left bottom, from($button-gradient-light), to($button-gradient-dark));
-        background: -moz-linear-gradient(top, $button-gradient-light, $button-gradient-dark);
-        background: linear-gradient(top, $button-gradient-light, $button-gradient-dark);
+
+        &.fire-submitted {
+          font-style: italic;
+        }
+
+        &[disabled] {
+          cursor: no-drop;
+        }
+//green for tpu- and tp-, red for fp-, could leave naa- as orange
+        &.fire-tpu-,
+        &.fire-tp- { linear-gradient($button-green); }
+        &.fire-fp- { linear-gradient($button-red); }
+        &.fire-naa- { linear-gradient($button-orange); }
+        &.focus { linear-gradient($button-gradient); }
       }
     }
 

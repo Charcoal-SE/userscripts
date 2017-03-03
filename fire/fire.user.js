@@ -14,6 +14,7 @@
 // @grant       none
 // ==/UserScript==
 /* global fire, CHAT */
+/* eslint-disable camelcase */
 
 (function () {
   "use strict";
@@ -49,6 +50,7 @@
       blur: true
     });
 
+    getCurrentUser();
     injectCSS();
     registerAnchorHover();
     showFireOnExistingMessages();
@@ -77,8 +79,12 @@
     var url = $this.data("url");
 
     getDataForUrl(url, function (data) {
-      data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
+      data.is_answer = data.link.indexOf("/a/") >= 0;
       data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+      data.disable_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
+        return f.user_name === fire.chatUser.name;
+      });
+
       $this.data("report", data);
     });
   }
@@ -90,7 +96,6 @@
         url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.api.ms.key + "&code=" + metaSmokeCode,
         method: "GET"
       }).done(function (data) {
-        fire.msWriteToken = data.token;
         fire.setData("metasmokeWriteToken", data.token);
 
         if (afterGetToken) {
@@ -284,15 +289,14 @@
       getWriteToken(function () {
         openPopup.call(that); // Open the popup later
       });
-
       return;
     }
 
     fire.isOpen = true;
 
-    var $this = $(that);
+    var $that = $(that);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
-    var d = $this.data("report");
+    var d = $that.data("report");
 
     var popup = element("div", "fire-popup")
       .css({top: "5%", left: w - 300});
@@ -375,21 +379,89 @@
 
   // Provide feedback / flag
   function feedback(data, verdict) {
+    var token = fire.userData.metasmokeWriteToken;
+    var ms = fire.api.ms;
+
+    $.ajax({
+      type: "POST",
+      url: ms.url + "w/post/" + data.id + "/feedback",
+      data: {
+        type: verdict,
+        key: ms.key,
+        token: token
+      }
+    }).done(function (data) {
+      debugger;
+      console.log(data);
+      // StackExchange.helpers.showSuccessMessage($(".topbar"), "Fed back " + feedbackType + " to metasmoke.", {
+      //   position: "toast",
+      //   transient: true,
+      //   transientTimeout: 10000
+      // });
+      // console.log(data);
+      // $(window.event.target).attr("data-fdsc-ms-id", null);
+      // fdsc.postFound = null;
+    }).error(function (jqXHR) {
+      debugger;
+      console.log(jqXHR);
+      // if (jqXHR.status === 401) {
+      //   StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
+      //     position: "toast",
+      //     transient: true,
+      //     transientTimeout: 10000
+      //   });
+      //   console.error("fdsc.sendFeedback was called without having a valid write token");
+      //   fdsc.confirm("Write token invalid. Attempt re-authentication?", function (result) {
+      //     if (result) {
+      //       fdsc.getWriteToken(false, function () {
+      //         fdsc.sendFeedback(feedbackType, postId);
+      //       });
+      //     }
+      //   });
+      // } else {
+      //   StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
+      //     position: "toast",
+      //     transient: true,
+      //     transientTimeout: 10000
+      //   });
+      //   console.log(jqXHR.status, jqXHR.responseText);
+      // }
+      // $(window.event.target).attr("data-fdsc-ms-id", null);
+      // fdsc.postFound = null;
+    });
+
     // if (data.autoflagged && data.autoflagged.flagged) {
     //   // Only allow actual flagging if this has been flagged already.
     // }
-    console.log(data, verdict);
+    console.log(fire.userData.metasmokeWriteToken, data, verdict);
     closePopup();
   }
 
   // Create a feedback button for the top of the popup
   function createFeedbackButton(data, keyCode, text, verdict, tooltip) { // eslint-disable-line max-params
-    fire.buttonKeyCodes.push(keyCode);
-    return element("a", "button fire-feedback-button", {
-      text: text,
+    var count;
+    var hasSubmittedFeedback;
+
+    if (data.feedbacks) { // Has feedback
+      count = data.feedbacks.filter(function (f) {
+        return f.feedback_type === verdict;
+      }).length;
+      hasSubmittedFeedback = data.feedbacks.some(function (f) {
+        return f.feedback_type === verdict &&
+          f.user_name === fire.chatUser.name;
+      });
+    }
+
+    var suffix = count ? " (" + count + ")" : "";
+    var cssClass = hasSubmittedFeedback ? " fire-submitted" : "";
+
+      text: text + suffix,
       click: function () {
-        feedback(data, verdict);
+        if (!data.disable_feedback) {
+          feedback(data, verdict);
+        }
       },
+      disabled: data.disable_feedback,
       "fire-key": keyCode,
       "fire-tooltip": tooltip
     });
@@ -481,5 +553,14 @@
     if (fire.userData === null) {
       fire.userData = defaultStorage;
     }
+  }
+
+  // Gets the currently logged-in user.
+  function getCurrentUser() {
+    CHAT.RoomUsers
+      .get(CHAT.CURRENT_USER_ID)
+      .done(function (user) {
+        fire.chatUser = user;
+      });
   }
 })();
