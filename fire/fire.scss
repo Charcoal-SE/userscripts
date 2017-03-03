@@ -1,15 +1,17 @@
-// out: ./fire.css, sourcemap: true, compress: true
-@blur: blur(2px);
-@zIndex: 100;
-@button-gradient-light: #54fc07;
-@button-gradient-dark: #43c407;
+---
+---
+
+$blur: blur(2px);
+$zIndex: 100;
+$button-gradient-light: #54fc07;
+$button-gradient-dark: #43c407;
 
 .fire-blur {
-  -webkit-filter: @blur;
-  -moz-filter: @blur;
-  -ms-filter: @blur;
-  -o-filter: @blur;
-  filter: @blur;
+  -webkit-filter: $blur;
+  -moz-filter: $blur;
+  -ms-filter: $blur;
+  -o-filter: $blur;
+  filter: $blur;
 }
 
 .fire-popup-modal {
@@ -44,7 +46,7 @@
   max-height: 600px;
   overflow: hidden;
   position: fixed;
-  z-index: @zIndex;
+  z-index: $zIndex;
   background: white;
   padding: 20px;
   border-radius: 10px;
@@ -64,11 +66,11 @@
         margin-right: 2px;
       }
       &.focus {
-        border: 1px solid @button-gradient-dark;
-        background-color: @button-gradient-dark;
-        background: -webkit-gradient(linear, left top, left bottom, from(@button-gradient-light), to(@button-gradient-dark));
-        background: -moz-linear-gradient(top, @button-gradient-light, @button-gradient-dark);
-        background: linear-gradient(top, @button-gradient-light, @button-gradient-dark);
+        border: 1px solid $button-gradient-dark;
+        background-color: $button-gradient-dark;
+        background: -webkit-gradient(linear, left top, left bottom, from($button-gradient-light), to($button-gradient-dark));
+        background: -moz-linear-gradient(top, $button-gradient-light, $button-gradient-dark);
+        background: linear-gradient(top, $button-gradient-light, $button-gradient-dark);
       }
     }
 
@@ -125,6 +127,6 @@
     box-shadow: 0 0 10px 0 #888;
     border: 1px solid #bbb;
     pointer-events: none;
-    z-index: @zIndex;
+    z-index: $zIndex;
   }
 } // End Popup container

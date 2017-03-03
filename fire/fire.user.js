@@ -21,7 +21,6 @@
   var useEmoji = hasEmojiSupport();
 
   window.fire = {
-    wip: true,
     buttonText: useEmoji ? "🔥" : "Fire",
     buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
     metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -39,7 +38,7 @@
 
   injectCSS();
   registerAnchorHover();
-  decorateExistingMessages();
+  showFireOnExistingMessages();
   CHAT.addEventHandlerHook(chatListener);
 
   function getDataForUrl(reportedUrl, callback) {
@@ -56,26 +55,6 @@
   //   // var autoflagData = {};
   //   var url = fire.metasmokeUrl + "posts/" + ids + "?key=" + fire.metasmokeKey;// + "&page=" + page || 1;
   // }
-
-  function decorateMessage(message) {
-    var m = $(message);
-    if (m.find(".fire-button").length === 0) {
-      var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
-      if (reportLink.length > 0) { // This is a report
-        var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", "fire-button", {
-          text: fire.buttonText,
-          click: openPopup
-        })
-        .data("url", reportedUrl)
-        .hover(loadDataForReport);
-
-        reportLink
-          .after(fireButton)
-          .after(" | ");
-      }
-    }
-  }
 
   // Loads a report's data when you hover over the FIRE button.
   function loadDataForReport() {
@@ -99,34 +78,54 @@
     }
   }
 
-  // Decorate messages that exist on page load
-  function decorateExistingMessages() {
-    var chat = $("#chat");
-    chat.on("DOMSubtreeModified", function () {
-      if (chat.html().length !== 0) {
-        // Chat messages loaded
-        chat.off("DOMSubtreeModified");
+  // Adds the "FIRE" button to the passed message
+  function decorateMessage(message) {
+    var m = $(message);
+    if (m.find(".fire-button").length === 0) {
+      var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
+      if (reportLink.length > 0) { // This is a report
+        var reportedUrl = reportLink.attr("href").split("url=").pop();
+        var fireButton = element("span", "fire-button", {
+          text: fire.buttonText,
+          click: openPopup
+        })
+        .data("url", reportedUrl)
+        .hover(loadDataForReport);
 
-        $(fire.SDMessageSelector).each(function () {
-          decorateMessage(this);
-        });
+        reportLink
+          .after(fireButton)
+          .after(" | ");
       }
-    });
+    }
   }
 
-  // Popup methods
-  function closePopup() {
-    $(".fire-popup, .fire-popup-modal")
-      .fadeOut("fast", function () {
-        $(this).remove();
+  // Decorate messages that exist on page load
+  function decorateExistingMessages(timeout) {
+    setTimeout(function () {
+      var chat = $("#chat");
+      chat.on("DOMSubtreeModified", function () {
+        if (chat.html().length !== 0) {
+          // Chat messages loaded
+          chat.off("DOMSubtreeModified");
+
+          $(fire.SDMessageSelector).each(function () {
+            decorateMessage(this);
+          });
+        }
       });
-
-    $(document).off("keydown", keyboardShortcuts);
-    $("#container").removeClass("fire-blur");
-
-    fire.isOpen = false;
+    }, timeout);
   }
 
+  // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
+  function showFireOnExistingMessages() {
+    $("#getmore, #getmore-mine")
+      .click(function () {
+        decorateExistingMessages(500);
+      });
+    decorateExistingMessages(0);
+  }
+
+  // Handle keypress events for the popup
   function keyboardShortcuts(e) {
     if (e.keyCode === 13 || e.keyCode === 32) { // Enter key or spacebar
       e.preventDefault();
@@ -162,6 +161,7 @@
     }
   }
 
+  // Build a popup and show it.
   function openPopup() {
     if (fire.isOpen) {
       return; // Don't open the popup twice.
@@ -224,6 +224,19 @@
     $(document).keydown(keyboardShortcuts);
   }
 
+  // Close the popup
+  function closePopup() {
+    $(".fire-popup, .fire-popup-modal")
+      .fadeOut("fast", function () {
+        $(this).remove();
+      });
+
+    $(document).off("keydown", keyboardShortcuts);
+    $("#container").removeClass("fire-blur");
+
+    fire.isOpen = false;
+  }
+
   // Provide feedback / flag
   function feedback(data, verdict) {
     // if (data.autoflagged && data.autoflagged.flagged) {
@@ -233,7 +246,7 @@
     closePopup();
   }
 
-  // DOM helpers
+  // Create a feedback button for the top of the popup
   function createFeedbackButton(data, keyCode, text, verdict, tooltip) { // eslint-disable-line max-params
     fire.buttonKeyCodes.push(keyCode);
     return element("a", "button fire-feedback-button", {
@@ -261,6 +274,7 @@
       });
   }
 
+  // Register the "tooltip" hover for anchor elements
   function registerAnchorHover() {
     var anchorSelector = "a[fire-tooltip]";
     $("body")
@@ -280,6 +294,7 @@
       });
   }
 
+  // Detect Emoji support in this browser
   function hasEmojiSupport() {
     var canvas = document.createElement("canvas");
     var ctx = canvas.getContext("2d");
@@ -293,24 +308,9 @@
 
   // Handle CSS injection
   function injectCSS() {
-    if (fire.wip) {
-      // This userscript is still work in progress. It's probably broken, useless or otherwise dangerous.
-      $.get(
-        "https://api.github.com/repos/Charcoal-SE/Userscripts/commits/FIRE",
-        function (commitData) {
-          var css = window.document.createElement("link");
-          css.rel = "stylesheet";
-          css.href = "https://cdn.rawgit.com/Charcoal-SE/Userscripts/" + commitData.sha + "/fire/fire.css";
-          document.head.appendChild(css);
-        }
-      );
-    } else {
-      // Release
-      // Inject CSS
-      var css = window.document.createElement("link");
-      css.rel = "stylesheet";
-      css.href = "//charcoal-se.org/userscripts/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
-      document.head.appendChild(css);
-    }
+    var css = window.document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "//charcoal-se.org/userscripts/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
+    document.head.appendChild(css);
   }
 })();
