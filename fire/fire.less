@@ -4,7 +4,7 @@
 @button-gradient-light: #54fc07;
 @button-gradient-dark: #43c407;
 
-.ai-blur {
+.fire-blur {
   -webkit-filter: @blur;
   -moz-filter: @blur;
   -ms-filter: @blur;
@@ -12,7 +12,7 @@
   filter: @blur;
 }
 
-.ai-fire-popup-modal {
+.fire-popup-modal {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -22,12 +22,21 @@
   z-index: 100;
 }
 
-.ai-fire-button {
+.fire-button {
   cursor: pointer;
+
+  &.fire-plain {
+    font-weight: bold;
+    color: firebrick;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 // Popup container
-.ai-fire-popup {
+.fire-popup {
   width: 600px;
   max-height: 600px;
   overflow: hidden;
@@ -39,15 +48,15 @@
   box-shadow: 0 0 20px 2px #646464;
 
   // Header
-  .ai-fire-popup-header {
+  .fire-popup-header {
     height: 40px;
 
     a.button {
       margin: 0;
-      &.ai-fire-close-button {
+      &.fire-close-button {
         float: right;
       }
-      &.ai-fire-feedback-button {
+      &.fire-feedback-button {
         float: left;
         margin-right: 2px;
       }
@@ -60,7 +69,7 @@
       }
     }
 
-    .ai-site-logo {
+    .fire-site-logo {
       background-position: top left;
       background-repeat: no-repeat;
       background-size: contain;
@@ -79,7 +88,7 @@
   } // End Header
 
   // Body
-  .ai-fire-popup-body {
+  .fire-popup-body {
     max-height: 520px;
     overflow-y: scroll;
     border: 1px solid #ccc;
@@ -105,7 +114,7 @@
     }
   } // End body
 
-  .ai-fire-tooltip {
+  .fire-tooltip {
     position: fixed;
     background: #eee;
     padding: 5px;

@@ -18,8 +18,12 @@
 (function () {
   "use strict";
 
+  var useEmoji = hasEmojiSupport();
+
   window.fire = {
     wip: true,
+    buttonText: useEmoji ? "🔥" : "Fire",
+    buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
     metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
     metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
     buttonKeyCodes: [],
@@ -55,12 +59,12 @@
 
   function decorateMessage(message) {
     var m = $(message);
-    if (m.find(".ai-fire-button").length === 0) {
+    if (m.find(".fire-button").length === 0) {
       var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
       if (reportLink.length > 0) { // This is a report
         var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", "ai-fire-button", {
-          text: "🔥",
+        var fireButton = element("span", "fire-button", {
+          text: fire.buttonText,
           click: openPopup
         })
         .data("url", reportedUrl)
@@ -112,13 +116,13 @@
 
   // Popup methods
   function closePopup() {
-    $(".ai-fire-popup, .ai-fire-popup-modal")
+    $(".fire-popup, .fire-popup-modal")
       .fadeOut("fast", function () {
         $(this).remove();
       });
 
     $(document).off("keydown", keyboardShortcuts);
-    $("#container").removeClass("ai-blur");
+    $("#container").removeClass("fire-blur");
 
     fire.isOpen = false;
   }
@@ -126,7 +130,7 @@
   function keyboardShortcuts(e) {
     if (e.keyCode === 13 || e.keyCode === 32) { // Enter key or spacebar
       e.preventDefault();
-      $(".ai-fire-popup-header a.button.focus")
+      $(".fire-popup-header a.button.focus")
         .fadeOut(100) // Flash to indicate which button was selected.
         .fadeIn(100, function () {
           $(this).click();
@@ -134,11 +138,11 @@
     } else if (fire.buttonKeyCodes.indexOf(e.keyCode) >= 0) {
       e.preventDefault();
 
-      $(".ai-fire-popup-header a.button")
+      $(".fire-popup-header a.button")
         .removeClass("focus")
         .trigger("mouseleave");
 
-      var $button = $(".ai-fire-popup-header a.button[fire-key=" + e.keyCode + "]");
+      var $button = $(".fire-popup-header a.button[fire-key=" + e.keyCode + "]");
       var button = $button[0];
 
       if (button) {
@@ -169,30 +173,30 @@
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var d = $this.data("report");
 
-    var popup = element("div", "ai-fire-popup")
+    var popup = element("div", "fire-popup")
       .css({top: "5%", left: w - 300});
 
-    var closeButton = element("a", "button ai-fire-close-button", {
+    var closeButton = element("a", "button fire-close-button", {
       text: "Close",
       click: closePopup,
       "fire-key": 27 // escape key code
     });
     fire.buttonKeyCodes.push(27);
 
-    var top = element("p", "ai-fire-popup-header")
+    var top = element("p", "fire-popup-header")
       .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "fp-", "fp-", "False Positive"))
       .append(createFeedbackButton(d, 52, "naa-", "naa-", "Not an Answer / VLQ"))
-      .append(element("span", "ai-site-logo", {
+      .append(element("span", "fire-site-logo", {
         text: d.site,
         css: {"background-image": "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)"}
       }))
       .append(closeButton);
 
-    var modal = element("div", "ai-fire-popup-modal");
+    var modal = element("div", "fire-popup-modal");
 
-    var body = element("div", "ai-fire-popup-body")
+    var body = element("div", "fire-popup-body")
       .append($("<h2 />", {text: "Question Title: "})
         .append($("<em />", {text: d.title}))
       )
@@ -213,7 +217,7 @@
       .appendTo("body")
       .fadeIn("fast");
 
-    $("#container").addClass("ai-blur");
+    $("#container").addClass("fire-blur");
 
     expandLinksOnHover();
 
@@ -232,7 +236,7 @@
   // DOM helpers
   function createFeedbackButton(data, keyCode, text, verdict, tooltip) { // eslint-disable-line max-params
     fire.buttonKeyCodes.push(keyCode);
-    return element("a", "button ai-fire-feedback-button", {
+    return element("a", "button fire-feedback-button", {
       text: text,
       click: function () {
         feedback(data, verdict);
@@ -251,7 +255,7 @@
 
   // Expands anchor elements in the report's body on hover, to show the href.
   function expandLinksOnHover() {
-    $(".ai-fire-popup-body a")
+    $(".fire-popup-body a")
       .each(function () {
         $(this).attr("fire-tooltip", this.href);
       });
@@ -262,18 +266,29 @@
     $("body")
       .on("mouseenter", anchorSelector, function () {
         var that = $(this);
-        that.after(element("span", "ai-fire-tooltip", {
+        that.after(element("span", "fire-tooltip", {
           text: that.attr("fire-tooltip")
         }));
       }).on("mousemove", anchorSelector, function (e) {
-        $(".ai-fire-tooltip").css({
+        $(".fire-tooltip").css({
           left: e.clientX + 20,
           top: e.clientY + 5
         });
       })
       .on("mouseleave", anchorSelector, function () {
-        $(".ai-fire-tooltip").remove();
+        $(".fire-tooltip").remove();
       });
+  }
+
+  function hasEmojiSupport() {
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+
+    ctx.textBaseline = "top";
+    ctx.font = "32px Arial";
+    ctx.fillText(smiley, 0, 0);
+    return ctx.getImageData(16, 16, 1, 1).data !== 0;
   }
 
   // Handle CSS injection
