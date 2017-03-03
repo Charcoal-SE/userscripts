@@ -94,7 +94,7 @@ $transitionTime: 0.4s;
         &.fire-tpu-,
         &.fire-tp- { @include button-gradient($button-green); }
         &.fire-fp- { @include button-gradient($button-red); }
-        &.fire-naa- { @include button-gradientt($button-orange); }
+        &.fire-naa- { @include button-gradient($button-orange); }
         &.focus { @include button-gradient($button-blue); }
       }
     }
