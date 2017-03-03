@@ -338,6 +338,9 @@
     expandLinksOnHover();
 
     $(document).keydown(keyboardShortcuts);
+    $(document).on("click", ".fire-popup-body pre", function () {
+      $(this).toggleClass("fire-expanded");
+    });
   }
 
   // Close the popup

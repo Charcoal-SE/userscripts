@@ -6,6 +6,7 @@ $zIndex: 100;
 $button-gradient-light: #54fc07;
 $button-gradient-dark: #43c407;
 $shadow-color: #646464;
+$transitionTime: 0.4s;
 
 .fire-blur {
   -webkit-filter: $blur;
@@ -131,6 +132,13 @@ $shadow-color: #646464;
       box-shadow: 0 0 10px -1px $shadow-color;
       border-radius: 3px;
       padding: 6px 10px;
+    	-webkit-transition: max-height $transitionTime;
+    	-moz-transition: max-height $transitionTime;
+    	transition: max-height $transitionTime;
+
+      &.fire-expanded {
+        max-height: 400px;
+      }
     }
   } // End body
 
