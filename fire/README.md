@@ -7,6 +7,7 @@ This is still a "work in progress". As of this moment, the userscript does not s
   *  Make it a MS api call?
 * ___Implement MS feedback___
 * ___Implement SE flags___
+* Make FIRE independent of AIM.
 * Store user configuration (API keys?)
 * Option to disable blur
 * Site name is parsed from the post URL. This has to be done.
