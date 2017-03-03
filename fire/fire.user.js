@@ -312,8 +312,16 @@
       .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
       .append($("<br />"))
       .append($("<div />")
-        .append(d.body.replace(/<script>/g, "&lt;script&gt;"))
+        .append(d.body.replace(/<script/g, "&lt;script"))
       );
+
+    body.find("pre code").each(function () {
+      this.innerHTML = this.innerHTML
+        .replace(/&/g, "&amp;")
+        .replace(/>/g, "&gt;")
+        .replace(/</g, "&lt;")
+        .replace(/"/g, "&quot;");
+    });
 
     element("div", "fire-popup-modal")
       .appendTo("body")
