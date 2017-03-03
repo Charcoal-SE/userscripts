@@ -27,7 +27,7 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
-      buttonText: useEmoji ? "🔥" : "Fire",
+      buttonText: useEmoji ? "??" : "Fire",
       buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
       metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
       metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
@@ -123,7 +123,7 @@
       var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
       if (reportLink.length > 0) { // This is a report
         var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", "fire-button", {
+        var fireButton = element("span", fire.buttonClass, {
           text: fire.buttonText,
           click: openPopup
         })
@@ -312,7 +312,7 @@
       .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
       .append($("<br />"))
       .append($("<div />")
-        .append(d.body)
+        .append(d.body.replace(/<script>/g, "&lt;script&gt;"))
       );
 
     element("div", "fire-popup-modal")
@@ -413,7 +413,7 @@
     ctx.textBaseline = "top";
     ctx.font = "32px Arial";
     ctx.fillText(smiley, 0, 0);
-    return ctx.getImageData(16, 16, 1, 1).data !== 0;
+    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
   }
 
   // Handle CSS injection
