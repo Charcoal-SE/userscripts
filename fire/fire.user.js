@@ -74,10 +74,10 @@
     });
   }
 
-  function getWriteToken(afterFlag, callback) {
-    console.log("getWriteToken");
+  function getWriteToken(callback) {
     window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.metasmokeKey, "_blank");
 
+    var afterGetToken = callback;
     writeTokenPopup(function (metaSmokeCode) {
       $.ajax({
         url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.metasmokeKey + "&code=" + metaSmokeCode,
@@ -85,6 +85,10 @@
       }).done(function (data) {
         fire.msWriteToken = data.token;
         fire.setData("metasmokeWriteToken", data.token);
+        debugger;
+        if (afterGetToken) {
+          afterGetToken();
+        }
       }).error(function (jqXHR) {
         if (jqXHR.status === 404) {
           StackExchange.helpers.showErrorMessage($(".topbar"), "Metasmoke could not find a write token - did you authorize the app?", {
@@ -101,10 +105,6 @@
           console.log(jqXHR.status, jqXHR.responseText);
         }
       });
-
-      if (callback) {
-        callback();
-      }
     });
   }
 
@@ -216,15 +216,24 @@
       .css({top: "5%", left: w - 300});
 
     var top = element("p", "fire-popup-header", {
-      html: "Once you've authenticated FIRE with metasmoke, you'll be given a code.<br />Please enter it here:"
+      html: "FIRE requires a metasmoke write token to submit feedback.<br />" +
+        "Once you've authenticated FIRE with metasmoke, you'll be given a code.<br />" +
+        "Please enter it here:"
     });
 
-    var input = element("input", "fire-popup-input", {type: "text"});
+    var input = element("input", "fire-popup-input", {
+      type: "text",
+      maxlength: "7"
+    });
+    
     var saveButton = element("a", "button", {
       text: "Save",
       click: function () {
-        callback(input.val());
-        closePopup();
+        var value = input.val();
+        if (value && value.length === 7) {
+          closePopup();
+          callback(value);
+        }
       }
     });
 
