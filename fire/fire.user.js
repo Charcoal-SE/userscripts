@@ -84,7 +84,7 @@
         method: "GET"
       }).done(function (data) {
         fire.msWriteToken = data.token;
-        fire.setValue("metasmokeWriteToken", data.token);
+        fire.setData("metasmokeWriteToken", data.token);
       }).error(function (jqXHR) {
         if (jqXHR.status === 404) {
           StackExchange.helpers.showErrorMessage($(".topbar"), "Metasmoke could not find a write token - did you authorize the app?", {
@@ -419,9 +419,14 @@
       }
     });
 
-    fire.setValue = function (key, value) {
+    fire.setData = function (key, value) {
       var data = fire.userData;
       data[key] = value;
+      fire.userData = data;
+    };
+    fire.clearData = function (key) {
+      var data = fire.userData;
+      delete data[key];
       fire.userData = data;
     };
 
