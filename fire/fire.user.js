@@ -18,28 +18,34 @@
 (function () {
   "use strict";
 
-  var useEmoji = hasEmojiSupport();
-
-  window.fire = {
-    buttonText: useEmoji ? "🔥" : "Fire",
-    buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
-    metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
-    metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
-    buttonKeyCodes: [],
-    isOpen: false,
-    smokeDetectorId: { // this is Smokey's user ID for each supported domain
+  (function (scope) { // Init
+    var useEmoji = hasEmojiSupport();
+    var smokeDetectorId = { // this is Smokey's user ID for each supported domain
       "chat.stackexchange.com": 120914,
       "chat.stackoverflow.com": 3735529,
       "chat.meta.stackexchange.com": 266345,
-    }[location.host] // From which, we need the current host's ID
-  };
+    }[location.host];       // From which, we need the current host's ID
 
-  fire.SDMessageSelector = ".user-" + fire.smokeDetectorId + " .message ";
+    scope.fire = {
+      buttonText: useEmoji ? "🔥" : "Fire",
+      buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
+      metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
+      metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
+      buttonKeyCodes: [],
+      isOpen: false,
+      smokeDetectorId: smokeDetectorId,
+      SDMessageSelector: ".user-" + smokeDetectorId + " .message "
+    };
 
-  injectCSS();
-  registerAnchorHover();
-  showFireOnExistingMessages();
-  CHAT.addEventHandlerHook(chatListener);
+    initLocalStorage({
+      blur: true
+    });
+
+    injectCSS();
+    registerAnchorHover();
+    showFireOnExistingMessages();
+    CHAT.addEventHandlerHook(chatListener);
+  })(window);
 
   function getDataForUrl(reportedUrl, callback) {
     var url = fire.metasmokeUrl + "posts/urls?key=" + fire.metasmokeKey + "&page=1&urls=" + reportedUrl;
@@ -68,6 +74,40 @@
     });
   }
 
+  function getWriteToken(afterFlag, callback) {
+    console.log("getWriteToken");
+    window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.metasmokeKey, "_blank");
+
+    writeTokenPopup(function (metaSmokeCode) {
+      $.ajax({
+        url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.metasmokeKey + "&code=" + metaSmokeCode,
+        method: "GET"
+      }).done(function (data) {
+        fire.msWriteToken = data.token;
+        fire.setValue("metasmokeWriteToken", data.token);
+      }).error(function (jqXHR) {
+        if (jqXHR.status === 404) {
+          StackExchange.helpers.showErrorMessage($(".topbar"), "Metasmoke could not find a write token - did you authorize the app?", {
+            position: "toast",
+            transient: true,
+            transientTimeout: 10000
+          });
+        } else {
+          StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
+            position: "toast",
+            transient: true,
+            transientTimeout: 10000
+          });
+          console.log(jqXHR.status, jqXHR.responseText);
+        }
+      });
+
+      if (callback) {
+        callback();
+      }
+    });
+  }
+
   // Chat message event listener
   function chatListener(e) {
     if (e.event_type === 1 && e.user_id === fire.smokeDetectorId) {
@@ -89,8 +129,7 @@
           text: fire.buttonText,
           click: openPopup
         })
-        .data("url", reportedUrl)
-        .hover(loadDataForReport);
+        .data("url", reportedUrl);
 
         reportLink
           .after(fireButton)
@@ -123,14 +162,22 @@
         decorateExistingMessages(500);
       });
     decorateExistingMessages(0);
+
+    $("body").on("mouseenter", ".fire-button", loadDataForReport);
   }
 
   // Handle keypress events for the popup
   function keyboardShortcuts(e) {
-    if (e.keyCode === 13 || e.keyCode === 32) { // Enter key or spacebar
+    if (e.keyCode === 66) {     // [B] key: Toggle blur
+      e.preventDefault();
+      var data = fire.userData;
+      data.blur = !data.blur;
+      $("#container").toggleClass("fire-blur", data.blur);
+      fire.userData = data;
+    } else if (e.keyCode === 13 || e.keyCode === 32) { // [Enter] key or spacebar
       e.preventDefault();
       $(".fire-popup-header a.button.focus")
-        .fadeOut(100) // Flash to indicate which button was selected.
+        .fadeOut(100)           // Flash to indicate which button was selected.
         .fadeIn(100, function () {
           $(this).click();
         });
@@ -145,9 +192,9 @@
       var button = $button[0];
 
       if (button) {
-        if (e.keyCode === 27) { // Esc key
+        if (e.keyCode === 27) { // [Esc] key
           $button.click();
-        } else {
+        } else {                // [1-4] keys for feedback buttons
           var pos = button.getBoundingClientRect();
           $button
             .addClass("focus")
@@ -161,15 +208,61 @@
     }
   }
 
+  // Open a popup to enter the write token
+  function writeTokenPopup(callback) {
+    var w = (window.innerWidth - $("#sidebar").width()) / 2;
+
+    var popup = element("div", "fire-popup")
+      .css({top: "5%", left: w - 300});
+
+    var top = element("p", "fire-popup-header")
+      .append("Once you've authenticated FIRE with metasmoke, you'll be given a code; enter it here.");
+
+    var input = element("input", "fire-popup-input", {type: "text"});
+    var saveButton = element("a", "button", {
+      text: "Save",
+      click: function () {
+        callback(input.val());
+        closePopup();
+      }
+    });
+
+    element("div", "fire-popup-modal")
+      .appendTo("body")
+      .click(closePopup);
+
+    popup
+      .append(top)
+      .append(input)
+      .append(saveButton)
+      .hide()
+      .appendTo("body")
+      .fadeIn("fast");
+
+    $("#container").toggleClass("fire-blur", fire.userData.blur);
+
+    $(document).keydown(keyboardShortcuts);
+  }
+
   // Build a popup and show it.
   function openPopup() {
     if (fire.isOpen) {
       return; // Don't open the popup twice.
     }
 
+    var that = this;
+
+    if (!fire.userData.metasmokeWriteToken) {
+      getWriteToken(function () {
+        openPopup.call(that); // Open the popup later
+      });
+
+      return;
+    }
+
     fire.isOpen = true;
 
-    var $this = $(this);
+    var $this = $(that);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var d = $this.data("report");
 
@@ -194,8 +287,6 @@
       }))
       .append(closeButton);
 
-    var modal = element("div", "fire-popup-modal");
-
     var body = element("div", "fire-popup-body")
       .append($("<h2 />", {text: "Question Title: "})
         .append($("<em />", {text: d.title}))
@@ -207,7 +298,8 @@
         .append(d.body)
       );
 
-    modal.appendTo("body")
+    element("div", "fire-popup-modal")
+      .appendTo("body")
       .click(closePopup);
 
     popup
@@ -217,7 +309,7 @@
       .appendTo("body")
       .fadeIn("fast");
 
-    $("#container").addClass("fire-blur");
+    $("#container").toggleClass("fire-blur", fire.userData.blur);
 
     expandLinksOnHover();
 
@@ -232,6 +324,7 @@
       });
 
     $(document).off("keydown", keyboardShortcuts);
+
     $("#container").removeClass("fire-blur");
 
     fire.isOpen = false;
@@ -312,5 +405,27 @@
     css.rel = "stylesheet";
     css.href = "//charcoal-se.org/userscripts/fire/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
     document.head.appendChild(css);
+  }
+
+  // Initializes localStorage
+  function initLocalStorage(defaultStorage) {
+    Object.defineProperty(fire, "userData", {
+      get: function () {
+        return JSON.parse(localStorage.getItem("fire-user-data"));
+      },
+      set: function (value) {
+        localStorage.setItem("fire-user-data", JSON.stringify(value));
+      }
+    });
+
+    fire.setValue = function (key, value) {
+      var data = fire.userData;
+      data[key] = value;
+      fire.userData = data;
+    };
+
+    if (fire.userData === null) {
+      fire.userData = defaultStorage;
+    }
   }
 })();
