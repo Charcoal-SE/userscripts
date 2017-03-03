@@ -75,8 +75,6 @@
   }
 
   function getWriteToken(callback) {
-    window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.metasmokeKey, "_blank");
-
     var afterGetToken = callback;
     writeTokenPopup(function (metaSmokeCode) {
       $.ajax({
@@ -223,7 +221,15 @@
 
     var input = element("input", "fire-popup-input", {
       type: "text",
-      maxlength: "7"
+      maxlength: "7",
+      placeholder: "Enter code here"
+    });
+
+    var requestButton = element("a", "button", {
+      text: "Request Token",
+      click: function () {
+        window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.metasmokeKey, "_blank");
+      }
     });
 
     var saveButton = element("a", "button", {
@@ -243,6 +249,7 @@
 
     popup
       .append(top)
+      .append(requestButton)
       .append(input)
       .append(saveButton)
       .hide()
