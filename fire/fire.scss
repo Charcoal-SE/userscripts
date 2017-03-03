@@ -3,14 +3,11 @@
 
 $blur: blur(2px);
 $zIndex: 100;
-$button-gradient:;
 
-$button-gradient-light: #54fc07;
-$button-gradient-dark: #43c407;
-
-$button-green: #390;
+$button-green: #339900;
 $button-red: #f00;
 $button-orange: #ff8c00;
+$button-blue: #0000ff;
 
 $shadow-color: #646464;
 $transitionTime: 0.4s;
@@ -98,7 +95,7 @@ $transitionTime: 0.4s;
         &.fire-tp- { linear-gradient($button-green); }
         &.fire-fp- { linear-gradient($button-red); }
         &.fire-naa- { linear-gradient($button-orange); }
-        &.focus { linear-gradient($button-gradient); }
+        &.focus { linear-gradient($button-blue); }
       }
     }
 
