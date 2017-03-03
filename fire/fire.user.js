@@ -186,12 +186,14 @@
         .removeClass("focus")
         .trigger("mouseleave");
 
-      var $button = $(".fire-popup-header a.button[fire-key=" + e.keyCode + "]");
+      var $button = $(".fire-popup-header a[fire-key=" + e.keyCode + "]");
       var button = $button[0];
 
       if (button) {
         if (e.keyCode === 27) { // [Esc] key
           $button.click();
+        } else if (e.keyCode === 53) { // [5]: Open the report on the site
+          window.open(button.href);
         } else {                // [1-4] keys for feedback buttons
           var pos = button.getBoundingClientRect();
           $button
@@ -286,22 +288,27 @@
     var popup = element("div", "fire-popup")
       .css({top: "5%", left: w - 300});
 
+    var openOnSiteButton = element("a", "fire-site-logo", {
+      text: d.site,
+      href: d.link,
+      target: "_blank",
+      css: {"background-image": "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)"},
+      "fire-key": 53,
+      "fire-tooltip": "Show on site"
+    });
+
     var closeButton = element("a", "button fire-close-button", {
       text: "Close",
       click: closePopup,
       "fire-key": 27 // escape key code
     });
-    fire.buttonKeyCodes.push(27);
 
     var top = element("p", "fire-popup-header")
       .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "fp-", "fp-", "False Positive"))
       .append(createFeedbackButton(d, 52, "naa-", "naa-", "Not an Answer / VLQ"))
-      .append(element("span", "fire-site-logo", {
-        text: d.site,
-        css: {"background-image": "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)"}
-      }))
+      .append(openOnSiteButton)
       .append(closeButton);
 
     var body = element("div", "fire-popup-body")
@@ -383,6 +390,11 @@
   function element(tagName, cssClass, options) {
     options = options || {};
     options.class = cssClass;
+
+    if (options["fire-key"]) {
+      fire.buttonKeyCodes.push(options["fire-key"]);
+    }
+
     return $("<" + tagName + "/>", options);
   }
 
@@ -399,6 +411,7 @@
     var anchorSelector = "a[fire-tooltip]";
     $("body")
       .on("mouseenter", anchorSelector, function () {
+        $(".fire-tooltip").remove();
         var that = $(this);
         that.after(element("span", "fire-tooltip", {
           text: that.attr("fire-tooltip")

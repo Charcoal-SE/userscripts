@@ -88,9 +88,12 @@ $transitionTime: 0.4s;
       left: 4px;
       font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
       font-size: 30px;
+      color: #444;
       padding: 0 0 0 60px;
       line-height: 60px;
       text-transform: capitalize;
+      cursor: pointer;
+      text-decoration: none;
     }
   } // End Header
 
