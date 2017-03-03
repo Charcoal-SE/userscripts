@@ -28,7 +28,7 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
-      buttonText: useEmoji ? "??" : "Fire",
+      buttonText: useEmoji ? "🔥" : "Fire",
       buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
       api: {
         ms: {
@@ -455,6 +455,7 @@
     var suffix = count ? " (" + count + ")" : "";
     var cssClass = hasSubmittedFeedback ? " fire-submitted" : "";
 
+    return element("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
       click: function () {
         if (!data.disable_feedback) {
