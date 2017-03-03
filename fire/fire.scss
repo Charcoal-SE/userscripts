@@ -12,7 +12,7 @@ $button-blue: #0000ff;
 $shadow-color: #646464;
 $transitionTime: 0.4s;
 
-@mixin linear-gradient($color) {
+@mixin button-gradient($color) {
   $light: lighten($color, 20%);
   $dark: darken($color, 20%);
   border: 1px solid $dark;
@@ -92,10 +92,10 @@ $transitionTime: 0.4s;
         }
 //green for tpu- and tp-, red for fp-, could leave naa- as orange
         &.fire-tpu-,
-        &.fire-tp- { linear-gradient($button-green); }
-        &.fire-fp- { linear-gradient($button-red); }
-        &.fire-naa- { linear-gradient($button-orange); }
-        &.focus { linear-gradient($button-blue); }
+        &.fire-tp- { button-gradient($button-green); }
+        &.fire-fp- { button-gradient($button-red); }
+        &.fire-naa- { button-gradientt($button-orange); }
+        &.focus { button-gradient($button-blue); }
       }
     }
 
