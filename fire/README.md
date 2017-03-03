@@ -1,12 +1,12 @@
-#FIRE!
+# 🔥 FIRE!
 
-This is still a "work in progress". As of this moment, the userscript does not send any feedback, so it's safe to click around a bit.
+This is still a "work in progress". As of this moment, the userscript does not send any flags, but _does_ sent MS feedback.
 
 # TODO:
-* ___Implement MS feedback___
+* ___Implement MS feedback error handling___
 * ___Implement SE flags___
 * ___Handle write token request errors___
-* Handle expired / invalid write tokens.
+  * Handle expired / invalid write tokens.
 * Keyboard shortcut to open last FIRE report
 * Site name is parsed from the post URL. This has to be done differently.
 * Disable / Highlight feedback buttons depending on (earlier) submitted feedback.
