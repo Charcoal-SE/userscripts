@@ -91,18 +91,18 @@
         }
       }).error(function (jqXHR) {
         if (jqXHR.status === 404) {
-          StackExchange.helpers.showErrorMessage($(".topbar"), "Metasmoke could not find a write token - did you authorize the app?", {
-            position: "toast",
-            transient: true,
-            transientTimeout: 10000
-          });
+          // StackExchange.helpers.showErrorMessage($(".topbar"), "Metasmoke could not find a write token - did you authorize the app?", {
+          //   position: "toast",
+          //   transient: true,
+          //   transientTimeout: 10000
+          // });
         } else {
-          StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
-            position: "toast",
-            transient: true,
-            transientTimeout: 10000
-          });
-          console.log(jqXHR.status, jqXHR.responseText);
+          // StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
+          //   position: "toast",
+          //   transient: true,
+          //   transientTimeout: 10000
+          // });
+          // console.log(jqXHR.status, jqXHR.responseText);
         }
       });
     });
