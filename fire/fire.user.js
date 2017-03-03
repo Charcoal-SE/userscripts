@@ -85,7 +85,7 @@
       }).done(function (data) {
         fire.msWriteToken = data.token;
         fire.setData("metasmokeWriteToken", data.token);
-        debugger;
+
         if (afterGetToken) {
           afterGetToken();
         }
@@ -225,7 +225,7 @@
       type: "text",
       maxlength: "7"
     });
-    
+
     var saveButton = element("a", "button", {
       text: "Save",
       click: function () {
