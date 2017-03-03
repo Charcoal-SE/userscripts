@@ -1,8 +1,132 @@
 ---
 ---
 
-$test: 1px;
+$blur: blur(2px);
+$zIndex: 100;
+$button-gradient-light: #54fc07;
+$button-gradient-dark: #43c407;
 
-body {
-  width: $test;
+.fire-blur {
+  -webkit-filter: $blur;
+  -moz-filter: $blur;
+  -ms-filter: $blur;
+  -o-filter: $blur;
+  filter: $blur;
 }
+
+.fire-popup-modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.fire-button {
+  cursor: pointer;
+
+  &.fire-plain {
+    font-weight: bold;
+    color: firebrick;
+    background: -webkit-linear-gradient(#ff4900, #e98646, red);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Popup container
+.fire-popup {
+  width: 600px;
+  max-height: 600px;
+  overflow: hidden;
+  position: fixed;
+  z-index: $zIndex;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px 2px #646464;
+
+  // Header
+  .fire-popup-header {
+    height: 40px;
+
+    a.button {
+      margin: 0;
+      &.fire-close-button {
+        float: right;
+      }
+      &.fire-feedback-button {
+        float: left;
+        margin-right: 2px;
+      }
+      &.focus {
+        border: 1px solid $button-gradient-dark;
+        background-color: $button-gradient-dark;
+        background: -webkit-gradient(linear, left top, left bottom, from($button-gradient-light), to($button-gradient-dark));
+        background: -moz-linear-gradient(top, $button-gradient-light, $button-gradient-dark);
+        background: linear-gradient(top, $button-gradient-light, $button-gradient-dark);
+      }
+    }
+
+    .fire-site-logo {
+      background-position: top left;
+      background-repeat: no-repeat;
+      background-size: contain;
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      position: relative;
+      top: -18px;
+      left: 4px;
+      font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+      font-size: 30px;
+      padding: 0 0 0 60px;
+      line-height: 60px;
+      text-transform: capitalize;
+    }
+  } // End Header
+
+  // Body
+  .fire-popup-body {
+    max-height: 520px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: inset 0 0 10px -3px #646464;
+    position: relative;
+
+    a {
+      .href {
+        display: none;
+        word-break: break-all;
+      }
+
+      &:hover {
+        .href {
+          display: inline;
+        }
+        .text {
+          display: none;
+        }
+      }
+    }
+  } // End body
+
+  .fire-tooltip {
+    position: fixed;
+    background: #eee;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px 0 #888;
+    border: 1px solid #bbb;
+    pointer-events: none;
+    z-index: $zIndex;
+  }
+} // End Popup container
