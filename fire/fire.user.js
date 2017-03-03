@@ -391,7 +391,7 @@
         token: token
       }
     }).done(function (data) {
-      debugger;
+      debugger; // eslint-disable-line no-debugger
       console.log(data);
       // StackExchange.helpers.showSuccessMessage($(".topbar"), "Fed back " + feedbackType + " to metasmoke.", {
       //   position: "toast",
@@ -402,7 +402,7 @@
       // $(window.event.target).attr("data-fdsc-ms-id", null);
       // fdsc.postFound = null;
     }).error(function (jqXHR) {
-      debugger;
+      debugger; // eslint-disable-line no-debugger
       console.log(jqXHR);
       // if (jqXHR.status === 401) {
       //   StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
