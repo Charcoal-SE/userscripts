@@ -13,102 +13,101 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
 // @grant       none
 // ==/UserScript==
-/* global autoflagging */
+/* global fire, CHAT */
 
 (function () {
   "use strict";
 
-  if (autoflagging) {
-    // Plugin registration
-    autoflagging.decorate.fire = onSmokeDetectorReport;
-    autoflagging.decorate.fire.location = "after";
-  } else {
-    console.error("\nFIRE dependency missing: The AIM userscript isn't loaded." +
-      "\nAIM GitHub url: https://github.com/Charcoal-SE/userscripts/blob/master/autoflagging.user.js" +
-      "\nAIM Download url: https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js");
-    return;
-  }
-
-  var fire = {
+  window.fire = {
     wip: true,
     metasmokeKey: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
     metasmokeUrl: "https://metasmoke.erwaysoftware.com/api/",
     buttonKeyCodes: [],
-    isOpen: false
+    isOpen: false,
+    smokeDetectorId: { // this is Smokey's user ID for each supported domain
+      "chat.stackexchange.com": 120914,
+      "chat.stackoverflow.com": 3735529,
+      "chat.meta.stackexchange.com": 266345,
+    }[location.host] // From which, we need the current host's ID
   };
 
-  fire.baseUrl = "https://metasmoke.erwaysoftware.com/api/posts?key=" + fire.metasmokeKey;
+  fire.SDMessageSelector = ".user-" + fire.smokeDetectorId + " .message ";
 
   injectCSS();
   registerAnchorHover();
+  decorateExistingMessages();
+  CHAT.addEventHandlerHook(chatListener);
 
-  getReportInfo(59354);
-
-  function getReportInfo(ids, page) {
-    // var autoflagData = {};
-    var url = fire.metasmokeUrl + "posts/" + ids + "?key=" + fire.metasmokeKey;// + "&page=" + page || 1;
-
-    autoflagging.log("URL: " + url);
+  function getDataForUrl(reportedUrl, callback) {
+    var url = fire.metasmokeUrl + "posts/urls?key=" + fire.metasmokeKey + "&page=1&urls=" + reportedUrl;
     $.get(url, function (data) {
-      // Handle returned data.
-      console.log(page, data);
-
-      /*
-      // Group information by link
-      for (var i = 0; i < data.items.length; i++) {
-        autoflagData[data.items[i].link] = data.items[i];
+      if (data && data.items) {
+        callback(data.items[0]);
       }
-
-      // Loop over all Smokey reports and decorate them
-      $(autoflagging.selector).each(function () {
-        var postURL = autoflagging.getPostURL(this);
-        if (typeof autoflagData[postURL] == "undefined") {
-          return;
-        }
-        autoflagging.decorateMessage($(this), autoflagData[postURL]);
-        // Post deleted?
-        if (autoflagData[postURL].deleted_at != null) {
-          $(this).find(".content").toggleClass("ai-deleted");
-        }
-      });
-
-      if (data.has_more) {
-        // There are more items on the next 'page'
-        autoflagging.callAPI(urls, ++page);
-      }
-      */
-    }).fail(function (xhr) {
-      autoflagging.notify("Failed to load data: " + xhr.statusText);
     });
   }
 
-  // Smoke Detector Report handler
-  function onSmokeDetectorReport($fire, data) {
-    if ($fire.find(".ai-fire-button").length === 0) {
-      if (data.link) {
-        data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
-        data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
-      } else {
-        console.error("No link found:", data); // No link. Something went FOOBAR
-      }
+  // getReportInfo(59354);
+  // function getReportInfo(ids, page) {
+  //   // var autoflagData = {};
+  //   var url = fire.metasmokeUrl + "posts/" + ids + "?key=" + fire.metasmokeKey;// + "&page=" + page || 1;
+  // }
 
-      var fireButton = element("span", "ai-fire-button", {
-        text: "🛠️", // http://graphemica.com/%F0%9F%9B%A0
-        click: openPopup
-      }).data("report", data);
+  function decorateMessage(message) {
+    var m = $(message);
+    if (m.find(".ai-fire-button").length === 0) {
+      var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
+      if (reportLink.length > 0) { // This is a report
+        var reportedUrl = reportLink.attr("href").split("url=").pop();
+        var fireButton = element("span", "ai-fire-button", {
+          text: "🔥",
+          click: openPopup
+        })
+        .data("url", reportedUrl)
+        .hover(loadDataForReport);
 
-      $fire.prepend(fireButton);
-    } else if (data) {
-      if (data.feedbacks) {
-        console.log("New feedback: ", data);
-        var button = $fire.find(".ai-fire-button");
-        var report = button.data("report");
-        report.feedbacks = (report.feedbacks || []).concat(data.feedbacks); // Add new feedback to data
-        button.data("report", report);
-      } else {
-        console.log("Unfamiliar message: ", data);
+        reportLink
+          .after(fireButton)
+          .after(" | ");
       }
     }
+  }
+
+  // Loads a report's data when you hover over the FIRE button.
+  function loadDataForReport() {
+    var $this = $(this);
+    var url = $this.data("url");
+
+    getDataForUrl(url, function (data) {
+      data.is_answer = data.link.indexOf("/a/") >= 0; // eslint-disable-line camelcase
+      data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+      $this.data("report", data);
+    });
+  }
+
+  // Chat message event listener
+  function chatListener(e) {
+    if (e.event_type === 1 && e.user_id === fire.smokeDetectorId) {
+      setTimeout(function () {
+        var message = $("#message-" + e.message_id);
+        decorateMessage(message);
+      });
+    }
+  }
+
+  // Decorate messages that exist on page load
+  function decorateExistingMessages() {
+    var chat = $("#chat");
+    chat.on("DOMSubtreeModified", function () {
+      if (chat.html().length !== 0) {
+        // Chat messages loaded
+        chat.off("DOMSubtreeModified");
+
+        $(fire.SDMessageSelector).each(function () {
+          decorateMessage(this);
+        });
+      }
+    });
   }
 
   // Popup methods
@@ -166,8 +165,9 @@
 
     fire.isOpen = true;
 
+    var $this = $(this);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
-    var d = $(this).data("report");
+    var d = $this.data("report");
 
     var popup = element("div", "ai-fire-popup")
       .css({top: "5%", left: w - 300});
