@@ -310,7 +310,7 @@
   function injectCSS() {
     var css = window.document.createElement("link");
     css.rel = "stylesheet";
-    css.href = "//charcoal-se.org/userscripts/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
+    css.href = "//charcoal-se.org/userscripts/fire/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
     document.head.appendChild(css);
   }
 })();
