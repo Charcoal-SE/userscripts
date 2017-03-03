@@ -4,9 +4,9 @@
 $blur: blur(2px);
 $zIndex: 100;
 
-$button-green: #339900;
-$button-red: #f00;
-$button-orange: #ff8c00;
+$button-green: #33bb00;
+$button-red: #ff0000;
+$button-orange: #ff8800;
 $button-blue: #0000ff;
 
 $shadow-color: #646464;
@@ -14,7 +14,7 @@ $transitionTime: 0.4s;
 
 @mixin button-gradient($color) {
   $light: lighten($color, 20%);
-  $dark: darken($color, 20%);
+  $dark: darken($color, 10%);
   border: 1px solid $dark;
   background-color: $dark;
   background: -webkit-gradient(linear, left top, left bottom, from($light), to($dark));
