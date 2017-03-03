@@ -92,10 +92,10 @@ $transitionTime: 0.4s;
         }
 //green for tpu- and tp-, red for fp-, could leave naa- as orange
         &.fire-tpu-,
-        &.fire-tp- { button-gradient($button-green); }
-        &.fire-fp- { button-gradient($button-red); }
-        &.fire-naa- { button-gradientt($button-orange); }
-        &.focus { button-gradient($button-blue); }
+        &.fire-tp- { @include button-gradient($button-green); }
+        &.fire-fp- { @include button-gradient($button-red); }
+        &.fire-naa- { @include button-gradientt($button-orange); }
+        &.focus { @include button-gradient($button-blue); }
       }
     }
 
