@@ -84,13 +84,14 @@ $transitionTime: 0.4s;
         margin-right: 2px;
 
         &.fire-submitted {
-          font-style: italic;
+          text-decoration: underline;
         }
 
         &[disabled] {
           cursor: no-drop;
+          opacity: 0.5;
         }
-//green for tpu- and tp-, red for fp-, could leave naa- as orange
+
         &.fire-tpu-,
         &.fire-tp- { @include button-gradient($button-green); }
         &.fire-fp- { @include button-gradient($button-red); }
