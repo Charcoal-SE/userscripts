@@ -119,6 +119,12 @@ $button-gradient-dark: #43c407;
     }
   } // End body
 
+  .fire-popup-input {
+    padding: 3px 6px;
+    border-radius: 6px;
+    margin-right: 4px;
+  }
+
   .fire-tooltip {
     position: fixed;
     background: #eee;

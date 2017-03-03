@@ -215,8 +215,9 @@
     var popup = element("div", "fire-popup")
       .css({top: "5%", left: w - 300});
 
-    var top = element("p", "fire-popup-header")
-      .append("Once you've authenticated FIRE with metasmoke, you'll be given a code; enter it here.");
+    var top = element("p", "fire-popup-header", {
+      html: "Once you've authenticated FIRE with metasmoke, you'll be given a code.<br />Please enter it here:"
+    });
 
     var input = element("input", "fire-popup-input", {type: "text"});
     var saveButton = element("a", "button", {
