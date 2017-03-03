@@ -317,7 +317,6 @@
 
     body.find("pre code").each(function () {
       this.innerHTML = this.innerHTML
-        .replace(/&/g, "&amp;")
         .replace(/>/g, "&gt;")
         .replace(/</g, "&lt;")
         .replace(/"/g, "&quot;");
