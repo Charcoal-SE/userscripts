@@ -13,7 +13,7 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
 // @grant       none
 // ==/UserScript==
-/* global fire, CHAT */
+/* global fire, toastr, CHAT */
 /* eslint-disable camelcase */
 
 (function () {
@@ -52,13 +52,14 @@
 
     getCurrentUser();
     loadStackExchangeSites();
-    injectCSS();
+    injectExternalScripts();
     showFireOnExistingMessages();
     registerAnchorHover();
     registerOpenLastReportKey();
     CHAT.addEventHandlerHook(chatListener);
   })(window);
 
+  // Loads MetaSmoke data for a specified post url
   function getDataForUrl(reportedUrl, callback) {
     var ms = fire.api.ms;
     var url = ms.url + "posts/urls?key=" + ms.key + "&page=1&urls=" + reportedUrl;
@@ -68,12 +69,6 @@
       }
     });
   }
-
-  // getReportInfo(59354);
-  // function getReportInfo(ids, page) {
-  //   // var autoflagData = {};
-  //   var url = fire.api.ms.url + "posts/" + ids + "?key=" + fire.api.ms.key;// + "&page=" + page || 1;
-  // }
 
   // Loads a report's data when you hover over the FIRE button.
   function loadDataForReport(openAfterLoad) {
@@ -130,30 +125,22 @@
         method: "GET"
       }).done(function (data) {
         fire.setData("metasmokeWriteToken", data.token);
+        toastr.success("Successfully obtained MetaSmoke write token!");
 
         if (afterGetToken) {
           afterGetToken();
         }
       }).error(function (jqXHR) {
         if (jqXHR.status === 404) {
-          // StackExchange.helpers.showErrorMessage($(".topbar"), "Metasmoke could not find a write token - did you authorize the app?", {
-          //   position: "toast",
-          //   transient: true,
-          //   transientTimeout: 10000
-          // });
+          toastr.error("Metasmoke could not find a write token - did you authorize the app?");
         } else {
-          // StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
-          //   position: "toast",
-          //   transient: true,
-          //   transientTimeout: 10000
-          // });
-          // console.log(jqXHR.status, jqXHR.responseText);
+          toastr.error("An unknown error occurred during OAuth with metasmoke.");
         }
       });
     });
   }
 
-  // Chat message event listener
+  // Chat message event listener. If SmokeDetector reports another post, decorate the message
   function chatListener(e) {
     if (e.event_type === 1 && e.user_id === fire.smokeDetectorId) {
       setTimeout(function () {
@@ -172,7 +159,7 @@
         var reportedUrl = reportLink.attr("href").split("url=").pop();
         var fireButton = element("span", fire.buttonClass, {
           text: fire.buttonText,
-          click: openPopup
+          click: openReportPopup
         })
         .data("url", reportedUrl);
 
@@ -206,8 +193,10 @@
       .click(function () {
         decorateExistingMessages(500);
       });
+
     decorateExistingMessages(0);
 
+    // Load report data on fire button hover
     $("body").on("mouseenter", ".fire-button", loadDataForReport);
   }
 
@@ -311,7 +300,7 @@
   }
 
   // Build a popup and show it.
-  function openPopup() {
+  function openReportPopup() {
     if (fire.isOpen) {
       return; // Don't open the popup twice.
     }
@@ -320,7 +309,7 @@
 
     if (!fire.userData.metasmokeWriteToken) {
       getWriteToken(function () {
-        openPopup.call(that); // Open the popup later
+        openReportPopup.call(that); // Open the popup later
       });
       return;
     }
@@ -413,61 +402,53 @@
 
   // Provide feedback / flag
   function feedback(data, verdict) {
-    var token = fire.userData.metasmokeWriteToken;
     var ms = fire.api.ms;
+    var token = fire.userData.metasmokeWriteToken;
 
+    postMetaSmokeFeedback(data, verdict, ms, token);
+    postMetaSmokeSpamFlag(data, verdict, ms, token);
+    closePopup();
+  }
+
+  // Flag the post as spam
+  function postMetaSmokeSpamFlag(data, verdict, ms, token) {
+    if (verdict === "tpu-") { // && !hasAlreadyFlagged
+      $.ajax({
+        type: "POST",
+        url: ms.url + "w/post/" + data.id + "/spam_flag",
+        data: {key: ms.key, token: token}
+      }).done(function (response) {
+        toastr.success("Successfully flagged post as spam.");
+
+        if (response.backoff) { // We've got a backoff. deal with it.
+          toastr.info("Backoff received");
+          console.info(data, response);
+        }
+      }).error(function (jqXHR) {
+        toastr.error("Something went wrong while attempting to submit a spam flag");
+        console.error(data, jqXHR);
+        // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
+        // will give you a 500 with status: 'failed' and a message if the spam flag fails;
+      });
+    }
+  }
+
+  // Submit MS feedback
+  function postMetaSmokeFeedback(data, verdict, ms, token) {
     $.ajax({
       type: "POST",
       url: ms.url + "w/post/" + data.id + "/feedback",
-      data: {
-        type: verdict,
-        key: ms.key,
-        token: token
-      }
-    }).done(function (data) {
-      debugger; // eslint-disable-line no-debugger
-      console.log(data);
-      // StackExchange.helpers.showSuccessMessage($(".topbar"), "Fed back " + feedbackType + " to metasmoke.", {
-      //   position: "toast",
-      //   transient: true,
-      //   transientTimeout: 10000
-      // });
-      // console.log(data);
-      // $(window.event.target).attr("data-fdsc-ms-id", null);
-      // fdsc.postFound = null;
+      data: {type: verdict, key: ms.key, token: token}
+    }).done(function () {
+      toastr.success("Fed back \"<em>" + verdict + "\"</em> to metasmoke.");
     }).error(function (jqXHR) {
-      debugger; // eslint-disable-line no-debugger
-      console.log(jqXHR);
-      // if (jqXHR.status === 401) {
-      //   StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
-      //     position: "toast",
-      //     transient: true,
-      //     transientTimeout: 10000
-      //   });
-      //   console.error("fdsc.sendFeedback was called without having a valid write token");
-      //   fdsc.confirm("Write token invalid. Attempt re-authentication?", function (result) {
-      //     if (result) {
-      //       fdsc.getWriteToken(false, function () {
-      //         fdsc.sendFeedback(feedbackType, postId);
-      //       });
-      //     }
-      //   });
-      // } else {
-      //   StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
-      //     position: "toast",
-      //     transient: true,
-      //     transientTimeout: 10000
-      //   });
-      //   console.log(jqXHR.status, jqXHR.responseText);
-      // }
-      // $(window.event.target).attr("data-fdsc-ms-id", null);
-      // fdsc.postFound = null;
+      if (jqXHR.status === 401) {
+        toastr.error("Can't send feedback to metasmoke - not authenticated.");
+      } else {
+        toastr.error("An error occurred sending post feedback to metasmoke.");
+        console.error("An error occurred sending post feedback to metasmoke.", jqXHR);
+      }
     });
-
-    // if (data.autoflagged && data.autoflagged.flagged) {
-    //   // Only allow actual flagging if this has been flagged already.
-    // }
-    closePopup();
   }
 
   // Create a feedback button for the top of the popup
@@ -513,12 +494,47 @@
     return $("<" + tagName + "/>", options);
   }
 
-  // Expands anchor elements in the report's body on hover, to show the href.
-  function expandLinksOnHover() {
-    $(".fire-popup-body a")
-      .each(function () {
-        $(this).attr("fire-tooltip", this.href);
-      });
+  // Detect Emoji support in this browser
+  function hasEmojiSupport() {
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+
+    ctx.textBaseline = "top";
+    ctx.font = "32px Arial";
+    ctx.fillText(smiley, 0, 0);
+    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
+  }
+
+  // Inject FIRE stylesheet and Toastr library
+  function injectExternalScripts() {
+    injectCSS("//charcoal-se.org/userscripts/fire/fire.css");
+
+    if (typeof toastr === "undefined") {
+      // toastr is a Javascript library for non-blocking notifications.
+      var path = "//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/";
+      injectCSS(path + "toastr.min.css");
+      $.getScript(path + "/toastr.min.js").then(toastrOptions);
+    }
+  }
+
+  // Inject the specified stylesheet
+  function injectCSS(path) {
+    var css = window.document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = path;
+    document.head.appendChild(css);
+  }
+
+  // Set toastr options
+  function toastrOptions() {
+    toastr.options = {
+      closeButton: true,
+      progressBar: true,
+      positionClass: "toast-top-right",
+      preventDuplicates: true,
+      extendedTimeOut: "500",
+    };
   }
 
   // Register the "tooltip" hover for anchor elements
@@ -542,6 +558,14 @@
       });
   }
 
+  // Expands anchor elements in the report's body on hover, to show the href.
+  function expandLinksOnHover() {
+    $(".fire-popup-body a")
+      .each(function () {
+        $(this).attr("fire-tooltip", this.href);
+      });
+  }
+
   // Open the last report on [Ctrl]+[Space]
   function registerOpenLastReportKey() {
     $(document).on("keydown", function (e) {
@@ -554,28 +578,8 @@
     });
   }
 
-  // Detect Emoji support in this browser
-  function hasEmojiSupport() {
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
-
-    ctx.textBaseline = "top";
-    ctx.font = "32px Arial";
-    ctx.fillText(smiley, 0, 0);
-    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
-  }
-
-  // Handle CSS injection
-  function injectCSS() {
-    var css = window.document.createElement("link");
-    css.rel = "stylesheet";
-    css.href = "//charcoal-se.org/userscripts/fire/fire.css"; // "cdn.rawgit.com/Charcoal-SE/userscripts/master/fire/fire.css"
-    document.head.appendChild(css);
-  }
-
   // Adds a property on `fire` that's stored in `localStorage`
-  function registerLocalStorage(key, localStorageKey) {
+  function registerForLocalStorage(key, localStorageKey) {
     Object.defineProperty(fire, key, {
       get: function () {
         return JSON.parse(localStorage.getItem(localStorageKey));
@@ -588,8 +592,8 @@
 
   // Initializes localStorage
   function initLocalStorage(defaultStorage) {
-    registerLocalStorage("userData", "fire-user-data");
-    registerLocalStorage("sites", "fire-sites");
+    registerForLocalStorage("userData", "fire-user-data");
+    registerForLocalStorage("sites", "fire-sites");
 
     fire.setData = function (key, value) {
       var data = fire.userData;
