@@ -52,8 +52,9 @@
 
     getCurrentUser();
     injectCSS();
-    registerAnchorHover();
     showFireOnExistingMessages();
+    registerAnchorHover();
+    registerOpenLastReportKey();
     CHAT.addEventHandlerHook(chatListener);
   })(window);
 
@@ -74,7 +75,7 @@
   // }
 
   // Loads a report's data when you hover over the FIRE button.
-  function loadDataForReport() {
+  function loadDataForReport(openAfterLoad) {
     var $this = $(this);
     var url = $this.data("url");
 
@@ -86,6 +87,10 @@
       });
 
       $this.data("report", data);
+
+      if (openAfterLoad) {
+        $this.click();
+      }
     });
   }
 
@@ -433,7 +438,6 @@
     // if (data.autoflagged && data.autoflagged.flagged) {
     //   // Only allow actual flagging if this has been flagged already.
     // }
-    console.log(fire.userData.metasmokeWriteToken, data, verdict);
     closePopup();
   }
 
@@ -507,6 +511,16 @@
       .on("mouseleave", anchorSelector, function () {
         $(".fire-tooltip").remove();
       });
+  }
+
+  // Open the last report on [Ctrl]+[Space]
+  function registerOpenLastReportKey() {
+    $(document).keypress(" ", function (e) {
+      if (e.ctrlKey) {
+        var button = $(".fire-button").last();
+        loadDataForReport.call(button, true);
+      }
+    });
   }
 
   // Detect Emoji support in this browser
