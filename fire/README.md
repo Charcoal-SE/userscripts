@@ -2,7 +2,9 @@
 
 This is still a "work in progress".  
 As of this moment, the userscript does post flags _and_ MS feedback.
+
 ---
+
 # Features
 - Open a popup for any SmokeDetector report by clicking the "Fire" or "🔥" button in the report.
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
@@ -44,6 +46,7 @@ To open the reported post on it's site:
 2. <kbd>5</kbd> - Open the post.
 
 ---
+
 # TODO:
 * ___Implement MS feedback error handling___
 * ___Handle write token request errors___
