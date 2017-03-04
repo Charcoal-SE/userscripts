@@ -36,7 +36,7 @@
           url: "https://metasmoke.erwaysoftware.com/api/"
         },
         se: {
-          key: "", // this script's Stack Exchange API key
+          key: "NDllMffmzoX8A6RPHEPVXQ((", // this script's Stack Exchange API key
           url: "https://api.stackexchange.com/2.2/"
         }
       },
@@ -51,6 +51,7 @@
     });
 
     getCurrentUser();
+    loadStackExchangeSites();
     injectCSS();
     showFireOnExistingMessages();
     registerAnchorHover();
@@ -94,6 +95,33 @@
     });
   }
 
+  // Loads a list of all Stack Exchange Sites.
+  function loadStackExchangeSites() {
+    var now = new Date().valueOf();
+    var sites = fire.sites;
+
+    // If there are no sites or the site data is a day old
+    if (!sites || sites.storedAt < (now - 604800000)) { // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
+      sites = {};                                       // Clear the site data
+    }
+
+    if (!sites.storedAt) { // If the site data is empy
+      var se = fire.api.se;
+      var url = se.url + "sites?key=" + se.key + "&filter=!Fn4IB7S7Yq2UJF5Bh48LrjSpTc&pagesize=10000";
+
+      $.get(url, function (response) {
+        for (var i = 0; i < response.items.length; i++) {
+          var item = response.items[i];
+          sites[item.api_site_parameter] = item;
+        }
+
+        sites.storedAt = now; // Set the storage timestamp
+        fire.sites = sites;   // Store the site list
+      });
+    }
+  }
+
+  // Gets a MetaSmoke write token
   function getWriteToken(callback) {
     var afterGetToken = callback;
     writeTokenPopup(function (metaSmokeCode) {
@@ -302,12 +330,13 @@
     var $that = $(that);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var d = $that.data("report");
+    var site = fire.sites[d.site];
 
     var popup = element("div", "fire-popup")
       .css({top: "5%", left: w - 300});
 
     var openOnSiteButton = element("a", "fire-site-logo", {
-      text: d.site,
+      text: site ? site.name : d.site,
       href: d.link,
       target: "_blank",
       css: {"background-image": "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)"},
@@ -545,16 +574,22 @@
     document.head.appendChild(css);
   }
 
-  // Initializes localStorage
-  function initLocalStorage(defaultStorage) {
-    Object.defineProperty(fire, "userData", {
+  // Adds a property on `fire` that's stored in `localStorage`
+  function registerLocalStorage(key, localStorageKey) {
+    Object.defineProperty(fire, key, {
       get: function () {
-        return JSON.parse(localStorage.getItem("fire-user-data"));
+        return JSON.parse(localStorage.getItem(localStorageKey));
       },
       set: function (value) {
-        localStorage.setItem("fire-user-data", JSON.stringify(value));
+        localStorage.setItem(localStorageKey, JSON.stringify(value));
       }
     });
+  }
+
+  // Initializes localStorage
+  function initLocalStorage(defaultStorage) {
+    registerLocalStorage("userData", "fire-user-data");
+    registerLocalStorage("sites", "fire-sites");
 
     fire.setData = function (key, value) {
       var data = fire.userData;
