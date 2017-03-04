@@ -7,6 +7,5 @@ This is still a "work in progress". As of this moment, the userscript does not s
 * ___Implement SE flags___
 * ___Handle write token request errors___
   * Handle expired / invalid write tokens.
-* Keyboard shortcut to open last FIRE report
 * Site name is parsed from the post URL. This has to be done differently.
 * Disable / Highlight feedback buttons depending on (earlier) submitted feedback.
