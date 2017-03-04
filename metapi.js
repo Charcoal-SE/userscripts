@@ -1,3 +1,11 @@
+/**
+ * metapi
+ * Client-side library for interacting with the MS API.
+ *
+ * Author:  ArtOfCode
+ * Version: 0.1.3-beta
+ */
+
 window.metapi = {};
 
 metapi.debugMode = false;
