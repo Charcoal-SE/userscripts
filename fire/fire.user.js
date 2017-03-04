@@ -533,7 +533,8 @@
       progressBar: true,
       positionClass: "toast-top-right",
       preventDuplicates: true,
-      extendedTimeOut: "500",
+      hideDuration: 250,
+      extendedTimeOut: 500,
     };
   }
 
