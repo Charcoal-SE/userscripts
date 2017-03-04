@@ -1,5 +1,13 @@
 window.metapi = {};
 
+metapi.debugMode = false;
+
+metapi.debug = function(obj) {
+    if (metapi.debugMode) {
+        console.log(obj);
+    }
+};
+
 metapi.Cache = function() {
     var store = {};
 
@@ -55,10 +63,13 @@ metapi.getPost = function(ident, key, options, callback) {
 
     var cached = metapi.postCache.get(ident);
     if (cached) {
+        metapi.debug("Post exists in cache; returning.");
         return new metapi.Response(true, cached);
     }
 
     if (typeof(ident) === "string") {
+        metapi.debug("ident is a string; fetching using posts-by-urls.");
+
         // Assume ident is a post URL; fetch using posts-by-urls.
         $.ajax({
             'type': 'GET',
@@ -78,11 +89,14 @@ metapi.getPost = function(ident, key, options, callback) {
         });
     }
     else if (typeof(ident) === "number") {
+        metapi.debug("ident is a number; fetching using posts-by-id.");
+
         // Assume ident is a post ID; fetch using posts.
         $.ajax({
             'type': 'GET',
             'url': 'https://metasmoke.erwaysoftware.com/api/posts/' + ident + '?key=' + key + optionString
         }).done(function(data) {
+            metapi.debug("Fetch done");
             var items = data['items'];
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
@@ -93,6 +107,7 @@ metapi.getPost = function(ident, key, options, callback) {
                       'error_code': 404,
                       'error_message': 'No items were returned or the requested item was null.'}));
         }).error(function(jqXhr, textStatus, errorThrown) {
+            metapi.debug("Fetch failed");
             callback(new metapi.Response(false, jqXhr.responseText));
         });
     }
