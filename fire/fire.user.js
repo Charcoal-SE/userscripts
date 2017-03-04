@@ -463,7 +463,7 @@
         toastr.error(
           "FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />" +
           "Your MetaSmoke account doesn't appear to be write-authenticated.<br />" +
-          "Open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to authenticate with Stack Exchange.",
+          "Please open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to authenticate with Stack Exchange.",
           null,
           {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
         console.error(data, jqXHR);
