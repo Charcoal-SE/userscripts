@@ -44,7 +44,7 @@ metapi.Response = function(success, data) {
 
 metapi.postCache = new metapi.Cache();
 
-metapi.getPost = function(ident, key, options) {
+metapi.getPost = function(ident, key, options, callback) {
     options = options || {};
 
     var optionString = "";
@@ -67,14 +67,14 @@ metapi.getPost = function(ident, key, options) {
             var items = data['items'];
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
-                return new metapi.Response(true, items[0]);
+                callback(new metapi.Response(true, items[0]));
             }
-            return new metapi.Response(false,
-                {'error_name': 'no_item',
-                    'error_code': 404,
-                    'error_message': 'No items were returned or the requested item was null.'});
+            callback(new metapi.Response(false,
+                     {'error_name': 'no_item',
+                      'error_code': 404,
+                      'error_message': 'No items were returned or the requested item was null.'}));
         }).error(function(jqXhr, textStatus, errorThrown) {
-            return new metapi.Response(false, jqXhr.responseText);
+            callback(new metapi.Response(false, jqXhr.responseText));
         });
     }
     else if (typeof(ident) === "number") {
@@ -86,14 +86,14 @@ metapi.getPost = function(ident, key, options) {
             var items = data['items'];
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
-                return new metapi.Response(true, items[0]);
+                callback(new metapi.Response(true, items[0]));
             }
-            return new metapi.Response(false,
-                {'error_name': 'no_item',
-                    'error_code': 404,
-                    'error_message': 'No items were returned or the requested item was null.'});
+            callback(new metapi.Response(false,
+                     {'error_name': 'no_item',
+                      'error_code': 404,
+                      'error_message': 'No items were returned or the requested item was null.'}));
         }).error(function(jqXhr, textStatus, errorThrown) {
-            return new metapi.Response(false, jqXhr.responseText);
+            callback(new metapi.Response(false, jqXhr.responseText));
         });
     }
     else {
