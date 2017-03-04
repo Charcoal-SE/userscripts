@@ -8,7 +8,9 @@ As of this moment, the userscript does post flags _and_ MS feedback.
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
 - The popup will contain:
   - The reported post's contents.
-  - 4 feedback buttons. (<kbd>1</kbd> - <kbd>4</kbd>, followed by <kbd>Space</kbd> or <kbd>Enter</kbd>)
+  - 4 feedback buttons. 
+    - [tpu-], [tp-], [naa-], [fp-], for Spam, vandalism, NAA/VLQ, false postitive.
+    - These can be selected with <kbd>1</kbd>-<kbd>4</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
   - A header for the post's site
     - Clicking this header will open the reported post on the site. (<kbd>5</kbd>)
   - A "Close" button (<kbd>Esc</kbd>)
