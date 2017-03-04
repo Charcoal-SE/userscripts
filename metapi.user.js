@@ -2,7 +2,7 @@
 // @name        metapi
 // @description A library for userscripts to interact with the metasmoke API.
 // @author      ArtOfCode
-// @version     0.1.0-alpha
+// @version     0.1.1-alpha
 // @match       *://*.stackexchange.com
 // @match       *://*.stackoverflow.com
 // @match       *://*.superuser.com/*
@@ -19,7 +19,9 @@ metapi.Cache = function() {
 
     return {
         add: function(k, v, options) {
-            if (!store[k] || options['overwrite'] === true) {
+            options = options || {};
+
+            if (!store[k] || options.overwrite === true) {
                 store[k] = v;
             }
             else {
@@ -34,7 +36,7 @@ metapi.Cache = function() {
         delete: function(k) {
             delete store[k];
         }
-    }
+    };
 };
 
 metapi.Response = function(success, data) {
@@ -57,6 +59,8 @@ metapi.Response = function(success, data) {
 metapi.postCache = new metapi.Cache();
 
 metapi.getPost = function(ident, key, options) {
+    options = options || {};
+
     var optionString = "";
     var optionNames = Object.keys(options);
     for (var i = 0; i < optionNames.length; i++) {
