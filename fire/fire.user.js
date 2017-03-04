@@ -518,7 +518,9 @@
     $(document).on("keydown", function (e) {
       if (e.keyCode === 32 && e.ctrlKey) {
         var button = $(".fire-button").last();
-        loadDataForReport.call(button, true);
+        if (button && button.length > 0) {
+          loadDataForReport.call(button, true);
+        }
       }
     });
   }
