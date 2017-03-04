@@ -41,7 +41,6 @@
         }
       },
       buttonKeyCodes: [],
-      isOpen: false,
       smokeDetectorId: smokeDetectorId,
       SDMessageSelector: ".user-" + smokeDetectorId + " .message "
     };
@@ -126,6 +125,7 @@
       }).done(function (data) {
         fire.setData("metasmokeWriteToken", data.token);
         toastr.success("Successfully obtained MetaSmoke write token!");
+        closePopup();
 
         if (afterGetToken) {
           afterGetToken();
@@ -276,7 +276,6 @@
       click: function () {
         var value = input.val();
         if (value && value.length === 7) {
-          closePopup();
           callback(value);
         }
       }
@@ -315,7 +314,7 @@
       return;
     }
 
-    fire.isOpen = true;
+    fire.isOpen = that;
 
     var $that = $(that);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
@@ -398,63 +397,73 @@
 
     $("#container").removeClass("fire-blur");
 
-    fire.isOpen = false;
-  }
+    var previous = fire.isOpen;
+    delete fire.isOpen;
 
-  // Provide feedback / flag
-  function feedback(data, verdict) {
-    var ms = fire.api.ms;
-    var token = fire.userData.metasmokeWriteToken;
-
-    postMetaSmokeFeedback(data, verdict, ms, token);
-    postMetaSmokeSpamFlag(data, verdict, ms, token);
-    closePopup();
-  }
-
-  // Flag the post as spam
-  function postMetaSmokeSpamFlag(data, verdict, ms, token) {
-    if (verdict === "tpu-") { // && !hasAlreadyFlagged
-      $.ajax({
-        type: "POST",
-        url: ms.url + "w/post/" + data.id + "/spam_flag",
-        data: {key: ms.key, token: token}
-      }).done(function (response) {
-        toastr.success("Successfully flagged post as spam.");
-
-        if (response.backoff) { // We've got a backoff. deal with it.
-          toastr.info("Backoff received");
-          console.info(data, response);
-        }
-      }).error(function (jqXHR) {
-        if (jqXHR.status === 409) {
-          // https://metasmoke.erwaysoftware.com/authentication/status
-          // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
-          toastr.error("Your MetaSmoke account doesn't appear to be write-authenticated.\n" +
-                       "Open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to do so.");
-          console.error(data, jqXHR);
-        } else {
-          // will give you a 500 with status: 'failed' and a message if the spam flag fails;
-          toastr.error("Something went wrong while attempting to submit a spam flag");
-          console.error(data, jqXHR);
-        }
-      });
-    }
+    return previous; // Return the previously closed popup's button so it can be re-opened
   }
 
   // Submit MS feedback
-  function postMetaSmokeFeedback(data, verdict, ms, token) {
+  function postMetaSmokeFeedback(data, verdict) {
+    var ms = fire.api.ms;
+    var token = fire.userData.metasmokeWriteToken;
+
     $.ajax({
       type: "POST",
       url: ms.url + "w/post/" + data.id + "/feedback",
       data: {type: verdict, key: ms.key, token: token}
     }).done(function () {
-      toastr.success("Fed back \"<em>" + verdict + "\"</em> to metasmoke.");
+      toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
+
+      if (verdict === "tpu-") {
+        postMetaSmokeSpamFlag(data, ms, token);
+      } else {
+        closePopup();
+      }
     }).error(function (jqXHR) {
       if (jqXHR.status === 401) {
         toastr.error("Can't send feedback to metasmoke - not authenticated.");
+
+        fire.clearData("metasmokeWriteToken");
+        var previous = closePopup();
+
+        getWriteToken(function () {
+          openReportPopup.call(previous); // Open the popup later
+        });
       } else {
         toastr.error("An error occurred sending post feedback to metasmoke.");
         console.error("An error occurred sending post feedback to metasmoke.", jqXHR);
+      }
+    });
+  }
+
+  // Flag the post as spam
+  function postMetaSmokeSpamFlag(data, ms, token) {
+    // if (!hasAlreadyFlagged)
+    $.ajax({
+      type: "POST",
+      url: ms.url + "w/post/" + data.id + "/spam_flag",
+      data: {key: ms.key, token: token}
+    }).done(function (response) {
+      toastr.success("Successfully flagged post as spam.");
+      closePopup();
+
+      if (response.backoff) { // We've got a backoff. deal with it.
+        debugger; // eslint-disable-line no-debugger
+        toastr.info("Backoff received");
+        console.info(data, response);
+      }
+    }).error(function (jqXHR) {
+      if (jqXHR.status === 409) {
+        // https://metasmoke.erwaysoftware.com/authentication/status
+        // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
+        toastr.error("Your MetaSmoke account doesn't appear to be write-authenticated.\n" +
+                     "Open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to do so.");
+        console.error(data, jqXHR);
+      } else {
+        // will give you a 500 with status: 'failed' and a message if the spam flag fails;
+        toastr.error("Something went wrong while attempting to submit a spam flag");
+        console.error(data, jqXHR);
       }
     });
   }
@@ -481,7 +490,7 @@
       text: text + suffix,
       click: function () {
         if (!data.disable_feedback) {
-          feedback(data, verdict);
+          postMetaSmokeFeedback(data, verdict);
         }
       },
       disabled: data.disable_feedback,
@@ -539,7 +548,7 @@
     toastr.options = {
       closeButton: true,
       progressBar: true,
-      positionClass: "toast-top-right",
+      positionClass: "toast-top-center",
       preventDuplicates: true,
       hideDuration: 250,
       extendedTimeOut: 500,
