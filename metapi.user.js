@@ -1,17 +1,3 @@
-// ==UserScript==
-// @name        metapi
-// @description A library for userscripts to interact with the metasmoke API.
-// @author      ArtOfCode
-// @version     0.1.1-alpha
-// @match       *://*.stackexchange.com
-// @match       *://*.stackoverflow.com
-// @match       *://*.superuser.com/*
-// @match       *://*.serverfault.com/*
-// @match       *://*.askubuntu.com/*
-// @match       *://*.stackapps.com/*
-// @match       *://*.mathoverflow.net/*
-// ==/UserScript==
-
 window.metapi = {};
 
 metapi.Cache = function() {
