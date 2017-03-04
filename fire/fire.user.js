@@ -88,7 +88,7 @@
 
       $this.data("report", data);
 
-      if (openAfterLoad) {
+      if (openAfterLoad === true) {
         $this.click();
       }
     });
@@ -572,10 +572,12 @@
 
   // Gets the currently logged-in user.
   function getCurrentUser() {
-    CHAT.RoomUsers
-      .get(CHAT.CURRENT_USER_ID)
-      .done(function (user) {
-        fire.chatUser = user;
-      });
+    setTimeout(function () { // This code was too fast for FireFox
+      CHAT.RoomUsers
+        .get(CHAT.CURRENT_USER_ID)
+        .done(function (user) {
+          fire.chatUser = user;
+        });
+    });
   }
 })();
