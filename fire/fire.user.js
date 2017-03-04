@@ -222,7 +222,7 @@
         .removeClass("focus")
         .trigger("mouseleave");
 
-      var $button = $(".fire-popup-header a[fire-key=" + e.keyCode + "]");
+      var $button = $(".fire-popup-header a[fire-key=" + e.keyCode + "]:not([disabled])");
       var button = $button[0];
 
       if (button) {
