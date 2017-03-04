@@ -110,7 +110,6 @@ $transitionTime: 0.4s;
       background-repeat: no-repeat;
       background-size: contain;
       display: inline-block;
-      width: 60px;
       height: 60px;
       position: relative;
       top: -18px;
@@ -123,6 +122,9 @@ $transitionTime: 0.4s;
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
+      max-width: 275px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   } // End Header
 
