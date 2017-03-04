@@ -22,9 +22,13 @@ $transitionTime: 0.4s;
   background: linear-gradient(top, $light, $dark);
 }
 
-#toast-container a {
-  text-decoration: underline;
-  font-style: italic;
+#toast-container {
+  margin-top: 4px;
+
+  a {
+    text-decoration: underline;
+    font-style: italic;
+  }
 }
 
 .fire-blur {

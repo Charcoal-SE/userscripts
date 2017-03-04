@@ -448,7 +448,10 @@
       toastr.success("Successfully flagged post as spam.");
       closePopup();
 
-      if (response.backoff) { // We've got a backoff. deal with it.
+      if (response.backoff) {
+        // We've got a backoff. Deal with it...
+        // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
+        // re-execute any pending requests that were submitted during that time, afterwards.
         debugger; // eslint-disable-line no-debugger
         toastr.info("Backoff received");
         console.info(data, response);
@@ -457,8 +460,12 @@
       if (jqXHR.status === 409) {
         // https://metasmoke.erwaysoftware.com/authentication/status
         // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
-        toastr.error("Your MetaSmoke account doesn't appear to be write-authenticated.\n" +
-                     "Open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to do so.");
+        toastr.error(
+          "FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />" +
+          "Your MetaSmoke account doesn't appear to be write-authenticated.<br />" +
+          "Open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to authenticate with Stack Exchange.",
+          null,
+          {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
         console.error(data, jqXHR);
       } else {
         // will give you a 500 with status: 'failed' and a message if the spam flag fails;
