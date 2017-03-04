@@ -27,16 +27,19 @@ As of this moment, the userscript does post flags _and_ MS feedback.
 When SmokeDetector reports a post, these steps can be taken:
 
 To flag it as spam / send _"True positive"_ feedback:
+
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>1</kbd> - Select _"True positive"_,
 3. <kbd>Space</kbd> or <kbd>Enter</kbd> - Submit.
 
 To send _"False positive"_ feedback:
+
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>1</kbd> - Select _"False positive"_,
 3. <kbd>Space</kbd> or <kbd>Enter</kbd> - Submit.
 
 To open the reported post on it's site:
+
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>5</kbd> - Open the post.
 
