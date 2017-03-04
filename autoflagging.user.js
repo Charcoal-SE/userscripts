@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.11.2
+// @version     0.12
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -414,7 +414,7 @@
           // Deletion log
           autoflagging.log(deletionLog.post_link + " deleted");
           let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
-          $(selector).parents(".content").toggleClass("ai-deleted");
+          $(selector).parents(".content").addClass("ai-deleted");
         } else if (typeof feedback != "undefined") {
           // Feedback
           autoflagging.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
