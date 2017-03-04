@@ -5,15 +5,16 @@ As of this moment, the userscript does post flags _and_ MS feedback.
 ---
 # Features
 - Open a popup for any SmokeDetector report by clicking the "Fire" or "🔥" button in the report.
+- SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
 - The popup will contain:
-  - The reported post.
+  - The reported post's contents.
   - 4 feedback buttons. (<kbd>1</kbd> - <kbd>4</kbd>, followed by <kbd>Space</kbd> or <kbd>Enter</kbd>)
   - A header for the post's site
     - Clicking this header will open the reported post on the site. (<kbd>5</kbd>)
   - A "Close" button (<kbd>Esc</kbd>)
-  - The modal's blur. (Toggle with <kbd>B</kbd>)
 - When you submit `tpu-` feedback, the post will _also_ be flagged as "spam" on the SE network.
   - Provided you [have authorized MetaSmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account.
+- The popup modal's blur can be toggled with <kbd>B</kbd>
 
 ---
 # TODO:
