@@ -22,6 +22,11 @@ $transitionTime: 0.4s;
   background: linear-gradient(top, $light, $dark);
 }
 
+#toast-container a {
+  text-decoration: underline;
+  font-style: italic;
+}
+
 .fire-blur {
   -webkit-filter: $blur;
   -moz-filter: $blur;

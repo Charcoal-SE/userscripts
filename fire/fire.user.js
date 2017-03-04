@@ -425,10 +425,17 @@
           console.info(data, response);
         }
       }).error(function (jqXHR) {
-        toastr.error("Something went wrong while attempting to submit a spam flag");
-        console.error(data, jqXHR);
-        // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
-        // will give you a 500 with status: 'failed' and a message if the spam flag fails;
+        if (jqXHR.status === 409) {
+          // https://metasmoke.erwaysoftware.com/authentication/status
+          // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
+          toastr.error("Your MetaSmoke account doesn't appear to be write-authenticated.\n" +
+                       "Open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to do so.");
+          console.error(data, jqXHR);
+        } else {
+          // will give you a 500 with status: 'failed' and a message if the spam flag fails;
+          toastr.error("Something went wrong while attempting to submit a spam flag");
+          console.error(data, jqXHR);
+        }
       });
     }
   }
