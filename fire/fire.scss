@@ -25,10 +25,10 @@ $transitionTime: 0.4s;
 #toast-container {
   margin-top: 4px;
 
-  > div {
+  > div.toast {
     opacity: 1;
   }
-  
+
   a {
     text-decoration: underline;
     font-style: italic;
