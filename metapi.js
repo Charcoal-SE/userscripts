@@ -79,6 +79,7 @@ metapi.getPost = function(ident, key, options, callback) {
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
                 callback(new metapi.Response(true, items[0]));
+                return;
             }
             callback(new metapi.Response(false,
                      {'error_name': 'no_item',
@@ -101,6 +102,7 @@ metapi.getPost = function(ident, key, options, callback) {
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
                 callback(new metapi.Response(true, items[0]));
+                return;
             }
             callback(new metapi.Response(false,
                      {'error_name': 'no_item',
