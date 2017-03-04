@@ -11,7 +11,7 @@ As of this moment, the userscript does post flags _and_ MS feedback.
 - The popup will contain:
   - The reported post's contents.
     - All links in a post will show their target url when you hover your mouse over them.
-  - 4 feedback buttons. 
+  - 4 feedback buttons.
     - [tpu-], [tp-], [naa-], [fp-], for Spam, vandalism, NAA/VLQ, false postitive.
     - These can be selected with <kbd>1</kbd>-<kbd>4</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
     - The buttons can contain a number. This indicates how many users have sent that type of feedback.
@@ -48,11 +48,10 @@ To open the reported post on it's site:
 ---
 
 # TODO:
-* ___Implement MS feedback error handling___
-* ___Handle write token request errors___
-  * Handle expired / invalid write tokens.
-* Disable / Highlight feedback buttons depending on (earlier) submitted feedback / flags.
+* Improve MS feedback error handling
+* Handle write token request errors
 * Detect if a user has flagged the post already
+  * Disable / Highlight feedback buttons depending on (earlier) submitted feedback / flags.
 
 Basically, now you can _"KILL IT WITH FIRE"_
 
