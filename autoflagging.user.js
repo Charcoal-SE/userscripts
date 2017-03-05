@@ -64,32 +64,38 @@
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
-  // MS links can appear in other Smokey messages too (like feedback on an old post, or conflicted feedback).
-  // Fortunately, those are direct links like https://metasmoke.erwaysoftware.com/post/56004 and won't be found by this selector.
 
   // Error handling
   autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
 
   /*!
-   * Decorates a jQuery DOM element with autoflagging information from the data.
+   * Decorates a message DOM element with information from the API or websocket.
+   * It will add the information both to the message itself
+   * and to the 'meta'-element shown on hovering over the message.
    *
    * The parameter 'data' is supposed to have a boolean property 'flagged', and a property 'users' with user information.
    * `element` is a message (i.e. has the message class)
    */
-  autoflagging.decorateMessage = function (message, data) {
-    autoflagging.decorate(message.children(".ai-information"), data);
-    autoflagging.decorate(message.find(".meta .ai-information"), data);
+  autoflagging.decorateMessage = function ($message, data) {
+    autoflagging.log("DECORATE " + JSON.stringify(data));
+    autoflagging.log($message);
+
+    autoflagging.decorate($message.children(".ai-information"), data);
+    autoflagging.decorate($message.find(".meta .ai-information"), data);
   };
 
-  autoflagging.decorate = function (element, data) {
-    autoflagging.log("DECORATE " + JSON.stringify(data));
-    autoflagging.log(element);
-    element.find(".ai-spinner").remove();
-    element.addClass("ai-loaded");
+  /*!
+   * Decorates a message DOM element with information from the API or websocket.
+   * Don't call this method directly, use decorateMessage instead.
+   */
+  autoflagging.decorate = function ($element, data) {
+    // Remove spinner
+    $element.find(".ai-spinner").remove();
+    $element.addClass("ai-loaded");
 
     // Insert reason weight
     if (typeof data.reason_weight != "undefined") {
-      element.siblings(".content").contents().each(function (index, node) {
+      $element.siblings(".content").contents().each(function (index, node) {
         // Text node?
         if (node.nodeType !== 3) {
           return;
@@ -112,33 +118,42 @@
       after: "append"
     };
 
+    // The decorate operation consists currently of two parts:
+    // - autoflag
+    // - feedback
     Object.keys(autoflagging.decorate).forEach(function (key) {
       var f = autoflagging.decorate[key];
-      if (element.find(".ai-" + key).length === 0) {
-        element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key));
+      if ($element.find(".ai-" + key).length === 0) {
+        $element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key));
       }
       if (!f.key) {
-        f(element.find(".ai-" + key), data);
+        f($element.find(".ai-" + key), data);
       } else if (hOP(data, f.key)) {
-        f(element.find(".ai-" + key), data[f.key], data);
+        f($element.find(".ai-" + key), data[f.key], data);
       }
     });
   };
 
-  /*!
-   * “Spec” for methods of autoflagging.decorate:
-   * Takes an element to update.
-   * data is from the API.
+  /*
+   * Specification for methods of autoflagging.decorate:
+   *
+   * - 1) [required] a DOM element to update
+   * - 2) [required] data from the API or websocket, usually only the parts
+   *      which is relevant
+   * - 3) [optional] complete post data
+   *
    * Properties:
-   * * location [required] ("before" | "after") Where to add the element if it
+   * - location [required] ("before" | "after") Where to add the element if it
    *   doesn’t exist
-   * * key [optional] The key that must be present on the data. The value of
+   * - key [optional] The key that must be present on the data. The value of
    *   this key is passed as the second parameter.
-   * * el [optional] the name of the element to create.
+   * - el [optional] the name of the element to create.
    */
-  autoflagging.decorate.autoflag = function ($autoflag, data, allData) {
-    autoflagging.log("AUTOFLAG " + JSON.stringify(data) + ", " + JSON.stringify(allData));
-    autoflagging.log($autoflag);
+
+  /*!
+   * Adds autoflag information to an autoflag DOM element.
+   */
+  autoflagging.decorate.autoflag = function ($autoflag, data, post) {
     // Determine if you (i.e. the current user) autoflagged this post.
     var site = "";
     switch (location.hostname) {
@@ -178,8 +193,8 @@
     }
     $autoflag.data("users", data.users);
 
-    if (allData.id && data.users.length > 0) {
-      $autoflag.find(".ai-flag-count").attr("href", "https://metasmoke.erwaysoftware.com/post/" + allData.id + "/flag_logs");
+    if (post.id && data.users.length > 0) {
+      $autoflag.find(".ai-flag-count").attr("href", "https://metasmoke.erwaysoftware.com/post/" + post.id + "/flag_logs");
     }
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
@@ -193,19 +208,25 @@
                "Not Autoflagged");
     $autoflag.data("users", data.users);
   };
-
-  autoflagging.decorate.autoflag.location = "after";
   autoflagging.decorate.autoflag.key = "autoflagged";
+  autoflagging.decorate.autoflag.location = "after";
 
+  /*!
+   * Adds feedback information to a feedback DOM element.
+   */
   autoflagging.decorate.feedback = function ($feedback, data) {
     data.forEach(function (item) {
       autoflagging.decorate.feedback._each($feedback, item);
     });
   };
-  autoflagging.decorate.feedback.location = "before";
   autoflagging.decorate.feedback.key = "feedbacks";
+  autoflagging.decorate.feedback.location = "before";
 
+  /*!
+   * Adds feedback information to a feedback DOM element.
+   */
   autoflagging.decorate.feedback._each = function ($feedback, data) {
+    // Group feedback by type
     var allFeedbacks = $feedback.data("feedbacks") || {};
     allFeedbacks[data.feedback_type] = (allFeedbacks[data.feedback_type] || []).concat(data);
     $feedback.data("feedbacks", allFeedbacks);
@@ -231,15 +252,17 @@
       }
     }
 
+    // Update feedback DOM element
     $feedback.empty();
     autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.k, $feedback, "tpu-");
     autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.f, $feedback, "fp-");
     autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.n, $feedback, "naa-");
   };
 
-  autoflagging.decorate.feedback.addFeedback = function (items, $el, defaultKey) {
-    autoflagging.log("ADD FEEDBACK " + JSON.stringify(items) + ", " + JSON.stringify(defaultKey));
-    autoflagging.log($el);
+  /*!
+   * Adds feedback of one type (tpu-, naa-, fp-) to a feedback DOM element.
+   */
+  autoflagging.decorate.feedback.addFeedback = function (items, $feedback, defaultKey) {
     var count = Object.keys(items)
                       .map(function (key) {
                         return items[key].length;
@@ -260,7 +283,11 @@
       titles = titles.filter(function (x) {
         return x;
       });
-      $el.append($("<span/>").addClass("ai-feedback-info").addClass("ai-feedback-info-" + defaultKey.replace(/-$/, "")).text(count).attr("title", titles.join("; ")));
+      $feedback.append(
+        $("<span/>").addClass("ai-feedback-info")
+          .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, ""))
+          .text(count).attr("title", titles.join("; "))
+      );
     }
   };
 
@@ -268,13 +295,13 @@
    * Decorates a DOM element with a spinner. Don't call this method directly,
    * use addSpinnerToMessage instead.
    */
-  autoflagging.addSpinner = function (element, inline) {
-    element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
+  autoflagging.addSpinner = function ($element, inline) {
+    $element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
-    if (element.parent().children(":first-child").hasClass("timestamp") && element.is(":nth-child(2)")) {
+    if ($element.parent().children(":first-child").hasClass("timestamp") && $element.is(":nth-child(2)")) {
       // don’t overlap the timestamp
-      element.css({
+      $element.css({
         minHeight: "3em"
       });
     }
@@ -284,11 +311,11 @@
    * Decorates a message DOM element with a spinner. It will add it both to the
    * message itself and to the 'meta'-element shown on hovering over the message.
    */
-  autoflagging.addSpinnerToMessage = function (element) {
+  autoflagging.addSpinnerToMessage = function ($message) {
     autoflagging.log("ADD SPINNER");
-    autoflagging.log(element);
-    autoflagging.addSpinner(element);
-    autoflagging.addSpinner(element.find(".meta"), true);
+    autoflagging.log($message);
+    autoflagging.addSpinner($message);
+    autoflagging.addSpinner($message.find(".meta"), true);
   };
 
   /*!
@@ -331,8 +358,11 @@
     });
   };
 
-  autoflagging.getPostURL = function (message) {
-    var matches = autoflagging.messageRegex.exec($(message).html());
+  /*!
+   * Returns the post URL in a Smokey report message (if there is any).
+   */
+  autoflagging.getPostURL = function (selector) {
+    var matches = autoflagging.messageRegex.exec($(selector).html());
     return matches && matches[2];
   };
 
@@ -433,7 +463,9 @@
           // Feedback
           autoflagging.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
           let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
-          decorate(selector, { feedbacks: [feedback] });
+          decorate(selector, {
+            feedbacks: [feedback]
+          });
         } else if (typeof notFlagged != "undefined") {
           // Not flagged
           autoflagging.log(notFlagged.post.link + " not flagged");
@@ -466,6 +498,8 @@
       var args = arguments;
       q.forEach(function (f) {
         setTimeout(function () {
+          autoflagging.log("Resolving queue: " + JSON.stringify(args));
+          autoflagging.log(self);
           f.apply(self, args);
         }, 100);
       });
