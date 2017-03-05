@@ -22,6 +22,19 @@ $transitionTime: 0.4s;
   background: linear-gradient(top, $light, $dark);
 }
 
+#toast-container {
+  margin-top: 4px;
+
+  > div.toast {
+    opacity: 1;
+  }
+
+  a {
+    text-decoration: underline;
+    font-style: italic;
+  }
+}
+
 .fire-blur {
   -webkit-filter: $blur;
   -moz-filter: $blur;
@@ -105,7 +118,6 @@ $transitionTime: 0.4s;
       background-repeat: no-repeat;
       background-size: contain;
       display: inline-block;
-      width: 60px;
       height: 60px;
       position: relative;
       top: -18px;
@@ -115,9 +127,12 @@ $transitionTime: 0.4s;
       color: #444;
       padding: 0 0 0 60px;
       line-height: 60px;
-      text-transform: capitalize;
+      white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
+      max-width: 275px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   } // End Header
 

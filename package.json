@@ -27,6 +27,8 @@
     ],
     "rules": {
       "quotes": ["error", "double"],
+      "camelcase": 1,
+      "dot-notation": 0,
       "linebreak-style": "off",
       "comma-dangle": "off",
       "no-eq-null": "off",

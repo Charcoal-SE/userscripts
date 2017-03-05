@@ -18,8 +18,8 @@
 // ==/UserScript==
 /* global autoflagging */
 
-// To enable/disable trace information, type autoflagging.trace(true) resp.
-// autoflagging.trace(false) in your browser's console.
+// To enable/disable trace information, type autoflagging.trace(true) or
+// autoflagging.trace(false), respectively, in your browser's console.
 
 (function () {
   "use strict";

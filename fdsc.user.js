@@ -284,9 +284,6 @@
           console.log("fdsc.msWriteToken: ", data.value);
         });
 
-        $(document).trigger("fdsc:ready");
-        fdsc.ready = true;
-
         $(".flag-post-link").on("click", function (clickEvent) {
           $(document).on("DOMNodeInserted", function (nodeEvent) {
             var container;
@@ -407,6 +404,9 @@
         $(".popup-close").on("click", function () {
           fdsc.postFound = null;
         });
+
+        $(document).trigger("fdsc:ready");
+        fdsc.ready = true;
       }
     });
   };
