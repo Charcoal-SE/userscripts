@@ -3,7 +3,7 @@
  * Client-side library for interacting with the MS API.
  *
  * Author:  ArtOfCode
- * Version: 0.1.3-beta
+ * Version: 0.1.4-beta
  */
 
 window.metapi = {};
@@ -87,12 +87,15 @@ metapi.getPost = function(ident, key, options, callback) {
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
                 callback(new metapi.Response(true, items[0]));
-                return;
             }
-            callback(new metapi.Response(false,
-                     {'error_name': 'no_item',
-                      'error_code': 404,
-                      'error_message': 'No items were returned or the requested item was null.'}));
+            else {
+                callback(new metapi.Response(false,
+                    {
+                        'error_name': 'no_item',
+                        'error_code': 404,
+                        'error_message': 'No items were returned or the requested item was null.'
+                    }));
+            }
         }).error(function(jqXhr, textStatus, errorThrown) {
             callback(new metapi.Response(false, jqXhr.responseText));
         });
@@ -110,12 +113,15 @@ metapi.getPost = function(ident, key, options, callback) {
             if (items.length > 0 && items[0]) {
                 metapi.postCache.add(ident, items[0]);
                 callback(new metapi.Response(true, items[0]));
-                return;
             }
-            callback(new metapi.Response(false,
-                     {'error_name': 'no_item',
-                      'error_code': 404,
-                      'error_message': 'No items were returned or the requested item was null.'}));
+            else {
+                callback(new metapi.Response(false,
+                    {
+                        'error_name': 'no_item',
+                        'error_code': 404,
+                        'error_message': 'No items were returned or the requested item was null.'
+                    }));
+            }
         }).error(function(jqXhr, textStatus, errorThrown) {
             metapi.debug("Fetch failed");
             callback(new metapi.Response(false, jqXhr.responseText));
