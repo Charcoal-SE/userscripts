@@ -82,6 +82,8 @@
   };
 
   autoflagging.decorate = function (element, data) {
+    autoflagging.log("DECORATE " + JSON.stringify(data));
+    autoflagging.log(element);
     element.find(".ai-spinner").remove();
     element.addClass("ai-loaded");
 
@@ -135,6 +137,8 @@
    * * el [optional] the name of the element to create.
    */
   autoflagging.decorate.autoflag = function ($autoflag, data, allData) {
+    autoflagging.log("AUTOFLAG " + JSON.stringify(data) + ", " + JSON.stringify(allData));
+    autoflagging.log($autoflag);
     // Determine if you (i.e. the current user) autoflagged this post.
     var site = "";
     switch (location.hostname) {
@@ -234,6 +238,8 @@
   };
 
   autoflagging.decorate.feedback.addFeedback = function (items, $el, defaultKey) {
+    autoflagging.log("ADD FEEDBACK " + JSON.stringify(items) + ", " + JSON.stringify(defaultKey));
+    autoflagging.log($el);
     var count = Object.keys(items)
                       .map(function (key) {
                         return items[key].length;
@@ -259,7 +265,8 @@
   };
 
   /*!
-   * Decorates a jQuery DOM element with a spinner.
+   * Decorates a DOM element with a spinner. Don't call this method directly,
+   * use addSpinnerToMessage instead.
    */
   autoflagging.addSpinner = function (element, inline) {
     element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
@@ -273,7 +280,13 @@
     }
   };
 
+  /*!
+   * Decorates a message DOM element with a spinner. It will add it both to the
+   * message itself and to the 'meta'-element shown on hovering over the message.
+   */
   autoflagging.addSpinnerToMessage = function (element) {
+    autoflagging.log("ADD SPINNER");
+    autoflagging.log(element);
     autoflagging.addSpinner(element);
     autoflagging.addSpinner(element.find(".meta"), true);
   };
@@ -386,6 +399,7 @@
           autoflagging.decorateMessage($(selector).parents(".message"), data);
         } else {
           // MS is faster than chat; add the decorate operation to the queue
+          autoflagging.log("Queueing \"" + selector + "\"" + JSON.stringify(data));
           autoflagging.msgQueue.push(_deco);
         }
       })();
@@ -419,10 +433,10 @@
           // Feedback
           autoflagging.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
           let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
-          decorate(selector, {
-            feedbacks: [feedback]
-          });
+          decorate(selector, { feedbacks: [feedback] });
         } else if (typeof notFlagged != "undefined") {
+          // Not flagged
+          autoflagging.log(notFlagged.post.link + " not flagged");
           let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
           decorate(selector, notFlagged.post);
         }
@@ -453,7 +467,7 @@
       q.forEach(function (f) {
         setTimeout(function () {
           f.apply(self, args);
-        });
+        }, 100);
       });
       setTimeout(function () {
         var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
