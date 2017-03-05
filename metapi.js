@@ -3,7 +3,7 @@
  * Client-side library for interacting with the MS API.
  *
  * Author:  ArtOfCode
- * Version: 0.1.4-beta
+ * Version: 0.2.1-beta
  */
 
 window.metapi = {};
@@ -130,4 +130,58 @@ metapi.getPost = function(ident, key, options, callback) {
     else {
         throw new TypeError("Unsupported post identifier type.");
     }
+};
+
+metapi.swapCodeForToken = function(code, key, callback) {
+    $.ajax({
+        'type': 'GET',
+        'url': 'https://metasmoke.erwaysoftware.com/oauth/token?code=' + code + '&key=' + key
+    }).done(function(data) {
+        callback(new metapi.Response(true, data));
+    }).error(function(jqXhr, textStatus, errorThrown) {
+        callback(new metapi.Response(false, jqXhr.responseText));
+    });
+};
+
+metapi.sendFeedback = function(id, feedback, key, token, callback) {
+    $.ajax({
+        'type': 'POST',
+        'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + id + '/feedback?type=' + feedback + '&key=' + key + '&token=' + token
+    }).done(function(data) {
+        callback(new metapi.Response(true, data['items']));
+    }).error(function(jqXhr, textStatus, errorThrown) {
+        callback(new metapi.Response(false, jqXhr.responseText));
+    });
+};
+
+metapi.reportPost = function(url, key, token, callback) {
+    $.ajax({
+        'type': 'POST',
+        'url': 'https://metasmoke.erwaysoftware.com/api/w/post/report?post_link=' + url + '&key=' + key + '&token=' + token
+    }).done(function(data) {
+        callback(new metapi.Response(true, {}));
+    }).error(function(jqXhr, textStatus, errorThrown) {
+        callback(new metapi.Response(false, {'error_name': 'crap', 'error_code': 911, 'error_message': 'Something has gone very wrong.'}));
+    });
+};
+
+metapi.spamFlagPost = function(id, key, token, callback) {
+    $.ajax({
+        'type': 'POST',
+        'url': 'https://metasmoke.erwaysoftware.com/api/w/post/' + id + 'spam_flag?key=' + key + '&token=' + token
+    }).done(function(data) {
+        callback(new metapi.Response(true, {backoff: data['backoff']}));
+    }).error(function(jqXhr, textStatus, errorThrown) {
+        if (jqXhr.status == 409) {
+            callback(new metapi.Response(false, jqXhr.responseText));
+        }
+        else if (jqXhr.status == 500) {
+            callback(new metapi.Response(false,
+                {
+                    'error_name': 'flag_failed',
+                    'error_code': 500,
+                    'error_message': jqXhr.responseText['message']
+                }));
+        }
+    })
 };
