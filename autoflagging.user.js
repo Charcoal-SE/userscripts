@@ -73,8 +73,8 @@
    * It will add the information both to the message itself
    * and to the 'meta'-element shown on hovering over the message.
    *
-   * The parameter 'data' is supposed to have a boolean property 'flagged', and a property 'users' with user information.
-   * `element` is a message (i.e. has the message class)
+   * The parameter 'data' is supposed to have an optional property 'flagged' with flagging information, and an optional property 'users' with user information.
+   * `element` is a message (i.e. has the .message class)
    */
   autoflagging.decorateMessage = function ($message, data) {
     autoflagging.log("DECORATE " + JSON.stringify(data));
@@ -85,7 +85,7 @@
   };
 
   /*!
-   * Decorates a message DOM element with information from the API or websocket.
+   * Adds the AIM information to the provided element.
    * Don't call this method directly, use decorateMessage instead.
    */
   autoflagging.decorate = function ($element, data) {
@@ -141,6 +141,9 @@
    * - 2) [required] data from the API or websocket, usually only the parts
    *      which is relevant
    * - 3) [optional] complete post data
+   * 
+   * It is best to make the method “idempotent,” meaning that it will display
+   * the same thing when called repeatedly with the same parameters.
    *
    * Properties:
    * - location [required] ("before" | "after") Where to add the element if it
@@ -292,6 +295,17 @@
   };
 
   /*!
+   * Decorates a message DOM element with a spinner. It will add it both to the
+   * message itself and to the 'meta'-element shown on hovering over the message.
+   */
+  autoflagging.addSpinnerToMessage = function ($message) {
+    autoflagging.log("ADD SPINNER");
+    autoflagging.log($message);
+    autoflagging.addSpinner($message);
+    autoflagging.addSpinner($message.find(".meta"), true);
+  };
+
+  /*!
    * Decorates a DOM element with a spinner. Don't call this method directly,
    * use addSpinnerToMessage instead.
    */
@@ -305,17 +319,6 @@
         minHeight: "3em"
       });
     }
-  };
-
-  /*!
-   * Decorates a message DOM element with a spinner. It will add it both to the
-   * message itself and to the 'meta'-element shown on hovering over the message.
-   */
-  autoflagging.addSpinnerToMessage = function ($message) {
-    autoflagging.log("ADD SPINNER");
-    autoflagging.log($message);
-    autoflagging.addSpinner($message);
-    autoflagging.addSpinner($message.find(".meta"), true);
   };
 
   /*!
