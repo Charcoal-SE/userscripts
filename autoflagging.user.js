@@ -425,11 +425,13 @@
   autoflagging.socket.onmessage = function (message) {
     function decorate(selector, data) {
       (function _deco() {
-        if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
+        autoflagging.log("Attempting to decorate \"" + selector + "\" with " + JSON.stringify(data));
+        autoflagging.log($(selector).parents(".message"));
+        if ($(selector).parents(".message").length > 0) {
           autoflagging.decorateMessage($(selector).parents(".message"), data);
         } else {
           // MS is faster than chat; add the decorate operation to the queue
-          autoflagging.log("Queueing \"" + selector + "\"" + JSON.stringify(data));
+          autoflagging.log("Queueing " + selector);
           autoflagging.msgQueue.push(_deco);
         }
       })();
@@ -499,9 +501,9 @@
       q.forEach(function (f) {
         setTimeout(function () {
           autoflagging.log("Resolving queue: " + JSON.stringify(args));
-          autoflagging.log(self);
+          autoflagging.log(f);
           f.apply(self, args);
-        }, 100);
+        }, 500);
       });
       setTimeout(function () {
         var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
