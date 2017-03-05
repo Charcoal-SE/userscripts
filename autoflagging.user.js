@@ -141,7 +141,7 @@
    * - 2) [required] data from the API or websocket, usually only the parts
    *      which is relevant
    * - 3) [optional] complete post data
-   * 
+   *
    * It is best to make the method “idempotent,” meaning that it will display
    * the same thing when called repeatedly with the same parameters.
    *
