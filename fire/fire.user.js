@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.3.8
+// @version     0.3.9
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -28,9 +28,7 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
-      version: "0.3.8",
-      buttonText: "🔥",
-      buttonClass: "fire-button",
+      version: "0.3.9",
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -165,8 +163,8 @@
       var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
       if (reportLink.length > 0) { // This is a report
         var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", fire.buttonClass, {
-          text: fire.buttonText,
+        var fireButton = element("span", "fire-button", {
+          text: "🔥",
           click: openReportPopup
         })
         .data("url", reportedUrl);
@@ -410,7 +408,7 @@
       .appendTo("body")
       .click(closePopup);
 
-    var settingsButton = element("a", "fire-settings-button fire-emoji"), {
+    var settingsButton = element("a", "fire-settings-button fire-emoji", {
       text: "⚙️",
       click: openSettingsPopup
     });
@@ -692,18 +690,6 @@
     }
 
     return $("<" + tagName + "/>", options);
-  }
-
-  // Detect Emoji support in this browser
-  function hasEmojiSupport() {
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
-
-    ctx.textBaseline = "top";
-    ctx.font = "32px Arial";
-    ctx.fillText(smiley, 0, 0);
-    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
   }
 
   // Inject FIRE stylesheet and Toastr library
