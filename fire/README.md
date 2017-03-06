@@ -48,14 +48,16 @@ To open the reported post on it's site:
 ---
 
 # TODO:
+* ___Cache report data on FIRE icon hover.___
+* ___Implement websocket to invalidate cached report data.___
 * Improve MS feedback error handling
+  * Respect passed "Backoff" params
 * Handle write token request errors
 * Detect if a user has flagged the post already
   * Disable / Highlight feedback buttons depending on (earlier) submitted flags.
   * Disable buttons if both flags & feedback have already been sent.
 * Improve popup creation:
-  * Popups are pretty hard-coded.
-  * Load (external?) HTML
+  * Popups are basically hard-coded. Load (external?) HTML?
 
 Basically, now you can _"KILL IT WITH FIRE"_
 

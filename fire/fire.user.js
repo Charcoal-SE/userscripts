@@ -13,7 +13,7 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
 // @grant       none
 // ==/UserScript==
-/* global fire, toastr, CHAT */
+/* global fire, metapi, toastr, CHAT */
 /* eslint-disable camelcase */
 
 (function () {
@@ -59,6 +59,7 @@
     injectExternalScripts();
     showFireOnExistingMessages();
     registerAnchorHover();
+    registerWebSocket();
     registerOpenLastReportKey();
     CHAT.addEventHandlerHook(chatListener);
   })(window);
@@ -709,7 +710,7 @@
 
   // Inject FIRE stylesheet and Toastr library
   function injectExternalScripts() {
-    injectCSS("//charcoal-se.org/userscripts/fire/fire.css?" + fire.version);
+    injectCSS("//charcoal-se.org/userscripts/fire/fire.css?v=" + fire.version);
 
     if (typeof toastr === "undefined") {
       // toastr is a Javascript library for non-blocking notifications.
@@ -759,6 +760,41 @@
       .on("mouseleave", anchorSelector, function () {
         $(".fire-tooltip").remove();
       });
+  }
+
+  // Register a websocket listener
+  function registerWebSocket() {
+    $.ajaxSetup({cache: true});
+    $.getScript("//charcoal-se.org/userscripts/metapi.js?v=" + fire.version)
+      .then(function () {
+        metapi.watchSocket(fire.api.ms.key, socketOnMessage);
+        $.ajaxSetup({cache: false});
+      });
+  }
+
+  // Handle socket messages
+  function socketOnMessage(message) {
+    var data = JSON.parse(message.data);
+
+    switch (data.type) {
+      case "confirm_subscription":
+      case "ping":
+      case "welcome":
+        break;
+      default: {
+        var info = data.message;
+        if (info.flag_log) {            // Autoflagging information
+          console.log(info.flagLog.user_name + " autoflagged " + info.flagLog.post.link);
+        } else if (info.deletion_log) { // Deletion log
+          console.log(info.deletionLog.post_link + " deleted");
+        } else if (info.feedback) {     // Feedback
+          console.log(info.feedback.user_name + " posted " + info.feedback.symbol + " on " + info.feedback.post_link, info.feedback);
+        } else if (info.not_flagged) {  // Not flagged
+          console.log(info.notFlagged.post.link + " not flagged");
+        }
+        break;
+      }
+    }
   }
 
   // Expands anchor elements in the report's body on hover, to show the href.
