@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.12.0
+// @version     1.13.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -329,15 +329,16 @@
                   var tps = data[0].count_tp;
                   var fps = data[0].count_fp;
                   var naa = data[0].count_naa;
-                  var buttonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
+                  var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
+                  var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
                   var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
 
                   if (isFlagged || isAutoflagged) {
-                    status += " - <a href='#' id='autoflag-tp' " + buttonStyle + ">tpu-</a></div>";
+                    status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
                   }
 
                   if (tps === 0) {
-                    status += " - <a href='#' id='feedback-fp' " + buttonStyle + ">false positive?</a></div>";
+                    status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a></div>";
                   } else {
                     // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
                     // Hence, do not display the false positive button
