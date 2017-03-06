@@ -415,11 +415,10 @@
       url: ms.url + "w/post/" + data.id + "/feedback",
       data: {type: verdict, key: ms.key, token: token}
     }).done(function () {
-      toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
-
       if (verdict === "tpu-") {
         postMetaSmokeSpamFlag(data, ms, token);
       } else {
+        toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
         closePopup();
       }
     }).error(function (jqXHR) {
@@ -441,40 +440,55 @@
 
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token) {
-    // if (!hasAlreadyFlagged)
-    $.ajax({
-      type: "POST",
-      url: ms.url + "w/post/" + data.id + "/spam_flag",
-      data: {key: ms.key, token: token}
-    }).done(function (response) {
-      toastr.success("Successfully flagged post as spam.");
-      closePopup();
+    var tpuSuccess = "Sent feedback \"<em>tpu-\"</em> to metasmoke.<br /><br />";
+    var hasAutoFlagged = data.autoflagged &&
+      data.autoflagged.flagged &&
+      data.autoflagged.names.indexOf(fire.chatUser.name) >= 0;
+    var isDeleted = data.deleted_at !== null;
 
-      if (response.backoff) {
-        // We've got a backoff. Deal with it...
-        // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
-        // re-execute any pending requests that were submitted during that time, afterwards.
-        debugger; // eslint-disable-line no-debugger
-        toastr.info("Backoff received");
-        console.info(data, response);
-      }
-    }).error(function (jqXHR) {
-      if (jqXHR.status === 409) {
-        // https://metasmoke.erwaysoftware.com/authentication/status
-        // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
-        toastr.error(
-          "FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />" +
-          "Your MetaSmoke account doesn't appear to be write-authenticated.<br />" +
-          "Please open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to authenticate with Stack Exchange.",
-          null,
-          {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
-        console.error(data, jqXHR);
-      } else {
-        // will give you a 500 with status: 'failed' and a message if the spam flag fails;
-        toastr.error("Something went wrong while attempting to submit a spam flag");
-        console.error(data, jqXHR);
-      }
-    });
+    if (hasAutoFlagged) {
+      toastr.success(tpuSuccess + "You already autoflagged this post as spam.");
+      closePopup();
+    } else if (isDeleted) {
+      toastr.success(tpuSuccess + "The reported post can't be flagged: It is already deleted.");
+      closePopup();
+    } else {
+      $.ajax({
+        type: "POST",
+        url: ms.url + "w/post/" + data.id + "/spam_flag",
+        data: {key: ms.key, token: token}
+      }).done(function (response) {
+        toastr.success(tpuSuccess + "Successfully flagged the post as \"spam\".");
+        closePopup();
+
+        if (response.backoff) {
+          // We've got a backoff. Deal with it...
+          // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
+          // re-execute any pending requests that were submitted during that time, afterwards.
+          debugger; // eslint-disable-line no-debugger
+          toastr.info("Backoff received");
+          console.info(data, response);
+        }
+      }).error(function (jqXHR) {
+        toastr.success("Sent feedback \"<em>tpu-\"</em> to metasmoke."); // We came from a "feedback" success handler.
+
+        if (jqXHR.status === 409) {
+          // https://metasmoke.erwaysoftware.com/authentication/status
+          // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
+          toastr.error(
+            "FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />" +
+            "Your MetaSmoke account doesn't appear to be write-authenticated.<br />" +
+            "Please open <em><a href='https://metasmoke.erwaysoftware.com/authentication/status' target='_blank'>this page</a></em> to authenticate with Stack Exchange.",
+            null,
+            {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
+          console.error(data, jqXHR);
+        } else {
+          // will give you a 500 with status: 'failed' and a message if the spam flag fails;
+          toastr.error("Something went wrong while attempting to submit a spam flag");
+          console.error(data, jqXHR);
+        }
+      });
+    }
   }
 
   // Create a feedback button for the top of the popup
