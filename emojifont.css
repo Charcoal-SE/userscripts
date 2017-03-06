@@ -1,0 +1,11 @@
+@font-face {
+  font-family: 'Emoji One';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Emoji One Color'),
+       url('emoji-one-color.woff') format('woff'),
+       url('emoji-one-color.eot') format('eot'),
+       url('emoji-one-color.otf') format('otf'),
+       url('emoji-one-color.svg') format('svg'),
+       url('emoji-one-color.woff2') format('woff2');
+}
