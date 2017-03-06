@@ -26,7 +26,7 @@
       "jquery"
     ],
     "rules": {
-      "quotes": ["error", "double"],
+      "quotes": ["error", "double", {"avoidEscape": true}],
       "camelcase": 1,
       "brace-style": 0,
       "no-prototype-builtins": 0,

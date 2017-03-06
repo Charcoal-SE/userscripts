@@ -3,7 +3,7 @@
  * Client-side library for interacting with the MS API.
  *
  * Author:  ArtOfCode
- * Version: 0.2.2-beta
+ * Version: 0.3.2-beta
  */
 
 /* globals metapi */
@@ -13,6 +13,8 @@ window.metapi = {};
 
 (function () {
   "use strict";
+
+  var sockets = {};
 
   metapi.debugMode = false;
 
@@ -59,6 +61,39 @@ window.metapi = {};
     return {
       success: success,
       data: data
+    };
+  };
+
+  metapi.WebSocket = function (address) {
+    var callbacks = [];
+
+    var getCallbacks = function () {
+      return callbacks;
+    };
+
+    var addCallback = function (callback) {
+      callbacks.push(callback);
+    };
+
+    var removeCallback = function (callback) {
+      callbacks.pop(callback);
+    };
+
+    var conn = new WebSocket(address);
+    conn.onmessage = function (data) {
+      for (var i = 0; i < callbacks.length; i++) {
+        callbacks[i](data);
+      }
+    };
+
+    return {
+      _conn: conn,
+      getCallbacks: getCallbacks,
+      addCallback: addCallback,
+      removeCallback: removeCallback,
+      send: function (data) {
+        conn.send(data);
+      }
     };
   };
 
@@ -159,5 +194,20 @@ window.metapi = {};
         }));
       }
     });
+  };
+
+  metapi.watchSocket = function (key, messageCallback) {
+    var sock;
+    if (!sockets.hasOwnProperty(key)) {
+      sockets[key] = new metapi.WebSocket("wss://metasmoke.erwaysoftware.com/cable");
+    }
+    sock = sockets[key];
+
+    sock._conn.onopen = function () {
+      /* eslint-disable no-useless-escape */
+      sock.send('{"identifier": "{\"channel\":\"ApiChannel\",\"key\":\"' + key + '\"}", "command": "subscribe"}');
+    };
+
+    sock.addCallback(messageCallback);
   };
 })();
