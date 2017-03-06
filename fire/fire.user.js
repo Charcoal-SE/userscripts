@@ -218,7 +218,7 @@
     toastr.options.positionClass = "toast-" + value;
 
     $("#toast-container").remove();
-    toastr.info("Toastr position updated");
+    toastr.info("Notification position updated.");
     fire.userData = data;
   }
 
@@ -477,7 +477,7 @@
     var toastDurationElements = element("div")
       .append(element("br"))
       .append(element("span", "", {
-        text: "Toastr popup duration:"
+        text: "Notification popup duration:"
       })
       .append(element("br"))
       .append(element("input", "", {
@@ -486,7 +486,7 @@
         value: fire.userData.toastrDuration,
         change: toastrDurationHandler,
         blur: function () {
-          toastr.info("Toastr duration updated");
+          toastr.info("Notification duration updated");
         }
       }))
       .append(" ms")
@@ -512,7 +512,7 @@
 
     var positionSelector = element("div")
       .append(element("br"))
-      .append(element("span", "", {text: "Toastr popup position:"})
+      .append(element("span", "", {text: "Notification popup position:"})
       .append(element("br"))
       .append(positionSelect)
     );
