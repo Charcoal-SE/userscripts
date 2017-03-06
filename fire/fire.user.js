@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.3.10
+// @version     0.3.11
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -28,11 +28,15 @@
       "chat.meta.stackexchange.com": 266345,
     }[location.host];       // From which, we need the current host's ID
 
+    var defaultOptions = {
+      blur: true,
+      toastrPosition: "top-right",
+      toastrDuration: 2500
+    };
+
     scope.fire = {
-      version: "0.3.10",
+      version: "0.3.11",
       useEmoji: useEmoji,
-      buttonText: useEmoji ? "🔥" : "Fire",
-      buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -48,12 +52,7 @@
       SDMessageSelector: ".user-" + smokeDetectorId + " .message "
     };
 
-    initLocalStorage(hOP, {
-      blur: true,
-      toastrPosition: "top-right",
-      toastrDuration: 2500
-    });
-
+    initLocalStorage(hOP, defaultOptions);
     getCurrentUser();
     loadStackExchangeSites();
     injectExternalScripts();
@@ -167,8 +166,8 @@
       var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
       if (reportLink.length > 0) { // This is a report
         var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", fire.buttonClass, {
-          text: fire.buttonText,
+        var fireButton = element("span", "fire-button", {
+          html: emojiOrImage("🔥"),
           click: openReportPopup
         })
         .data("url", reportedUrl);
@@ -412,8 +411,8 @@
       .appendTo("body")
       .click(closePopup);
 
-    var settingsButton = element("a", "fire-settings-button" + (fire.useEmoji ? " fire-emoji" : ""), {
-      text: fire.useEmoji ? "⚙️" : "options",
+    var settingsButton = element("a", "fire-settings-button", {
+      html: emojiOrImage("⚙️"),
       click: openSettingsPopup
     });
 
@@ -457,7 +456,10 @@
     });
 
     var top = element("p", "fire-popup-header")
-      .append(element("h2", "", {text: (fire.useEmoji ? "🔥 " : "") + "FIRE settings."}))
+      .append(
+        element("h2")
+          .append(emojiOrImage("🔥"))
+          .append(" FIRE settings."))
       .append(closeButton);
 
     var container = element("div");
@@ -708,6 +710,23 @@
     return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
   }
 
+  // Returns the emoji if it's supported. Otherwise, return a fallback image.
+  function emojiOrImage(emoji) {
+    if (fire.useEmoji) {
+      return $(emoji);
+    }
+
+    var url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
+    var hex = emoji.codePointAt(0).toString(16);
+
+    var emojiImage = element("img", "fire-emoji", {
+      src: url + hex + ".png",
+      alt: emoji
+    });
+
+    return emojiImage;
+  }
+
   // Inject FIRE stylesheet and Toastr library
   function injectExternalScripts() {
     injectCSS("//charcoal-se.org/userscripts/fire/fire.css?v=" + fire.version);
@@ -782,7 +801,7 @@
       case "welcome":
         break;
       default: {
-        var info = JSON.parse(data.message);
+        var info = data.message;
         if (info.flag_log) {            // Autoflagging information
           console.log(info.flag_log.user_name + " autoflagged " + info.flag_log.post.link);
         } else if (info.deletion_log) { // Deletion log
@@ -791,6 +810,8 @@
           console.log(info.feedback.user_name + " posted " + info.feedback.symbol + " on " + info.feedback.post_link, info.feedback);
         } else if (info.not_flagged) {  // Not flagged
           console.log(info.not_flagged.post.link + " not flagged");
+        } else {
+          console.log(info);
         }
         break;
       }

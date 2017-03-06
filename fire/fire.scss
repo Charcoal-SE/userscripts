@@ -29,6 +29,16 @@ $transitionTime: 0.4s;
   }
 }
 
+img.fire-emoji {
+  width: 16px;
+  height: 16px;
+
+  &.large {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 #toast-container {
   margin-top: 4px;
 
@@ -63,16 +73,9 @@ $transitionTime: 0.4s;
 .fire-button {
   cursor: pointer;
 
-  &.fire-plain {
-    font-weight: bold;
-    color: firebrick;
-    background: -webkit-linear-gradient(#ff4900, #e98646, red);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    &:hover {
-      font-style: italic;
-    }
+  .fire-emoji {
+    position: relative;
+    top: -2px;
   }
 }
 
@@ -204,7 +207,7 @@ $transitionTime: 0.4s;
     text-decoration: none;
     line-height: 16px;
 
-    &.fire-emoji:hover {
+    &:hover {
       animation: spinner .6s linear infinite;
     }
   }
