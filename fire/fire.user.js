@@ -782,7 +782,7 @@
       case "welcome":
         break;
       default: {
-        var info = data.message;
+        var info = JSON.parse(data.message);
         if (info.flag_log) {            // Autoflagging information
           console.log(info.flagLog.user_name + " autoflagged " + info.flagLog.post.link);
         } else if (info.deletion_log) { // Deletion log
