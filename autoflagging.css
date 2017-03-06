@@ -1,7 +1,3 @@
-.no-emoji .ai-feedback-info {
-  font-family: Emoji One;
-}
-
 .ai-information:not(.inline) {
   position: absolute;
   right: 4px;
@@ -62,4 +58,15 @@
 }
 .ai-feedback-info-naa::after {
   content: " 💩";
+}
+.no-emoji .ai-feedback-info-naa::after {
+  content: " " url(https://charcoal-se.org/userscripts/emoji/naa.png)
+}
+
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  .no-emoji .ai-feedback-info-naa::after {
+    content: " " url(https://charcoal-se.org/userscripts/emoji/naa-2x.png)
+  }
 }
