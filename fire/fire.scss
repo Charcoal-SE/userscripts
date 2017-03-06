@@ -32,11 +32,11 @@ $transitionTime: 0.4s;
 img.fire-emoji {
   width: 16px;
   height: 16px;
+}
 
-  &.large {
-    width: 24px;
-    height: 24px;
-  }
+img.fire-emoji-large {
+  width: 24px;
+  height: 24px;
 }
 
 #toast-container {

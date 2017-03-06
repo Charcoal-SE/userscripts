@@ -711,7 +711,7 @@
   }
 
   // Returns the emoji if it's supported. Otherwise, return a fallback image.
-  function emojiOrImage(emoji) {
+  function emojiOrImage(emoji, large) {
     if (fire.useEmoji) {
       return $(emoji);
     }
