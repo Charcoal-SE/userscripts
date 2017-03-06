@@ -53,10 +53,6 @@ To open the reported post on it's site:
 * Detect if a user has flagged the post already
   * Disable / Highlight feedback buttons depending on (earlier) submitted flags.
   * Disable buttons if both flags & feedback have already been sent.
-* Add options GUI instead of "hidden" keyboard shortcuts
-  * Make toast position configurable.
-  * Make toast duration configurable.
-  * Add modal blur option to GUI.
 
 Basically, now you can _"KILL IT WITH FIRE"_
 

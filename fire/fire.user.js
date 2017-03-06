@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.2.6
+// @version     0.3.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -20,6 +20,7 @@
   "use strict";
 
   (function (scope) { // Init
+    var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
     var useEmoji = hasEmojiSupport();
     var smokeDetectorId = { // this is Smokey's user ID for each supported domain
       "chat.stackexchange.com": 120914,
@@ -28,6 +29,7 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
+      useEmoji: useEmoji,
       buttonText: useEmoji ? "🔥" : "Fire",
       buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
       api: {
@@ -45,8 +47,10 @@
       SDMessageSelector: ".user-" + smokeDetectorId + " .message "
     };
 
-    initLocalStorage({
-      blur: true
+    initLocalStorage(hOP, {
+      blur: true,
+      toastrPosition: "top-right",
+      toastrDuration: 2500
     });
 
     getCurrentUser();
@@ -204,23 +208,52 @@
     $("body").on("mouseenter", ".fire-button", loadDataForReport);
   }
 
+  // Set the toastr class
+  function toastrRadioClickHandler() {
+    var value = $(this).val();
+
+    var data = fire.userData;
+    data.toastrPosition = value;
+    toastr.options.positionClass = "toast-" + value;
+
+    $("#toast-container").remove();
+    toastr.info("Toastr position updated");
+    fire.userData = data;
+  }
+
+  // Update the toastr duration
+  function toastrDurationHandler() {
+    var value = $(this).val();
+
+    var data = fire.userData;
+    data.toastrDuration = value;
+    toastr.options.timeOut = value;
+
+    $("#toast-container").remove();
+    fire.userData = data;
+  }
+
+  // Set the "Blur" option
+  function blurOptionClickHandler() {
+    var value = $(this).is(":checked");
+
+    var data = fire.userData;
+    data.blur = value;
+    $("#container").toggleClass("fire-blur", data.blur);
+    toastr.info("Blur " + (data.blur ? "en" : "dis") + "abled.");
+    fire.userData = data;
+  }
+
   // Handle keypress events for the popup
   function keyboardShortcuts(e) {
-    if (e.keyCode === 66) {     // [B] key: Toggle blur
-      e.preventDefault();
-      var data = fire.userData;
-      data.blur = !data.blur;
-      $("#container").toggleClass("fire-blur", data.blur);
-      toastr.info("Blur " + (data.blur ? "en" : "dis") + "abled.");
-      fire.userData = data;
-    } else if (e.keyCode === 13 || e.keyCode === 32) { // [Enter] key or spacebar
+    if (e.keyCode === 13 || e.keyCode === 32) { // [Enter] key or spacebar
       e.preventDefault();
       $(".fire-popup-header a.button.focus")
         .fadeOut(100)           // Flash to indicate which button was selected.
         .fadeIn(100, function () {
           $(this).click();
         });
-    } else if (fire.buttonKeyCodes.indexOf(e.keyCode) >= 0) {
+    } else if (fire.buttonKeyCodes.indexOf(e.keyCode) >= 0 && !fire.settingsAreOpen) {
       e.preventDefault();
 
       $(".fire-popup-header a.button")
@@ -375,9 +408,15 @@
       .appendTo("body")
       .click(closePopup);
 
+    var settingsButton = element("a", "fire-settings-button", {
+      text: fire.useEmoji ? "⚙️" : "⚙",
+      click: openSettingsPopup
+    });
+
     popup
       .append(top)
       .append(body)
+      .append(settingsButton)
       .hide()
       .appendTo("body")
       .fadeIn("fast");
@@ -392,21 +431,134 @@
     });
   }
 
+  // Opens a popup to change fire's settings
+  function openSettingsPopup() {
+    if (fire.settingsAreOpen) {
+      return; // Don't open the settings twice.
+    }
+    fire.settingsAreOpen = true;
+
+    // var that = this;
+    // var $that = $(that);
+    var w = (window.innerWidth - $("#sidebar").width()) / 2;
+    var popup = element("div", "fire-popup", {
+      id: "fire-settings"
+    })
+    .css({top: "5%", left: w - 300});
+
+    var closeButton = element("a", "button fire-close-button", {
+      text: "Close",
+      click: closePopup
+    });
+
+    var top = element("p", "fire-popup-header")
+      .append(element("h2", "", {text: (fire.useEmoji ? "🔥 " : "") + "FIRE settings."}))
+      .append(closeButton);
+
+    var container = element("div");
+
+    var blurCheckBox = element("input", "", {
+      id: "checkbox_blur",
+      type: "checkbox",
+      checked: fire.userData.blur,
+      click: blurOptionClickHandler
+    });
+
+    var blurLabel = element("label", "", {
+      for: "checkbox_blur",
+      text: "Enable blur on popup background."
+    });
+
+    var blurSection = element("div")
+      .append(blurCheckBox)
+      .append(blurLabel);
+
+    var toastDurationElements = element("div")
+      .append(element("br"))
+      .append(element("span", "", {
+        text: "Toastr popup duration:"
+      })
+      .append(element("br"))
+      .append(element("input", "", {
+        id: "toastr_duration",
+        type: "number",
+        value: fire.userData.toastrDuration,
+        change: toastrDurationHandler,
+        blur: function () {
+          toastr.info("Toastr duration updated");
+        }
+      }))
+      .append(" ms")
+    );
+
+    var positionRadios = element("div")
+      .append(element("br"))
+      .append(element("span", "", {
+        text: "Toastr popup position:"
+      })
+      .append(element("br"))
+    );
+
+    var toastrClasses = ["top-right", "bottom-right", "bottom-left", "top-left", "top-full-width", "bottom-full-width", "top-center", "bottom-center"];
+    var selected = fire.userData.toastrPosition;
+
+    for (var i = 0; i < toastrClasses.length; i++) {
+      var val = toastrClasses[i];
+      positionRadios.append(
+        radioOption(
+          {
+            name: "fire-radio-label",
+            value: val,
+            checked: val === selected,
+            click: toastrRadioClickHandler,
+            index: i,
+          },
+          val.replace(/-/g, " ")
+        )
+      );
+    }
+
+    container
+      .append(element("h3", "", {text: "Popup blur:"}))
+      .append(blurSection)
+      .append(element("br"))
+      .append(element("h3", "", {text: "Notification settins:"}))
+      .append(toastDurationElements)
+      .append(positionRadios);
+
+    popup
+      .append(top)
+      .append(container)
+      .hide()
+      .appendTo("body")
+      .fadeIn("fast");
+  }
+  fire.openSettingsPopup = openSettingsPopup;
+
   // Close the popup
   function closePopup() {
-    $(".fire-popup, .fire-popup-modal")
-      .fadeOut("fast", function () {
-        $(this).remove();
-      });
+    if (fire.settingsAreOpen) {
+      $(".fire-popup#fire-settings")
+        .fadeOut("fast", function () {
+          $(this).remove();
+        });
 
-    $(document).off("keydown", keyboardShortcuts);
+      delete fire.settingsAreOpen;
+    } else {
+      $(".fire-popup, .fire-popup-modal")
+        .fadeOut("fast", function () {
+          $(this).remove();
+        });
 
-    $("#container").removeClass("fire-blur");
+      $(document).off("keydown", keyboardShortcuts);
 
-    var previous = fire.isOpen;
-    delete fire.isOpen;
+      $("#container").removeClass("fire-blur");
 
-    return previous; // Return the previously closed popup's button so it can be re-opened
+      var previous = fire.isOpen;
+      delete fire.isOpen;
+
+      return previous; // Return the previously closed popup's button so it can be re-opened
+    }
   }
 
   // Submit MS feedback
@@ -529,6 +681,21 @@
     });
   }
 
+  // Creates a radio button
+  function radioOption(options, text) {
+    var id = options.name + options.index;
+
+    var label = element("label", options.name, {
+      text: text,
+      for: id
+    });
+
+    options.type = "radio";
+    options.id = id;
+    var input = element("input", "", options);
+    return label.prepend(input);
+  }
+
   // Wrapper to create a new element with a specified class.
   function element(tagName, cssClass, options) {
     options = options || {};
@@ -578,8 +745,9 @@
     toastr.options = {
       closeButton: true,
       progressBar: true,
-      positionClass: "toast-top-center",
+      positionClass: "toast-" + fire.userData.toastrPosition,
       preventDuplicates: false, // If we send feedback twice, show 2 notifications, even if they're duplicates.
+      timeOut: fire.userData.toastrDuration,
       hideDuration: 250,
       extendedTimeOut: 500,
     };
@@ -639,13 +807,20 @@
   }
 
   // Initializes localStorage
-  function initLocalStorage(defaultStorage) {
+  function initLocalStorage(hOP, defaultStorage) {
     registerForLocalStorage(fire, "userData", "fire-user-data");
     registerForLocalStorage(fire, "sites", "fire-sites");
 
     if (fire.userData === null) {
       fire.userData = defaultStorage;
     }
+    var data = fire.userData;
+    for (var key in defaultStorage) {
+      if (hOP(defaultStorage, key) && !hOP(data, key)) {
+        data[key] = defaultStorage[key];
+      }
+    }
+    fire.userData = data;
   }
 
   // Sets a value on `fire.userData`, stored in `localStorage`

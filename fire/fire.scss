@@ -196,10 +196,22 @@ $transitionTime: 0.4s;
     }
   } // End body
 
+  .fire-settings-button {
+    float: right;
+    margin: 0 -16px -20px 0;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
   .fire-popup-input {
     padding: 3px 6px;
     border-radius: 6px;
     margin: 0 4px;
+  }
+
+  .fire-radio-label {
+    text-transform: capitalize;
+    display: block;
   }
 
   .fire-tooltip {
@@ -211,5 +223,16 @@ $transitionTime: 0.4s;
     border: 1px solid #bbb;
     pointer-events: none;
     z-index: $zIndex;
+  }
+
+  &#fire-settings {
+    .fire-popup-header h2 {
+      display: inline-block;
+    }
+
+    #toastr_duration {
+      max-width: 50px;
+      margin-top: 4px;
+    }
   }
 } // End Popup container
