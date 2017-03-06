@@ -29,6 +29,7 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
+      version = "0.3.0",
       useEmoji: useEmoji,
       buttonText: useEmoji ? "🔥" : "Fire",
       buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
@@ -722,7 +723,7 @@
 
   // Inject FIRE stylesheet and Toastr library
   function injectExternalScripts() {
-    injectCSS("//charcoal-se.org/userscripts/fire/fire.css");
+    injectCSS("//charcoal-se.org/userscripts/fire/fire.css?" + fire.version);
 
     if (typeof toastr === "undefined") {
       // toastr is a Javascript library for non-blocking notifications.
