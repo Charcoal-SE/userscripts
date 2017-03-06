@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.2.2
+// @version     0.2.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -123,7 +123,7 @@
         url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.api.ms.key + "&code=" + metaSmokeCode,
         method: "GET"
       }).done(function (data) {
-        fire.setData("metasmokeWriteToken", data.token);
+        setValue("metasmokeWriteToken", data.token);
         toastr.success("Successfully obtained MetaSmoke write token!");
         closePopup();
 
@@ -319,6 +319,8 @@
     var $that = $(that);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var d = $that.data("report");
+
+    console.log("Sometimes, d seems to be undefined", $that, d);
     var site = fire.sites[d.site];
 
     var popup = element("div", "fire-popup")
@@ -424,7 +426,7 @@
       if (jqXHR.status === 401) {
         toastr.error("Can't send feedback to metasmoke - not authenticated.");
 
-        fire.clearData("metasmokeWriteToken");
+        clearValue("metasmokeWriteToken");
         var previous = closePopup();
 
         getWriteToken(function () {
@@ -604,8 +606,8 @@
   }
 
   // Adds a property on `fire` that's stored in `localStorage`
-  function registerForLocalStorage(key, localStorageKey) {
-    Object.defineProperty(fire, key, {
+  function registerForLocalStorage(object, key, localStorageKey) {
+    Object.defineProperty(object, key, {
       get: function () {
         return JSON.parse(localStorage.getItem(localStorageKey));
       },
@@ -617,23 +619,26 @@
 
   // Initializes localStorage
   function initLocalStorage(defaultStorage) {
-    registerForLocalStorage("userData", "fire-user-data");
-    registerForLocalStorage("sites", "fire-sites");
-
-    fire.setData = function (key, value) {
-      var data = fire.userData;
-      data[key] = value;
-      fire.userData = data;
-    };
-    fire.clearData = function (key) {
-      var data = fire.userData;
-      delete data[key];
-      fire.userData = data;
-    };
+    registerForLocalStorage(fire, "userData", "fire-user-data");
+    registerForLocalStorage(fire, "sites", "fire-sites");
 
     if (fire.userData === null) {
       fire.userData = defaultStorage;
     }
+  }
+
+  // Sets a value on `fire.userData`, stored in `localStorage`
+  function setValue(key, value) {
+    var data = fire.userData;
+    data[key] = value;
+    fire.userData = data;
+  }
+
+  // Removes a value from `fire.userData`, stored in `localStorage`
+  function clearValue(key) {
+    var data = fire.userData;
+    delete data[key];
+    fire.userData = data;
   }
 
   // Gets the currently logged-in user.

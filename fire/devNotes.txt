@@ -1,0 +1,13 @@
+metapi is sort of vaguely beta-ready, if you want to modify (or fork) your scripts to test it
+there'll be an @require header you can add once I've fixed the CI errors
+
+the following in your userscript header should make sure metapi is loaded:
+// @require https://cdn.rawgit.com/Charcoal-SE/userscripts/7b3131f41ef3408cc0e605c29e725e6e65af8e85/metapi.js
+documentation for metapi, when you want it https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation
+
+
+
+Uncaught TypeError: Cannot read property 'site' of undefined
+    at HTMLSpanElement.openReportPopup (eval at <anonymous> (:2:297), <anonymous>:326:28)
+    at HTMLSpanElement.dispatch (http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js:3:4351)
+    at HTMLSpanElement.i (http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js:3:328)
