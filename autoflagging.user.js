@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.12
+// @version     0.12.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -141,7 +141,7 @@
    * - 2) [required] data from the API or websocket, usually only the parts
    *      which is relevant
    * - 3) [optional] complete post data
-   * 
+   *
    * It is best to make the method “idempotent,” meaning that it will display
    * the same thing when called repeatedly with the same parameters.
    *
@@ -430,7 +430,7 @@
       (function _deco() {
         autoflagging.log("Attempting to decorate \"" + selector + "\" with " + JSON.stringify(data));
         autoflagging.log($(selector).parents(".message"));
-        if ($(selector).parents(".message").length > 0) {
+        if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
           autoflagging.decorateMessage($(selector).parents(".message"), data);
         } else {
           // MS is faster than chat; add the decorate operation to the queue
@@ -498,24 +498,27 @@
   CHAT.addEventHandlerHook(function (e) {
     if (e.event_type === 1 && e.user_id === autoflagging.smokeyID) {
       var self = this;
-      var q = autoflagging.msgQueue;
-      autoflagging.msgQueue = [];
-      var args = arguments;
-      q.forEach(function (f) {
-        setTimeout(function () {
-          autoflagging.log("Resolving queue: " + JSON.stringify(args));
-          autoflagging.log(f);
-          f.apply(self, args);
-        }, 500);
-      });
       setTimeout(function () {
         var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
         if (!matches) {
           return;
         }
+
+        // Resolve queue
+        var q = autoflagging.msgQueue;
+        autoflagging.msgQueue = [];
+        var args = arguments;
+        q.forEach(function (f) {
+          setTimeout(function () {
+            autoflagging.log("Resolving queue: " + JSON.stringify(args));
+            autoflagging.log(f);
+            f.apply(self, args);
+          }, 100);
+        });
+
         // Show spinner
         autoflagging.addSpinnerToMessage($("#message-" + e.message_id));
-      }, 1000);
+      }, 100);
     }
   });
 })();
