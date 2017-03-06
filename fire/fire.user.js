@@ -449,7 +449,8 @@
 
     var closeButton = element("a", "button fire-close-button", {
       text: "Close",
-      click: closePopup
+      click: closePopup,
+      "fire-key": 27 // escape key code
     });
 
     var top = element("p", "fire-popup-header")
