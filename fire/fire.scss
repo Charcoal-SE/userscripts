@@ -96,8 +96,12 @@ $transitionTime: 0.4s;
         float: left;
         margin-right: 2px;
 
-        &.fire-submitted {
+        &.fire-submitted,
+        &:hover {
           text-decoration: underline;
+          -webkit-box-shadow: 0 -6px 6px 0 rgba(0,255,0,0.5);
+          -moz-box-shadow: 0 -6px 6px 0 rgba(0,255,0,0.5);
+          box-shadow: 0 -6px 6px 0 rgba(0,255,0,0.5);
         }
 
         &[disabled] {

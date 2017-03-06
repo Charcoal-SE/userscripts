@@ -51,7 +51,8 @@ To open the reported post on it's site:
 * Improve MS feedback error handling
 * Handle write token request errors
 * Detect if a user has flagged the post already
-  * Disable / Highlight feedback buttons depending on (earlier) submitted feedback / flags.
+  * Disable / Highlight feedback buttons depending on (earlier) submitted flags.
+  * Disable buttons if both flags & feedback have already been sent.
 * Add options GUI instead of "hidden" keyboard shortcuts
   * Make toast position configurable.
   * Make toast duration configurable.
