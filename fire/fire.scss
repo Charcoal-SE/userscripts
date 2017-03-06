@@ -62,7 +62,6 @@ $transitionTime: 0.4s;
 
 .fire-button {
   cursor: pointer;
-  transition: all 0.2s ease;
 
   &.fire-plain {
     font-weight: bold;
@@ -103,6 +102,7 @@ $transitionTime: 0.4s;
       &.fire-feedback-button {
         float: left;
         margin-right: 2px;
+        transition: all 0.2s ease;
 
         &[disabled] {
           cursor: no-drop;
