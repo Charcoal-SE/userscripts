@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.3.2
+// @version     0.3.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -29,7 +29,7 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
-      version: "0.3.2",
+      version: "0.3.3",
       useEmoji: useEmoji,
       buttonText: useEmoji ? "🔥" : "Fire",
       buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
@@ -210,7 +210,7 @@
   }
 
   // Set the toastr class
-  function toastrRadioClickHandler() {
+  function toastrPositionChangeHandler() {
     var value = $(this).val();
 
     var data = fire.userData;
@@ -492,32 +492,30 @@
       .append(" ms")
     );
 
-    var positionRadios = element("div")
-      .append(element("br"))
-      .append(element("span", "", {
-        text: "Toastr popup position:"
-      })
-      .append(element("br"))
-    );
-
     var toastrClasses = ["top-right", "bottom-right", "bottom-left", "top-left", "top-full-width", "bottom-full-width", "top-center", "bottom-center"];
     var selected = fire.userData.toastrPosition;
 
+    var positionSelect = element("select", "fire-position-select", {
+      change: toastrPositionChangeHandler
+    });
+
     for (var i = 0; i < toastrClasses.length; i++) {
       var val = toastrClasses[i];
-      positionRadios.append(
-        radioOption(
-          {
-            name: "fire-radio-label",
-            value: val,
-            checked: val === selected,
-            click: toastrRadioClickHandler,
-            index: i,
-          },
-          val.replace(/-/g, " ")
-        )
+      positionSelect.append(
+        element("option", "", {
+          value: val,
+          text: val.replace(/-/g, " "),
+          selected: val === selected
+        })
       );
     }
+
+    var positionSelector = element("div")
+      .append(element("br"))
+      .append(element("span", "", {text: "Toastr popup position:"})
+      .append(element("br"))
+      .append(positionSelect)
+    );
 
     container
       .append(element("h3", "", {text: "Popup blur:"}))
@@ -525,7 +523,7 @@
       .append(element("br"))
       .append(element("h3", "", {text: "Notification settings:"}))
       .append(toastDurationElements)
-      .append(positionRadios);
+      .append(positionSelector);
 
     popup
       .append(top)
@@ -680,21 +678,6 @@
       "fire-key": keyCode,
       "fire-tooltip": tooltip
     });
-  }
-
-  // Creates a radio button
-  function radioOption(options, text) {
-    var id = options.name + options.index;
-
-    var label = element("label", options.name, {
-      text: text,
-      for: id
-    });
-
-    options.type = "radio";
-    options.id = id;
-    var input = element("input", "", options);
-    return label.prepend(input);
   }
 
   // Wrapper to create a new element with a specified class.
