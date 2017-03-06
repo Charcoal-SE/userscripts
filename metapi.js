@@ -3,7 +3,7 @@
  * Client-side library for interacting with the MS API.
  *
  * Author:  ArtOfCode
- * Version: 0.3.2-beta
+ * Version: 0.3.3-beta
  */
 
 /* globals metapi */
@@ -205,7 +205,13 @@ window.metapi = {};
 
     sock._conn.onopen = function () {
       /* eslint-disable no-useless-escape */
-      sock.send('{"identifier": "{\"channel\":\"ApiChannel\",\"key\":\"' + key + '\"}", "command": "subscribe"}');
+      sock.send(JSON.stringify({
+        identifier: JSON.stringify({
+          channel: "ApiChannel",
+          key: key
+        }),
+        command: "subscribe"
+      }));
     };
 
     sock.addCallback(messageCallback);
