@@ -21,7 +21,6 @@
 
   (function (scope) { // Init
     var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
-    var useEmoji = hasEmojiSupport();
     var smokeDetectorId = { // this is Smokey's user ID for each supported domain
       "chat.stackexchange.com": 120914,
       "chat.stackoverflow.com": 3735529,
@@ -30,9 +29,8 @@
 
     scope.fire = {
       version: "0.3.8",
-      useEmoji: useEmoji,
-      buttonText: useEmoji ? "🔥" : "Fire",
-      buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
+      buttonText: "🔥",
+      buttonClass: "fire-button",
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -412,8 +410,8 @@
       .appendTo("body")
       .click(closePopup);
 
-    var settingsButton = element("a", "fire-settings-button" + (fire.useEmoji ? " fire-emoji" : ""), {
-      text: fire.useEmoji ? "⚙️" : "options",
+    var settingsButton = element("a", "fire-settings-button fire-emoji"), {
+      text: "⚙️",
       click: openSettingsPopup
     });
 
@@ -457,7 +455,7 @@
     });
 
     var top = element("p", "fire-popup-header")
-      .append(element("h2", "", {text: (fire.useEmoji ? "🔥 " : "") + "FIRE settings."}))
+      .append(element("h2", "", {text: "🔥 FIRE settings."}))
       .append(closeButton);
 
     var container = element("div");
@@ -716,7 +714,13 @@
       // toastr is a Javascript library for non-blocking notifications.
       var path = "//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/";
       injectCSS(path + "toastr.min.css");
+
+      $.ajaxSetup({cache: true});
       $.getScript(path + "/toastr.min.js").then(toastrOptions);
+      if (!window.emojiSupportChecker) {
+        $.getScript("//charcoal-se.org/userscripts/emoji/emoji.js");
+      }
+      $.ajaxSetup({cache: false});
     }
   }
 

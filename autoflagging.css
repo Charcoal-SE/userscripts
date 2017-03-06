@@ -1,6 +1,4 @@
-@import url('https://charcoal-se.org/userscripts/emojifont.css');
-
-.ai-no-emoji .ai-feedback-info {
+.no-emoji .ai-feedback-info {
   font-family: Emoji One;
 }
 

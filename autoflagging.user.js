@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.12.1
+// @version     0.12.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -30,6 +30,13 @@
   css.rel = "stylesheet";
   css.href = "//charcoal-se.org/userscripts/autoflagging.css";
   document.head.appendChild(css);
+
+  // Load the Emoji support script
+  if (!window.emojiSupportChecker) {
+    $.ajaxSetup({cache: true});
+    $.getScript("//charcoal-se.org/userscripts/emoji/emoji.js");
+    $.ajaxSetup({cache: false});
+  }
 
   // Constants
   var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
@@ -67,8 +74,6 @@
 
   // Error handling
   autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
-  
-  $('html').toggleClass('ai-no-emoji', !autoflagging.hasEmojiSupport())
 
   /*!
    * Decorates a message DOM element with information from the API or websocket.
@@ -290,7 +295,7 @@
       });
       $feedback.append(
         $("<span/>").addClass("ai-feedback-info")
-          .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, "") + emojiSuffix)
+          .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, ""))
           .text(count).attr("title", titles.join("; "))
       );
     }
@@ -493,18 +498,6 @@
       }),
       command: "subscribe"
     }));
-  };
-
-  // Check if the user can render emojis
-  autoflagging.hasEmojiSupport = function () {
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
-
-    ctx.textBaseline = "top";
-    ctx.font = "32px Arial";
-    ctx.fillText(smiley, 0, 0);
-    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
   };
 
   // Sometimes, autoflagging information arrives before the chat message.
