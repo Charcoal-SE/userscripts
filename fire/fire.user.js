@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.3.9
+// @version     0.3.10
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -21,6 +21,7 @@
 
   (function (scope) { // Init
     var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
+    var useEmoji = hasEmojiSupport();
     var smokeDetectorId = { // this is Smokey's user ID for each supported domain
       "chat.stackexchange.com": 120914,
       "chat.stackoverflow.com": 3735529,
@@ -28,7 +29,10 @@
     }[location.host];       // From which, we need the current host's ID
 
     scope.fire = {
-      version: "0.3.9",
+      version: "0.3.10",
+      useEmoji: useEmoji,
+      buttonText: useEmoji ? "🔥" : "Fire",
+      buttonClass: useEmoji ? "fire-button" : "fire-button fire-plain",
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -163,8 +167,8 @@
       var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
       if (reportLink.length > 0) { // This is a report
         var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", "fire-button", {
-          text: "🔥",
+        var fireButton = element("span", fire.buttonClass, {
+          text: fire.buttonText,
           click: openReportPopup
         })
         .data("url", reportedUrl);
@@ -408,8 +412,8 @@
       .appendTo("body")
       .click(closePopup);
 
-    var settingsButton = element("a", "fire-settings-button fire-emoji", {
-      text: "⚙️",
+    var settingsButton = element("a", "fire-settings-button" + (fire.useEmoji ? " fire-emoji" : ""), {
+      text: fire.useEmoji ? "⚙️" : "options",
       click: openSettingsPopup
     });
 
@@ -453,7 +457,7 @@
     });
 
     var top = element("p", "fire-popup-header")
-      .append(element("h2", "", {text: "🔥 FIRE settings."}))
+      .append(element("h2", "", {text: (fire.useEmoji ? "🔥 " : "") + "FIRE settings."}))
       .append(closeButton);
 
     var container = element("div");
@@ -692,6 +696,18 @@
     return $("<" + tagName + "/>", options);
   }
 
+  // Detect Emoji support in this browser
+  function hasEmojiSupport() {
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+
+    ctx.textBaseline = "top";
+    ctx.font = "32px Arial";
+    ctx.fillText(smiley, 0, 0);
+    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
+  }
+
   // Inject FIRE stylesheet and Toastr library
   function injectExternalScripts() {
     injectCSS("//charcoal-se.org/userscripts/fire/fire.css?v=" + fire.version);
@@ -700,13 +716,7 @@
       // toastr is a Javascript library for non-blocking notifications.
       var path = "//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/";
       injectCSS(path + "toastr.min.css");
-
-      $.ajaxSetup({cache: true});
       $.getScript(path + "/toastr.min.js").then(toastrOptions);
-      if (!window.emojiSupportChecker) {
-        $.getScript("//charcoal-se.org/userscripts/emoji/emoji.js");
-      }
-      $.ajaxSetup({cache: false});
     }
   }
 
