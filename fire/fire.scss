@@ -20,6 +20,13 @@ $transitionTime: 0.4s;
   background: -webkit-gradient(linear, left top, left bottom, from($light), to($dark));
   background: -moz-linear-gradient(top, $light, $dark);
   background: linear-gradient(top, $light, $dark);
+
+  &.fire-submitted,
+  &:hover {
+    -webkit-box-shadow: 0 -6px 6px 0 transparentize($light, 0.5));
+    -moz-box-shadow: 0 -6px 6px 0 transparentize($light, 0.5));
+    box-shadow: 0 -6px 6px 0 transparentize($light, 0.5));
+  }
 }
 
 #toast-container {
@@ -95,14 +102,6 @@ $transitionTime: 0.4s;
       &.fire-feedback-button {
         float: left;
         margin-right: 2px;
-
-        &.fire-submitted,
-        &:hover {
-          text-decoration: underline;
-          -webkit-box-shadow: 0 -6px 6px 0 rgba(0,255,0,0.5);
-          -moz-box-shadow: 0 -6px 6px 0 rgba(0,255,0,0.5);
-          box-shadow: 0 -6px 6px 0 rgba(0,255,0,0.5);
-        }
 
         &[disabled] {
           cursor: no-drop;
