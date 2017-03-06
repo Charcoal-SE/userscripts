@@ -360,7 +360,7 @@
       .append($("<hr />"))
       .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
       .append($("<br />"))
-      .append($("<div />")
+      .append(element("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
         .append(d.body.replace(/<script/g, "&lt;script"))
       );
 
