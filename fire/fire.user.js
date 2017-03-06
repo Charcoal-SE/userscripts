@@ -409,7 +409,7 @@
       .appendTo("body")
       .click(closePopup);
 
-    var settingsButton = element("a", "fire-settings-button", {
+    var settingsButton = element("a", "fire-settings-button" + (fire.useEmoji ? " fire-emoji" : ""), {
       text: fire.useEmoji ? "⚙️" : "options",
       click: openSettingsPopup
     });

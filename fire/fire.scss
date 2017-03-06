@@ -202,6 +202,10 @@ $transitionTime: 0.4s;
     margin: 0 -16px -20px 0;
     cursor: pointer;
     text-decoration: none;
+
+    &.fire-emoji:hover {
+      animation: spinner .6s linear infinite;
+    }
   }
 
   .fire-popup-input {
@@ -236,3 +240,7 @@ $transitionTime: 0.4s;
     }
   }
 } // End Popup container
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
