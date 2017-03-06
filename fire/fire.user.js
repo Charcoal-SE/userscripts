@@ -579,7 +579,7 @@
       closeButton: true,
       progressBar: true,
       positionClass: "toast-top-center",
-      preventDuplicates: true,
+      preventDuplicates: false, // If we send feedback twice, show 2 notifications, even if they're duplicates.
       hideDuration: 250,
       extendedTimeOut: 500,
     };
