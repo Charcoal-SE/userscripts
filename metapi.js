@@ -67,6 +67,8 @@ window.metapi = {};
   metapi.getPost = function (ident, key, options, callback) {
     options = options || {};
 
+    var overwrite = options.hasOwnProperty("forceReload") && delete options["forceReload"];
+
     var optionString = "";
     var optionNames = Object.keys(options);
     for (var i = 0; i < optionNames.length; i++) {
@@ -74,30 +76,23 @@ window.metapi = {};
     }
 
     var cached = metapi.postCache.get(ident);
-    if (cached) {
-      metapi.debug("Post exists in cache; returning.");
+    if (cached && !overwrite) {
       return new metapi.Response(true, cached);
     }
 
-    var method = "";
-
-    if (typeof (ident) === "string") {
-      metapi.debug("ident is a string; fetching using posts-by-urls.");
-      method = "urls?urls=";
-    } else if (typeof (ident) === "number") {
-      metapi.debug("ident is a number; fetching using posts-by-id."); // (Default method will suffice)
-    } else {
-      throw new TypeError("Unsupported post identifier type.");
+    var fetchUrl = "";
+    if (typeof ident === "string") {
+      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/urls?urls=" + ident + "&key=" + key + optionString;
     }
-
-    var url = "https://metasmoke.erwaysoftware.com/api/posts/" + method + ident + "&key=" + key + optionString;
+    else if (typeof ident === "number") {
+      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/" + ident + "?key=" + key + optionString;
+    }
 
     $.ajax({
       type: "GET",
-      url: url
+      url: fetchUrl
     })
     .done(function (data) {
-      metapi.debug("Fetch done");
       var items = data.items;
       if (items.length > 0 && items[0]) {
         metapi.postCache.add(ident, items[0]);
@@ -110,7 +105,6 @@ window.metapi = {};
         }));
       }
     }).error(function (jqXhr) {
-      metapi.debug("Fetch failed");
       callback(new metapi.Response(false, jqXhr.responseText));
     });
   };

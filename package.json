@@ -28,6 +28,8 @@
     "rules": {
       "quotes": ["error", "double"],
       "camelcase": 1,
+      "brace-style": 0,
+      "no-prototype-builtins": 0,
       "dot-notation": 0,
       "linebreak-style": "off",
       "comma-dangle": "off",
