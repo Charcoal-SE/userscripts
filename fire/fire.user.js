@@ -784,13 +784,13 @@
       default: {
         var info = JSON.parse(data.message);
         if (info.flag_log) {            // Autoflagging information
-          console.log(info.flagLog.user_name + " autoflagged " + info.flagLog.post.link);
+          console.log(info.flag_log.user_name + " autoflagged " + info.flag_log.post.link);
         } else if (info.deletion_log) { // Deletion log
-          console.log(info.deletionLog.post_link + " deleted");
+          console.log(info.deletion_log.post_link + " deleted");
         } else if (info.feedback) {     // Feedback
           console.log(info.feedback.user_name + " posted " + info.feedback.symbol + " on " + info.feedback.post_link, info.feedback);
         } else if (info.not_flagged) {  // Not flagged
-          console.log(info.notFlagged.post.link + " not flagged");
+          console.log(info.not_flagged.post.link + " not flagged");
         }
         break;
       }
