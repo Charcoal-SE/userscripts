@@ -410,7 +410,7 @@
       .click(closePopup);
 
     var settingsButton = element("a", "fire-settings-button", {
-      text: fire.useEmoji ? "⚙️" : "⚙",
+      text: fire.useEmoji ? "⚙️" : "options",
       click: openSettingsPopup
     });
 
