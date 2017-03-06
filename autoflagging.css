@@ -1,3 +1,9 @@
+@import url('https://charcoal-se.org/userscripts/emojifont.css');
+
+.ai-no-emoji .ai-feedback-info {
+  font-family: Emoji One;
+}
+
 .ai-information:not(.inline) {
   position: absolute;
   right: 4px;
@@ -58,7 +64,4 @@
 }
 .ai-feedback-info-naa::after {
   content: " 💩";
-}
-.ai-feedback-info-naa.ai-no-emoji::after {
-  content: " naa";
 }
