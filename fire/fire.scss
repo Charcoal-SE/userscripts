@@ -62,6 +62,7 @@ $transitionTime: 0.4s;
 
 .fire-button {
   cursor: pointer;
+  transition: all 0.2s ease;
 
   &.fire-plain {
     font-weight: bold;

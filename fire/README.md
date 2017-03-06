@@ -53,6 +53,9 @@ To open the reported post on it's site:
 * Detect if a user has flagged the post already
   * Disable / Highlight feedback buttons depending on (earlier) submitted flags.
   * Disable buttons if both flags & feedback have already been sent.
+* Improve popup creation:
+  * Popups are pretty hard-coded.
+  * Load (external?) HTML
 
 Basically, now you can _"KILL IT WITH FIRE"_
 
