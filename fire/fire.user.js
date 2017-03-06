@@ -523,7 +523,7 @@
       .append(element("h3", "", {text: "Popup blur:"}))
       .append(blurSection)
       .append(element("br"))
-      .append(element("h3", "", {text: "Notification settins:"}))
+      .append(element("h3", "", {text: "Notification settings:"}))
       .append(toastDurationElements)
       .append(positionRadios);
 
