@@ -67,6 +67,8 @@
 
   // Error handling
   autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
+  
+  $('html').toggleClass('ai-no-emoji', !autoflagging.hasEmojiSupport())
 
   /*!
    * Decorates a message DOM element with information from the API or websocket.
@@ -286,7 +288,6 @@
       titles = titles.filter(function (x) {
         return x;
       });
-      var emojiSuffix = autoflagging.hasEmojiSupport() ? "" : " ai-no-emoji";
       $feedback.append(
         $("<span/>").addClass("ai-feedback-info")
           .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, "") + emojiSuffix)
