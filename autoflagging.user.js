@@ -286,9 +286,10 @@
       titles = titles.filter(function (x) {
         return x;
       });
+      var emojiSuffix = autoflagging.hasEmojiSupport() ? "" : " ai-no-emoji";
       $feedback.append(
         $("<span/>").addClass("ai-feedback-info")
-          .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, ""))
+          .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, "") + emojiSuffix)
           .text(count).attr("title", titles.join("; "))
       );
     }
@@ -491,6 +492,18 @@
       }),
       command: "subscribe"
     }));
+  };
+
+  // Check if the user can render emojis
+  autoflagging.hasEmojiSupport = function () {
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+
+    ctx.textBaseline = "top";
+    ctx.font = "32px Arial";
+    ctx.fillText(smiley, 0, 0);
+    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
   };
 
   // Sometimes, autoflagging information arrives before the chat message.
