@@ -24,4 +24,24 @@
 
     $("html").toggleClass("no-emoji", true);
   }
+
+  // Returns the emoji if it's supported. Otherwise, return a fallback image.
+  // usage: `emojiOrImage("🔥", "emoji-class-name", true)`
+  // Returns a jQuery-wrapped text node or a jQuery-wrapped image.
+  scope.emojiOrImage = function (emoji, cssClass, large) {
+    if (scope.hasEmojiSupport) {
+      return $(document.createTextNode(emoji));
+    }
+
+    var url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
+    var hex = emoji.codePointAt(0).toString(16);
+
+    var emojiImage = $("<img/>", {
+      class: cssClass + (large ? "-large" : ""),
+      src: url + hex + ".png",
+      alt: emoji
+    });
+
+    return emojiImage;
+  };
 })(window);
