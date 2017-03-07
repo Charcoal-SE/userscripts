@@ -49,6 +49,7 @@ To open the reported post on it's site:
 
 # TODO:
 * Load data through metapi.js for cross-script storage;
+* Add username to report popup
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
 * Handle write token request errors
