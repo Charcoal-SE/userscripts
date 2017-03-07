@@ -48,8 +48,7 @@ To open the reported post on it's site:
 ---
 
 # TODO:
-* ___Cache report data on FIRE icon hover.___
-* ___Implement websocket to invalidate cached report data.___
+* Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
 * Handle write token request errors

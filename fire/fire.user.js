@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.3.12
+// @version     0.4.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.3.12",
+      version: "0.4.0",
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -47,9 +47,10 @@
           url: "https://api.stackexchange.com/2.2/"
         }
       },
-      buttonKeyCodes: [],
       smokeDetectorId: smokeDetectorId,
-      SDMessageSelector: ".user-" + smokeDetectorId + " .message "
+      SDMessageSelector: ".user-" + smokeDetectorId + " .message ",
+      buttonKeyCodes: [],
+      reportCache: {}
     };
 
     initLocalStorage(hOP, defaultOptions);
@@ -79,23 +80,25 @@
     var $this = $(this);
     var url = $this.data("url");
 
-    getDataForUrl(url, function (data) {
-      data.is_answer = data.link.indexOf("/a/") >= 0;
-      data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
-      data.is_deleted = data.deleted_at !== null;
-      data.disable_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
-        return f.user_name === fire.chatUser.name;
+    if (!fire.reportCache[url]) {
+      getDataForUrl(url, function (data) {
+        data.is_answer = data.link.indexOf("/a/") >= 0;
+        data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+        data.is_deleted = data.deleted_at !== null;
+        data.disable_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
+          return f.user_name === fire.chatUser.name;
+        });
+        data.has_auto_flagged = data.autoflagged &&
+          data.autoflagged.flagged &&
+          data.autoflagged.names.indexOf(fire.chatUser.name) >= 0;
+
+        fire.reportCache[url] = data; // Store the data
+
+        if (openAfterLoad === true) {
+          $this.click();
+        }
       });
-      data.has_auto_flagged = data.autoflagged &&
-        data.autoflagged.flagged &&
-        data.autoflagged.names.indexOf(fire.chatUser.name) >= 0;
-
-      $this.data("report", data);
-
-      if (openAfterLoad === true) {
-        $this.click();
-      }
-    });
+    }
   }
 
   // Loads a list of all Stack Exchange Sites.
@@ -357,10 +360,20 @@
     fire.isOpen = that;
 
     var $that = $(that);
-    var w = (window.innerWidth - $("#sidebar").width()) / 2;
-    var d = $that.data("report");
+    var url = $that.data("url");
+    var d;
 
-    console.log("Sometimes, d seems to be undefined", $that, d);
+    if (url && fire.reportCache[url] && !fire.reportCache[url].isExpired) {
+      d = fire.reportCache[url];
+    } else {
+      loadDataForReport.call(that, true); // No data, so load it.
+    }
+
+    if (typeof d === "undefined") {
+      console.log("Sometimes, d seems to be undefined", $that, d);
+    }
+
+    var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var site = fire.sites[d.site];
 
     var popup = element("div", "fire-popup")
@@ -802,17 +815,21 @@
         break;
       default: {
         var info = data.message;
+        var url;
+        debugger;
         if (info.flag_log) {            // Autoflagging information
-          console.log(info.flag_log.user_name + " autoflagged " + info.flag_log.post.link);
+          url = info.flag_log.post.link;
         } else if (info.deletion_log) { // Deletion log
-          console.log(info.deletion_log.post_link + " deleted");
+          url = info.deletion_log.post_link;
         } else if (info.feedback) {     // Feedback
-          console.log(info.feedback.user_name + " posted " + info.feedback.symbol + " on " + info.feedback.post_link, info.feedback);
+          url = info.feedback.post_link;
         } else if (info.not_flagged) {  // Not flagged
-          console.log(info.not_flagged.post.link + " not flagged");
+          url = info.not_flagged.post.link;
         } else {
-          console.log(info);
+          console.log("Socket message: ", info);
         }
+
+        delete fire.reportCache[url]; // Remove this url from the cache, if it's in there.
         break;
       }
     }
