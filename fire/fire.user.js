@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.8
+// @version     0.4.9
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.4.8",
+      version: "0.4.9",
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -85,7 +85,7 @@
         data.is_answer = data.link.indexOf("/a/") >= 0;
         data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
         data.is_deleted = data.deleted_at !== null;
-        data.disable_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
+        data.has_sent_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
           return f.user_name === fire.chatUser.name;
         });
         data.has_auto_flagged = data.autoflagged &&
@@ -394,28 +394,22 @@
       "fire-tooltip": "Show on site"
     });
 
-    var closeButton = _("a", "button fire-close-button", {
-      text: "Close",
-      click: closePopup,
-      "fire-key": 27 // escape key code
-    });
-
     var top = _("p", "fire-popup-header")
       .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "naa-", "naa-", "Not an Answer / VLQ"))
       .append(createFeedbackButton(d, 52, "fp-", "fp-", "False Positive"))
       .append(openOnSiteButton)
-      .append(closeButton);
+      .append(createCloseButton(closePopup));
 
     var body = _("div", "fire-popup-body")
       .append(_("h2")
-        .append(_("em", {text: d.title}))
+        .append(_("em", {text: d.title, title: "Question Title"}))
       )
       .append(_("hr"))
       .append(_("h3")
         .append(_("span", "fire-type", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
-        .append(_("span", "fire-username", {text: d.username}))
+        .append(_("span", "fire-username", {text: d.username, title: "Username"}))
       )
       .append(_("br"))
       .append(_("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
@@ -435,6 +429,7 @@
 
     var settingsButton = _("a", "fire-settings-button", {
       html: emojiOrImage("⚙️"),
+      title: "FIRE Configuration",
       click: openSettingsPopup
     });
 
@@ -471,18 +466,12 @@
     })
     .css({top: "5%", left: w - 300});
 
-    var closeButton = _("a", "button fire-close-button", {
-      text: "Close",
-      click: closePopup,
-      "fire-key": 27 // escape key code
-    });
-
     var top = _("p", "fire-popup-header")
       .append(
         _("h2")
           .append(emojiOrImage("🔥"))
           .append(" FIRE settings."))
-      .append(closeButton);
+      .append(createCloseButton(closePopup));
 
     var container = _("div");
 
@@ -595,7 +584,7 @@
 
       var ms = fire.api.ms;
       var token = fire.userData.metasmokeWriteToken;
-      if (data.disable_feedback) {
+      if (data.has_sent_feedback) {
         var message = "You have already sent feedback to MetaSmoke for this report.";
         if (verdict === "tpu-") {
           postMetaSmokeSpamFlag(data, ms, token, message + "<br /><br />");
@@ -721,17 +710,27 @@
 
     var suffix = count ? " (" + count + ")" : "";
     var cssClass = hasSubmittedFeedback ? " fire-submitted" : "";
+    var hasSentFeedbackAndFlagged = data.has_sent_feedback && (data.has_auto_flagged || data.has_flagged);
 
     return _("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
       click: function () {
-        // if (!data.disable_feedback) {
-        postMetaSmokeFeedback(data, verdict);
-        // }
+        if (!hasSentFeedbackAndFlagged) {
+          postMetaSmokeFeedback(data, verdict);
+        }
       },
-      // disabled: data.disable_feedback,
+      disabled: hasSentFeedbackAndFlagged,
       "fire-key": keyCode,
       "fire-tooltip": tooltip
+    });
+  }
+
+  function createCloseButton(clickHandler) {
+    return _("a", "button fire-close-button", {
+      text: "Close",
+      title: "Close this popup",
+      click: clickHandler,
+      "fire-key": 27 // escape key code
     });
   }
 
