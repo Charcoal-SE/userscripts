@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Autoflagging Information & More
 // @namespace   https://github.com/Charcoal-SE/
-// @description AIM adds autoflagging information and post deletion information to Charcoal HQ.
+// @description AIM adds autoflagging, deletion and feedback information to Charcoal HQ.
 // @author      Glorfindel
 // @author      J F
 // @contributor angussidney

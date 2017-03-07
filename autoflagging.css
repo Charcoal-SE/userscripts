@@ -2,7 +2,6 @@
   position: absolute;
   right: 4px;
   bottom: 0;
-  background: white;
 }
 .reply-parent .ai-information:not(.inline) {
   background: silver;
