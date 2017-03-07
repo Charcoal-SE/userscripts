@@ -91,6 +91,10 @@
         data.has_auto_flagged = data.autoflagged &&
           data.autoflagged.flagged &&
           data.autoflagged.names.indexOf(fire.chatUser.name) >= 0;
+        data.has_flagged = data.manual_flags &&
+          data.manual_flags.users.some(function (u) {
+            return u.username === fire.chatUser.name;
+          });
 
         fire.reportCache[url] = data; // Store the data
 
@@ -633,7 +637,11 @@
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     if (data.has_auto_flagged) {
-      toastr.info(feedbackSuccess + "You already (auto)flagged this post as spam.");
+      toastr.info(feedbackSuccess + "You already autoflagged this post as spam.");
+      fire.sendingFeedback = false;
+      closePopup();
+    } else if (data.has_flagged) {
+      toastr.info(feedbackSuccess + "You already flagged this post as spam.");
       fire.sendingFeedback = false;
       closePopup();
     } else if (data.is_deleted) {
