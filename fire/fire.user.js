@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.5
+// @version     0.4.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.4.5",
+      version: "0.4.6",
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -403,7 +403,7 @@
       .append(closeButton);
 
     var body = element("div", "fire-popup-body")
-      .append($("<h2 />", {text: "Q: "})
+      .append($("<h2 />")
         .append($("<em />", {text: d.title}))
       )
       .append($("<hr />"))
@@ -581,43 +581,50 @@
 
   // Submit MS feedback
   function postMetaSmokeFeedback(data, verdict) {
-    var ms = fire.api.ms;
-    var token = fire.userData.metasmokeWriteToken;
-    if (data.disable_feedback) {
-      var message = "You have already sent feedback to MetaSmoke for this report.";
-      if (verdict === "tpu-") {
-        postMetaSmokeSpamFlag(data, ms, token, message + "<br /><br />");
-      } else {
-        toastr.info(message);
-        closePopup();
-      }
-    } else {
-      $.ajax({
-        type: "POST",
-        url: ms.url + "w/post/" + data.id + "/feedback",
-        data: {type: verdict, key: ms.key, token: token}
-      }).done(function () {
+    if (!fire.sendingFeedback) {
+      fire.sendingFeedback = true;
+
+      var ms = fire.api.ms;
+      var token = fire.userData.metasmokeWriteToken;
+      if (data.disable_feedback) {
+        var message = "You have already sent feedback to MetaSmoke for this report.";
         if (verdict === "tpu-") {
-          postMetaSmokeSpamFlag(data, ms, token, "Sent feedback \"<em>tpu-\"</em> to metasmoke.<br /><br />");
+          postMetaSmokeSpamFlag(data, ms, token, message + "<br /><br />");
         } else {
-          toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
+          toastr.info(message);
           closePopup();
+          fire.sendingFeedback = false;
         }
-      }).error(function (jqXHR) {
-        if (jqXHR.status === 401) {
-          toastr.error("Can't send feedback to metasmoke - not authenticated.");
+      } else {
+        $.ajax({
+          type: "POST",
+          url: ms.url + "w/post/" + data.id + "/feedback",
+          data: {type: verdict, key: ms.key, token: token}
+        }).done(function () {
+          if (verdict === "tpu-") {
+            postMetaSmokeSpamFlag(data, ms, token, "Sent feedback \"<em>tpu-\"</em> to metasmoke.<br /><br />");
+          } else {
+            toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
+            closePopup();
+          }
+        }).error(function (jqXHR) {
+          if (jqXHR.status === 401) {
+            toastr.error("Can't send feedback to metasmoke - not authenticated.");
 
-          clearValue("metasmokeWriteToken");
-          var previous = closePopup();
+            clearValue("metasmokeWriteToken");
+            var previous = closePopup();
 
-          getWriteToken(function () {
-            openReportPopup.call(previous); // Open the popup later
-          });
-        } else {
-          toastr.error("An error occurred sending post feedback to metasmoke.");
-          console.error("An error occurred sending post feedback to metasmoke.", jqXHR);
-        }
-      });
+            getWriteToken(function () {
+              openReportPopup.call(previous); // Open the popup later
+            });
+          } else {
+            toastr.error("An error occurred sending post feedback to metasmoke.");
+            console.error("An error occurred sending post feedback to metasmoke.", jqXHR);
+          }
+        }).always(function () {
+          fire.sendingFeedback = false;
+        });
+      }
     }
   }
 
@@ -625,9 +632,11 @@
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     if (data.has_auto_flagged) {
       toastr.info(feedbackSuccess + "You already (auto)flagged this post as spam.");
+      fire.sendingFeedback = false;
       closePopup();
     } else if (data.is_deleted) {
       toastr.info(feedbackSuccess + "The reported post can't be flagged: It is already deleted.");
+      fire.sendingFeedback = false;
       closePopup();
     } else {
       $.ajax({
@@ -636,6 +645,7 @@
         data: {key: ms.key, token: token}
       }).done(function (response) {
         toastr.success(feedbackSuccess + "Successfully flagged the post as \"spam\".");
+        fire.sendingFeedback = false;
         closePopup();
 
         if (response.backoff) {
@@ -666,6 +676,7 @@
             if (response.message === "Spam flag option not present") {
               toastr.info("This post could not be flagged.<br />" +
                 "It is probably deleted already.");
+              fire.sendingFeedback = false;
               return;
             }
           }
@@ -673,6 +684,7 @@
           // will give you a 500 with status: 'failed' and a message if the spam flag fails;
           toastr.error("Something went wrong while attempting to submit a spam flag");
           console.error(data, jqXHR);
+          fire.sendingFeedback = false;
         }
       });
     }

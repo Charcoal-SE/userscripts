@@ -48,8 +48,6 @@ To open the reported post on it's site:
 ---
 
 # TODO:
-* "Debounce" button presses.
-  * Don't allow feedback buttons to be pressed more than once.
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
