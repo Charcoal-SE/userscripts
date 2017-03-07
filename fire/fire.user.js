@@ -624,7 +624,7 @@
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     if (data.has_auto_flagged) {
-      toastr.info(feedbackSuccess + "You already autoflagged this post as spam.");
+      toastr.info(feedbackSuccess + "You already (auto)flagged this post as spam.");
       closePopup();
     } else if (data.is_deleted) {
       toastr.info(feedbackSuccess + "The reported post can't be flagged: It is already deleted.");
