@@ -677,6 +677,7 @@
               toastr.info("This post could not be flagged.<br />" +
                 "It is probably deleted already.");
               fire.sendingFeedback = false;
+              closePopup();
               return;
             }
           }
