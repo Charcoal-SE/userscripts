@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.2
+// @version     0.4.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.4.2",
+      version: "0.4.3",
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -383,7 +383,7 @@
       text: site ? site.name : d.site,
       href: d.link,
       target: "_blank",
-      css: {"background-image": "url(//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png)"},
+      css: {"background-image": "url(" + (site ? site.icon_url : "//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png") + ")"},
       "fire-key": 53,
       "fire-tooltip": "Show on site"
     });
@@ -660,6 +660,16 @@
             {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
           console.error(data, jqXHR);
         } else {
+          if (jqXHR.responseText) {
+            var response = JSON.parse(jqXHR.responseText);
+
+            if (response.message === "Spam flag option not present") {
+              toastr.info("This post could not be flagged.<br />" +
+                "It is probably deleted already.");
+              return;
+            }
+          }
+
           // will give you a 500 with status: 'failed' and a message if the spam flag fails;
           toastr.error("Something went wrong while attempting to submit a spam flag");
           console.error(data, jqXHR);
