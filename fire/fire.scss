@@ -153,6 +153,10 @@ img.fire-emoji-large {
     box-shadow: inset 0 0 10px -3px $shadow-color;
     position: relative;
 
+    .fire-username {
+      float: right;
+    }
+
     .fire-reported-post {
       padding: 10px;
       margin: 0 -10px -10px -10px;

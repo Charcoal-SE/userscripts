@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.7
+// @version     0.4.8
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.4.7",
+      version: "0.4.8",
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -175,7 +175,7 @@
       var reportLink = m.find(".content a[href^='//m.erwaysoftware']");
       if (reportLink.length > 0) { // This is a report
         var reportedUrl = reportLink.attr("href").split("url=").pop();
-        var fireButton = element("span", "fire-button", {
+        var fireButton = _("span", "fire-button", {
           html: emojiOrImage("🔥"),
           click: openReportPopup
         })
@@ -298,29 +298,29 @@
   function writeTokenPopup(callback) {
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
 
-    var popup = element("div", "fire-popup")
+    var popup = _("div", "fire-popup")
       .css({top: "5%", left: w - 300});
 
-    var top = element("p", "fire-popup-header", {
+    var top = _("p", "fire-popup-header", {
       html: "FIRE requires a metasmoke write token to submit feedback.<br />" +
         "Once you've authenticated FIRE with metasmoke, you'll be given a code.<br />" +
         "Please enter it here:"
     });
 
-    var input = element("input", "fire-popup-input", {
+    var input = _("input", "fire-popup-input", {
       type: "text",
       maxlength: "7",
       placeholder: "Enter code here"
     });
 
-    var requestButton = element("a", "button", {
+    var requestButton = _("a", "button", {
       text: "Request Token",
       click: function () {
         window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank");
       }
     });
 
-    var saveButton = element("a", "button", {
+    var saveButton = _("a", "button", {
       text: "Save",
       click: function () {
         var value = input.val();
@@ -330,7 +330,7 @@
       }
     });
 
-    element("div", "fire-popup-modal")
+    _("div", "fire-popup-modal")
       .appendTo("body")
       .click(closePopup);
 
@@ -382,10 +382,10 @@
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var site = fire.sites[d.site];
 
-    var popup = element("div", "fire-popup")
+    var popup = _("div", "fire-popup")
       .css({top: "5%", left: w - 300});
 
-    var openOnSiteButton = element("a", "fire-site-logo", {
+    var openOnSiteButton = _("a", "fire-site-logo", {
       text: site ? site.name : d.site,
       href: d.link,
       target: "_blank",
@@ -394,13 +394,13 @@
       "fire-tooltip": "Show on site"
     });
 
-    var closeButton = element("a", "button fire-close-button", {
+    var closeButton = _("a", "button fire-close-button", {
       text: "Close",
       click: closePopup,
       "fire-key": 27 // escape key code
     });
 
-    var top = element("p", "fire-popup-header")
+    var top = _("p", "fire-popup-header")
       .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
       .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
       .append(createFeedbackButton(d, 51, "naa-", "naa-", "Not an Answer / VLQ"))
@@ -408,14 +408,17 @@
       .append(openOnSiteButton)
       .append(closeButton);
 
-    var body = element("div", "fire-popup-body")
-      .append($("<h2 />")
-        .append($("<em />", {text: d.title}))
+    var body = _("div", "fire-popup-body")
+      .append(_("h2")
+        .append(_("em", {text: d.title}))
       )
-      .append($("<hr />"))
-      .append($("<h3 />", {text: (d.is_answer ? "Answer" : "Question") + " body:"}))
-      .append($("<br />"))
-      .append(element("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
+      .append(_("hr"))
+      .append(_("h3")
+        .append(_("span", "fire-type", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
+        .append(_("span", "fire-username", {text: d.username}))
+      )
+      .append(_("br"))
+      .append(_("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
         .append(d.body.replace(/<script/g, "&lt;script"))
       );
 
@@ -426,11 +429,11 @@
         .replace(/"/g, "&quot;");
     });
 
-    element("div", "fire-popup-modal")
+    _("div", "fire-popup-modal")
       .appendTo("body")
       .click(closePopup);
 
-    var settingsButton = element("a", "fire-settings-button", {
+    var settingsButton = _("a", "fire-settings-button", {
       html: emojiOrImage("⚙️"),
       click: openSettingsPopup
     });
@@ -463,49 +466,49 @@
     // var that = this;
     // var $that = $(that);
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
-    var popup = element("div", "fire-popup", {
+    var popup = _("div", "fire-popup", {
       id: "fire-settings"
     })
     .css({top: "5%", left: w - 300});
 
-    var closeButton = element("a", "button fire-close-button", {
+    var closeButton = _("a", "button fire-close-button", {
       text: "Close",
       click: closePopup,
       "fire-key": 27 // escape key code
     });
 
-    var top = element("p", "fire-popup-header")
+    var top = _("p", "fire-popup-header")
       .append(
-        element("h2")
+        _("h2")
           .append(emojiOrImage("🔥"))
           .append(" FIRE settings."))
       .append(closeButton);
 
-    var container = element("div");
+    var container = _("div");
 
-    var blurCheckBox = element("input", "", {
+    var blurCheckBox = _("input", {
       id: "checkbox_blur",
       type: "checkbox",
       checked: fire.userData.blur,
       click: blurOptionClickHandler
     });
 
-    var blurLabel = element("label", "", {
+    var blurLabel = _("label", {
       for: "checkbox_blur",
       text: "Enable blur on popup background."
     });
 
-    var blurSection = element("div")
+    var blurSection = _("div")
       .append(blurCheckBox)
       .append(blurLabel);
 
-    var toastDurationElements = element("div")
-      .append(element("br"))
-      .append(element("span", "", {
+    var toastDurationElements = _("div")
+      .append(_("br"))
+      .append(_("span", {
         text: "Notification popup duration:"
       })
-      .append(element("br"))
-      .append(element("input", "", {
+      .append(_("br"))
+      .append(_("input", {
         id: "toastr_duration",
         type: "number",
         value: fire.userData.toastrDuration,
@@ -520,14 +523,14 @@
     var toastrClasses = ["top-right", "bottom-right", "bottom-left", "top-left", "top-full-width", "bottom-full-width", "top-center", "bottom-center"];
     var selected = fire.userData.toastrPosition;
 
-    var positionSelect = element("select", "fire-position-select", {
+    var positionSelect = _("select", "fire-position-select", {
       change: toastrPositionChangeHandler
     });
 
     for (var i = 0; i < toastrClasses.length; i++) {
       var val = toastrClasses[i];
       positionSelect.append(
-        element("option", "", {
+        _("option", {
           value: val,
           text: val.replace(/-/g, " "),
           selected: val === selected
@@ -535,18 +538,18 @@
       );
     }
 
-    var positionSelector = element("div")
-      .append(element("br"))
-      .append(element("span", "", {text: "Notification popup position:"})
-      .append(element("br"))
+    var positionSelector = _("div")
+      .append(_("br"))
+      .append(_("span", {text: "Notification popup position:"})
+      .append(_("br"))
       .append(positionSelect)
     );
 
     container
-      .append(element("h3", "", {text: "Popup blur:"}))
+      .append(_("h3", {text: "Popup blur:"}))
       .append(blurSection)
-      .append(element("br"))
-      .append(element("h3", "", {text: "Notification settings:"}))
+      .append(_("br"))
+      .append(_("h3", {text: "Notification settings:"}))
       .append(toastDurationElements)
       .append(positionSelector);
 
@@ -719,7 +722,7 @@
     var suffix = count ? " (" + count + ")" : "";
     var cssClass = hasSubmittedFeedback ? " fire-submitted" : "";
 
-    return element("a", "button fire-feedback-button fire-" + verdict + cssClass, {
+    return _("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
       click: function () {
         // if (!data.disable_feedback) {
@@ -733,7 +736,12 @@
   }
 
   // Wrapper to create a new element with a specified class.
-  function element(tagName, cssClass, options) {
+  function _(tagName, cssClass, options) {
+    if (typeof cssClass === "object") {
+      options = cssClass;
+      cssClass = undefined;
+    }
+
     options = options || {};
     options.class = cssClass;
 
@@ -765,7 +773,7 @@
     var url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
     var hex = emoji.codePointAt(0).toString(16);
 
-    var emojiImage = element("img", "fire-emoji" + (large ? "-large" : ""), {
+    var emojiImage = _("img", "fire-emoji" + (large ? "-large" : ""), {
       src: url + hex + ".png",
       alt: emoji
     });
@@ -813,7 +821,7 @@
       .on("mouseenter", anchorSelector, function () {
         $(".fire-tooltip").remove();
         var that = $(this);
-        that.after(element("span", "fire-tooltip", {
+        that.after(_("span", "fire-tooltip", {
           text: that.attr("fire-tooltip")
         }));
       }).on("mousemove", anchorSelector, function (e) {
