@@ -11,6 +11,7 @@ As of this moment, the userscript does post flags _and_ MS feedback.
 - The popup will contain:
   - The reported post's contents.
     - All links in a post will show their target url when you hover your mouse over them.
+    - Code blocks in the post can be expanded by clicking on them.
   - 4 feedback buttons.
     - [tpu-], [tp-], [naa-], [fp-], for Spam, vandalism, NAA/VLQ, false postitive.
     - These can be selected with <kbd>1</kbd>-<kbd>4</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
@@ -49,6 +50,7 @@ To open the reported post on it's site:
 
 # TODO:
 * Load data through metapi.js for cross-script storage;
+* Setting to disable flag-casting.
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
 * Handle write token request errors
