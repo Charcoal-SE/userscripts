@@ -50,7 +50,6 @@ To open the reported post on it's site:
 
 # TODO:
 * Load data through metapi.js for cross-script storage;
-* Setting to disable flag-casting.
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
 * Handle write token request errors
