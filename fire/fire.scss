@@ -21,6 +21,10 @@ $transitionTime: 0.4s;
   background: -moz-linear-gradient(top, $light, $dark);
   background: linear-gradient(top, $light, $dark);
 
+  &.fire-submitted {
+    text-decoration: underline;
+  }
+
   &.fire-submitted,
   &:hover {
     -webkit-box-shadow: 0 -6px 6px 0 transparentize($light, 0.5);
@@ -155,6 +159,7 @@ img.fire-emoji-large {
 
     .fire-username {
       float: right;
+      font-weight: normal;
     }
 
     .fire-reported-post {

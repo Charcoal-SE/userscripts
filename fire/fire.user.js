@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.9
+// @version     0.4.10
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.4.9",
+      version: "0.4.10",
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -75,6 +75,13 @@
     });
   }
 
+  function listHasCurrentUser(flags) {
+    return flags &&
+      flags.users.some(function (u) {
+        return u.username === fire.chatUser.name;
+      });
+  }
+
   // Loads a report's data when you hover over the FIRE button.
   function loadDataForReport(openAfterLoad) {
     var $this = $(this);
@@ -85,16 +92,14 @@
         data.is_answer = data.link.indexOf("/a/") >= 0;
         data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
         data.is_deleted = data.deleted_at !== null;
+
+        data.has_auto_flagged = listHasCurrentUser(data.autoflagged) && data.autoflagged.flagged;
+        data.has_manual_flagged = listHasCurrentUser(data.manual_flags);
+        data.has_flagged = data.has_auto_flagged || data.has_manual_flagged;
+
         data.has_sent_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
           return f.user_name === fire.chatUser.name;
         });
-        data.has_auto_flagged = data.autoflagged &&
-          data.autoflagged.flagged &&
-          data.autoflagged.names.indexOf(fire.chatUser.name) >= 0;
-        data.has_flagged = data.manual_flags &&
-          data.manual_flags.users.some(function (u) {
-            return u.username === fire.chatUser.name;
-          });
 
         fire.reportCache[url] = data; // Store the data
 
@@ -402,14 +407,24 @@
       .append(openOnSiteButton)
       .append(createCloseButton(closePopup));
 
+    var postType = d.is_answer ? "Answer" : "Question";
     var body = _("div", "fire-popup-body")
       .append(_("h2")
         .append(_("em", {text: d.title, title: "Question Title"}))
       )
       .append(_("hr"))
-      .append(_("h3")
-        .append(_("span", "fire-type", {text: (d.is_answer ? "Answer" : "Question") + ":"}))
-        .append(_("span", "fire-username", {text: d.username, title: "Username"}))
+      .append(
+        _("h3")
+          .append(_("span", "fire-type", {
+            text: postType + ":",
+            title: "The reported post is a " + postType.toLowerCase()
+          }))
+          .append(
+            _("span", "fire-username", {
+              text: d.username + " ",
+              title: "Username"
+            })
+            .append(emojiOrImage("👤")))
       )
       .append(_("br"))
       .append(_("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
@@ -553,6 +568,7 @@
 
   // Close the popup
   function closePopup() {
+    fire.sendingFeedback = false;
     if (fire.settingsAreOpen) {
       $(".fire-popup#fire-settings")
         .fadeOut("fast", function () {
@@ -591,7 +607,6 @@
         } else {
           toastr.info(message);
           closePopup();
-          fire.sendingFeedback = false;
         }
       } else {
         $.ajax({
@@ -630,15 +645,12 @@
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     if (data.has_auto_flagged) {
       toastr.info(feedbackSuccess + "You already autoflagged this post as spam.");
-      fire.sendingFeedback = false;
       closePopup();
-    } else if (data.has_flagged) {
+    } else if (data.has_manual_flagged) {
       toastr.info(feedbackSuccess + "You already flagged this post as spam.");
-      fire.sendingFeedback = false;
       closePopup();
     } else if (data.is_deleted) {
       toastr.info(feedbackSuccess + "The reported post can't be flagged: It is already deleted.");
-      fire.sendingFeedback = false;
       closePopup();
     } else {
       $.ajax({
@@ -647,7 +659,6 @@
         data: {key: ms.key, token: token}
       }).done(function (response) {
         toastr.success(feedbackSuccess + "Successfully flagged the post as \"spam\".");
-        fire.sendingFeedback = false;
         closePopup();
 
         if (response.backoff) {
@@ -678,7 +689,6 @@
             if (response.message === "Spam flag option not present") {
               toastr.info("This post could not be flagged.<br />" +
                 "It is probably deleted already.");
-              fire.sendingFeedback = false;
               closePopup();
               return;
             }
@@ -710,16 +720,29 @@
 
     var suffix = count ? " (" + count + ")" : "";
     var cssClass = hasSubmittedFeedback ? " fire-submitted" : "";
-    var hasSentFeedbackAndFlagged = data.has_sent_feedback && (data.has_auto_flagged || data.has_flagged);
 
     return _("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
       click: function () {
-        if (!hasSentFeedbackAndFlagged) {
+        if (!data.has_sent_feedback || !(data.has_flagged || data.is_deleted)) {
           postMetaSmokeFeedback(data, verdict);
+        } else {
+          var performedAction;
+          if (data.has_flagged) {
+            performedAction = "flagged";
+          } else if (data.is_deleted) {
+            performedAction = "flagged";
+          }
+
+          toastr.info(
+            "You have already sent feedback for this reported post.<br />" +
+            "The post has already been " + performedAction + ".",
+            null, {
+              preventDuplicates: true
+            });
         }
       },
-      disabled: hasSentFeedbackAndFlagged,
+      disabled: data.has_sent_feedback && (data.has_flagged || data.is_deleted),
       "fire-key": keyCode,
       "fire-tooltip": tooltip
     });

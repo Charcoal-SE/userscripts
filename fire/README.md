@@ -49,14 +49,11 @@ To open the reported post on it's site:
 
 # TODO:
 * Load data through metapi.js for cross-script storage;
-* Add username to report popup
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
 * Handle write token request errors
 * Detect if a user has flagged the post already:
-  * Distinguish between auto flags and manual flags.
-  * Disable / Highlight feedback buttons depending on (earlier) submitted flags.
-  * Disable buttons if both flags & feedback have already been sent.
+  * Detect flags not sent through MS
 * Improve popup creation:
   * Popups are basically hard-coded. Load (external?) HTML?
 
