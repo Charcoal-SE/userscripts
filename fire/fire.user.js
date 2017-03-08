@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.10
+// @version     0.4.11
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -13,7 +13,7 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
 // @grant       none
 // ==/UserScript==
-/* global fire, metapi, toastr, CHAT */
+/* global fire, metapi, toastr, CHAT, GM_info */
 /* eslint-disable camelcase */
 
 (function () {
@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      version: "0.4.10",
+      metaData: GM_info.script,
       useEmoji: useEmoji,
       api: {
         ms: {
@@ -391,7 +391,7 @@
       .css({top: "5%", left: w - 300});
 
     var openOnSiteButton = _("a", "fire-site-logo", {
-      text: site ? site.name : d.site,
+      html: site ? site.name : d.site,
       href: d.link,
       target: "_blank",
       css: {"background-image": "url(" + (site ? site.icon_url : "//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png") + ")"},
@@ -410,7 +410,7 @@
     var postType = d.is_answer ? "Answer" : "Question";
     var body = _("div", "fire-popup-body")
       .append(_("h2")
-        .append(_("em", {text: d.title, title: "Question Title"}))
+        .append(_("em", {html: d.title, title: "Question Title"}))
       )
       .append(_("hr"))
       .append(
@@ -743,10 +743,11 @@
       },
       disabled: data.has_sent_feedback && (data.has_flagged || data.is_deleted),
       "fire-key": keyCode,
-      "fire-tooltip": tooltip
+      "fire-tooltip": tooltip + suffix
     });
   }
 
+  // Create a button to close a popup
   function createCloseButton(clickHandler) {
     return _("a", "button fire-close-button", {
       text: "Close",
@@ -804,7 +805,7 @@
 
   // Inject FIRE stylesheet and Toastr library
   function injectExternalScripts() {
-    injectCSS("//charcoal-se.org/userscripts/fire/fire.css?v=" + fire.version);
+    injectCSS("//charcoal-se.org/userscripts/fire/fire.css?v=" + fire.metaData.version);
 
     if (typeof toastr === "undefined") {
       // toastr is a Javascript library for non-blocking notifications.
@@ -871,7 +872,7 @@
   // Register a websocket listener
   function registerWebSocket() {
     $.ajaxSetup({cache: true});
-    $.getScript("//charcoal-se.org/userscripts/metapi.js?v=" + fire.version)
+    $.getScript("//charcoal-se.org/userscripts/metapi.js?v=" + fire.metaData.version)
       .then(function () {
         metapi.watchSocket(fire.api.ms.key, socketOnMessage);
         $.ajaxSetup({cache: false});
