@@ -564,7 +564,6 @@
       .appendTo("body")
       .fadeIn("fast");
   }
-  fire.openSettingsPopup = openSettingsPopup;
 
   // Close the popup
   function closePopup() {
@@ -836,6 +835,18 @@
     };
   }
 
+  // Open the last report on [Ctrl]+[Space]
+  function registerOpenLastReportKey() {
+    $(document).on("keydown", function (e) {
+      if (e.keyCode === 32 && e.ctrlKey) {
+        var button = $(".fire-button").last();
+        if (button && button.length > 0) {
+          loadDataForReport.call(button, true);
+        }
+      }
+    });
+  }
+
   // Register the "tooltip" hover for anchor elements
   function registerAnchorHover() {
     var anchorSelector = "a[fire-tooltip]";
@@ -865,6 +876,18 @@
         metapi.watchSocket(fire.api.ms.key, socketOnMessage);
         $.ajaxSetup({cache: false});
       });
+  }
+
+  // Adds a property on `fire` that's stored in `localStorage`
+  function registerForLocalStorage(object, key, localStorageKey) {
+    Object.defineProperty(object, key, {
+      get: function () {
+        return JSON.parse(localStorage.getItem(localStorageKey));
+      },
+      set: function (value) {
+        localStorage.setItem(localStorageKey, JSON.stringify(value));
+      }
+    });
   }
 
   // Handle socket messages
@@ -904,30 +927,6 @@
       .each(function () {
         $(this).attr("fire-tooltip", this.href);
       });
-  }
-
-  // Open the last report on [Ctrl]+[Space]
-  function registerOpenLastReportKey() {
-    $(document).on("keydown", function (e) {
-      if (e.keyCode === 32 && e.ctrlKey) {
-        var button = $(".fire-button").last();
-        if (button && button.length > 0) {
-          loadDataForReport.call(button, true);
-        }
-      }
-    });
-  }
-
-  // Adds a property on `fire` that's stored in `localStorage`
-  function registerForLocalStorage(object, key, localStorageKey) {
-    Object.defineProperty(object, key, {
-      get: function () {
-        return JSON.parse(localStorage.getItem(localStorageKey));
-      },
-      set: function (value) {
-        localStorage.setItem(localStorageKey, JSON.stringify(value));
-      }
-    });
   }
 
   // Initializes localStorage
