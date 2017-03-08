@@ -35,7 +35,7 @@
     };
 
     scope.fire = {
-      metaData: GM_info.script,
+      metaData: GM_info.script || GM_info["Flag Instantly, Rapidly, Effortlessly"],
       useEmoji: useEmoji,
       api: {
         ms: {
