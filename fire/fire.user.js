@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.4.14
+// @version     0.5.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -30,6 +30,7 @@
 
     var defaultOptions = {
       blur: true,
+      flag: true,
       toastrPosition: "top-right",
       toastrDuration: 2500
     };
@@ -75,6 +76,7 @@
     });
   }
 
+  // Checks if the list of users on this flag report contains the current user.
   function listHasCurrentUser(flags) {
     return flags &&
       flags.users.some(function (u) {
@@ -270,6 +272,16 @@
     data.blur = value;
     $("#container").toggleClass("fire-blur", data.blur);
     toastr.info("Blur " + (data.blur ? "en" : "dis") + "abled.");
+    fire.userData = data;
+  }
+
+  // Set the "Flag" option
+  function flagOptionClickHandler() {
+    var value = $(this).is(":checked");
+
+    var data = fire.userData;
+    data.flag = value;
+    toastr.info("Flagging on \"tpu-\" feedback " + (data.flag ? "en" : "dis") + "abled.");
     fire.userData = data;
   }
 
@@ -517,26 +529,44 @@
     });
 
     var blurSection = _("div")
+      .append(_("h3", {text: "Popup blur:"}))
       .append(blurCheckBox)
       .append(blurLabel);
 
+    var flagCheckBox = _("input", {
+      id: "checkbox_flag",
+      type: "checkbox",
+      checked: fire.userData.flag,
+      click: flagOptionClickHandler
+    });
+
+    var flagLabel = _("label", {
+      for: "checkbox_flag",
+      text: "Also submit \"Spam\" flag with \"tpu-\" feedback."
+    });
+
+    var flagSection = _("div")
+      .append(_("h3", {text: "Flag on feedback:"}))
+      .append(flagCheckBox)
+      .append(flagLabel);
+
     var toastDurationElements = _("div")
-      .append(_("br"))
-      .append(_("span", {
-        text: "Notification popup duration:"
-      })
-      .append(_("br"))
-      .append(_("input", {
-        id: "toastr_duration",
-        type: "number",
-        value: fire.userData.toastrDuration,
-        change: toastrDurationHandler,
-        blur: function () {
-          toastr.info("Notification duration updated");
-        }
-      }))
-      .append(" ms")
-    );
+      .append(
+        _("span", {
+          text: "Notification popup duration:"
+        })
+        .append(_("br"))
+        .append(_("input", {
+          id: "toastr_duration",
+          type: "number",
+          value: fire.userData.toastrDuration,
+          change: toastrDurationHandler,
+          blur: function () {
+            toastr.info("Notification duration updated");
+          }
+        }))
+        .append(" ms")
+      );
 
     var toastrClasses = ["top-right", "bottom-right", "bottom-left", "top-left", "top-full-width", "bottom-full-width", "top-center", "bottom-center"];
     var selected = fire.userData.toastrPosition;
@@ -558,18 +588,26 @@
 
     var positionSelector = _("div")
       .append(_("br"))
-      .append(_("span", {text: "Notification popup position:"})
-      .append(_("br"))
-      .append(positionSelect)
-    );
+      .append(
+        _("span", {text: "Notification popup position:"})
+          .append(_("br"))
+          .append(positionSelect)
+        );
 
     container
-      .append(_("h3", {text: "Popup blur:"}))
-      .append(blurSection)
-      .append(_("br"))
-      .append(_("h3", {text: "Notification settings:"}))
-      .append(toastDurationElements)
-      .append(positionSelector);
+      .append(
+        _("div", "fire-settings-section fire-settings-left")
+        .append()
+        .append(blurSection)
+        .append(_("br"))
+        .append(flagSection)
+      )
+      .append(
+        _("div", "fire-settings-section fire-settings-right")
+          .append(_("h3", {text: "Notifications:"}))
+          .append(toastDurationElements)
+          .append(positionSelector)
+      );
 
     popup
       .append(top)
@@ -627,7 +665,7 @@
           url: ms.url + "w/post/" + data.id + "/feedback",
           data: {type: verdict, key: ms.key, token: token}
         }).done(function () {
-          if (verdict === "tpu-") {
+          if (verdict === "tpu-" && fire.userData.flag) {
             postMetaSmokeSpamFlag(data, ms, token, "Sent feedback \"<em>tpu-\"</em> to metasmoke.<br /><br />");
           } else {
             toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
@@ -737,7 +775,9 @@
     return _("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
       click: function () {
-        if (!data.has_sent_feedback || !(data.has_flagged || data.is_deleted)) {
+        if (!data.has_sent_feedback ||
+          (fire.userData.flag && !(data.has_flagged || data.is_deleted))
+        ) {
           postMetaSmokeFeedback(data, verdict);
         } else {
           var performedAction;
@@ -755,7 +795,7 @@
             });
         }
       },
-      disabled: data.has_sent_feedback && (data.has_flagged || data.is_deleted),
+      disabled: data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag),
       "fire-key": keyCode,
       "fire-tooltip": tooltip + suffix
     });
