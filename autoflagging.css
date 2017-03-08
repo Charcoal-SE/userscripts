@@ -2,6 +2,13 @@
   position: absolute;
   right: 4px;
   bottom: 0;
+  /* This 'inherit' and the next one make sure the autoflagging information
+  is readable *over* the chat message itself, but uses the default background
+  of the chatroom messages. */
+  background: inherit;
+}
+div.message {
+  background: inherit;
 }
 .reply-parent .ai-information:not(.inline) {
   background: silver;
