@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.5.1
+// @version     0.5.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -119,7 +119,7 @@
     var now = new Date().valueOf();
     var sites = fire.sites;
 
-    // If there are no sites or the site data is a day old
+    // If there are no sites or the site data is over 7 days
     if (!sites || sites.storedAt < (now - 604800000)) { // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       sites = {};                                       // Clear the site data
     }
@@ -214,8 +214,7 @@
     setTimeout(function () {
       var chat = $("#chat");
       chat.on("DOMSubtreeModified", function () {
-        if (chat.html().length !== 0) {
-          // Chat messages loaded
+        if (chat.html().length !== 0) { // Chat messages have loaded
           chat.off("DOMSubtreeModified");
 
           $(fire.SDMessageSelector).each(function () {
@@ -514,42 +513,6 @@
           .append(" FIRE settings."))
       .append(createCloseButton(closePopup));
 
-    var container = _("div");
-
-    var blurCheckBox = _("input", {
-      id: "checkbox_blur",
-      type: "checkbox",
-      checked: fire.userData.blur,
-      click: blurOptionClickHandler
-    });
-
-    var blurLabel = _("label", {
-      for: "checkbox_blur",
-      text: "Enable blur on popup background."
-    });
-
-    var blurSection = _("div")
-      .append(_("h3", {text: "Popup blur:"}))
-      .append(blurCheckBox)
-      .append(blurLabel);
-
-    var flagCheckBox = _("input", {
-      id: "checkbox_flag",
-      type: "checkbox",
-      checked: fire.userData.flag,
-      click: flagOptionClickHandler
-    });
-
-    var flagLabel = _("label", {
-      for: "checkbox_flag",
-      text: "Also submit \"Spam\" flag with \"tpu-\" feedback."
-    });
-
-    var flagSection = _("div")
-      .append(_("h3", {text: "Flag on feedback:"}))
-      .append(flagCheckBox)
-      .append(flagLabel);
-
     var toastDurationElements = _("div")
       .append(
         _("span", {
@@ -594,13 +557,18 @@
           .append(positionSelect)
         );
 
-    container
+    var container = _("div")
       .append(
         _("div", "fire-settings-section fire-settings-left")
-        .append()
-        .append(blurSection)
+        .append(createSettingscheckBox("blur", fire.userData.blur, blurOptionClickHandler,
+          "Enable blur on popup background.",
+          "Popup blur:"
+        ))
         .append(_("br"))
-        .append(flagSection)
+        .append(createSettingscheckBox("flag", fire.userData.flag, flagOptionClickHandler,
+          "Also submit \"Spam\" flag with \"tpu-\" feedback.",
+          "Flag on feedback:")
+        )
       )
       .append(
         _("div", "fire-settings-section fire-settings-right")
@@ -696,13 +664,10 @@
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     if (data.has_auto_flagged) {
       toastr.info(feedbackSuccess + "You already autoflagged this post as spam.");
-      closePopup();
     } else if (data.has_manual_flagged) {
       toastr.info(feedbackSuccess + "You already flagged this post as spam.");
-      closePopup();
     } else if (data.is_deleted) {
       toastr.info(feedbackSuccess + "The reported post can't be flagged: It is already deleted.");
-      closePopup();
     } else {
       $.ajax({
         type: "POST",
@@ -751,7 +716,9 @@
           fire.sendingFeedback = false;
         }
       });
+      return;
     }
+    closePopup();
   }
 
   // Create a feedback button for the top of the popup
@@ -809,6 +776,26 @@
       click: clickHandler,
       "fire-key": 27 // escape key code
     });
+  }
+
+  // Creates a input[type=checkbox] for the settings
+  function createSettingscheckBox(id, value, handler, labelText, headerText) { // eslint-disable-line max-params
+    var checkBox = _("input", {
+      id: "checkbox_" + id,
+      type: "checkbox",
+      checked: value,
+      click: handler
+    });
+
+    var label = _("label", {
+      for: "checkbox_" + id,
+      text: labelText
+    });
+
+    return _("div")
+      .append(_("h3", {text: headerText}))
+      .append(checkBox)
+      .append(label);
   }
 
   // Wrapper to create a new element with a specified class.

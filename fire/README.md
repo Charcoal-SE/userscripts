@@ -49,6 +49,8 @@ To open the reported post on it's site:
 ---
 
 # TODO:
+* ___Re-structure document___
+  * Wrap similar functions in objecs, like `popups.openSettings()`
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
