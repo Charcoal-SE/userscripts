@@ -203,7 +203,7 @@
 
           reportLink
             .after(fireButton)
-            .after(" | ");
+            .after(document.createTextNode(" | "));
         }
       }
     }
