@@ -28,7 +28,7 @@
       "chat.meta.stackexchange.com": 266345,
     }[location.host];       // From which, we need the current host's ID
 
-    var defaultOptions = {
+    var defaultLocalStorage = {
       blur: true,
       flag: true,
       toastrPosition: "top-right",
@@ -58,7 +58,7 @@
     registerLoggingFunctions(false);
 
     hasEmojiSupport();
-    initLocalStorage(hOP, defaultOptions);
+    initLocalStorage(hOP, defaultLocalStorage);
     getCurrentUser();
     loadStackExchangeSites();
     injectExternalScripts();
