@@ -53,7 +53,7 @@
       reportCache: {}
     };
 
-    registerLoggingFunctions(true);
+    registerLoggingFunctions(false);
 
     hasEmojiSupport();
     initLocalStorage(hOP, defaultOptions);
