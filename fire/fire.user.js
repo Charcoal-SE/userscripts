@@ -880,7 +880,7 @@
   function registerOpenLastReportKey() {
     $(document).on("keydown", function (e) {
       if (e.keyCode === 32 && e.ctrlKey) {
-        var button = $(".fire-button").last();
+        var button = $(".fire-button").last(); // .content:not(.ai-deleted)
         if (button && button.length > 0) {
           loadDataForReport.call(button, true);
         }
