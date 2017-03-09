@@ -1,6 +1,7 @@
 # TODO:
 * ___Re-structure document___
   * Wrap similar functions in objecs, like `popups.openSettings()`
+* Properly parse tpu- messages to show FIRE as well?
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling
   * Respect passed "Backoff" params

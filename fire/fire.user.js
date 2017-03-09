@@ -194,7 +194,7 @@
           reportedUrl = reportLink.nextAll("a")[0].href.replace(/https?:/, "");
         }
 
-        if (!reportedUrl.startsWith("//github.com")) {
+        if (!reportedUrl.startsWith("//github.com") && reportedUrl.indexOf("erwaysoftware.com") === -1) {
           var fireButton = _("span", "fire-button", {
             html: emojiOrImage("🔥"),
             click: openReportPopup
