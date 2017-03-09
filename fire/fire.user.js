@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.5.6
+// @version     0.5.7
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -37,6 +37,9 @@
 
     scope.fire = {
       metaData: GM_info.script || GM_info["Flag Instantly, Rapidly, Effortlessly"],
+      openReportPopup: openReportPopupForMessage,
+      hasNewReports: false,
+      emoji: {fire: "🔥", user: "👤", gear: "⚙️"},
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -50,8 +53,7 @@
       smokeDetectorId: smokeDetectorId,
       SDMessageSelector: ".user-" + smokeDetectorId + " .message ",
       buttonKeyCodes: [],
-      reportCache: {},
-      openReportPopup: openReportPopupForMessage
+      reportCache: {}
     };
 
     registerLoggingFunctions(false);
@@ -65,6 +67,7 @@
     registerAnchorHover();
     registerWebSocket();
     registerOpenLastReportKey();
+    registerFocusListeners();
     CHAT.addEventHandlerHook(chatListener);
   })(window);
 
@@ -203,7 +206,7 @@
 
         if (!reportedUrl.startsWith("//github.com") && reportedUrl.indexOf("erwaysoftware.com") === -1) {
           var fireButton = _("span", "fire-button", {
-            html: emojiOrImage("🔥"),
+            html: emojiOrImage("fire"),
             click: openReportPopup
           })
           .data("url", reportedUrl);
@@ -211,6 +214,11 @@
           reportLink
             .after(fireButton)
             .after(" | ");
+
+          if (fire.useEmoji && fire.focused === false && !fire.hasNewReports) {
+            fire.hasNewReports = true;
+            document.title = fire.emoji.fire + " " + document.title;
+          }
         }
       }
     }
@@ -435,7 +443,7 @@
               text: d.username + " ",
               title: "Username"
             })
-            .append(emojiOrImage("👤")))
+            .append(emojiOrImage("user")))
       )
       .append(_("br"))
       .append(_("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
@@ -454,7 +462,7 @@
       .click(closePopup);
 
     var settingsButton = _("a", "fire-settings-button", {
-      html: emojiOrImage("⚙️"),
+      html: emojiOrImage("gear"),
       title: "FIRE Configuration",
       click: openSettingsPopup
     });
@@ -495,7 +503,7 @@
     var top = _("p", "fire-popup-header")
       .append(
         _("h2")
-          .append(emojiOrImage("🔥", true))
+          .append(emojiOrImage("fire", true))
           .append(" FIRE settings."))
       .append(createCloseButton(closePopup));
 
@@ -824,6 +832,8 @@
 
   // Returns the emoji if it's supported. Otherwise, return a fallback image.
   function emojiOrImage(emoji, large) {
+    emoji = fire.emoji[emoji] || emoji;
+
     if (fire.useEmoji) {
       return $(document.createTextNode(emoji));
     }
@@ -925,6 +935,21 @@
       });
   }
 
+  // Register window focus events
+  function registerFocusListeners() {
+    window.onfocus = function () {
+      fire.focused = true;
+      document.title = document.title.replace(fire.emoji.fire + " ", "");
+      fire.hasNewReports = false;
+    };
+
+    window.onblur = function () {
+      fire.focused = false;
+    };
+
+    fire.log("Window focus listeners registered.");
+  }
+
   // Adds a property on `fire` that's stored in `localStorage`
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
@@ -989,7 +1014,7 @@
       if (fire.debug)
       {
         var args = Array.prototype.slice.call(arguments);
-        args.unshift("🔥 FIRE " + fn + ":");
+        args.unshift(fire.emoji.fire + " FIRE " + fn + ":");
         console[fn].apply(console, args);
       }
     };

@@ -27,7 +27,4 @@ The following in your userscript header should make sure metapi is loaded:
 "💣"
 "🏷️"
 "🛡️"
-"⚙️"
-"👤"
-"🔥"
 --->
