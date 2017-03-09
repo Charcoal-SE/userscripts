@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Enable fire debug mode
+// @name        Enable FIRE debug mode
 // @namespace   https://github.com/Charcoal-SE/
 // @description Automatically enable debug mode for FIRE
 // @author      Cerbrus

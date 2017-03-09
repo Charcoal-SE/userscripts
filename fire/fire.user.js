@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.5.7
+// @version     0.5.8
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -38,7 +38,6 @@
     scope.fire = {
       metaData: GM_info.script || GM_info["Flag Instantly, Rapidly, Effortlessly"],
       openReportPopup: openReportPopupForMessage,
-      hasNewReports: false,
       emoji: {fire: "🔥", user: "👤", gear: "⚙️"},
       api: {
         ms: {
@@ -67,7 +66,6 @@
     registerAnchorHover();
     registerWebSocket();
     registerOpenLastReportKey();
-    registerFocusListeners();
     CHAT.addEventHandlerHook(chatListener);
   })(window);
 
@@ -214,11 +212,6 @@
           reportLink
             .after(fireButton)
             .after(" | ");
-
-          if (fire.useEmoji && fire.focused === false && !fire.hasNewReports) {
-            fire.hasNewReports = true;
-            document.title = fire.emoji.fire + " " + document.title;
-          }
         }
       }
     }
@@ -933,21 +926,6 @@
 
         fire.log("Websocket initialized.");
       });
-  }
-
-  // Register window focus events
-  function registerFocusListeners() {
-    window.onfocus = function () {
-      fire.focused = true;
-      document.title = document.title.replace(fire.emoji.fire + " ", "");
-      fire.hasNewReports = false;
-    };
-
-    window.onblur = function () {
-      fire.focused = false;
-    };
-
-    fire.log("Window focus listeners registered.");
   }
 
   // Adds a property on `fire` that's stored in `localStorage`
