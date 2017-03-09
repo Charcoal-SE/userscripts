@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.5.3
+// @version     0.5.4
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -21,7 +21,7 @@
 
   (function (scope) { // Init
     var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
-    var useEmoji = hasEmojiSupport();
+
     var smokeDetectorId = { // this is Smokey's user ID for each supported domain
       "chat.stackexchange.com": 120914,
       "chat.stackoverflow.com": 3735529,
@@ -37,7 +37,6 @@
 
     scope.fire = {
       metaData: GM_info.script || GM_info["Flag Instantly, Rapidly, Effortlessly"],
-      useEmoji: useEmoji,
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -54,6 +53,9 @@
       reportCache: {}
     };
 
+    registerLoggingFunctions();
+
+    hasEmojiSupport();
     initLocalStorage(hOP, defaultOptions);
     getCurrentUser();
     loadStackExchangeSites();
@@ -105,6 +107,8 @@
 
         fire.reportCache[url] = data; // Store the data
 
+        fire.log("Loaded report data", data);
+
         if (openAfterLoad === true) {
           $this.click();
         }
@@ -136,6 +140,8 @@
 
         sites.storedAt = now; // Set the storage timestamp
         fire.sites = sites;   // Store the site list
+
+        fire.log("Loaded Stack Exchange sites");
       });
     }
   }
@@ -207,35 +213,6 @@
         }
       }
     }
-  }
-
-  // Decorate messages that exist on page load
-  function decorateExistingMessages(timeout) {
-    setTimeout(function () {
-      var chat = $("#chat");
-      chat.on("DOMSubtreeModified", function () {
-        if (chat.html().length !== 0) { // Chat messages have loaded
-          chat.off("DOMSubtreeModified");
-
-          $(fire.SDMessageSelector).each(function () {
-            decorateMessage(this);
-          });
-        }
-      });
-    }, timeout);
-  }
-
-  // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
-  function showFireOnExistingMessages() {
-    $("#getmore, #getmore-mine")
-      .click(function () {
-        decorateExistingMessages(500);
-      });
-
-    decorateExistingMessages(0);
-
-    // Load report data on fire button hover
-    $("body").on("mouseenter", ".fire-button", loadDataForReport);
   }
 
   // Set the toastr class
@@ -620,9 +597,9 @@
       var ms = fire.api.ms;
       var token = fire.userData.metasmokeWriteToken;
       if (data.has_sent_feedback) {
-        var message = "You have already sent feedback to MetaSmoke for this report.";
+        var message = span("You have already sent feedback to MetaSmoke for this report.");
         if (verdict === "tpu-") {
-          postMetaSmokeSpamFlag(data, ms, token, message + "<br /><br />");
+          postMetaSmokeSpamFlag(data, ms, token, message.after("<br /><br />"));
         } else {
           toastr.info(message);
           closePopup();
@@ -633,10 +610,11 @@
           url: ms.url + "w/post/" + data.id + "/feedback",
           data: {type: verdict, key: ms.key, token: token}
         }).done(function () {
+          var message = span("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
           if (verdict === "tpu-" && fire.userData.flag) {
-            postMetaSmokeSpamFlag(data, ms, token, "Sent feedback \"<em>tpu-\"</em> to metasmoke.<br /><br />");
+            postMetaSmokeSpamFlag(data, ms, token, message.after("<br /><br />"));
           } else {
-            toastr.success("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
+            toastr.success(message);
             closePopup();
           }
         }).error(function (jqXHR) {
@@ -663,18 +641,18 @@
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     if (data.has_auto_flagged) {
-      toastr.info(feedbackSuccess + "You already autoflagged this post as spam.");
+      toastr.info(feedbackSuccess.after(span("You already autoflagged this post as spam.")));
     } else if (data.has_manual_flagged) {
-      toastr.info(feedbackSuccess + "You already flagged this post as spam.");
+      toastr.info(feedbackSuccess.after(span("You already flagged this post as spam.")));
     } else if (data.is_deleted) {
-      toastr.info(feedbackSuccess + "The reported post can't be flagged: It is already deleted.");
+      toastr.info(feedbackSuccess.after(span("The reported post can't be flagged: It is already deleted.")));
     } else {
       $.ajax({
         type: "POST",
         url: ms.url + "w/post/" + data.id + "/spam_flag",
         data: {key: ms.key, token: token}
       }).done(function (response) {
-        toastr.success(feedbackSuccess + "Successfully flagged the post as \"spam\".");
+        toastr.success(feedbackSuccess.after(span("Successfully flagged the post as \"spam\".")));
         closePopup();
 
         if (response.backoff) {
@@ -815,6 +793,11 @@
     return $("<" + tagName + "/>", options);
   }
 
+  // Create a `<span>` with the specified contents.
+  function span(contents) {
+    return _("span", {html: contents});
+  }
+
   // Detect Emoji support in this browser
   function hasEmojiSupport() {
     var canvas = document.createElement("canvas");
@@ -824,7 +807,10 @@
     ctx.textBaseline = "top";
     ctx.font = "32px Arial";
     ctx.fillText(smiley, 0, 0);
-    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
+
+    fire.useEmoji = ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
+
+    fire.log("Emoji support detected:", fire.useEmoji);
   }
 
   // Returns the emoji if it's supported. Otherwise, return a fallback image.
@@ -854,6 +840,8 @@
       injectCSS(path + "toastr.min.css");
       $.getScript(path + "/toastr.min.js").then(toastrOptions);
     }
+
+    fire.log("Injected scripts and stylesheets.");
   }
 
   // Inject the specified stylesheet
@@ -875,6 +863,8 @@
       hideDuration: 250,
       extendedTimeOut: 500,
     };
+
+    fire.log("Toastr included, notification options set.");
   }
 
   // Open the last report on [Ctrl]+[Space]
@@ -887,6 +877,8 @@
         }
       }
     });
+
+    fire.log("Registered \"Open last report\" key.");
   }
 
   // Register the "tooltip" hover for anchor elements
@@ -908,6 +900,8 @@
       .on("mouseleave", anchorSelector, function () {
         $(".fire-tooltip").remove();
       });
+
+    fire.log("Registered anchor hover tooltip.");
   }
 
   // Register a websocket listener
@@ -917,6 +911,8 @@
       .then(function () {
         metapi.watchSocket(fire.api.ms.key, socketOnMessage);
         $.ajaxSetup({cache: false});
+
+        fire.log("Websocket initialized.");
       });
   }
 
@@ -930,6 +926,64 @@
         localStorage.setItem(localStorageKey, JSON.stringify(value));
       }
     });
+  }
+
+  // Registers logging functions on `fire`
+  function registerLoggingFunctions() {
+    fire.debug = fire.metaData.lastModified !== fire.metaData.lastUpdated;
+    fire.log = getLogger("log");
+    fire.info = getLogger("info");
+    fire.warn = getLogger("warn");
+    fire.error = getLogger("error");
+
+    if (fire.debug) {
+      fire.info("This script has been modified. Debug mode enabled.");
+    }
+  }
+
+  // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
+  function showFireOnExistingMessages() {
+    $("#getmore, #getmore-mine")
+      .click(function () {
+        decorateExistingMessages(500);
+      });
+
+    decorateExistingMessages(0);
+
+    // Load report data on fire button hover
+    $("body").on("mouseenter", ".fire-button", loadDataForReport);
+
+    fire.log("Registered loadDataForReport");
+  }
+
+  // Decorate messages that exist on page load
+  function decorateExistingMessages(timeout) {
+    setTimeout(function () {
+      var chat = $("#chat");
+      chat.on("DOMSubtreeModified", function () {
+        if (chat.html().length !== 0) { // Chat messages have loaded
+          chat.off("DOMSubtreeModified");
+
+          $(fire.SDMessageSelector).each(function () {
+            decorateMessage(this);
+          });
+
+          fire.log("Decorated existing messages.");
+        }
+      });
+    }, timeout);
+  }
+
+  // Gets a log wrapper for the specified console function.
+  function getLogger(fn) {
+    return function () {
+      if (fire.debug)
+      {
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift("🔥 FIRE " + fn + ":");
+        console[fn].apply(console, args);
+      }
+    };
   }
 
   // Handle socket messages
@@ -986,6 +1040,8 @@
       }
     }
     fire.userData = data;
+
+    fire.log("Initialized localStorage.");
   }
 
   // Sets a value on `fire.userData`, stored in `localStorage`
@@ -1009,6 +1065,8 @@
         .get(CHAT.CURRENT_USER_ID)
         .done(function (user) {
           fire.chatUser = user;
+
+          fire.log("Current user found.");
         });
     });
   }

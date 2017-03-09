@@ -1,7 +1,6 @@
 # TODO:
 * ___Re-structure document___
   * Wrap similar functions in objecs, like `popups.openSettings()`
-* Properly parse tpu- messages to show FIRE as well?
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling
   * Respect passed "Backoff" params
@@ -21,3 +20,13 @@ The following in your userscript header should make sure metapi is loaded:
 [Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).
 
 <!--- http://stackapps.com/apps/oauth/view/9136 --->
+<!---
+"🚩"
+"🗳️"
+"💣"
+"🏷️"
+"🛡️"
+"⚙️"
+"👤"
+"🔥"
+--->
