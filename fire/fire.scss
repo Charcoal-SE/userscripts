@@ -180,15 +180,16 @@ img.fire-emoji-large {
         white-space: pre-line;
         font-size: 0.8em;
         font-family: $codeFont;
-        overflow: hidden;
         position: relative;
         left: 2px;
         top: 8px;
         background-color: $codeBlockColor;
         border-radius: 3px;
         padding: 4px;
-        margin: 10px 6px 0 0;
+        margin: 10px 6px 20px 0;
         box-shadow: 0 0 10px -1px $shadow-color;
+        max-height: 50px;
+        overflow-y: auto;
       }
     }
 
