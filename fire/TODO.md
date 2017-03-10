@@ -1,4 +1,5 @@
 # TODO:
+* ___Show if the reported post has been edited___
 * ___Re-structure document___
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Load data through metapi.js for cross-script storage;
