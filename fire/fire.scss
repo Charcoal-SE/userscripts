@@ -12,7 +12,7 @@ $button-blue: #0000ff;
 $shadow-color: #646464;
 $transitionTime: 0.4s;
 $codeBlockColor: #eff0f1;
-$codeFont: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif
+$codeFont: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
 
 @mixin button-gradient($color) {
   $light: lighten($color, 20%);
