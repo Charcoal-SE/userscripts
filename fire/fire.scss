@@ -159,6 +159,8 @@ img.fire-emoji-large {
 
     .fire-report-info {
       max-height: 20px;
+      overflow: hidden;
+      cursor: pointer;
     	transition: max-height $transitionTime;
 
       &.fire-show-reason {
