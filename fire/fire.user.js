@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.6.0
+// @version     0.6.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -462,10 +462,12 @@
       )
       .append(_("hr"))
       .append(
-        _("h3")
-          .append(_("span", "fire-type", {
-            text: postType + ":",
-            title: "The reported post is a " + postType.toLowerCase()
+        _("div", "fire-report-info")
+          .click(function () {
+            $(this).toggleClass("fire-show-reason");
+          })
+          .append(_("h3", "fire-type", {
+            text: postType + ":"
           }))
           .append(
             _("span", "fire-username", {
@@ -473,8 +475,12 @@
               title: "Username"
             })
             .append(emojiOrImage("user")))
+          .append(_("span", "fire-reason", {
+            text: "The reported post is a" + (d.is_answer ? "n " : " ") + postType.toLowerCase() +
+                  "\nReason weight: " + d.reason_weight + "\n" +
+                  d.why
+          }))
       )
-      .append(_("br"))
       .append(_("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
         .append(d.body.replace(/<script/g, "&lt;script"))
       );
