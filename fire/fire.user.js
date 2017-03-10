@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.6.5
+// @version     0.6.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -476,8 +476,8 @@
             })
             .append(emojiOrImage("user")))
           .append(_("span", "fire-reason", {
-            text: "The reported post is a" + (d.is_answer ? "n " : " ") + postType.toLowerCase() +
-                  "\nReason weight: " + d.reason_weight + "\n" +
+            text: "The reported post is a" + (d.is_answer ? "n " : " ") + postType.toLowerCase() + ". " +
+                  "Reason weight: " + d.reason_weight + "\n" +
                   d.why
           }))
       )
