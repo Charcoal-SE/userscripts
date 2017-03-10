@@ -187,10 +187,13 @@
   function decorateMessage(message) {
     var m = $(message);
     if (m.find(".fire-button").length === 0) {
-      var reportLink = filterOnContents(m.find(".content a"), "MS");
+      var anchors = m.find(".content a");
+
+      var reportLink = filterOnContents(anchors, "MS");
       var urlOnReportLink = true;
+
       if (reportLink.length === 0) {
-        reportLink = filterOnContents(m.find(".content a"), "SmokeDetector");
+        reportLink = filterOnContents(anchors, "SmokeDetector");
         urlOnReportLink = false;
       }
 
