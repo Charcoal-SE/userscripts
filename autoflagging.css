@@ -35,6 +35,13 @@ div.message {
 .ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {
   opacity: 0.5;
 }
+.ai-deleted {
+    max-height: 1.4em;
+    transition: all 0.5s ease;
+}
+.ai-deleted:hover {
+    max-height: 3em;
+}
 .ai-flag-count {
   color: inherit;
   text-decoration: none !important;
