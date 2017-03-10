@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.6.7
+// @version     0.7.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -14,7 +14,7 @@
 // @grant       none
 // ==/UserScript==
 /* global fire, metapi, toastr, CHAT, GM_info */
-/* eslint-disable camelcase */
+/* eslint-disable camelcase, max-params */
 
 (function () {
   "use strict";
@@ -33,13 +33,14 @@
       flag: true,
       toastrPosition: "top-right",
       toastrDuration: 2500,
-      readOnly: false
+      readOnly: false,
+      authentication: {token: ""}
     };
 
     scope.fire = {
       metaData: GM_info.script || GM_info["Flag Instantly, Rapidly, Effortlessly"],
       openReportPopup: openReportPopupForMessage,
-      emoji: {fire: "🔥", user: "👤", gear: "⚙️"},
+      emoji: {fire: "🔥", user: "👤", gear: "⚙️", pencil: "✏️️"},
       api: {
         ms: {
           key: "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // this script's MetaSmoke API key
@@ -47,7 +48,8 @@
         },
         se: {
           key: "NDllMffmzoX8A6RPHEPVXQ((", // this script's Stack Exchange API key
-          url: "https://api.stackexchange.com/2.2/"
+          url: "https://api.stackexchange.com/2.2/",
+          clientId: 9136
         }
       },
       smokeDetectorId: smokeDetectorId,
@@ -68,7 +70,44 @@
     registerWebSocket();
     registerOpenLastReportKey();
     CHAT.addEventHandlerHook(chatListener);
+
+    checkHashForWriteToken();
   })(window);
+
+  // Request a Stack Exchange Write token for this app.
+  function requestStackExchangeToken() {
+    var url = "https://stackexchange.com/oauth/dialog" +
+      "?client_id=" + fire.api.se.clientId +
+      "&scope=" + encodeURIComponent("no_expiry") + // write_access private_info read_inbox
+      "&redirect_uri=" + encodeURIComponent(location.href);
+
+    // Register the focus event to check if the write token was successfully obtained
+    $(window).on("focus", checkWriteTokenSuccess);
+
+    window.open(url);
+  }
+
+  // Check the url hash to see if a write token has been obtained. If so, parse it.
+  function checkHashForWriteToken() {
+    if (location.hash && location.hash.length > 0) {
+      var result = location.hash.match(/#+access_token=(.+)/);
+      if (result) {
+        setValue("stackexchangeWriteToken", result[1]);
+        window.close();
+      }
+      // Clear hash
+      history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
+  }
+
+  // Check if the write token was successfully obtained
+  function checkWriteTokenSuccess() {
+    if (fire.userData.stackexchangeWriteToken) {
+      toastr.success("Successfully obtained Stack Exchange write token!");
+      $(".fire-popup .fire-request-write-token").remove();
+      $(window).off("focus", checkWriteTokenSuccess);
+    }
+  }
 
   // Loads MetaSmoke data for a specified post url
   function getDataForUrl(reportedUrl, callback) {
@@ -132,21 +171,96 @@
     }
 
     if (!sites.storedAt) { // If the site data is empy
-      var se = fire.api.se;
-      var url = se.url + "sites?key=" + se.key + "&filter=!Fn4IB7S7Yq2UJF5Bh48LrjSpTc&pagesize=10000";
+      var parameters = {
+        filter: "!Fn4IB7S7Yq2UJF5Bh48LrjSpTc",
+        pagesize: 10000
+      };
 
-      $.get(url, function (response) {
-        for (var i = 0; i < response.items.length; i++) {
-          var item = response.items[i];
-          sites[item.api_site_parameter] = item;
-        }
+      getSE(
+        "sites",
+        parameters,
+        function (response) {
+          for (var i = 0; i < response.items.length; i++) {
+            var item = response.items[i];
+            sites[item.api_site_parameter] = item;
+          }
 
-        sites.storedAt = now; // Set the storage timestamp
-        fire.sites = sites;   // Store the site list
+          sites.storedAt = now; // Set the storage timestamp
+          fire.sites = sites;   // Store the site list
 
-        fire.log("Loaded Stack Exchange sites");
-      });
+          fire.log("Loaded Stack Exchange sites");
+        });
     }
+  }
+
+  // Loads a post's revision history
+  function loadPostRevisions(report) {
+    if (!report || !report.link) {
+      return;
+    }
+    var match = report.link.match(/\d+/);
+    if (!match || !match[0]) {
+      return;
+    }
+
+    var parameters = {
+      site: report.site
+    };
+
+    getSE(
+      "/posts/" + match[0] + "/revisions",
+      parameters,
+      function (response) {
+        if (response && response.items) {
+          report.revision_count = response.items.length;
+          if (report.revision_count) {
+            $(".fire-popup-body > h2")
+              .prepend(
+                emojiOrImage("pencil", true)
+                  .attr("title", "This post has been edited!")
+                  .after(" ")
+              );
+          }
+        }
+      });
+  }
+
+  // get call on the Stack Exchange API
+  function getSE(method, parameters, success, error, always) {
+    stackExchangeAjaxCall(false, method, parameters, success, error, always);
+  }
+
+  // // post call on the Stack Exchange API
+  // function postSE(method, parameters, success, error, always) {
+  //   stackExchangeAjaxCall(true, method, parameters, success, error, always);
+  // }
+
+  // AJAX call on the Stack Exchange API
+  function stackExchangeAjaxCall(isPost, method, parameters, success, error, always) {
+    var call = isPost ? "post" : "get";
+    var se = fire.api.se;
+
+    parameters = parameters || {};
+
+    parameters.key = se.key;
+
+    if (fire.userData.stackexchangeWriteToken) {
+      parameters.access_token = fire.userData.stackexchangeWriteToken;
+    }
+
+    var ajaxCall = $[call](se.url + method, parameters);
+
+    if (success) {
+      ajaxCall.done(success);
+    }
+    if (error) {
+      ajaxCall.fail(error);
+    }
+    if (always) {
+      ajaxCall.always(always);
+    }
+
+    return ajaxCall;
   }
 
   // Gets a MetaSmoke write token
@@ -423,7 +537,10 @@
       d = fire.reportCache[url];
     } else {
       loadDataForReport.call(that, true); // No data, so load it.
+      return;
     }
+
+    loadPostRevisions(d);
 
     if (typeof d === "undefined") {
       console.log("Sometimes, d seems to be undefined", $that, d);
@@ -577,11 +694,23 @@
       );
     }
 
-    var disableReadonly = $();
+    var disableReadonlyButton = $();
     if (fire.userData.readOnly) {
-      disableReadonly = _("br").after(
+      disableReadonlyButton = _("br").after(
         button("Disable read-only mode", clickHandlers.disableReadonly)
       );
+    }
+
+    var requestStackExchangeTokenButton = $();
+    if (!fire.userData.stackexchangeWriteToken) {
+      requestStackExchangeTokenButton = _("p", "fire-request-write-token")
+        .append(_("br"))
+        .append(_("h3", {text: "Stack Exchange write token:"}))
+        .append(_("p", {html:
+          "Authorize FIRE with your Stack Exchange account.<br />" +
+          "This allows FIRE to load additional data for reported posts."
+        }))
+        .append(button("Request Stack Exchange write token", requestStackExchangeToken));
     }
 
     var positionSelector = _("div")
@@ -604,13 +733,14 @@
             "Also submit \"Spam\" flag with \"tpu-\" feedback.",
             "Flag on feedback:")
           )
-          .append(disableReadonly)
+          .append(disableReadonlyButton)
       )
       .append(
         _("div", "fire-settings-section fire-settings-right")
           .append(_("h3", {text: "Notifications:"}))
           .append(toastDurationElements)
           .append(positionSelector)
+          .append(requestStackExchangeTokenButton)
       );
 
     popup
@@ -759,7 +889,7 @@
   }
 
   // Create a feedback button for the top of the popup
-  function createFeedbackButton(data, keyCode, text, verdict, tooltip) { // eslint-disable-line max-params
+  function createFeedbackButton(data, keyCode, text, verdict, tooltip) {
     var count;
     var hasSubmittedFeedback;
 
@@ -816,7 +946,7 @@
   }
 
   // Creates a input[type=checkbox] for the settings
-  function createSettingscheckBox(id, value, handler, labelText, headerText) { // eslint-disable-line max-params
+  function createSettingscheckBox(id, value, handler, labelText, headerText) {
     var checkBox = _("input", {
       id: "checkbox_" + id,
       type: "checkbox",
@@ -1004,6 +1134,7 @@
     fire.info = getLogger("info");
     fire.warn = getLogger("warn");
     fire.error = getLogger("error");
+    fire.logPrefix = (fire.useEmoji ? fire.emoji.fire + " " : "") + "FIRE ";
 
     if (fire.debug) {
       fire.info("Debug mode enabled.");
@@ -1049,7 +1180,7 @@
       if (fire.debug)
       {
         var args = Array.prototype.slice.call(arguments);
-        args.unshift(fire.emoji.fire + " FIRE " + fn + ":");
+        args.unshift(fire.logPrefix + fn + ":");
         console[fn].apply(console, args);
       }
     };
