@@ -2,7 +2,6 @@
 * ___Re-structure document___
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Load data through metapi.js for cross-script storage;
-* Allow non-reviewer users to use FIRE in "no-feedback" mode (see post, open on site)
 * Improve MS feedback error handling.
   * Respect passed "Backoff" params
 * Handle write token request errors

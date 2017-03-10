@@ -97,7 +97,7 @@ img.fire-emoji-large {
 
   // Header
   .fire-popup-header {
-    height: 40px;
+    min-height: 40px;
 
     a.button {
       margin: 0;
@@ -260,6 +260,12 @@ img.fire-emoji-large {
     }
   }
 } // End Popup container
+
+.fire-popup.fire-readonly {
+  .fire-popup-header .fire-site-logo {
+    max-width: 475px;
+  }
+}
 
 @keyframes spinner {
   to {transform: rotate(360deg);}

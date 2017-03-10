@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.5.9
+// @version     0.6.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -32,7 +32,8 @@
       blur: true,
       flag: true,
       toastrPosition: "top-right",
-      toastrDuration: 2500
+      toastrDuration: 2500,
+      readOnly: false
     };
 
     scope.fire = {
@@ -150,26 +151,38 @@
 
   // Gets a MetaSmoke write token
   function getWriteToken(callback) {
+    setValue("readOnly", false);
     var afterGetToken = callback;
+
     writeTokenPopup(function (metaSmokeCode) {
-      $.ajax({
-        url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.api.ms.key + "&code=" + metaSmokeCode,
-        method: "GET"
-      }).done(function (data) {
-        setValue("metasmokeWriteToken", data.token);
-        toastr.success("Successfully obtained MetaSmoke write token!");
+      if (metaSmokeCode && metaSmokeCode.length === 7) {
+        $.ajax({
+          url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.api.ms.key + "&code=" + metaSmokeCode,
+          method: "GET"
+        }).done(function (data) {
+          setValue("metasmokeWriteToken", data.token);
+          toastr.success("Successfully obtained MetaSmoke write token!");
+          closePopup();
+
+          if (afterGetToken) {
+            afterGetToken();
+          }
+        }).error(function (jqXHR) {
+          if (jqXHR.status === 404) {
+            toastr.error("Metasmoke could not find a write token - did you authorize the app?");
+          } else {
+            toastr.error("An unknown error occurred during OAuth with metasmoke.");
+          }
+        });
+      } else {
+        setValue("readOnly", true);
+        toastr.info("FIRE is not in read-only mode.");
         closePopup();
 
         if (afterGetToken) {
           afterGetToken();
         }
-      }).error(function (jqXHR) {
-        if (jqXHR.status === 404) {
-          toastr.error("Metasmoke could not find a write token - did you authorize the app?");
-        } else {
-          toastr.error("An unknown error occurred during OAuth with metasmoke.");
-        }
-      });
+      }
     });
   }
 
@@ -313,51 +326,58 @@
     }
   }
 
+  var clickHandlers = {
+    requestToken: function () {
+      window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank");
+    },
+    saveToken: function (input, callback) {
+      var value = input.val();
+      if (value && value.length === 7) {
+        callback(value);
+      }
+    },
+    disableReadonly: function () {
+      closePopup();
+      closePopup();
+      getWriteToken();
+    }
+  };
+
   // Open a popup to enter the write token
   function writeTokenPopup(callback) {
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
-
-    var popup = _("div", "fire-popup")
-      .css({top: "5%", left: w - 300});
-
-    var top = _("p", "fire-popup-header", {
-      html: "FIRE requires a metasmoke write token to submit feedback.<br />" +
-        "Once you've authenticated FIRE with metasmoke, you'll be given a code.<br />" +
-        "Please enter it here:"
-    });
-
     var input = _("input", "fire-popup-input", {
       type: "text",
       maxlength: "7",
       placeholder: "Enter code here"
     });
 
-    var requestButton = _("a", "button", {
-      text: "Request Token",
-      click: function () {
-        window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank");
-      }
-    });
-
-    var saveButton = _("a", "button", {
-      text: "Save",
-      click: function () {
-        var value = input.val();
-        if (value && value.length === 7) {
-          callback(value);
-        }
-      }
-    });
-
     _("div", "fire-popup-modal")
       .appendTo("body")
       .click(closePopup);
 
-    popup
-      .append(top)
-      .append(requestButton)
-      .append(input)
-      .append(saveButton)
+    _("div", "fire-popup")
+      .css({top: "5%", left: w - 300})
+      .append(
+        _("div", "fire-popup-header")
+          .append(_("p", {
+            html: "FIRE requires a MetaSmoke write token to submit feedback.<br />" +
+                  "This requires that your MetaSmoke account has the \"Reviewer\" role. <br />" +
+                  "Once you've authenticated FIRE with MetaSmoke, you'll be given a code.<br />"
+          }))
+          .append(button("Request Token", clickHandlers.requestToken))
+          .append(input)
+          .append(button("Save", function () {
+            clickHandlers.saveToken(input, callback);
+          }))
+          .append(_("br"))
+          .append(_("br"))
+          .append(_("p", {
+            html: "Alternatively, if you're not a \"Reviewer\", you can run FIRE in read-only mode by disabling feedback.<br />" +
+                  "You will still be able to view reports."
+          }))
+          .append(button("Disable feedback", callback))
+      )
       .hide()
       .appendTo("body")
       .fadeIn("fast");
@@ -383,7 +403,7 @@
 
     var that = this;
 
-    if (!fire.userData.metasmokeWriteToken) {
+    if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
       getWriteToken(function () {
         openReportPopup.call(that); // Open the popup later
       });
@@ -409,7 +429,7 @@
     var w = (window.innerWidth - $("#sidebar").width()) / 2;
     var site = fire.sites[d.site];
 
-    var popup = _("div", "fire-popup")
+    var popup = _("div", "fire-popup" + (fire.userData.readOnly ? " fire-readonly" : ""))
       .css({top: "5%", left: w - 300});
 
     var openOnSiteButton = _("a", "fire-site-logo", {
@@ -421,11 +441,17 @@
       "fire-tooltip": "Show on site"
     });
 
-    var top = _("p", "fire-popup-header")
-      .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
-      .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
-      .append(createFeedbackButton(d, 51, "naa-", "naa-", "Not an Answer / VLQ"))
-      .append(createFeedbackButton(d, 52, "fp-", "fp-", "False Positive"))
+    var top = _("p", "fire-popup-header");
+
+    if (!fire.userData.readOnly) {
+      top
+        .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
+        .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
+        .append(createFeedbackButton(d, 51, "naa-", "naa-", "Not an Answer / VLQ"))
+        .append(createFeedbackButton(d, 52, "fp-", "fp-", "False Positive"));
+    }
+
+    top
       .append(openOnSiteButton)
       .append(createCloseButton(closePopup));
 
@@ -546,6 +572,13 @@
       );
     }
 
+    var disableReadonly = $();
+    if (fire.userData.readOnly) {
+      disableReadonly = _("br").after(
+        button("Disable read-only mode", clickHandlers.disableReadonly)
+      );
+    }
+
     var positionSelector = _("div")
       .append(_("br"))
       .append(
@@ -557,15 +590,16 @@
     var container = _("div")
       .append(
         _("div", "fire-settings-section fire-settings-left")
-        .append(createSettingscheckBox("blur", fire.userData.blur, blurOptionClickHandler,
-          "Enable blur on popup background.",
-          "Popup blur:"
-        ))
-        .append(_("br"))
-        .append(createSettingscheckBox("flag", fire.userData.flag, flagOptionClickHandler,
-          "Also submit \"Spam\" flag with \"tpu-\" feedback.",
-          "Flag on feedback:")
-        )
+          .append(createSettingscheckBox("blur", fire.userData.blur, blurOptionClickHandler,
+            "Enable blur on popup background.",
+            "Popup blur:"
+          ))
+          .append(_("br"))
+          .append(createSettingscheckBox("flag", fire.userData.flag, flagOptionClickHandler,
+            "Also submit \"Spam\" flag with \"tpu-\" feedback.",
+            "Flag on feedback:")
+          )
+          .append(disableReadonly)
       )
       .append(
         _("div", "fire-settings-section fire-settings-right")
@@ -816,6 +850,14 @@
   // Create a `<span>` with the specified contents.
   function span(contents) {
     return _("span", {html: contents});
+  }
+
+  // Create a button
+  function button(text, clickHandler) {
+    return _("a", "button", {
+      text: text,
+      click: clickHandler
+    });
   }
 
   // Detect Emoji support in this browser
