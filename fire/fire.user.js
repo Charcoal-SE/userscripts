@@ -326,6 +326,14 @@
     }
   }
 
+  // Opens a report popup for a specific message
+  function openReportPopupForMessage(message) {
+    loadDataForReport.call(
+      $(message).find(".fire-button"),
+      true
+    );
+  }
+
   var clickHandlers = {
     requestToken: function () {
       window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank");
@@ -340,6 +348,9 @@
       closePopup();
       closePopup();
       getWriteToken();
+    },
+    toggleReportReason: function () {
+      $(this).toggleClass("fire-show-reason");
     }
   };
 
@@ -385,14 +396,6 @@
     $("#container").toggleClass("fire-blur", fire.userData.blur);
 
     $(document).keydown(keyboardShortcuts);
-  }
-
-  // Opens a report popup for a specific message
-  function openReportPopupForMessage(message) {
-    loadDataForReport.call(
-      $(message).find(".fire-button"),
-      true
-    );
   }
 
   // Build a popup and show it.
@@ -462,24 +465,20 @@
       )
       .append(_("hr"))
       .append(
-        _("div", "fire-report-info", {title: "Click to show reason"})
-          .click(function () {
-            $(this).toggleClass("fire-show-reason");
-          })
-          .append(_("h3", "fire-type", {
-            text: postType + ":"
-          }))
-          .append(
-            _("span", "fire-username", {
-              text: d.username + " ",
-              title: "Username"
-            })
-            .append(emojiOrImage("user")))
-          .append(_("span", "fire-reason", {
-            text: "The reported post is a" + (d.is_answer ? "n " : " ") + postType.toLowerCase() + ". " +
-                  "Reason weight: " + d.reason_weight + "\n" +
-                  d.why
-          }))
+        _("div", "fire-report-info", {
+          title: "Click to show reason",
+          click: clickHandlers.toggleReportReason
+        })
+        .append(_("h3", "fire-type", {text: postType + ":"}))
+        .append(
+          _("span", "fire-username", {text: d.username + " ", title: "Username"})
+            .append(emojiOrImage("user"))
+        )
+        .append(_("span", "fire-reason", {
+          text: "The reported post is a" + (d.is_answer ? "n " : " ") + postType.toLowerCase() + ". " +
+                "Reason weight: " + d.reason_weight + "\n" +
+                d.why
+        }))
       )
       .append(_("div", "fire-reported-post" + (d.is_deleted ? " fire-deleted" : ""))
         .append(d.body.replace(/<script/g, "&lt;script"))

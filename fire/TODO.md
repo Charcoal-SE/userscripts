@@ -8,7 +8,6 @@
 * Handle write token request errors
 * Detect if a user has flagged the post already:
   * Detect flags not sent through MS
-* Show if a post has been edited.
 * "Open last report that needs action" keyboard shortcut.
 * Improve popup creation:
   * Popups are basically hard-coded. Load (external?) HTML?
