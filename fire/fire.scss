@@ -224,7 +224,7 @@ img.fire-emoji-large {
       width: auto;
       max-height: 100px;
       overflow: auto;
-      font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+      font-family: $codeFont;
       font-size: 13px;
       background-color: $codeBlockColor;
       box-shadow: 0 0 10px -1px $shadow-color;
