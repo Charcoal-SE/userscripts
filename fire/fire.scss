@@ -187,14 +187,14 @@ img.fire-emoji-large {
         background-color: $codeBlockColor;
         border-radius: 3px;
         padding: 4px;
-        margin-bottom: 10px;
+        margin-bottom: 10px 6px 0 0;
         box-shadow: 0 0 10px -1px $shadow-color;
       }
     }
 
     .fire-reported-post {
       padding: 10px;
-      margin: -10px;
+      margin: 0 -10px -10px -10px;
 
       &.fire-deleted {
         background-color: #f4eaea;
