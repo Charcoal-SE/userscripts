@@ -37,6 +37,7 @@ div.message {
 }
 .ai-deleted {
     max-height: 1.5em;
+    overflow: hidden;
     transition: all 0.5s ease;
 }
 .ai-deleted:hover {
