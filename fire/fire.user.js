@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.2
+// @version     0.7.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -455,9 +455,11 @@
   function keyboardShortcuts(e) {
     if (e.keyCode === 13 || e.keyCode === 32) { // [Enter] key or spacebar
       e.preventDefault();
-      $(".fire-popup-header a.button.focus")
+
+      var selector = ".fire-popup-header a.button.focus";
+      $(selector)
         .fadeOut(100)           // Flash to indicate which button was selected.
-        .fadeIn(100, event => $(event.currentTarget).click());
+        .fadeIn(100, () => $(selector).click());
     } else if (fire.buttonKeyCodes.indexOf(e.keyCode) >= 0 && !fire.settingsAreOpen) {
       e.preventDefault();
 
@@ -795,12 +797,12 @@
     fire.sendingFeedback = false;
     if (fire.settingsAreOpen) {
       $(".fire-popup#fire-settings")
-        .fadeOut("fast", event => $(event.currentTarget).remove());
+        .fadeOut("fast", element => $(element).remove());
 
       delete fire.settingsAreOpen;
     } else {
       $(".fire-popup, .fire-popup-modal")
-        .fadeOut("fast", event => $(event.currentTarget).remove());
+        .fadeOut("fast", element => $(element).remove());
 
       $(document).off("keydown", keyboardShortcuts);
 
@@ -1244,7 +1246,7 @@
   // Expands anchor elements in the report's body on hover, to show the href.
   function expandLinksOnHover() {
     $(".fire-popup-body a")
-      .each(event => $(event.currentTarget).attr("fire-tooltip", this.href));
+      .each(element => $(element).attr("fire-tooltip", element));
   }
 
   // Initializes localStorage
