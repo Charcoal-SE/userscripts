@@ -8,9 +8,9 @@
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
-// @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq
-// @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers
-// @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta
+// @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
+// @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
+// @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
 // @grant       none
 // ==/UserScript==
 /* global fire, metapi, toastr, CHAT, GM_info */
@@ -33,8 +33,7 @@
       flag: true,
       toastrPosition: "top-right",
       toastrDuration: 2500,
-      readOnly: false,
-      authentication: {token: ""}
+      readOnly: false
     };
 
     scope.fire = {

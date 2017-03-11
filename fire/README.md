@@ -45,3 +45,12 @@ To open the reported post on it's site:
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>5</kbd> - Open the post.
+
+# Authorize FIRE with Stack Exchange
+
+1. Open the settings window.
+2. Click "Authorize" button.
+3. A new window opens where you "accept"
+4. That window redirects to this chat with an access token in the url hash.
+5. Fire sees the hash, saves your token, then closes the new window.
+6. You go back to the old window, it detects a token, and shows you a "success" message.
