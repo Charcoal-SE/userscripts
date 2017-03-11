@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.5
+// @version     0.7.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -200,7 +200,7 @@
     }
   }
 
-  // Loads a post's revision history
+  // Loads a post
   function loadPost(report) {
     var parameters = {
       site: report.site
@@ -236,18 +236,27 @@
         if (response && response.items) {
           report.se.revisions = response.items;
           report.revision_count = response.items.length;
+
           if (report.revision_count) {
-            $(".fire-popup-body > h2")
-              .prepend(
-                emojiOrImage("pencil", true)
-                  .attr("title", "This post has been edited!")
-                  .after(" ")
-              );
+            showEditedIcon();
           }
 
           fire.log("Loaded a post's revision status", response);
         }
       });
+  }
+
+  // Render a "Edited" icon
+  function showEditedIcon() {
+    var h2 = $(".fire-popup-body > h2");
+    if (!h2.data("has-edit-icon")) {
+      $(".fire-popup-body > h2")
+        .prepend(
+          emojiOrImage("pencil", true)
+            .attr("title", "This post has been edited!")
+            .after(" ")
+        ).data("has-edit-icon", true);
+    }
   }
 
   // Loads a post's flagging status
@@ -665,6 +674,10 @@
       .hide()
       .appendTo("body")
       .fadeIn("fast");
+
+    if (d.revision_count) {
+      showEditedIcon();
+    }
 
     $("#container").toggleClass("fire-blur", fire.userData.blur);
 
