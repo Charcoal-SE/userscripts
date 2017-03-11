@@ -38,7 +38,7 @@ To flag it as spam / send _"True positive"_ feedback:
 To send _"False positive"_ feedback:
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
-2. <kbd>1</kbd> - Select _"False positive"_,
+2. <kbd>4</kbd> - Select _"False positive"_,
 3. <kbd>Space</kbd> or <kbd>Enter</kbd> - Submit.
 
 To open the reported post on it's site:
