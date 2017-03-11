@@ -1,13 +1,12 @@
 # TODO:
 * ___Re-structure document___
   * Wrap similar functions in objects, like `popups.openSettings()`
+  * Start using arrow functions
 * Move "why" block up.
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling.
   * Respect passed "Backoff" params
 * Handle write token request errors
-* Detect if a user has flagged the post already:
-  * Detect flags not sent through MS
 * "Open last report that needs action" keyboard shortcut.
 * Improve popup creation:
   * Popups are basically hard-coded. Load (external?) HTML?

@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.0
+// @version     0.7.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -147,9 +147,16 @@
           return f.user_name === fire.chatUser.name;
         });
 
+        var match = data.link.match(/\d+/);
+        if (match && match[0]) {
+          data.post_id = match[0];
+        }
+
         fire.reportCache[url] = data; // Store the data
 
         fire.log("Loaded report data", data);
+
+        loadPost(data);
 
         if (openAfterLoad === true) {
           $this.click();
@@ -194,24 +201,40 @@
   }
 
   // Loads a post's revision history
-  function loadPostRevisions(report) {
-    if (!report || !report.link) {
-      return;
-    }
-    var match = report.link.match(/\d+/);
-    if (!match || !match[0]) {
-      return;
-    }
-
+  function loadPost(report) {
     var parameters = {
       site: report.site
     };
 
     getSE(
-      "/posts/" + match[0] + "/revisions",
+      "posts/" + report.post_id,
+      parameters,
+      function (response) {
+        if (response.items && response.items.length > 0) {
+          report.se = report.se || {};
+          report.se.post = response.items[0];
+          loadPostFlagStatus(report);
+          loadPostRevisions(report);
+        } else {
+          report.is_deleted = true;
+        }
+
+        fire.log("Loaded a post", response);
+      });
+  }
+
+  // Loads a post's revision history
+  function loadPostRevisions(report) {
+    var parameters = {
+      site: report.site
+    };
+
+    getSE(
+      "posts/" + report.post_id + "/revisions",
       parameters,
       function (response) {
         if (response && response.items) {
+          report.se.revisions = response.items;
           report.revision_count = response.items.length;
           if (report.revision_count) {
             $(".fire-popup-body > h2")
@@ -221,7 +244,30 @@
                   .after(" ")
               );
           }
+
+          fire.log("Loaded a post's revision status", response);
         }
+      });
+  }
+
+  // Loads a post's flagging status
+  function loadPostFlagStatus(report) {
+    var parameters = {
+      site: report.site,
+      filter: "!-.Lt3GZC8aYs",
+      auth: true
+    };
+
+    var type = report.is_answer ? "answers" : "questions";
+
+    getSE(
+      type + "/" + report.post_id + "/flags/options",
+      parameters,
+      function (response) {
+        report.se.available_flags = response.items;
+        report.has_flagged = response.items && response.items.some(f => !f.has_flagged && f.title === "spam");
+
+        fire.log("Loaded a post's flag status", response);
       });
   }
 
@@ -237,7 +283,7 @@
 
   // AJAX call on the Stack Exchange API
   function stackExchangeAjaxCall(isPost, method, parameters, success, error, always) {
-    var call = isPost ? "post" : "get";
+    var type = isPost ? "post" : "get";
     var se = fire.api.se;
 
     parameters = parameters || {};
@@ -246,15 +292,23 @@
 
     if (fire.userData.stackexchangeWriteToken) {
       parameters.access_token = fire.userData.stackexchangeWriteToken;
+      delete parameters.auth;
+    } else if (parameters.auth) {
+      fire.warn("Auth is required for this API call, but was not available.\n\"" + type + "\": " + method);
+      return;
     }
 
-    var ajaxCall = $[call](se.url + method, parameters);
+    var ajaxCall = $[type](se.url + method, parameters);
 
     if (success) {
       ajaxCall.done(success);
     }
     if (error) {
       ajaxCall.fail(error);
+    } else {
+      ajaxCall.fail(function (jqXHR) {
+        fire.error("Error performing this AJAX call!", jqXHR);
+      });
     }
     if (always) {
       ajaxCall.always(always);
@@ -540,8 +594,6 @@
       return;
     }
 
-    loadPostRevisions(d);
-
     if (typeof d === "undefined") {
       console.log("Sometimes, d seems to be undefined", $that, d);
     }
@@ -710,7 +762,7 @@
           "Authorize FIRE with your Stack Exchange account.<br />" +
           "This allows FIRE to load additional data for reported posts."
         }))
-        .append(button("Request Stack Exchange write token", requestStackExchangeToken));
+        .append(button("Authorize FIRE with Stack Exchange", requestStackExchangeToken));
     }
 
     var positionSelector = _("div")
@@ -893,6 +945,10 @@
     var count;
     var hasSubmittedFeedback;
 
+    if (verdict === "naa-" && !data.is_answer) {
+      return $();
+    }
+
     if (data.feedbacks) { // Has feedback
       count = data.feedbacks.filter(function (f) {
         return f.feedback_type === verdict;
@@ -918,7 +974,7 @@
           if (data.has_flagged) {
             performedAction = "flagged";
           } else if (data.is_deleted) {
-            performedAction = "flagged";
+            performedAction = "deleted";
           }
 
           toastr.info(
