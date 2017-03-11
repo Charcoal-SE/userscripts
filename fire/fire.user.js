@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.1
+// @version     0.7.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -113,7 +113,7 @@
   function getDataForUrl(reportedUrl, callback) {
     var ms = fire.api.ms;
     var url = ms.url + "posts/urls?key=" + ms.key + "&page=1&urls=" + reportedUrl;
-    $.get(url, function (data) {
+    $.get(url, data => {
       if (data && data.items) {
         callback(data.items[0]);
       }
@@ -123,9 +123,7 @@
   // Checks if the list of users on this flag report contains the current user.
   function listHasCurrentUser(flags) {
     return flags &&
-      flags.users.some(function (u) {
-        return u.username === fire.chatUser.name;
-      });
+      flags.users.some(u => u.username === fire.chatUser.name);
   }
 
   // Loads a report's data when you hover over the FIRE button.
@@ -134,35 +132,38 @@
     var url = $this.data("url");
 
     if (!fire.reportCache[url]) {
-      getDataForUrl(url, function (data) {
-        data.is_answer = data.link.indexOf("/a/") >= 0;
-        data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
-        data.is_deleted = data.deleted_at !== null;
-
-        data.has_auto_flagged = listHasCurrentUser(data.autoflagged) && data.autoflagged.flagged;
-        data.has_manual_flagged = listHasCurrentUser(data.manual_flags);
-        data.has_flagged = data.has_auto_flagged || data.has_manual_flagged;
-
-        data.has_sent_feedback = data.feedbacks.some(function (f) { // Feedback has been sent already
-          return f.user_name === fire.chatUser.name;
-        });
-
-        var match = data.link.match(/\d+/);
-        if (match && match[0]) {
-          data.post_id = match[0];
-        }
-
-        fire.reportCache[url] = data; // Store the data
-
-        fire.log("Loaded report data", data);
-
-        loadPost(data);
-
-        if (openAfterLoad === true) {
-          $this.click();
-        }
-      });
+      getDataForUrl(url, data => parseDataForReport(data, openAfterLoad, $this));
     } else if (openAfterLoad === true) {
+      $this.click();
+    }
+  }
+
+  // Parse a report's loaded data
+  function parseDataForReport(data, openAfterLoad, $this) {
+    data.is_answer = data.link.indexOf("/a/") >= 0;
+    data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+    data.is_deleted = data.deleted_at !== null;
+
+    data.has_auto_flagged = listHasCurrentUser(data.autoflagged) && data.autoflagged.flagged;
+    data.has_manual_flagged = listHasCurrentUser(data.manual_flags);
+    data.has_flagged = data.has_auto_flagged || data.has_manual_flagged;
+
+    data.has_sent_feedback = data.feedbacks.some( // Feedback has been sent already
+      f => f.user_name === fire.chatUser.name
+    );
+
+    var match = data.link.match(/\d+/);
+    if (match && match[0]) {
+      data.post_id = match[0];
+    }
+
+    fire.reportCache[data.link] = data; // Store the data
+
+    fire.log("Loaded report data", data);
+
+    loadPost(data);
+
+    if (openAfterLoad === true) {
       $this.click();
     }
   }
@@ -186,7 +187,7 @@
       getSE(
         "sites",
         parameters,
-        function (response) {
+        response => {
           for (var i = 0; i < response.items.length; i++) {
             var item = response.items[i];
             sites[item.api_site_parameter] = item;
@@ -209,7 +210,7 @@
     getSE(
       "posts/" + report.post_id,
       parameters,
-      function (response) {
+      response => {
         if (response.items && response.items.length > 0) {
           report.se = report.se || {};
           report.se.post = response.items[0];
@@ -232,7 +233,7 @@
     getSE(
       "posts/" + report.post_id + "/revisions",
       parameters,
-      function (response) {
+      response => {
         if (response && response.items) {
           report.se.revisions = response.items;
           report.revision_count = response.items.length;
@@ -263,7 +264,7 @@
     getSE(
       type + "/" + report.post_id + "/flags/options",
       parameters,
-      function (response) {
+      response => {
         report.se.available_flags = response.items;
         report.has_flagged = response.items && response.items.some(f => !f.has_flagged && f.title === "spam");
 
@@ -306,9 +307,7 @@
     if (error) {
       ajaxCall.fail(error);
     } else {
-      ajaxCall.fail(function (jqXHR) {
-        fire.error("Error performing this AJAX call!", jqXHR);
-      });
+      ajaxCall.fail(jqXHR => fire.error("Error performing this AJAX call!", jqXHR));
     }
     if (always) {
       ajaxCall.always(always);
@@ -322,12 +321,12 @@
     setValue("readOnly", false);
     var afterGetToken = callback;
 
-    writeTokenPopup(function (metaSmokeCode) {
+    writeTokenPopup(metaSmokeCode => {
       if (metaSmokeCode && metaSmokeCode.length === 7) {
         $.ajax({
           url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fire.api.ms.key + "&code=" + metaSmokeCode,
           method: "GET"
-        }).done(function (data) {
+        }).done(data => {
           setValue("metasmokeWriteToken", data.token);
           toastr.success("Successfully obtained MetaSmoke write token!");
           closePopup();
@@ -335,7 +334,7 @@
           if (afterGetToken) {
             afterGetToken();
           }
-        }).error(function (jqXHR) {
+        }).error(jqXHR => {
           if (jqXHR.status === 404) {
             toastr.error("Metasmoke could not find a write token - did you authorize the app?");
           } else {
@@ -357,7 +356,7 @@
   // Chat message event listener. If SmokeDetector reports another post, decorate the message
   function chatListener(e) {
     if (e.event_type === 1 && e.user_id === fire.smokeDetectorId) {
-      setTimeout(function () {
+      setTimeout(() => {
         var message = $("#message-" + e.message_id);
         decorateMessage(message);
       });
@@ -403,9 +402,7 @@
 
   // Filter a jQuery list on the element text.
   function filterOnContents($object, text) {
-    return $object.filter(function () {
-      return $(this).text() === text;
-    });
+    return $object.filter((i, element) => $(element).text() === text);
   }
 
   // Set the toastr class
@@ -460,9 +457,7 @@
       e.preventDefault();
       $(".fire-popup-header a.button.focus")
         .fadeOut(100)           // Flash to indicate which button was selected.
-        .fadeIn(100, function () {
-          $(this).click();
-        });
+        .fadeIn(100, event => $(event.currentTarget).click());
     } else if (fire.buttonKeyCodes.indexOf(e.keyCode) >= 0 && !fire.settingsAreOpen) {
       e.preventDefault();
 
@@ -503,23 +498,19 @@
   }
 
   var clickHandlers = {
-    requestToken: function () {
-      window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank");
-    },
-    saveToken: function (input, callback) {
+    requestToken: () => window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fire.api.ms.key, "_blank"),
+    saveToken: (input, callback) => {
       var value = input.val();
       if (value && value.length === 7) {
         callback(value);
       }
     },
-    disableReadonly: function () {
+    disableReadonly: () => {
       closePopup();
       closePopup();
       getWriteToken();
     },
-    toggleReportReason: function () {
-      $(this).toggleClass("fire-show-reason");
-    }
+    toggleReportReason: event => $(event.currentTarget).toggleClass("fire-show-reason")
   };
 
   // Open a popup to enter the write token
@@ -546,9 +537,7 @@
           }))
           .append(button("Request Token", clickHandlers.requestToken))
           .append(input)
-          .append(button("Save", function () {
-            clickHandlers.saveToken(input, callback);
-          }))
+          .append(button("Save", () => clickHandlers.saveToken(input, callback)))
           .append(_("br"))
           .append(_("br"))
           .append(_("p", {
@@ -575,9 +564,7 @@
     var that = this;
 
     if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
-      getWriteToken(function () {
-        openReportPopup.call(that); // Open the popup later
-      });
+      getWriteToken(() => openReportPopup.call(that)); // Open the popup later
       return;
     }
 
@@ -653,7 +640,7 @@
         .append(d.body.replace(/<script/g, "&lt;script"))
       );
 
-    body.find("pre code").each(function () {
+    body.find("pre code").each(() => {
       this.innerHTML = this.innerHTML
         .replace(/>/g, "&gt;")
         .replace(/</g, "&lt;")
@@ -683,9 +670,11 @@
     expandLinksOnHover();
 
     $(document).keydown(keyboardShortcuts);
-    $(document).on("click", ".fire-popup-body pre", function () {
-      $(this).toggleClass("fire-expanded");
-    });
+    $(document).on(
+      "click",
+      ".fire-popup-body pre",
+      event => $(event.currentTarget).toggleClass("fire-expanded")
+    );
   }
 
   // Opens a popup to change fire's settings
@@ -721,9 +710,7 @@
           type: "number",
           value: fire.userData.toastrDuration,
           change: toastrDurationHandler,
-          blur: function () {
-            toastr.info("Notification duration updated");
-          }
+          blur: () => toastr.info("Notification duration updated")
         }))
         .append(" ms")
       );
@@ -808,16 +795,12 @@
     fire.sendingFeedback = false;
     if (fire.settingsAreOpen) {
       $(".fire-popup#fire-settings")
-        .fadeOut("fast", function () {
-          $(this).remove();
-        });
+        .fadeOut("fast", event => $(event.currentTarget).remove());
 
       delete fire.settingsAreOpen;
     } else {
       $(".fire-popup, .fire-popup-modal")
-        .fadeOut("fast", function () {
-          $(this).remove();
-        });
+        .fadeOut("fast", event => $(event.currentTarget).remove());
 
       $(document).off("keydown", keyboardShortcuts);
 
@@ -850,7 +833,7 @@
           type: "POST",
           url: ms.url + "w/post/" + data.id + "/feedback",
           data: {type: verdict, key: ms.key, token: token}
-        }).done(function () {
+        }).done(() => {
           var message = span("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
           if (verdict === "tpu-" && fire.userData.flag) {
             postMetaSmokeSpamFlag(data, ms, token, message.after("<br /><br />"));
@@ -858,23 +841,19 @@
             toastr.success(message);
             closePopup();
           }
-        }).error(function (jqXHR) {
+        }).error(jqXHR => {
           if (jqXHR.status === 401) {
             toastr.error("Can't send feedback to metasmoke - not authenticated.");
 
             clearValue("metasmokeWriteToken");
             var previous = closePopup();
 
-            getWriteToken(function () {
-              openReportPopup.call(previous); // Open the popup later
-            });
+            getWriteToken(() => openReportPopup.call(previous)); // Open the popup later
           } else {
             toastr.error("An error occurred sending post feedback to metasmoke.");
             console.error("An error occurred sending post feedback to metasmoke.", jqXHR);
           }
-        }).always(function () {
-          fire.sendingFeedback = false;
-        });
+        }).always(() => {fire.sendingFeedback = false;});
       }
     }
   }
@@ -892,7 +871,7 @@
         type: "POST",
         url: ms.url + "w/post/" + data.id + "/spam_flag",
         data: {key: ms.key, token: token}
-      }).done(function (response) {
+      }).done(response => {
         toastr.success(feedbackSuccess.after(span("Successfully flagged the post as \"spam\".")));
         closePopup();
 
@@ -904,7 +883,7 @@
           toastr.info("Backoff received");
           console.info(data, response);
         }
-      }).error(function (jqXHR) {
+      }).error(jqXHR => {
         toastr.success("Sent feedback \"<em>tpu-\"</em> to metasmoke."); // We came from a "feedback" success handler.
 
         if (jqXHR.status === 409) {
@@ -950,13 +929,12 @@
     }
 
     if (data.feedbacks) { // Has feedback
-      count = data.feedbacks.filter(function (f) {
-        return f.feedback_type === verdict;
-      }).length;
-      hasSubmittedFeedback = data.feedbacks.some(function (f) {
-        return f.feedback_type === verdict &&
-          f.user_name === fire.chatUser.name;
-      });
+      count = data.feedbacks.filter(
+        f => f.feedback_type === verdict
+      ).length;
+      hasSubmittedFeedback = data.feedbacks.some(
+        f => f.feedback_type === verdict && f.user_name === fire.chatUser.name
+      );
     }
 
     var suffix = count ? " (" + count + ")" : "";
@@ -964,7 +942,7 @@
 
     return _("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
-      click: function () {
+      click: () => {
         if (!data.has_sent_feedback ||
           (fire.userData.flag && !(data.has_flagged || data.is_deleted))
         ) {
@@ -1124,7 +1102,7 @@
 
   // Open the last report on [Ctrl]+[Space]
   function registerOpenLastReportKey() {
-    $(document).on("keydown", function (e) {
+    $(document).on("keydown", e => {
       if (e.keyCode === 32 && e.ctrlKey) {
         var button = $(".fire-button").last(); // .content:not(.ai-deleted)
         if (button && button.length > 0) {
@@ -1140,21 +1118,21 @@
   function registerAnchorHover() {
     var anchorSelector = "a[fire-tooltip]";
     $("body")
-      .on("mouseenter", anchorSelector, function () {
+      .on("mouseenter", anchorSelector, event => {
         $(".fire-tooltip").remove();
-        var that = $(this);
+        var that = $(event.currentTarget);
         that.after(_("span", "fire-tooltip", {
           text: that.attr("fire-tooltip")
         }));
-      }).on("mousemove", anchorSelector, function (e) {
+      }).on("mousemove", anchorSelector, event => {
         $(".fire-tooltip").css({
-          left: e.clientX + 20,
-          top: e.clientY + 5
+          left: event.clientX + 20,
+          top: event.clientY + 5
         });
       })
-      .on("mouseleave", anchorSelector, function () {
-        $(".fire-tooltip").remove();
-      });
+      .on("mouseleave", anchorSelector,
+        () => $(".fire-tooltip").remove()
+      );
 
     fire.log("Registered anchor hover tooltip.");
   }
@@ -1163,7 +1141,7 @@
   function registerWebSocket() {
     $.ajaxSetup({cache: true});
     $.getScript("//charcoal-se.org/userscripts/metapi.js?v=" + fire.metaData.version)
-      .then(function () {
+      .then(() => {
         metapi.watchSocket(fire.api.ms.key, socketOnMessage);
         $.ajaxSetup({cache: false});
 
@@ -1174,12 +1152,8 @@
   // Adds a property on `fire` that's stored in `localStorage`
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
-      get: function () {
-        return JSON.parse(localStorage.getItem(localStorageKey));
-      },
-      set: function (value) {
-        localStorage.setItem(localStorageKey, JSON.stringify(value));
-      }
+      get: () => JSON.parse(localStorage.getItem(localStorageKey)),
+      set: value => localStorage.setItem(localStorageKey, JSON.stringify(value))
     });
   }
 
@@ -1200,9 +1174,7 @@
   // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
   function showFireOnExistingMessages() {
     $("#getmore, #getmore-mine")
-      .click(function () {
-        decorateExistingMessages(500);
-      });
+      .click(() => decorateExistingMessages(500));
 
     decorateExistingMessages(0);
 
@@ -1214,15 +1186,12 @@
 
   // Decorate messages that exist on page load
   function decorateExistingMessages(timeout) {
-    setTimeout(function () {
+    setTimeout(() => {
       var chat = $("#chat");
-      chat.on("DOMSubtreeModified", function () {
+      chat.on("DOMSubtreeModified", () => {
         if (chat.html().length !== 0) { // Chat messages have loaded
           chat.off("DOMSubtreeModified");
-
-          $(fire.SDMessageSelector).each(function () {
-            decorateMessage(this);
-          });
+          $(fire.SDMessageSelector).each((...args) => decorateMessage(args[1]));
 
           fire.log("Decorated existing messages.");
         }
@@ -1232,10 +1201,9 @@
 
   // Gets a log wrapper for the specified console function.
   function getLogger(fn) {
-    return function () {
+    return (...args) => {
       if (fire.debug)
       {
-        var args = Array.prototype.slice.call(arguments);
         args.unshift(fire.logPrefix + fn + ":");
         console[fn].apply(console, args);
       }
@@ -1276,9 +1244,7 @@
   // Expands anchor elements in the report's body on hover, to show the href.
   function expandLinksOnHover() {
     $(".fire-popup-body a")
-      .each(function () {
-        $(this).attr("fire-tooltip", this.href);
-      });
+      .each(event => $(event.currentTarget).attr("fire-tooltip", this.href));
   }
 
   // Initializes localStorage
@@ -1316,10 +1282,10 @@
 
   // Gets the currently logged-in user.
   function getCurrentUser() {
-    setTimeout(function () { // This code was too fast for FireFox
+    setTimeout(() => { // This code was too fast for FireFox
       CHAT.RoomUsers
         .get(CHAT.CURRENT_USER_ID)
-        .done(function (user) {
+        .done(user => {
           fire.chatUser = user;
 
           fire.log("Current user found.");
