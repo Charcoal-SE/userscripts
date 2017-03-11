@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.4
+// @version     0.7.5
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -795,13 +795,15 @@
   function closePopup() {
     fire.sendingFeedback = false;
     if (fire.settingsAreOpen) {
-      $(".fire-popup#fire-settings")
-        .fadeOut("fast", element => $(element).remove());
+      let selector = ".fire-popup#fire-settings";
+      $(selector)
+        .fadeOut("fast", () => $(selector).remove());
 
       delete fire.settingsAreOpen;
     } else {
-      $(".fire-popup, .fire-popup-modal")
-        .fadeOut("fast", element => $(element).remove());
+      let selector = ".fire-popup, .fire-popup-modal";
+      $(selector)
+        .fadeOut("fast", () => $(selector).remove());
 
       $(document).off("keydown", keyboardShortcuts);
 
@@ -925,8 +927,13 @@
     var count;
     var hasSubmittedFeedback;
 
-    if (verdict === "naa-" && !data.is_answer) {
-      return $();
+    if (!data.is_answer) {
+      if (verdict === "naa-") {
+        return $();
+      }
+      if (verdict === "fp-") {
+        keyCode--; // For questions, there are only 3 buttons.
+      }
     }
 
     if (data.feedbacks) { // Has feedback
