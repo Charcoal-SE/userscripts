@@ -930,7 +930,6 @@
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
     let site = fire.sites[data.site];
-    debugger;
     if (!site.account) {
       toastr.info(feedbackSuccess.after(span("You don't have an account on this site, so you can't cast a spam flag.")));
       window.open(site.site_url + "/users/join");
