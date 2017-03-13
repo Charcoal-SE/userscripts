@@ -3,7 +3,7 @@
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Move "why" block up.
 * Add "Rude/Abusive" button.
-* Add verdict keyboard aliases.
+  * Implement SE "rude" feedback.
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling.
   * Respect passed "Backoff" params

@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.7
+// @version     0.7.8
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -53,6 +53,7 @@
       },
       smokeDetectorId: smokeDetectorId,
       SDMessageSelector: ".user-" + smokeDetectorId + " .message ",
+      openOnSiteCodes: keyCodesToArray(["6", "o"]),
       buttonKeyCodes: [],
       reportCache: {}
     };
@@ -528,15 +529,15 @@
         .removeClass("focus")
         .trigger("mouseleave");
 
-      var $button = $(".fire-popup-header a[fire-key=" + e.keyCode + "]:not([disabled])");
-      var button = $button[0];
+      let $button = $(".fire-popup-header a[fire-key~=" + e.keyCode + "]:not([disabled])");
+      let button = $button[0];
 
       if (button) {
         if (e.keyCode === 27) { // [Esc] key
           $button.click();
-        } else if (e.keyCode === 53) { // [5]: Open the report on the site
+        } else if (fire.openOnSiteCodes.indexOf(e.keyCode) >= 0) { // Open the report on the site
           window.open(button.href);
-        } else {                // [1-4] keys for feedback buttons
+        } else {                // [1-5] keys for feedback buttons
           var pos = button.getBoundingClientRect();
           $button
             .addClass("focus")
@@ -545,6 +546,11 @@
               clientX: pos.right - (button.offsetWidth + 20),
               clientY: pos.top + 20
             }));
+        }
+      } else {
+        let $button = $("a[fire-key~=" + e.keyCode + "]:not([disabled])");
+        if ($button[0]) {
+          $button.click();
         }
       }
     } else if (fire.settingsAreOpen && e.keyCode === 27) {
@@ -659,7 +665,7 @@
       href: d.link,
       target: "_blank",
       css: {"background-image": "url(" + (site ? site.icon_url : "//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png") + ")"},
-      "fire-key": 53,
+      "fire-key": fire.openOnSiteCodes,
       "fire-tooltip": "Show on site"
     });
 
@@ -667,15 +673,16 @@
 
     if (!fire.userData.readOnly) {
       top
-        .append(createFeedbackButton(d, 49, "tpu-", "tpu-", "True positive"))
-        .append(createFeedbackButton(d, 50, "tp-", "tp-", "Vandalism"))
-        .append(createFeedbackButton(d, 51, "naa-", "naa-", "Not an Answer / VLQ"))
-        .append(createFeedbackButton(d, 52, "fp-", "fp-", "False Positive"));
+        .append(createFeedbackButton(d, ["1", "k"], "spam", "tpu-", "True positive"))
+        .append(createFeedbackButton(d, ["2", "r"], "rude", "rude", "Rude / Abusive"))
+        .append(createFeedbackButton(d, ["3", "v"], "tp-", "tp-", "Vandalism"))
+        .append(createFeedbackButton(d, ["4", "n"], "naa-", "naa-", "Not an Answer / VLQ"))
+        .append(createFeedbackButton(d, ["5", "f"], "fp-", "fp-", "False Positive"));
     }
 
     top
-      .append(openOnSiteButton)
-      .append(createCloseButton(closePopup));
+      .append(createCloseButton(closePopup))
+      .append(openOnSiteButton);
 
     var postType = d.is_answer ? "Answer" : "Question";
     var body = _("div", "fire-popup-body")
@@ -716,8 +723,9 @@
 
     var settingsButton = _("a", "fire-settings-button", {
       html: emojiOrImage("gear"),
-      title: "FIRE Configuration",
-      click: openSettingsPopup
+      click: openSettingsPopup,
+      "fire-key": keyCodesToArray("s"),
+      "fire-tooltip": "FIRE Configuration"
     });
 
     popup
@@ -883,8 +891,8 @@
   }
 
   // Submit MS feedback
-  function postMetaSmokeFeedback(data, verdict) {
-    if (!fire.sendingFeedback) {
+  function postMetaSmokeFeedback(data, verdict, button) {
+    if (!fire.sendingFeedback && !$(button).attr("disabled")) {
       fire.sendingFeedback = true;
 
       var ms = fire.api.ms;
@@ -898,10 +906,17 @@
           closePopup();
         }
       } else {
+        let msVerdict = verdict;
+        if (verdict === "rude") {
+          msVerdict = "tpu-";
+          toastr.info("\"Rude / Abusive\" flagging isn't implemented yet.<br />" +
+            "If you wish to flag this as well, please select \"tpu-\"");
+        }
+
         $.ajax({
           type: "POST",
           url: ms.url + "w/post/" + data.id + "/feedback",
-          data: {type: verdict, key: ms.key, token: token}
+          data: {type: msVerdict, key: ms.key, token: token}
         }).done(() => {
           var message = span("Sent feedback \"<em>" + verdict + "\"</em> to metasmoke.");
           if (verdict === "tpu-" && fire.userData.flag) {
@@ -994,18 +1009,29 @@
     closePopup();
   }
 
+  // Structure the keyCodes Array.
+  function keyCodesToArray(keyCodes) {
+    if (!Array.isArray(keyCodes)) {
+      keyCodes = [keyCodes];
+    }
+
+    for (var i = 0; i < keyCodes.length; i++) {
+      keyCodes[i] = typeof keyCodes[i] === "number" ?
+        keyCodes[i] :
+        keyCodes[i].toUpperCase().charCodeAt(0);
+    }
+
+    return keyCodes;
+  }
+
   // Create a feedback button for the top of the popup
-  function createFeedbackButton(data, keyCode, text, verdict, tooltip) {
+  function createFeedbackButton(data, keyCodes, text, verdict, tooltip) {
     var count;
     var hasSubmittedFeedback;
+    let disabled = false;
 
     if (!data.is_answer) {
-      if (verdict === "naa-") {
-        return $();
-      }
-      if (verdict === "fp-") {
-        keyCode--; // For questions, there are only 3 buttons.
-      }
+      disabled = verdict === "naa-";
     }
 
     if (data.feedbacks) { // Has feedback
@@ -1022,11 +1048,11 @@
 
     return _("a", "button fire-feedback-button fire-" + verdict + cssClass, {
       text: text + suffix,
-      click: () => {
+      click: event => {
         if (!data.has_sent_feedback ||
           (fire.userData.flag && !(data.has_flagged || data.is_deleted))
         ) {
-          postMetaSmokeFeedback(data, verdict);
+          postMetaSmokeFeedback(data, verdict, event.currentTarget);
         } else {
           var performedAction;
           if (data.has_flagged) {
@@ -1043,8 +1069,8 @@
             });
         }
       },
-      disabled: data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag),
-      "fire-key": keyCode,
+      disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)),
+      "fire-key": keyCodesToArray(keyCodes),
       "fire-tooltip": tooltip + suffix
     });
   }
@@ -1055,7 +1081,7 @@
       text: "Close",
       title: "Close this popup",
       click: clickHandler,
-      "fire-key": 27 // escape key code
+      "fire-key": keyCodesToArray(27) // escape key code
     });
   }
 
@@ -1090,7 +1116,8 @@
     options.class = cssClass;
 
     if (options["fire-key"]) {
-      fire.buttonKeyCodes.push(options["fire-key"]);
+      fire.buttonKeyCodes = fire.buttonKeyCodes.concat(options["fire-key"]);
+      options["fire-key"] = options["fire-key"].join(" ");
     }
 
     return $("<" + tagName + "/>", options);

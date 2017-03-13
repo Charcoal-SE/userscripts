@@ -119,6 +119,7 @@ img.fire-emoji-large {
         }
 
         &.fire-tpu-,
+        &.fire-rude,
         &.fire-tp- { @include button-gradient($button-green); }
         &.fire-fp- { @include button-gradient($button-red); }
         &.fire-naa- { @include button-gradient($button-orange); }
@@ -133,8 +134,6 @@ img.fire-emoji-large {
       display: inline-block;
       height: 60px;
       position: relative;
-      top: -18px;
-      left: 4px;
       font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
       font-size: 30px;
       color: #444;
@@ -143,7 +142,7 @@ img.fire-emoji-large {
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
-      max-width: 275px;
+      max-width: 540px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
