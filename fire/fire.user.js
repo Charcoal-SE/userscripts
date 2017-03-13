@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.6
+// @version     0.7.7
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -57,11 +57,10 @@
       reportCache: {}
     };
 
-    registerLoggingFunctions(false);
-
+    registerLoggingFunctions();
     hasEmojiSupport();
     initLocalStorage(hOP, defaultLocalStorage);
-    getCurrentUser();
+    getCurrentChatUser();
     loadStackExchangeSites();
     injectExternalScripts();
     showFireOnExistingMessages();
@@ -140,7 +139,7 @@
   // Parse a report's loaded data
   function parseDataForReport(data, openAfterLoad, $this) {
     data.is_answer = data.link.indexOf("/a/") >= 0;
-    data.site = data.link.split(".com")[0].replace(/\.stackexchange|\/+/g, "");
+    data.site = parseSiteUrl(data.link);
     data.is_deleted = data.deleted_at !== null;
 
     data.has_auto_flagged = listHasCurrentUser(data.autoflagged) && data.autoflagged.flagged;
@@ -165,6 +164,12 @@
     if (openAfterLoad === true) {
       $this.click();
     }
+  }
+
+  // Parse a site url into a api parameter
+  function parseSiteUrl(url) {
+    return url.split(".com")[0]
+      .replace(/\.stackexchange|(https?:)?\/+/g, "");
   }
 
   // Loads a list of all Stack Exchange Sites.
@@ -194,6 +199,8 @@
 
           sites.storedAt = now; // Set the storage timestamp
           fire.sites = sites;   // Store the site list
+
+          loadCurrentSEUser();
 
           fire.log("Loaded Stack Exchange sites");
         });
@@ -278,6 +285,52 @@
 
         fire.log("Loaded a post's flag status", response);
       });
+  }
+
+  // Loads the current SE user and what sites they're registered at.
+  function loadCurrentSEUser(page) {
+    page = page || 1;
+    var parameters = {
+      page: page,
+      pagesize: 100,
+      filter: "!-rT(axL(",
+      auth: true
+    };
+
+    getSE(
+      "me/associated",
+      parameters,
+      response => parseUserResponse(response, page)
+    );
+  }
+
+  // Parse the user response.
+  function parseUserResponse(response, page) {
+    fire.log("Loaded the current user, page " + page + ":", response);
+    if (page === 1) {
+      fire.userSites = [];
+    }
+
+    fire.userSites = fire.userSites.concat(response.items);
+
+    if (response.has_more) {
+      loadCurrentSEUser(page + 1);
+    } else {
+      var accounts = fire.userSites;
+      var sites = fire.sites;
+
+      accounts.forEach(site => {
+        site.apiName = parseSiteUrl(site.site_url);
+
+        if (sites[site.apiName]) {
+          sites[site.apiName].account = site;
+        }
+      });
+
+      fire.userSites = accounts;
+      fire.sites = sites;
+      fire.log("Loaded all sites for the current user:", fire.userSites);
+    }
   }
 
   // get call on the Stack Exchange API
@@ -876,7 +929,14 @@
 
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
-    if (data.has_auto_flagged) {
+    let site = fire.sites[data.site];
+    debugger;
+    if (!site.account) {
+      toastr.info(feedbackSuccess.after(span("You don't have an account on this site, so you can't cast a spam flag.")));
+      window.open(site.site_url + "/users/join");
+    } else if (site.account.reputation < 15) {
+      toastr.info(feedbackSuccess.after(span("You don't have enough reputation on this site to cast a spam flag.")));
+    } else if (data.has_auto_flagged) {
       toastr.info(feedbackSuccess.after(span("You already autoflagged this post as spam.")));
     } else if (data.has_manual_flagged) {
       toastr.info(feedbackSuccess.after(span("You already flagged this post as spam.")));
@@ -914,7 +974,7 @@
           console.error(data, jqXHR);
         } else {
           if (jqXHR.responseText) {
-            var response = JSON.parse(jqXHR.responseText);
+            let response = JSON.parse(jqXHR.responseText);
 
             if (response.message === "Spam flag option not present") {
               toastr.info("This post could not be flagged.<br />" +
@@ -1180,12 +1240,13 @@
 
   // Registers logging functions on `fire`
   function registerLoggingFunctions(debug) {
-    fire.debug = debug;
+    if (typeof debug === "boolean") {
+      fire.debug = debug;
+    }
     fire.log = getLogger("log");
     fire.info = getLogger("info");
     fire.warn = getLogger("warn");
     fire.error = getLogger("error");
-    fire.logPrefix = (fire.useEmoji ? fire.emoji.fire + " " : "") + "FIRE ";
 
     if (fire.debug) {
       fire.info("Debug mode enabled.");
@@ -1225,7 +1286,8 @@
     return (...args) => {
       if (fire.debug)
       {
-        args.unshift(fire.logPrefix + fn + ":");
+        let logPrefix = (fire.useEmoji ? fire.emoji.fire + " " : "") + "FIRE ";
+        args.unshift(logPrefix + fn + ":");
         console[fn].apply(console, args);
       }
     };
@@ -1271,7 +1333,9 @@
   // Initializes localStorage
   function initLocalStorage(hOP, defaultStorage) {
     registerForLocalStorage(fire, "userData", "fire-user-data");
+    registerForLocalStorage(fire, "userSites", "fire-user-sites");
     registerForLocalStorage(fire, "sites", "fire-sites");
+    registerForLocalStorage(fire, "debug", "fire-debug-mode");
 
     if (fire.userData === null) {
       fire.userData = defaultStorage;
@@ -1302,7 +1366,7 @@
   }
 
   // Gets the currently logged-in user.
-  function getCurrentUser() {
+  function getCurrentChatUser() {
     setTimeout(() => { // This code was too fast for FireFox
       CHAT.RoomUsers
         .get(CHAT.CURRENT_USER_ID)
