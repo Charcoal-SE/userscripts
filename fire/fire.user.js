@@ -139,8 +139,28 @@
     }
   }
 
+  // Loads all MS data on the page;
+  function updateReportCache() {
+    let urls = $(".fire-button")
+      .map((index, element) => $(element).data("url"))
+      .toArray()
+      .filter(url => !fire.reportCache[url]) // Only get un-cached reports
+      .join(encodeURIComponent(";"));
+
+    var ms = fire.api.ms;
+    var url = ms.url + "posts/urls?key=" + ms.key + "&page=1&urls=" + urls;
+    $.get(url, response => {
+      console.log(response);
+      if (response && response.items) {
+        for (var i = 0; i < response.items.length; i++) {
+          parseDataForReport(response.items[i], false, null, true);
+        }
+      }
+    });
+  }
+
   // Parse a report's loaded data
-  function parseDataForReport(data, openAfterLoad, $this) {
+  function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.indexOf("/a/") >= 0;
     data.site = parseSiteUrl(data.link);
     data.is_deleted = data.deleted_at !== null;
@@ -153,7 +173,7 @@
       f => f.user_name === fire.chatUser.name
     );
 
-    var match = data.link.match(/\d+/);
+    let match = data.link.match(/\d+/);
     if (match && match[0]) {
       data.post_id = match[0];
     }
@@ -162,7 +182,9 @@
 
     fire.log("Loaded report data", data);
 
-    loadPost(data);
+    if (!skipLoadPost) {
+      loadPost(data);
+    }
 
     if (openAfterLoad === true) {
       $this.click();
@@ -1325,6 +1347,9 @@
           $(fire.SDMessageSelector).each((...args) => decorateMessage(args[1]));
 
           fire.log("Decorated existing messages.");
+
+          // TODO: Load SE data for each report
+          updateReportCache();
         }
       });
     }, timeout);
