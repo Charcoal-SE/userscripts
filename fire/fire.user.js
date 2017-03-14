@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.9
+// @version     0.7.10
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -944,13 +944,15 @@
 
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
+    /* TODO: Fix this.
     let site = fire.sites[data.site];
     if (!site.account) {
       toastr.info(feedbackSuccess.after(span("You don't have an account on this site, so you can't cast a spam flag.")));
       window.open(site.site_url + "/users/join");
     } else if (site.account.reputation < 15) {
       toastr.info(feedbackSuccess.after(span("You don't have enough reputation on this site to cast a spam flag.")));
-    } else if (data.has_auto_flagged) {
+    } else */
+    if (data.has_auto_flagged) {
       toastr.info(feedbackSuccess.after(span("You already autoflagged this post as spam.")));
     } else if (data.has_manual_flagged) {
       toastr.info(feedbackSuccess.after(span("You already flagged this post as spam.")));
