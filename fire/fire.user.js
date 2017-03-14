@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.13
+// @version     0.7.14
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -28,14 +28,6 @@
       "chat.meta.stackexchange.com": 266345,
     }[location.host];       // From which, we need the current host's ID
 
-    var defaultLocalStorage = {
-      blur: true,
-      flag: true,
-      toastrPosition: "top-right",
-      toastrDuration: 2500,
-      readOnly: false
-    };
-
     scope.fire = {
       metaData: GM_info.script || GM_info["Flag Instantly, Rapidly, Effortlessly"],
       openReportPopup: openReportPopupForMessage,
@@ -57,6 +49,15 @@
       openOnMSCodes: keyCodesToArray(["7", "m"]),
       buttonKeyCodes: [],
       reportCache: {}
+    };
+
+    var defaultLocalStorage = {
+      blur: true,
+      flag: true,
+      toastrPosition: "top-right",
+      toastrDuration: 2500,
+      readOnly: false,
+      version: fire.metaData.version
     };
 
     registerLoggingFunctions();
@@ -176,16 +177,19 @@
 
   // Loads a list of all Stack Exchange Sites.
   function loadStackExchangeSites() {
-    var now = new Date().valueOf();
-    var sites = fire.sites;
+    let now = new Date().valueOf();
+    let sites = fire.sites;
+    let hasUpdated = fire.metaData.version === fire.userData.version;
 
     // If there are no sites or the site data is over 7 days
-    if (!sites || sites.storedAt < (now - 604800000)) { // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
-      sites = {};                                       // Clear the site data
+    if (hasUpdated || !sites || sites.storedAt < (now - 604800000)) { // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
+      sites = {};                                                     // Clear the site data
+      delete localStorage["fire-sites"];
+      delete localStorage["fire-user-sites"];
     }
 
     if (!sites.storedAt) { // If the site data is empy
-      var parameters = {
+      let parameters = {
         filter: "!Fn4IB7S7Yq2UJF5Bh48LrjSpTc",
         pagesize: 10000
       };
@@ -195,7 +199,7 @@
         parameters,
         response => {
           for (var i = 0; i < response.items.length; i++) {
-            var item = response.items[i];
+            let item = response.items[i];
             sites[item.api_site_parameter] = item;
           }
 

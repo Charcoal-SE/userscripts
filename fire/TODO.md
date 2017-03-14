@@ -1,8 +1,8 @@
 # TODO:
-* ___Re-structure document___
+* Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Move "why" block up.
-* Add "Rude/Abusive" button.
+* Add "Rude/Abusive" button:
   * Implement SE "rude" feedback.
 * Load data through metapi.js for cross-script storage;
 * Improve MS feedback error handling.
