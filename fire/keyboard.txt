@@ -1,13 +1,14 @@
 Keyboard shortcuts:
 
-Spam:            [k] / [1]
-Rude / abusive:  [r] / [2]
-tp- / vandalism: [v] / [3]
-naa:             [n] / [4]
-False positive:  [f] / [5]
+Spam:               [k] / [1]
+Rude / abusive:     [r] / [2]
+tp- / vandalism:    [v] / [3]
+naa:                [n] / [4]
+False positive:     [f] / [5]
 
 Submit selected feedback: [Enter] / [Esc]
 
-Open on site:    [o] / [6]
-Settings:        [s]
-Close popup:     [Esc]
+Open on site:       [o] / [6]
+Open on MetaSmoke:  [m] / [7]
+Settings:           [s]
+Close popup:        [Esc]

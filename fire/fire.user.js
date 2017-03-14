@@ -54,7 +54,7 @@
       smokeDetectorId: smokeDetectorId,
       SDMessageSelector: ".user-" + smokeDetectorId + " .message ",
       openOnSiteCodes: keyCodesToArray(["6", "o"]),
-      openOnMSCodes: keyCodesToArray(["m"]),
+      openOnMSCodes: keyCodesToArray(["7", "m"]),
       buttonKeyCodes: [],
       reportCache: {}
     };
