@@ -148,7 +148,7 @@ img.fire-emoji-large {
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
-      width: 460px;
+      max-width: 460px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
