@@ -103,8 +103,14 @@ img.fire-emoji-large {
     a.button {
       margin: 0;
 
-      &.fire-close-button {
+      &.fire-metasmoke-button {
+        margin-right: 4px;
+      }
+
+      &.fire-close-button,
+      &.fire-metasmoke-button {
         float: right;
+        margin-bottom: -23px;
       }
 
       &.fire-feedback-button {
@@ -122,7 +128,8 @@ img.fire-emoji-large {
         &.fire-tp- { @include button-gradient($button-green); }
         &.fire-fp- { @include button-gradient($button-red); }
         &.fire-naa- { @include button-gradient($button-orange); }
-        &.focus { @include button-gradient($button-blue); }
+        &.focus,
+        &.fire-metasmoke { @include button-gradient($button-blue); }
       }
     }
 
@@ -141,7 +148,7 @@ img.fire-emoji-large {
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
-      max-width: 540px;
+      width: 540px;
       overflow: hidden;
       text-overflow: ellipsis;
     }

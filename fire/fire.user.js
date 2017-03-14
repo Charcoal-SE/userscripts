@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.10
+// @version     0.7.11
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -54,6 +54,7 @@
       smokeDetectorId: smokeDetectorId,
       SDMessageSelector: ".user-" + smokeDetectorId + " .message ",
       openOnSiteCodes: keyCodesToArray(["6", "o"]),
+      openOnMSCodes: keyCodesToArray(["m"]),
       buttonKeyCodes: [],
       reportCache: {}
     };
@@ -535,7 +536,7 @@
       if (button) {
         if (e.keyCode === 27) { // [Esc] key
           $button.click();
-        } else if (fire.openOnSiteCodes.indexOf(e.keyCode) >= 0) { // Open the report on the site
+        } else if (fire.openOnSiteCodes.indexOf(e.keyCode) >= 0 || fire.openOnMSCodes.indexOf(e.keyCode) >= 0) { // Open the report on the site
           window.open(button.href);
         } else {                // [1-5] keys for feedback buttons
           var pos = button.getBoundingClientRect();
@@ -607,8 +608,8 @@
           .append(button("Request Token", clickHandlers.requestToken))
           .append(input)
           .append(button("Save", () => clickHandlers.saveToken(input, callback)))
-          .append(_("br"))
-          .append(_("br"))
+          .append(_br())
+          .append(_br())
           .append(_("p", {
             html: "Alternatively, if you're not a \"Reviewer\", you can run FIRE in read-only mode by disabling feedback.<br />" +
                   "You will still be able to view reports."
@@ -669,7 +670,20 @@
       "fire-tooltip": "Show on site"
     });
 
-    var top = _("p", "fire-popup-header");
+    var openOnMSButton = _("a", "button fire-metasmoke-button", {
+      text: "MS",
+      href: "http://m.erwaysoftware.com/posts/by-url?url=" + d.link,
+      target: "_blank",
+      "fire-key": fire.openOnMSCodes,
+      "fire-tooltip": "Open on MetaSmoke"
+    });
+
+    var top = _("p", "fire-popup-header")
+      .append(createCloseButton(closePopup))
+      .append(openOnMSButton)
+      .append(openOnSiteButton)
+      .append(_br())
+      .after(_br());
 
     if (!fire.userData.readOnly) {
       top
@@ -679,10 +693,6 @@
         .append(createFeedbackButton(d, ["4", "n"], "naa-", "naa-", "Not an Answer / VLQ"))
         .append(createFeedbackButton(d, ["5", "f"], "fp-", "fp-", "False Positive"));
     }
-
-    top
-      .append(createCloseButton(closePopup))
-      .append(openOnSiteButton);
 
     var postType = d.is_answer ? "Answer" : "Question";
     var body = _("div", "fire-popup-body")
@@ -779,7 +789,7 @@
         _("span", {
           text: "Notification popup duration:"
         })
-        .append(_("br"))
+        .append(_br())
         .append(_("input", {
           id: "toastr_duration",
           type: "number",
@@ -810,7 +820,7 @@
 
     var disableReadonlyButton = $();
     if (fire.userData.readOnly) {
-      disableReadonlyButton = _("br").after(
+      disableReadonlyButton = _br().after(
         button("Disable read-only mode", clickHandlers.disableReadonly)
       );
     }
@@ -818,7 +828,7 @@
     var requestStackExchangeTokenButton = $();
     if (!fire.userData.stackexchangeWriteToken) {
       requestStackExchangeTokenButton = _("p", "fire-request-write-token")
-        .append(_("br"))
+        .append(_br())
         .append(_("h3", {text: "Stack Exchange write token:"}))
         .append(_("p", {html:
           "Authorize FIRE with your Stack Exchange account.<br />" +
@@ -828,10 +838,10 @@
     }
 
     var positionSelector = _("div")
-      .append(_("br"))
+      .append(_br())
       .append(
         _("span", {text: "Notification popup position:"})
-          .append(_("br"))
+          .append(_br())
           .append(positionSelect)
         );
 
@@ -842,7 +852,7 @@
             "Enable blur on popup background.",
             "Popup blur:"
           ))
-          .append(_("br"))
+          .append(_br())
           .append(createSettingscheckBox("flag", fire.userData.flag, flagOptionClickHandler,
             "Also submit \"Spam\" flag with \"tpu-\" feedback.",
             "Flag on feedback:")
@@ -944,15 +954,13 @@
 
   // Flag the post as spam
   function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
-    /* TODO: Fix this.
     let site = fire.sites[data.site];
     if (!site.account) {
       toastr.info(feedbackSuccess.after(span("You don't have an account on this site, so you can't cast a spam flag.")));
       window.open(site.site_url + "/users/join");
     } else if (site.account.reputation < 15) {
       toastr.info(feedbackSuccess.after(span("You don't have enough reputation on this site to cast a spam flag.")));
-    } else */
-    if (data.has_auto_flagged) {
+    } else if (data.has_auto_flagged) {
       toastr.info(feedbackSuccess.after(span("You already autoflagged this post as spam.")));
     } else if (data.has_manual_flagged) {
       toastr.info(feedbackSuccess.after(span("You already flagged this post as spam.")));
@@ -1083,7 +1091,8 @@
       text: "Close",
       title: "Close this popup",
       click: clickHandler,
-      "fire-key": keyCodesToArray(27) // escape key code
+      "fire-tooltip": "Close popup",
+      "fire-key": keyCodesToArray(27) // escape key code,
     });
   }
 
@@ -1123,6 +1132,11 @@
     }
 
     return $("<" + tagName + "/>", options);
+  }
+
+  // Create a linebreak
+  function _br() {
+    return _("br");
   }
 
   // Create a `<span>` with the specified contents.
