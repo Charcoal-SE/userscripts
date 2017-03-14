@@ -6,7 +6,7 @@
 // @contributor angussidney
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.13.0
+// @version     1.14.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -26,6 +26,7 @@
 // @grant       none
 // ==/UserScript==
 /* global fdsc, $, xdLocalStorage, confirm */
+/* eslint-disable max-nested-callbacks */
 
 (function () {
   "use strict";
@@ -332,6 +333,12 @@
                   var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
                   var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
                   var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
+                  var writeTokenButton = false;
+
+                  if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
+                    status += " - <a href='#' id='get-write-token'>get write token</a></div>";
+                    writeTokenButton = true;
+                  }
 
                   if (isFlagged || isAutoflagged) {
                     status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
@@ -349,6 +356,18 @@
                   registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
                   // On click of the confirm autoflag
                   registerFeedbackButton("#autoflag-tp", "tpu-", "Reporting as true positive");
+
+                  if (writeTokenButton) {
+                    $("#get-write-token").on("click", function (ev) {
+                      ev.preventDefault();
+                      fdsc.getWriteToken(false, function () {
+                        console.log(clickEvent);
+
+                        $(".popup-close a").click();
+                        $(clickEvent.currentTarget).click();
+                      }); // Add a "Get write token" link.
+                    });
+                  }
                 } else {
                   fdsc.postFound = false;
                 }
