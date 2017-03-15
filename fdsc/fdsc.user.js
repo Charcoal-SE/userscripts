@@ -7,8 +7,8 @@
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
 // @version     1.14.0
-// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
-// @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc.user.js
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
+// @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://*.stackexchange.com/*
 // @match       *://*.stackoverflow.com/*

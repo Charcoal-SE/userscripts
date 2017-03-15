@@ -8,8 +8,8 @@
 // @contributor ArtOfCode
 // @contributor Cerbrus
 // @version     0.12.3
-// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
-// @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging.user.js
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
+// @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
@@ -28,7 +28,7 @@
   // Inject CSS
   var css = window.document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "//charcoal-se.org/userscripts/autoflagging.css";
+  css.href = "//charcoal-se.org/userscripts/autoflagging/autoflagging.css";
   document.head.appendChild(css);
 
   // Load the Emoji support script
