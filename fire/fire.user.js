@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.8.0
+// @version     0.8.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -724,7 +724,7 @@
     if (!fire.userData.readOnly) {
       top
         .append(createFeedbackButton(d, ["1", "k"], "spam", "tpu-", "True positive"))
-        .append(createFeedbackButton(d, ["2", "r"], "rude", "rude", "Rude / Abusive"))
+        .append(createFeedbackButton(d, ["2", "r"], "rude", "tpu-", "Rude / Abusive"))
         .append(createFeedbackButton(d, ["3", "v"], "tp-", "tp-", "Vandalism"))
         .append(createFeedbackButton(d, ["4", "n"], "naa-", "naa-", "Not an Answer / VLQ"))
         .append(createFeedbackButton(d, ["5", "f"], "fp-", "fp-", "False Positive"));
