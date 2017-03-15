@@ -15,7 +15,19 @@
       "camelcase": 0,
       "max-params": ["warn", 5],
       "linebreak-style": "off",
-      "curly": ["error", "multi-or-nest", "consistent"]
+      "curly": ["error", "multi-or-nest", "consistent"],
+      "no-console": "error",
+      "no-extra-parens": "error",
+      "no-prototype-builtins": "error",
+      "complexity": ["error", 10],
+      "consistent-return": "error",
+      "no-else-return": "error",
+      "no-empty-function": "error",
+      "no-magic-numbers": ["error", {
+        "ignore": [0, 1, 2],
+        "ignoreArrayIndexes": true
+      }],
+      "vars-on-top": "info"
     },
     "globals": [
       "fire",

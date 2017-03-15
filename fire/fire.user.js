@@ -39,6 +39,7 @@
           clientId: 9136
         }
       },
+      siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       smokeDetectorId,
       SDMessageSelector: `.user-${smokeDetectorId} .message `,
       openOnSiteCodes: keyCodesToArray(['6', 'o']),
@@ -57,6 +58,7 @@
       version: fire.metaData.version
     };
 
+    setFireConstants();
     registerLoggingFunctions();
     hasEmojiSupport();
     initLocalStorage(hOP, defaultLocalStorage);
@@ -171,8 +173,8 @@
     let sites = fire.sites;
 
     // If there are no sites or the site data is over 7 days
-    if (hasUpdated || !sites || sites.storedAt < (now - 604800000)) { // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
-      sites = {};                                                     // Clear the site data
+    if (hasUpdated || !sites || sites.storedAt < now - fire.siteDataCacheTime) {
+      sites = {}; // Clear the site data
       delete localStorage['fire-sites'];
       delete localStorage['fire-user-sites'];
     }
@@ -339,7 +341,7 @@
   // AJAX call on the Stack Exchange API
   function stackExchangeAjaxCall(method, parameters, {call, success, error, always}) {
     const se = fire.api.se;
-    const type = (call === $.get ? 'get' : 'post');
+    const type = call === $.get ? 'get' : 'post';
 
     parameters = parameters || {};
 
@@ -350,7 +352,7 @@
       delete parameters.auth;
     } else if (parameters.auth) {
       fire.warn(`Auth is required for this API call, but was not available.\n"${type}": ${method}`);
-      return;
+      return null;
     }
 
     const ajaxCall = call(se.url + method, parameters);
@@ -375,7 +377,7 @@
     const afterGetToken = callback;
 
     writeTokenPopup(metaSmokeCode => {
-      if (metaSmokeCode && metaSmokeCode.length === 7) {
+      if (metaSmokeCode && metaSmokeCode.length === fire.constants.metaSmokeCodeLength) {
         $.ajax({
           url: `https://metasmoke.erwaysoftware.com/oauth/token?key=${fire.api.ms.key}&code=${metaSmokeCode}`,
           method: 'GET'
@@ -387,7 +389,7 @@
           if (afterGetToken)
             afterGetToken();
         }).error(({status}) => {
-          if (status === 404)
+          if (status === fire.constants.http.notFound)
             toastr.error('Metasmoke could not find a write token - did you authorize the app?');
           else
             toastr.error('An unknown error occurred during OAuth with metasmoke.');
@@ -511,13 +513,14 @@
 
   // Handle keypress events for the popup
   function keyboardShortcuts(e) {
-    if (e.keyCode === 13 || e.keyCode === 32) { // [Enter] key or spacebar
+    const c = fire.constants;
+    if (e.keyCode === c.keys.enter || e.keyCode === c.keys.space) {
       e.preventDefault();
 
       const selector = '.fire-popup-header a.button.focus';
       $(selector)
-        .fadeOut(100)           // Flash to indicate which button was selected.
-        .fadeIn(100, () => $(selector).click());
+        .fadeOut(c.buttonFade)           // Flash to indicate which button was selected.
+        .fadeIn(c.buttonFade, () => $(selector).click());
     } else if (fire.buttonKeyCodes.includes(e.keyCode) && !fire.settingsAreOpen) {
       e.preventDefault();
 
@@ -529,7 +532,7 @@
       const button = $button[0];
 
       if (button) {
-        if (e.keyCode === 27) { // [Esc] key
+        if (e.keyCode === c.keys.esc) { // [Esc] key
           $button.click();
         } else if (fire.openOnSiteCodes.includes(e.keyCode) || fire.openOnMSCodes.includes(e.keyCode)) { // Open the report on the site
           window.open(button.href);
@@ -539,8 +542,8 @@
             .addClass('focus')
             .trigger('mouseenter')
             .trigger($.Event('mousemove', { // eslint-disable-line new-cap
-              clientX: pos.right - (button.offsetWidth + 20),
-              clientY: pos.top + 20
+              clientX: pos.right - (button.offsetWidth + c.tooltipOffset),
+              clientY: pos.top + c.tooltipOffset
             }));
         }
       } else {
@@ -548,7 +551,7 @@
         if ($button[0])
           $button.click();
       }
-    } else if (fire.settingsAreOpen && e.keyCode === 27) {
+    } else if (fire.settingsAreOpen && e.keyCode === c.keys.esc) {
       closePopup();
     }
   }
@@ -565,7 +568,7 @@
     requestToken: () => window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank'),
     saveToken: (input, callback) => {
       const value = input.val();
-      if (value && value.length === 7)
+      if (value && value.length === fire.constants.metaSmokeCodeLength)
         callback(value);
     },
     disableReadonly: () => {
@@ -590,7 +593,7 @@
       .click(closePopup);
 
     _('div', 'fire-popup')
-      .css({top: '5%', left: w - 300})
+      .css({top: '5%', left: w - fire.constants.halfPopupWidth})
       .append(
         _('div', 'fire-popup-header')
           .append(_('p', {
@@ -619,7 +622,7 @@
   }
 
   // Build a popup and show it.
-  function openReportPopup() {
+  function openReportPopup() { // eslint-disable-line complexity
     if (fire.isOpen && $('.fire-popup').length > 0)
       return; // Don't open the popup twice.
 
@@ -644,14 +647,14 @@
     }
 
     if (typeof d === 'undefined')
-      console.log('Sometimes, d seems to be undefined', $that, d);
+      fire.log('Sometimes, d seems to be undefined', $that, d);
 
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const site = fire.sites[d.site];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
 
     const popup = _('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
-      .css({top: '5%', left: w - 300});
+      .css({top: '5%', left: w - fire.constants.halfPopupWidth});
 
     const openOnSiteButton = _('a', 'fire-site-logo', {
       html: site ? site.name : d.site,
@@ -766,7 +769,7 @@
     const popup = _('div', 'fire-popup', {
       id: 'fire-settings'
     })
-    .css({top: '5%', left: w - 300});
+    .css({top: '5%', left: w - fire.constants.halfPopupWidth});
 
     const top = _('p', 'fire-popup-header')
       .append(
@@ -893,6 +896,8 @@
 
       return previous; // Return the previously closed popup's button so it can be re-opened
     }
+
+    return null;
   }
 
   // Submit MS feedback
@@ -931,7 +936,7 @@
             closePopup();
           }
         }).error(jqXHR => {
-          if (jqXHR.status === 401) {
+          if (jqXHR.status === fire.constants.http.unauthorized) {
             toastr.error('Can\'t send feedback to metasmoke - not authenticated.');
 
             clearValue('metasmokeWriteToken');
@@ -940,7 +945,7 @@
             getWriteToken(() => openReportPopup.call(previous)); // Open the popup later
           } else {
             toastr.error('An error occurred sending post feedback to metasmoke.');
-            console.error('An error occurred sending post feedback to metasmoke.', jqXHR);
+            fire.error('An error occurred sending post feedback to metasmoke.', jqXHR);
           }
         }).always(() => {
           fire.sendingFeedback = false;
@@ -981,12 +986,12 @@
           // re-execute any pending requests that were submitted during that time, afterwards.
           debugger; // eslint-disable-line no-debugger
           toastr.info('Backoff received');
-          console.info(data, response);
+          fire.info('Backoff received', data, response);
         }
       }).error(jqXHR => {
         toastr.success('Sent feedback <em>"tpu-"</em> to metasmoke.'); // We came from a "feedback" success handler.
 
-        if (jqXHR.status === 409) {
+        if (jqXHR.status === fire.constants.http.conflict) {
           // https://metasmoke.erwaysoftware.com/authentication/status
           // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
           toastr.error(
@@ -995,7 +1000,7 @@
             'Please open <em><a href="https://metasmoke.erwaysoftware.com/authentication/status" target="_blank">this page</a></em> to authenticate with Stack Exchange.',
             null,
             {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
-          console.error(data, jqXHR);
+          fire.error('Not write-authenticated', data, jqXHR);
         } else {
           if (jqXHR.responseText) {
             const response = JSON.parse(jqXHR.responseText);
@@ -1010,7 +1015,7 @@
 
           // will give you a 500 with status: 'failed' and a message if the spam flag fails;
           toastr.error('Something went wrong while attempting to submit a spam flag');
-          console.error(data, jqXHR);
+          fire.error('Something went wrong while attempting to submit a spam flag', data, jqXHR);
           fire.sendingFeedback = false;
         }
       });
@@ -1059,7 +1064,7 @@
       text: text + suffix,
       click: ({currentTarget}) => {
         if (!data.has_sent_feedback ||
-          (fire.userData.flag && !(data.has_flagged || data.is_deleted))
+          (fire.userData.flag && !(data.has_flagged || data.is_deleted)) // eslint-disable-line no-extra-parens
         ) {
           postMetaSmokeFeedback(data, verdict, currentTarget);
         } else {
@@ -1076,7 +1081,7 @@
             });
         }
       },
-      disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)),
+      disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)), // eslint-disable-line no-extra-parens
       'fire-key': keyCodesToArray(keyCodes),
       'fire-tooltip': tooltip + suffix
     });
@@ -1089,7 +1094,7 @@
       title: 'Close this popup',
       click: clickHandler,
       'fire-tooltip': 'Close popup',
-      'fire-key': keyCodesToArray(27) // escape key code,
+      'fire-key': keyCodesToArray(fire.constants.keys.esc) // escape key code,
     });
   }
 
@@ -1153,26 +1158,26 @@
   function hasEmojiSupport() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+    const smiley = fire.constants.emoji.smile; // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
 
     ctx.textBaseline = 'top';
     ctx.font = '32px Arial';
     ctx.fillText(smiley, 0, 0);
 
-    fire.useEmoji = ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
+    fire.useEmoji = ctx.getImageData(fire.constants.emojiSize, fire.constants.emojiSize, 1, 1).data[0] !== 0;
 
     fire.log('Emoji support detected:', fire.useEmoji);
   }
 
   // Returns the emoji if it's supported. Otherwise, return a fallback image.
   function emojiOrImage(emoji, large) {
-    emoji = fire.emoji[emoji] || emoji;
+    emoji = fire.constants.emoji[emoji] || emoji;
 
     if (fire.useEmoji)
       return $(document.createTextNode(emoji));
 
     const url = 'https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/';
-    const hex = emoji.codePointAt(0).toString(16);
+    const hex = emoji.codePointAt(0).toString(fire.constants.hex);
 
     const emojiImage = _('img', `fire-emoji${large ? '-large' : ''}`, {
       src: `${url + hex}.png`,
@@ -1237,7 +1242,7 @@
   // Open the last report on [Ctrl]+[Space]
   function registerOpenLastReportKey() {
     $(document).on('keydown', ({keyCode, ctrlKey}) => {
-      if (keyCode === 32 && ctrlKey) {
+      if (keyCode === fire.constants.keys.space && ctrlKey) {
         const button = $('.fire-button').last(); // .content:not(.ai-deleted)
         if (button && button.length > 0)
           loadDataForReport.call(button, true);
@@ -1259,8 +1264,8 @@
         }));
       }).on('mousemove', anchorSelector, ({clientX, clientY}) => {
         $('.fire-tooltip').css({
-          left: clientX + 20,
-          top: clientY + 5
+          left: clientX + fire.constants.tooltipOffset,
+          top: clientY + fire.constants.tooltipOffsetSmall
         });
       })
       .on('mouseleave', anchorSelector,
@@ -1295,7 +1300,7 @@
   // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
   function showFireOnExistingMessages() {
     $('#getmore, #getmore-mine')
-      .click(() => decorateExistingMessages(500));
+      .click(() => decorateExistingMessages(fire.constants.loadAllMessagesDelay));
 
     decorateExistingMessages(0);
 
@@ -1324,9 +1329,9 @@
   function getLogger(fn) {
     return (...args) => {
       if ((fire.userData || localStorage['fire-user-data']).debug) {
-        const logPrefix = `${fire.useEmoji ? `${fire.emoji.fire} ` : ''}FIRE `;
+        const logPrefix = `${fire.useEmoji ? `${fire.constants.emoji.fire} ` : ''}FIRE `;
         args.unshift(`${logPrefix + fn}:`);
-        console[fn](...args);
+        console[fn](...args); // eslint-disable-line no-console
       }
     };
   }
@@ -1353,7 +1358,7 @@
         } else if (info.not_flagged) {  // Not flagged
           url = info.not_flagged.post.link;
         } else {
-          console.log('Socket message: ', info);
+          fire.log('Socket message: ', info);
         }
 
         delete fire.reportCache[url]; // Remove this url from the cache, if it's in there.
@@ -1415,5 +1420,30 @@
           fire.log('Current user found.');
         });
     });
+  }
+
+  // Sets constants
+  function setFireConstants() {
+    fire.constants = {
+      keys: {
+        enter: 13,
+        esc: 27,
+        space: 32
+      },
+      http: {
+        unauthorized: 401,
+        notFound: 404,
+        conflict: 409
+      },
+      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄'},
+      emojiSize: 16,
+      hex: 16,
+      metaSmokeCodeLength: 7,
+      buttonFade: 100,
+      loadAllMessagesDelay: 500,
+      tooltipOffset: 20,
+      tooltipOffsetSmall: 5,
+      halfPopupWidth: 300
+    };
   }
 })();
