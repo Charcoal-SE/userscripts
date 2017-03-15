@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.15
+// @version     0.7.16
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -54,6 +54,7 @@
     var defaultLocalStorage = {
       blur: true,
       flag: true,
+      debug: false,
       toastrPosition: "top-right",
       toastrDuration: 2500,
       readOnly: false,
@@ -499,23 +500,33 @@
 
   // Set the "Blur" option
   function blurOptionClickHandler() {
-    var value = $(this).is(":checked");
-
-    var data = fire.userData;
-    data.blur = value;
-    $("#container").toggleClass("fire-blur", data.blur);
-    toastr.info("Blur " + (data.blur ? "en" : "dis") + "abled.");
-    fire.userData = data;
+    boolOptionClickHandler(this, "Blur", "blur", () => {
+      $("#container").toggleClass("fire-blur", fire.userData.blur);
+    });
   }
 
   // Set the "Flag" option
   function flagOptionClickHandler() {
-    var value = $(this).is(":checked");
+    boolOptionClickHandler(this, "Flagging on \"tpu-\" feedback", "flag");
+  }
+
+    // Set the "Debug" option
+  function debugOptionClickHandler() {
+    boolOptionClickHandler(this, "Debug mode", "debug");
+  }
+
+  // Set a bool option
+  function boolOptionClickHandler(that, message, key, callback) {
+    var value = $(that).is(":checked");
 
     var data = fire.userData;
-    data.flag = value;
-    toastr.info("Flagging on \"tpu-\" feedback " + (data.flag ? "en" : "dis") + "abled.");
+    data[key] = value;
+    toastr.info(message + " " + (value ? "en" : "dis") + "abled.");
     fire.userData = data;
+
+    if (callback) {
+      callback();
+    }
   }
 
   // Handle keypress events for the popup
@@ -860,6 +871,11 @@
           .append(createSettingscheckBox("flag", fire.userData.flag, flagOptionClickHandler,
             "Also submit \"Spam\" flag with \"tpu-\" feedback.",
             "Flag on feedback:")
+          )
+          .append(_br())
+          .append(createSettingscheckBox("debug", fire.userData.debug, debugOptionClickHandler,
+            "Enable FIRE logging in developer console.",
+            "Debug mode:")
           )
           .append(disableReadonlyButton)
       )
@@ -1288,18 +1304,11 @@
   }
 
   // Registers logging functions on `fire`
-  function registerLoggingFunctions(debug) {
-    if (typeof debug === "boolean") {
-      fire.debug = debug;
-    }
+  function registerLoggingFunctions() {
     fire.log = getLogger("log");
     fire.info = getLogger("info");
     fire.warn = getLogger("warn");
     fire.error = getLogger("error");
-
-    if (fire.debug) {
-      fire.info("Debug mode enabled.");
-    }
   }
 
   // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
@@ -1333,7 +1342,7 @@
   // Gets a log wrapper for the specified console function.
   function getLogger(fn) {
     return (...args) => {
-      if (fire.debug)
+      if ((fire.userData || localStorage["fire-user-data"]).debug)
       {
         let logPrefix = (fire.useEmoji ? fire.emoji.fire + " " : "") + "FIRE ";
         args.unshift(logPrefix + fn + ":");
@@ -1384,7 +1393,10 @@
     registerForLocalStorage(fire, "userData", "fire-user-data");
     registerForLocalStorage(fire, "userSites", "fire-user-sites");
     registerForLocalStorage(fire, "sites", "fire-sites");
-    registerForLocalStorage(fire, "debug", "fire-debug-mode");
+
+    if (fire.userData.debug) {
+      fire.info("Debug mode enabled.");
+    }
 
     if (fire.userData === null) {
       fire.userData = defaultStorage;
