@@ -12,7 +12,7 @@
 
 window.csslib = {
   createSheet: function () {
-    var style = document.createElement("style");
+    var style = document.createElement("style")
     style.appendChild(document.createTextNode(""));
     document.head.appendChild(style);
     return style.sheet;
@@ -43,7 +43,7 @@ var userscript = function ($) {
     background: "#333"
   });
 
-  csslib.addRule(sheet, ".col-md-10 a:not(.btn), .col-md-10 a:not(.btn):visited", 0, {
+  csslib.addRule(sheet, '.col-md-10 a:not(.btn), .col-md-10 a:not(.btn):visited', 0, {
     color: "#63a0d4"
   });
   csslib.addRule(sheet, ".col-md-10 a:not(.btn):hover, .col-md-10 a:not(.btn):active", 0, {
