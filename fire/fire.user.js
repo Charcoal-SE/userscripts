@@ -985,7 +985,7 @@
       $.ajax({
         type: "POST",
         url: `${url}w/post/${data.id}/spam_flag`,
-        data: {key: key, token}
+        data: {key, token}
       }).done(response => {
         toastr.success(feedbackSuccess.after(span("Successfully flagged the post as \"spam\".")));
         closePopup();
