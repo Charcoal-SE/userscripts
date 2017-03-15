@@ -1,0 +1,23 @@
+{
+  "xo": {
+    "space": true,
+    "envs": [
+      "browser",
+      "es6",
+      "jquery",
+      "greasemonkey"
+    ],
+    "rules": {
+      "quotes": ["error", "single", {"avoidEscape": true}],
+      "camelcase": 0,
+      "max-params": ["warn", 6],
+      "linebreak-style": "off"
+    },
+    "globals": [
+      "fire",
+      "metapi",
+      "toastr",
+      "CHAT"
+    ]
+  }
+}
