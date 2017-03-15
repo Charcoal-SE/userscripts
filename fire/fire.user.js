@@ -26,8 +26,6 @@
 
     scope.fire = {
       metaData: GM_info.script || GM_info['Flag Instantly, Rapidly, Effortlessly'],
-      openReportPopup: openReportPopupForMessage,
-      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️'},
       api: {
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // this script's MetaSmoke API key
@@ -39,8 +37,8 @@
           clientId: 9136
         }
       },
-      siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       smokeDetectorId,
+      openReportPopup: openReportPopupForMessage,
       SDMessageSelector: `.user-${smokeDetectorId} .message `,
       openOnSiteCodes: keyCodesToArray(['6', 'o']),
       openOnMSCodes: keyCodesToArray(['7', 'm']),
@@ -173,7 +171,7 @@
     let sites = fire.sites;
 
     // If there are no sites or the site data is over 7 days
-    if (hasUpdated || !sites || sites.storedAt < now - fire.siteDataCacheTime) {
+    if (hasUpdated || !sites || sites.storedAt < now - fire.constants.siteDataCacheTime) {
       sites = {}; // Clear the site data
       delete localStorage['fire-sites'];
       delete localStorage['fire-user-sites'];
@@ -1437,6 +1435,7 @@
       },
       emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄'},
       emojiSize: 16,
+      siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,
       metaSmokeCodeLength: 7,
       buttonFade: 100,
