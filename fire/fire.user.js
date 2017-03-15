@@ -38,12 +38,13 @@
         }
       },
       smokeDetectorId,
-      openReportPopup: openReportPopupForMessage,
       SDMessageSelector: `.user-${smokeDetectorId} .message `,
       openOnSiteCodes: keyCodesToArray(['6', 'o']),
       openOnMSCodes: keyCodesToArray(['7', 'm']),
       buttonKeyCodes: [],
-      reportCache: {}
+      reportCache: {},
+      openReportPopupForMessage,
+      decorateMessage
     };
 
     const defaultLocalStorage = {
@@ -454,17 +455,20 @@
         else
           reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
 
-        if (!reportedUrl.startsWith('//github.com') && !reportedUrl.includes('erwaysoftware.com')) {
-          const fireButton = _('span', 'fire-button', {
-            html: emojiOrImage('fire'),
-            click: openReportPopup
-          })
-          .data('url', reportedUrl);
+        if (reportedUrl.startsWith('//github.com') ||
+          reportedUrl.includes('erwaysoftware.com') ||
+          reportedUrl.includes('/users/'))
+          return;
 
-          reportLink
-            .after(fireButton)
-            .after(' | ');
-        }
+        const fireButton = _('span', 'fire-button', {
+          html: emojiOrImage('fire'),
+          click: openReportPopup
+        })
+        .data('url', reportedUrl);
+
+        reportLink
+          .after(fireButton)
+          .after(' | ');
       }
     }
   }
@@ -640,7 +644,7 @@
   }
 
   // Build a popup and show it.
-  function openReportPopup() { // eslint-disable-line complexity
+  function openReportPopup() {
     if (fire.isOpen && $('.fire-popup').length > 0)
       return; // Don't open the popup twice.
 
@@ -664,15 +668,9 @@
       return;
     }
 
-    if (typeof d === 'undefined')
-      fire.log('Sometimes, d seems to be undefined', $that, d);
-
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const site = fire.sites[d.site];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
-
-    const popup = _('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
-      .css({top: '5%', left: w - fire.constants.halfPopupWidth});
 
     const openOnSiteButton = _('a', 'fire-site-logo', {
       html: site ? site.name : d.site,
@@ -707,7 +705,17 @@
         .append(createFeedbackButton(d, ['5', 'f'], 'fp-', 'fp-', 'False Positive'));
     }
 
-    const postType = d.is_answer ? 'Answer' : 'Question';
+    let postType;
+    let suffix;
+
+    if (d.is_answer) {
+      postType = 'Answer';
+      suffix = 'n';
+    } else {
+      postType = 'Question';
+      suffix = '';
+    }
+
     const body = _('div', 'fire-popup-body')
       .append(_('h2')
         .append(_('em', {html: d.title, title: 'Question Title'}))
@@ -724,11 +732,7 @@
             .append(emojiOrImage('user'))
         )
         .append(_('span', 'fire-reason', {
-          text: `The reported post is a${
-            d.is_answer ? 'n ' : ` ${postType.toLowerCase()}`
-          }. Reason weight: ${
-            `${d.reason_weight}\n${d.why}`
-          }`
+          text: `The reported post is a${suffix} ${postType.toLowerCase()}. Reason weight: ${d.reason_weight}\n${d.why}`
         }))
       )
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
@@ -753,7 +757,8 @@
       'fire-tooltip': 'FIRE Configuration'
     });
 
-    popup
+    _('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
+      .css({top: '5%', left: w - fire.constants.halfPopupWidth})
       .append(top)
       .append(body)
       .append(settingsButton)

@@ -20,7 +20,7 @@
       "no-console": "error",
       "no-extra-parens": "error",
       "no-prototype-builtins": "error",
-      "complexity": ["error", 10],
+      "complexity": ["error", 12],
       "consistent-return": "error",
       "no-else-return": "error",
       "no-empty-function": "error",
