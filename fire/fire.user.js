@@ -140,7 +140,7 @@
   }
 
   // Loads all MS data on the page;
-  function updateReportCache() {
+  function updateReportCache() { // eslint-disable-line no-unused-vars
     let urls = $(".fire-button")
       .map((index, element) => $(element).data("url"))
       .toArray()
@@ -1366,7 +1366,7 @@
           fire.log("Decorated existing messages.");
 
           // TODO: Load SE data for each report
-          updateReportCache();
+          // updateReportCache();
         }
       });
     }, timeout);
