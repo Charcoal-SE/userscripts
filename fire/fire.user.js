@@ -130,8 +130,27 @@
       $this.click();
   }
 
+  // Loads all MS data on the page;
+  function updateReportCache() { // eslint-disable-line no-unused-vars
+    let urls = $('.fire-button')
+      .map((index, element) => $(element).data('url'))
+      .toArray()
+      .filter(url => !fire.reportCache[url]) // Only get un-cached reports
+      .join(encodeURIComponent(';'));
+
+    const ms = fire.api.ms;
+    const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${urls}`;
+    $.get(url, response => {
+      fire.log('Report cache updated:', response);
+      if (response && response.items) {
+        for (const item of response.items)
+          parseDataForReport(item, false, null, true);
+      }
+    });
+  }
+
   // Parse a report's loaded data
-  function parseDataForReport(data, openAfterLoad, $this) {
+  function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
     data.site = parseSiteUrl(data.link);
     data.is_deleted = data.deleted_at !== null;
@@ -152,7 +171,8 @@
 
     fire.log('Loaded report data', data);
 
-    loadPost(data);
+    if (!skipLoadPost)
+      loadPost(data);
 
     if (openAfterLoad === true)
       $this.click();
@@ -1318,6 +1338,9 @@
           $(fire.SDMessageSelector).each((...args) => decorateMessage(args[1]));
 
           fire.log('Decorated existing messages.');
+
+          // TODO: Load SE data for each report
+          // updateReportCache();
         }
       });
     }, timeout);
