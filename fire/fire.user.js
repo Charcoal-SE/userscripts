@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.7.16
+// @version     0.8.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -69,7 +69,6 @@
     injectExternalScripts();
     showFireOnExistingMessages();
     registerAnchorHover();
-    registerWebSocket();
     registerOpenLastReportKey();
     CHAT.addEventHandlerHook(chatListener);
 
@@ -1177,9 +1176,9 @@
 
   // Detect Emoji support in this browser
   function hasEmojiSupport() {
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+    let canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+    let smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
 
     ctx.textBaseline = "top";
     ctx.font = "32px Arial";
@@ -1198,10 +1197,10 @@
       return $(document.createTextNode(emoji));
     }
 
-    var url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
-    var hex = emoji.codePointAt(0).toString(16);
+    let url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
+    let hex = emoji.codePointAt(0).toString(16);
 
-    var emojiImage = _("img", "fire-emoji" + (large ? "-large" : ""), {
+    let emojiImage = _("img", "fire-emoji" + (large ? "-large" : ""), {
       src: url + hex + ".png",
       alt: emoji
     });
@@ -1211,28 +1210,43 @@
 
   // Inject FIRE stylesheet and Toastr library
   function injectExternalScripts() {
-    injectCSS("//charcoal-se.org/userscripts/fire/fire.css?v=" + fire.metaData.version);
+    injectCSS("//charcoal-se.org/userscripts/fire/fire.css");
 
-    if (typeof toastr === "undefined") {
-      // toastr is a Javascript library for non-blocking notifications.
-      var path = "//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/";
-      injectCSS(path + "toastr.min.css");
-      $.getScript(path + "/toastr.min.js").then(toastrOptions);
-    }
+    // toastr is a Javascript library for non-blocking notifications.
+    injectScript(typeof toastr, "//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js", loadToastrCss, initializeToastr);
+    injectScript(typeof metapi, "//charcoal-se.org/userscripts/metapi.js", registerWebSocket);
 
     fire.log("Injected scripts and stylesheets.");
   }
 
   // Inject the specified stylesheet
   function injectCSS(path) {
-    var css = window.document.createElement("link");
+    let css = window.document.createElement("link");
     css.rel = "stylesheet";
-    css.href = path;
+    css.href = path + "?fire=" + fire.metaData.version;
     document.head.appendChild(css);
   }
 
+  // Inject the specified script
+  function injectScript(name, path, callback, always) {
+    if (name === "undefined") {
+      $.ajaxSetup({cache: true});
+      $.getScript(path + "?fire=" + fire.metaData.version)
+        .done(callback || $.noop)
+        .done(() => fire.log("Script loaded: ", path))
+        .fail(() => fire.error("Script failed to load: ", path))
+        .always(always || $.noop)
+        .always(() => $.ajaxSetup({cache: false}));
+    }
+  }
+
+  // Load toastr css
+  function loadToastrCss() {
+    injectCSS("//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css");
+  }
+
   // Set toastr options
-  function toastrOptions() {
+  function initializeToastr() {
     toastr.options = {
       closeButton: true,
       progressBar: true,
@@ -1285,14 +1299,8 @@
 
   // Register a websocket listener
   function registerWebSocket() {
-    $.ajaxSetup({cache: true});
-    $.getScript("//charcoal-se.org/userscripts/metapi.js?v=" + fire.metaData.version)
-      .then(() => {
-        metapi.watchSocket(fire.api.ms.key, socketOnMessage);
-        $.ajaxSetup({cache: false});
-
-        fire.log("Websocket initialized.");
-      });
+    metapi.watchSocket(fire.api.ms.key, socketOnMessage);
+    fire.log("Websocket initialized.");
   }
 
   // Adds a property on `fire` that's stored in `localStorage`
