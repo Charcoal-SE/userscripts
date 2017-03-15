@@ -148,7 +148,7 @@ img.fire-emoji-large {
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
-      width: 460px;
+      max-width: 460px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -156,7 +156,7 @@ img.fire-emoji-large {
 
   // Body
   .fire-popup-body {
-    max-height: 420px;
+    max-height: 390px;
     overflow-y: scroll;
     border: 1px solid #ccc;
     padding: 10px;
