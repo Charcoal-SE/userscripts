@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.8.1
+// @version     0.8.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -119,7 +119,7 @@
   // Checks if the list of users on this flag report contains the current user.
   function listHasCurrentUser(flags) {
     return flags &&
-      flags.users.some(u => u.username === fire.chatUser.name);
+      flags.users.some(({username}) => username === fire.chatUser.name);
   }
 
   // Loads a report's data when you hover over the FIRE button.
@@ -145,7 +145,7 @@
     data.has_flagged = data.has_auto_flagged || data.has_manual_flagged;
 
     data.has_sent_feedback = data.feedbacks.some( // Feedback has been sent already
-      f => f.user_name === fire.chatUser.name
+      ({user_name}) => user_name === fire.chatUser.name
     );
 
     const match = data.link.match(/\d+/);
@@ -192,8 +192,8 @@
       getSE(
         "sites",
         parameters,
-        response => {
-          for (let item of response.items) {
+        ({items}) => {
+          for (let item of items) {
             sites[item.api_site_parameter] = item;
           }
 
@@ -281,7 +281,7 @@
       parameters,
       response => {
         report.se.available_flags = response.items;
-        report.has_flagged = response.items && response.items.some(f => !f.has_flagged && f.title === "spam");
+        report.has_flagged = response.items && response.items.some(({has_flagged, title}) => !has_flagged && title === "spam");
 
         fire.log("Loaded a post's flag status", response);
       });
@@ -386,16 +386,16 @@
         $.ajax({
           url: `https://metasmoke.erwaysoftware.com/oauth/token?key=${fire.api.ms.key}&code=${metaSmokeCode}`,
           method: "GET"
-        }).done(data => {
-          setValue("metasmokeWriteToken", data.token);
+        }).done(({token}) => {
+          setValue("metasmokeWriteToken", token);
           toastr.success("Successfully obtained MetaSmoke write token!");
           closePopup();
 
           if (afterGetToken) {
             afterGetToken();
           }
-        }).error(jqXHR => {
-          if (jqXHR.status === 404) {
+        }).error(({status}) => {
+          if (status === 404) {
             toastr.error("Metasmoke could not find a write token - did you authorize the app?");
           } else {
             toastr.error("An unknown error occurred during OAuth with metasmoke.");
@@ -414,10 +414,10 @@
   }
 
   // Chat message event listener. If SmokeDetector reports another post, decorate the message
-  function chatListener(e) {
-    if (e.event_type === 1 && e.user_id === fire.smokeDetectorId) {
+  function chatListener({event_type, user_id, message_id}) {
+    if (event_type === 1 && user_id === fire.smokeDetectorId) {
       setTimeout(() => {
-        const message = $(`#message-${e.message_id}`);
+        const message = $(`#message-${message_id}`);
         decorateMessage(message);
       });
     }
@@ -587,7 +587,7 @@
       closePopup();
       getWriteToken();
     },
-    toggleReportReason: event => $(event.currentTarget).toggleClass("fire-show-reason")
+    toggleReportReason: ({currentTarget}) => $(currentTarget).toggleClass("fire-show-reason")
   };
 
   // Open a popup to enter the write token
@@ -768,7 +768,7 @@
     $(document).on(
       "click",
       ".fire-popup-body pre",
-      event => $(event.currentTarget).toggleClass("fire-expanded")
+      ({currentTarget}) => $(currentTarget).toggleClass("fire-expanded")
     );
   }
 
@@ -779,8 +779,6 @@
     }
     fire.settingsAreOpen = true;
 
-    // var that = this;
-    // var $that = $(that);
     const w = (window.innerWidth - $("#sidebar").width()) / 2;
     const popup = _("div", "fire-popup", {
       id: "fire-settings"
@@ -967,7 +965,7 @@
   }
 
   // Flag the post as spam
-  function postMetaSmokeSpamFlag(data, ms, token, feedbackSuccess) {
+  function postMetaSmokeSpamFlag(data, {url, key}, token, feedbackSuccess) {
     /* TODO: fix this
     let site = fire.sites[data.site];
     if (!site.account) {
@@ -986,8 +984,8 @@
     } else {
       $.ajax({
         type: "POST",
-        url: `${ms.url}w/post/${data.id}/spam_flag`,
-        data: {key: ms.key, token}
+        url: `${url}w/post/${data.id}/spam_flag`,
+        data: {key: key, token}
       }).done(response => {
         toastr.success(feedbackSuccess.after(span("Successfully flagged the post as \"spam\".")));
         closePopup();
@@ -1063,10 +1061,10 @@
 
     if (data.feedbacks) { // Has feedback
       count = data.feedbacks.filter(
-        f => f.feedback_type === verdict
+        ({feedback_type}) => feedback_type === verdict
       ).length;
       hasSubmittedFeedback = data.feedbacks.some(
-        f => f.feedback_type === verdict && f.user_name === fire.chatUser.name
+        ({feedback_type, user_name}) => feedback_type === verdict && user_name === fire.chatUser.name
       );
     }
 
@@ -1075,11 +1073,11 @@
 
     return _("a", `button fire-feedback-button fire-${verdict}${cssClass}`, {
       text: text + suffix,
-      click: event => {
+      click: ({currentTarget}) => {
         if (!data.has_sent_feedback ||
           (fire.userData.flag && !(data.has_flagged || data.is_deleted))
         ) {
-          postMetaSmokeFeedback(data, verdict, event.currentTarget);
+          postMetaSmokeFeedback(data, verdict, currentTarget);
         } else {
           let performedAction;
           if (data.has_flagged) {
@@ -1256,8 +1254,8 @@
 
   // Open the last report on [Ctrl]+[Space]
   function registerOpenLastReportKey() {
-    $(document).on("keydown", e => {
-      if (e.keyCode === 32 && e.ctrlKey) {
+    $(document).on("keydown", ({keyCode, ctrlKey}) => {
+      if (keyCode === 32 && ctrlKey) {
         const button = $(".fire-button").last(); // .content:not(.ai-deleted)
         if (button && button.length > 0) {
           loadDataForReport.call(button, true);
@@ -1272,16 +1270,16 @@
   function registerAnchorHover() {
     const anchorSelector = "a[fire-tooltip]";
     $("body")
-      .on("mouseenter", anchorSelector, event => {
+      .on("mouseenter", anchorSelector, ({currentTarget}) => {
         $(".fire-tooltip").remove();
-        const that = $(event.currentTarget);
+        const that = $(currentTarget);
         that.after(_("span", "fire-tooltip", {
           text: that.attr("fire-tooltip")
         }));
-      }).on("mousemove", anchorSelector, event => {
+      }).on("mousemove", anchorSelector, ({clientX, clientY}) => {
         $(".fire-tooltip").css({
-          left: event.clientX + 20,
-          top: event.clientY + 5
+          left: clientX + 20,
+          top: clientY + 5
         });
       })
       .on("mouseleave", anchorSelector,
