@@ -1040,11 +1040,12 @@
       keyCodes = [keyCodes];
     }
 
-    for (let i = 0; i < keyCodes.length; i++) {
-      keyCodes[i] = typeof keyCodes[i] === "number" ?
-        keyCodes[i] :
-        keyCodes[i].toUpperCase().charCodeAt(0);
-    }
+    keyCodes.forEach((value, i) => {
+      keyCodes[i] =
+        typeof value === "number" ?
+          value :
+          value.toUpperCase().charCodeAt(0);
+    });
 
     return keyCodes;
   }
