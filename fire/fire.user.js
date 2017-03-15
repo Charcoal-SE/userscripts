@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.8.0
+// @version     0.8.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -16,11 +16,9 @@
 /* global fire, metapi, toastr, CHAT, GM_info */
 /* eslint-disable camelcase, max-params */
 
-(function () {
-  "use strict";
-
-  (function (scope) { // Init
-    var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
+(() => {
+  (scope => { // Init
+    const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
 
     const smokeDetectorId = { // this is Smokey's user ID for each supported domain
       "chat.stackexchange.com": 120914,
@@ -666,6 +664,7 @@
 
     const w = (window.innerWidth - $("#sidebar").width()) / 2;
     const site = fire.sites[d.site];
+    const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
 
     const popup = _("div", `fire-popup${fire.userData.readOnly ? " fire-readonly" : ""}`)
       .css({top: "5%", left: w - 300});
@@ -674,7 +673,7 @@
       html: site ? site.name : d.site,
       href: d.link,
       target: "_blank",
-      css: {"background-image": `url(${site ? site.icon_url : "//cdn.sstatic.net/Sites/" + d.site + "/img/apple-touch-icon.png"})`},
+      css: {"background-image": `url(${siteIcon})`},
       "fire-key": fire.openOnSiteCodes,
       "fire-tooltip": "Show on site"
     });
@@ -720,9 +719,11 @@
             .append(emojiOrImage("user"))
         )
         .append(_("span", "fire-reason", {
-          text: "The reported post is a" + (d.is_answer ? "n " : " ") + postType.toLowerCase() + ". " +
-                "Reason weight: " + d.reason_weight + "\n" +
-                d.why
+          text: `The reported post is a${
+            d.is_answer ? "n " : ` ${postType.toLowerCase()}`
+          }. Reason weight: ${
+            `${d.reason_weight}\n${d.why}`
+          }`
         }))
       )
       .append(_("div", `fire-reported-post${d.is_deleted ? " fire-deleted" : ""}`)
@@ -1088,8 +1089,7 @@
           }
 
           toastr.info(
-            "You have already sent feedback for this reported post.<br />" +
-            "The post has already been " + performedAction + ".",
+            `You have already sent feedback for this reported post.<br />The post has already been ${performedAction}.`,
             null, {
               preventDuplicates: true
             });
@@ -1346,7 +1346,7 @@
     return (...args) => {
       if ((fire.userData || localStorage["fire-user-data"]).debug)
       {
-        let logPrefix = `${fire.useEmoji ? fire.emoji.fire + " " : ""}FIRE `;
+        let logPrefix = `${fire.useEmoji ? `${fire.emoji.fire} ` : ""}FIRE `;
         args.unshift(`${logPrefix + fn}:`);
         console[fn](...args);
       }
