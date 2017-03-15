@@ -108,9 +108,8 @@
     const ms = fire.api.ms;
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${reportedUrl}`;
     $.get(url, data => {
-      if (data && data.items) {
+      if (data && data.items)
         callback(data.items[0]);
-      }
     });
   }
 
@@ -125,11 +124,10 @@
     const $this = $(this);
     const url = $this.data('url');
 
-    if (!fire.reportCache[url]) {
+    if (!fire.reportCache[url])
       getDataForUrl(url, data => parseDataForReport(data, openAfterLoad, $this));
-    } else if (openAfterLoad === true) {
+    else if (openAfterLoad === true)
       $this.click();
-    }
   }
 
   // Parse a report's loaded data
@@ -147,9 +145,8 @@
     );
 
     const match = data.link.match(/\d+/);
-    if (match && match[0]) {
+    if (match && match[0])
       data.post_id = match[0];
-    }
 
     fire.reportCache[data.link] = data; // Store the data
 
@@ -157,9 +154,8 @@
 
     loadPost(data);
 
-    if (openAfterLoad === true) {
+    if (openAfterLoad === true)
       $this.click();
-    }
   }
 
   // Parse a site url into a api parameter
@@ -170,9 +166,9 @@
 
   // Loads a list of all Stack Exchange Sites.
   function loadStackExchangeSites() {
-    let now = new Date().valueOf();
+    const now = new Date().valueOf();
+    const hasUpdated = fire.metaData.version === fire.userData.version;
     let sites = fire.sites;
-    let hasUpdated = fire.metaData.version === fire.userData.version;
 
     // If there are no sites or the site data is over 7 days
     if (hasUpdated || !sites || sites.storedAt < (now - 604800000)) { // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
@@ -182,7 +178,7 @@
     }
 
     if (!sites.storedAt) { // If the site data is empy
-      let parameters = {
+      const parameters = {
         filter: '!Fn4IB7S7Yq2UJF5Bh48LrjSpTc',
         pagesize: 10000
       };
@@ -191,9 +187,8 @@
         'sites',
         parameters,
         ({items}) => {
-          for (let item of items) {
+          for (const item of items)
             sites[item.api_site_parameter] = item;
-          }
 
           sites.storedAt = now; // Set the storage timestamp
           fire.sites = sites;   // Store the site list
@@ -242,9 +237,8 @@
           report.se.revisions = response.items;
           report.revision_count = response.items.length;
 
-          if (report.revision_count) {
+          if (report.revision_count)
             showEditedIcon();
-          }
 
           fire.log('Loaded a post\'s revision status', response);
         }
@@ -304,9 +298,8 @@
   // Parse the user response.
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
-    if (page === 1) {
+    if (page === 1)
       fire.userSites = [];
-    }
 
     fire.userSites = fire.userSites.concat(response.items);
 
@@ -319,9 +312,8 @@
       accounts.forEach(site => {
         site.apiName = parseSiteUrl(site.site_url);
 
-        if (sites[site.apiName]) {
+        if (sites[site.apiName])
           sites[site.apiName].account = site;
-        }
       });
 
       fire.userSites = accounts;
@@ -332,18 +324,22 @@
 
   // get call on the Stack Exchange API
   function getSE(method, parameters, success, error, always) {
-    stackExchangeAjaxCall(false, method, parameters, success, error, always);
+    stackExchangeAjaxCall(method, parameters, {
+      call: $.get, success, error, always
+    });
   }
 
   // // post call on the Stack Exchange API
   // function postSE(method, parameters, success, error, always) {
-  //   stackExchangeAjaxCall(true, method, parameters, success, error, always);
+  //  stackExchangeAjaxCall(method, parameters, {
+  //    call: $.post, success, error, always
+  //  });
   // }
 
   // AJAX call on the Stack Exchange API
-  function stackExchangeAjaxCall(isPost, method, parameters, success, error, always) {
-    const type = isPost ? 'post' : 'get';
+  function stackExchangeAjaxCall(method, parameters, {call, success, error, always}) {
     const se = fire.api.se;
+    const type = (call === $.get ? 'get' : 'post');
 
     parameters = parameters || {};
 
@@ -357,19 +353,18 @@
       return;
     }
 
-    const ajaxCall = $[type](se.url + method, parameters);
+    const ajaxCall = call(se.url + method, parameters);
 
-    if (success) {
+    if (success)
       ajaxCall.done(success);
-    }
-    if (error) {
+
+    if (error)
       ajaxCall.fail(error);
-    } else {
+    else
       ajaxCall.fail(jqXHR => fire.error('Error performing this AJAX call!', jqXHR));
-    }
-    if (always) {
+
+    if (always)
       ajaxCall.always(always);
-    }
 
     return ajaxCall;
   }
@@ -389,24 +384,21 @@
           toastr.success('Successfully obtained MetaSmoke write token!');
           closePopup();
 
-          if (afterGetToken) {
+          if (afterGetToken)
             afterGetToken();
-          }
         }).error(({status}) => {
-          if (status === 404) {
+          if (status === 404)
             toastr.error('Metasmoke could not find a write token - did you authorize the app?');
-          } else {
+          else
             toastr.error('An unknown error occurred during OAuth with metasmoke.');
-          }
         });
       } else {
         setValue('readOnly', true);
         toastr.info('FIRE is not in read-only mode.');
         closePopup();
 
-        if (afterGetToken) {
+        if (afterGetToken)
           afterGetToken();
-        }
       }
     });
   }
@@ -437,11 +429,10 @@
 
       if (reportLink.length > 0) { // This is a report
         let reportedUrl;
-        if (urlOnReportLink) {
+        if (urlOnReportLink)
           reportedUrl = reportLink[0].href.split('url=').pop();
-        } else {
+        else
           reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
-        }
 
         if (!reportedUrl.startsWith('//github.com') && !reportedUrl.includes('erwaysoftware.com')) {
           const fireButton = _('span', 'fire-button', {
@@ -514,9 +505,8 @@
     toastr.info(`${message} ${value ? 'en' : 'dis'}abled.`);
     fire.userData = data;
 
-    if (callback) {
+    if (callback)
       callback();
-    }
   }
 
   // Handle keypress events for the popup
@@ -535,8 +525,8 @@
         .removeClass('focus')
         .trigger('mouseleave');
 
-      let $button = $(`.fire-popup-header a[fire-key~=${e.keyCode}]:not([disabled])`);
-      let button = $button[0];
+      const $button = $(`.fire-popup-header a[fire-key~=${e.keyCode}]:not([disabled])`);
+      const button = $button[0];
 
       if (button) {
         if (e.keyCode === 27) { // [Esc] key
@@ -554,10 +544,9 @@
             }));
         }
       } else {
-        let $button = $(`a[fire-key~=${e.keyCode}]:not([disabled])`);
-        if ($button[0]) {
+        const $button = $(`a[fire-key~=${e.keyCode}]:not([disabled])`);
+        if ($button[0])
           $button.click();
-        }
       }
     } else if (fire.settingsAreOpen && e.keyCode === 27) {
       closePopup();
@@ -576,9 +565,8 @@
     requestToken: () => window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank'),
     saveToken: (input, callback) => {
       const value = input.val();
-      if (value && value.length === 7) {
+      if (value && value.length === 7)
         callback(value);
-      }
     },
     disableReadonly: () => {
       closePopup();
@@ -632,9 +620,8 @@
 
   // Build a popup and show it.
   function openReportPopup() {
-    if (fire.isOpen && $('.fire-popup').length > 0) {
+    if (fire.isOpen && $('.fire-popup').length > 0)
       return; // Don't open the popup twice.
-    }
 
     const that = this;
 
@@ -656,9 +643,8 @@
       return;
     }
 
-    if (typeof d === 'undefined') {
+    if (typeof d === 'undefined')
       console.log('Sometimes, d seems to be undefined', $that, d);
-    }
 
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const site = fire.sites[d.site];
@@ -754,9 +740,8 @@
       .appendTo('body')
       .fadeIn('fast');
 
-    if (d.revision_count) {
+    if (d.revision_count)
       showEditedIcon();
-    }
 
     $('#container').toggleClass('fire-blur', fire.userData.blur);
 
@@ -772,9 +757,9 @@
 
   // Opens a popup to change fire's settings
   function openSettingsPopup() {
-    if (fire.settingsAreOpen) {
+    if (fire.settingsAreOpen)
       return; // Don't open the settings twice.
-    }
+
     fire.settingsAreOpen = true;
 
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
@@ -889,13 +874,13 @@
   function closePopup() {
     fire.sendingFeedback = false;
     if (fire.settingsAreOpen) {
-      let selector = '.fire-popup#fire-settings';
+      const selector = '.fire-popup#fire-settings';
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
 
       delete fire.settingsAreOpen;
     } else {
-      let selector = '.fire-popup, .fire-popup-modal';
+      const selector = '.fire-popup, .fire-popup-modal';
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
 
@@ -1013,7 +998,7 @@
           console.error(data, jqXHR);
         } else {
           if (jqXHR.responseText) {
-            let response = JSON.parse(jqXHR.responseText);
+            const response = JSON.parse(jqXHR.responseText);
 
             if (response.message === 'Spam flag option not present') {
               toastr.info('This post could not be flagged.<br />' +
@@ -1036,9 +1021,8 @@
 
   // Structure the keyCodes Array.
   function keyCodesToArray(keyCodes) {
-    if (!Array.isArray(keyCodes)) {
+    if (!Array.isArray(keyCodes))
       keyCodes = [keyCodes];
-    }
 
     keyCodes.forEach((value, i) => {
       keyCodes[i] =
@@ -1056,9 +1040,8 @@
     let hasSubmittedFeedback;
     let disabled = false;
 
-    if (!data.is_answer) {
+    if (!data.is_answer)
       disabled = verdict === 'naa-';
-    }
 
     if (data.feedbacks) { // Has feedback
       count = data.feedbacks.filter(
@@ -1081,11 +1064,10 @@
           postMetaSmokeFeedback(data, verdict, currentTarget);
         } else {
           let performedAction;
-          if (data.has_flagged) {
+          if (data.has_flagged)
             performedAction = 'flagged';
-          } else if (data.is_deleted) {
+          else if (data.is_deleted)
             performedAction = 'deleted';
-          }
 
           toastr.info(
             `You have already sent feedback for this reported post.<br />The post has already been ${performedAction}.`,
@@ -1169,9 +1151,9 @@
 
   // Detect Emoji support in this browser
   function hasEmojiSupport() {
-    let canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d');
-    let smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
 
     ctx.textBaseline = 'top';
     ctx.font = '32px Arial';
@@ -1186,14 +1168,13 @@
   function emojiOrImage(emoji, large) {
     emoji = fire.emoji[emoji] || emoji;
 
-    if (fire.useEmoji) {
+    if (fire.useEmoji)
       return $(document.createTextNode(emoji));
-    }
 
-    let url = 'https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/';
-    let hex = emoji.codePointAt(0).toString(16);
+    const url = 'https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/';
+    const hex = emoji.codePointAt(0).toString(16);
 
-    let emojiImage = _('img', `fire-emoji${large ? '-large' : ''}`, {
+    const emojiImage = _('img', `fire-emoji${large ? '-large' : ''}`, {
       src: `${url + hex}.png`,
       alt: emoji
     });
@@ -1214,7 +1195,7 @@
 
   // Inject the specified stylesheet
   function injectCSS(path) {
-    let css = window.document.createElement('link');
+    const css = window.document.createElement('link');
     css.rel = 'stylesheet';
     css.href = `${path}?fire=${fire.metaData.version}`;
     document.head.appendChild(css);
@@ -1258,9 +1239,8 @@
     $(document).on('keydown', ({keyCode, ctrlKey}) => {
       if (keyCode === 32 && ctrlKey) {
         const button = $('.fire-button').last(); // .content:not(.ai-deleted)
-        if (button && button.length > 0) {
+        if (button && button.length > 0)
           loadDataForReport.call(button, true);
-        }
       }
     });
 
@@ -1344,7 +1324,7 @@
   function getLogger(fn) {
     return (...args) => {
       if ((fire.userData || localStorage['fire-user-data']).debug) {
-        let logPrefix = `${fire.useEmoji ? `${fire.emoji.fire} ` : ''}FIRE `;
+        const logPrefix = `${fire.useEmoji ? `${fire.emoji.fire} ` : ''}FIRE `;
         args.unshift(`${logPrefix + fn}:`);
         console[fn](...args);
       }
@@ -1394,18 +1374,16 @@
     registerForLocalStorage(fire, 'userSites', 'fire-user-sites');
     registerForLocalStorage(fire, 'sites', 'fire-sites');
 
-    if (fire.userData.debug) {
+    if (fire.userData.debug)
       fire.info('Debug mode enabled.');
-    }
 
-    if (fire.userData === null) {
+    if (fire.userData === null)
       fire.userData = defaultStorage;
-    }
+
     const data = fire.userData;
     for (const key in defaultStorage) {
-      if (hOP(defaultStorage, key) && !hOP(data, key)) {
+      if (hOP(defaultStorage, key) && !hOP(data, key))
         data[key] = defaultStorage[key];
-      }
     }
     fire.userData = data;
 

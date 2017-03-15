@@ -1,4 +1,7 @@
 {
+  "devDependencies": {
+    "xo": "^0.17.1"
+  },
   "xo": {
     "space": true,
     "envs": [
@@ -10,8 +13,9 @@
     "rules": {
       "quotes": ["error", "single", {"avoidEscape": true}],
       "camelcase": 0,
-      "max-params": ["warn", 6],
-      "linebreak-style": "off"
+      "max-params": ["warn", 5],
+      "linebreak-style": "off",
+      "curly": ["error", "multi-or-nest", "consistent"]
     },
     "globals": [
       "fire",
