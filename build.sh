@@ -5,6 +5,9 @@
 overridden=()
 build_codes=()
 
+RED="\033[0;31m"
+NORMAL="\033[0m"
+
 for dir in */ ;
 do
   if [ -f $dir"package.json" ]
@@ -22,8 +25,12 @@ done
 
 echo "Building main project..."
 npm test
-build_codes+=($?)
-echo ""
+ecode=$?
+if [ "$ecode" != "0" ]
+then
+  echo -e "${RED}Exit code${NORMAL}: $ecode"
+  exit $ecode
+fi
 
 for dir in $overridden ;
 do
@@ -32,14 +39,10 @@ do
   cd $dir
   npm install
   npm test
-  build_codes+=($?)
-  cd ..
-done
-
-for ecode in $build_codes ;
-do
-  if [[ $ecode != 0 ]]; then
-    echo "\033[31mExit Code\033[39m: $ecode"
+  ecode=$?
+  if [ "$ecode" != "0" ]
+  then
+    echo -e "${RED}Exit code${NORMAL}: $ecode"
     exit $ecode
   fi
 done
