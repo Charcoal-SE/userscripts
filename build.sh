@@ -3,6 +3,7 @@
 # repo-wide settings, they should also have their own package.json in the directory.
 
 overridden=()
+build_codes=()
 
 for dir in */ ;
 do
@@ -21,6 +22,7 @@ done
 
 echo "Building main project..."
 npm test
+build_codes+=($?)
 echo ""
 
 for dir in $overridden ;
@@ -30,5 +32,14 @@ do
   cd $dir
   npm install
   npm test
+  build_codes+=($?)
   cd ..
+done
+
+for ecode in $build_codes ;
+do
+  if [ ! $ecode -eq 0 ]
+  then
+    exit $ecode
+  fi
 done
