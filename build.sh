@@ -38,8 +38,8 @@ done
 
 for ecode in $build_codes ;
 do
-  if [ ! $ecode -eq 0 ]
-  then
+  if [[ $ecode != 0 ]]; then
+    echo "\033[31mExit Code\033[39m: $ecode"
     exit $ecode
   fi
 done
