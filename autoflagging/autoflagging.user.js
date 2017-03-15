@@ -28,7 +28,7 @@
   // Inject CSS
   var css = window.document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "//charcoal-se.org/userscripts/autoflagging.css";
+  css.href = "//charcoal-se.org/userscripts/autoflagging/autoflagging.css";
   document.head.appendChild(css);
 
   // Load the Emoji support script

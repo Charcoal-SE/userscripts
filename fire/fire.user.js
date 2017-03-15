@@ -1236,7 +1236,7 @@
 
     // toastr is a Javascript library for non-blocking notifications.
     injectScript(typeof toastr, "//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js", loadToastrCss, initializeToastr);
-    injectScript(typeof metapi, "//charcoal-se.org/userscripts/metapi.js", registerWebSocket);
+    injectScript(typeof metapi, "//charcoal-se.org/userscripts/metapi/metapi.js", registerWebSocket);
 
     fire.log("Injected scripts and stylesheets.");
   }
