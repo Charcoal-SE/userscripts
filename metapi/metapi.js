@@ -101,14 +101,11 @@ window.metapi = {};
 
   metapi.getPost = function (ident, key, options, callback) {
     options = options || {};
+    options.key = key;
+    options.page = options.page || 1;
 
-    var overwrite = options.hasOwnProperty("forceReload") && delete options["forceReload"];
-
-    var optionString = "";
-    var optionNames = Object.keys(options);
-    for (var i = 0; i < optionNames.length; i++) {
-      optionString += "&" + optionNames[i] + "=" + options[optionNames[i]];
-    }
+    var overwrite = options.hasOwnProperty("forceReload") && options["forceReload"];
+    delete options["forceReload"];
 
     if (!(ident instanceof Array)) {
       ident = [ident];
@@ -132,26 +129,40 @@ window.metapi = {};
     }
 
     var ids = toLoad.join(encodeURIComponent(";"));
-    var fetchUrl = "";
+    var fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/";
+    var type = "GET";
+
     if (typeof toLoad[0] === "string") {
-      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/urls?urls=" + ids + "&key=" + key + optionString;
+      fetchUrl += "urls";
+      options.urls = ids;
+      // type = "POST";
     }
     else if (typeof toLoad[0] === "number") {
-      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/" + ids + "?key=" + key + optionString;
+      fetchUrl += ids;
     }
 
     $.ajax({
-      type: "GET",
-      url: fetchUrl
+      url: fetchUrl,
+      type: type,
+      data: options
     })
     .done(function (data) {
       var items = data.items;
-      if (items.length > 0) {
+      if (items && items.length > 0) {
         for (var k = 0; k < items.length; k++) {
           metapi.postCache.add(items[k].link, items[k], {overwrite: true}); // Overwrite: "urls to be loaded" aren't cached.
           response.push(new metapi.Response(true, items[k]));
         }
-        callback(new metapi.Response(true, response));
+
+        if (data.has_more) {
+          options.forceReload = overwrite;
+          options.page++;
+          metapi.getPost(ident, key, options, function (nextPage) {
+            callback(new metapi.Response(true, response.concat(nextPage.data)));
+          });
+        } else {
+          callback(new metapi.Response(true, response));
+        }
       } else {
         callback(new metapi.Response(false, {
           error_name: "no_item",
@@ -237,3 +248,47 @@ window.metapi = {};
     sock.addCallback(messageCallback);
   };
 })();
+
+metapi.getPost(
+  [
+    "//superuser.com/questions/1189186",
+    "//stackoverflow.com/questions/42825995",
+    "//stackoverflow.com/a/42826028",
+    "//askubuntu.com/questions/893545",
+    "//tex.stackexchange.com/a/358714",
+    "//tex.stackexchange.com/a/358713",
+    // "//graphicdesign.stackexchange.com/questions/86886",
+    // "//gaming.stackexchange.com/questions/303249",
+    // "//stackoverflow.com/a/42826194",
+    // "//law.stackexchange.com/questions/17756",
+    // "//apple.stackexchange.com/questions/276457",
+    // "//askubuntu.com/questions/893552",
+    // "//superuser.com/questions/1189191",
+    // "//apple.stackexchange.com/questions/276461",
+    // "//graphicdesign.stackexchange.com/questions/86887",
+    // "//stackoverflow.com/a/42826604",
+    // "//drupal.stackexchange.com/questions/231452",
+    // "//ai.stackexchange.com/a/3000",
+    // "//graphicdesign.stackexchange.com/questions/86888",
+    // "//meta.stackexchange.com/questions/292425",
+    // "//codegolf.stackexchange.com/questions/113019",
+    // "//askubuntu.com/questions/893563",
+    // "//security.stackexchange.com/questions/154021",
+    // "//graphicdesign.stackexchange.com/questions/86889",
+    // "//apple.stackexchange.com/questions/276465",
+    // "//arduino.stackexchange.com/questions/35870",
+    // "//superuser.com/questions/1189195",
+    // "//drupal.stackexchange.com/questions/231455",
+    // "//graphicdesign.stackexchange.com/questions/86890",
+    // "//drupal.stackexchange.com/questions/231456",
+    // "//apple.stackexchange.com/questions/276468",
+    // "//apple.stackexchange.com/questions/276470",
+    // "//bitcoin.stackexchange.com/questions/52165",
+    // "//travel.stackexchange.com/a/89928"
+  ],
+  "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // (FIRE MS api key, for debugging purposes)
+  null,
+  function () {
+    console.log(arguments);
+  }
+);
