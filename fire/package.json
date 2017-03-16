@@ -1,0 +1,74 @@
+{
+  "name": "charcoal-userscripts",
+  "version": "0.0.0",
+  "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
+  "scripts": {
+    "test": "xo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Charcoal-SE/userscripts.git"
+  },
+  "author": "Charcoal",
+  "license": "(MIT OR Apache-2.0)",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/Charcoal-SE/userscripts/issues"
+  },
+  "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
+  "devDependencies": {
+    "xo": "^0.17.1"
+  },
+  "//": "FIRE overrides",
+  "xo": {
+    "space": true,
+    "envs": [
+      "browser",
+      "es6",
+      "jquery",
+      "greasemonkey"
+    ],
+    "rules": {
+      "quotes": ["error", "single", {"avoidEscape": true}],
+      "camelcase": "off",
+      "max-params": ["warn", 5],
+      "linebreak-style": "off",
+      "curly": ["error", "multi-or-nest", "consistent"],
+      "no-console": "error",
+      "no-extra-parens": "error",
+      "no-prototype-builtins": "error",
+      "complexity": ["error", 12],
+      "consistent-return": "error",
+      "no-else-return": "error",
+      "no-empty-function": "error",
+      "no-magic-numbers": ["error", {
+        "ignore": [0, 1, 2],
+        "ignoreArrayIndexes": true
+      }],
+      "vars-on-top": "error",
+      "capitalized-comments": ["error", "always", { "ignoreConsecutiveComments": true }],
+      "consistent-this": ["error", "that"],
+      "func-style": ["error", "declaration"],
+      "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
+      "no-underscore-dangle": "error",
+      "no-unneeded-ternary": "error",
+      "object-curly-newline": ["error", { "multiline": true }],
+      "template-curly-spacing": ["error", "never"],
+      "prefer-template": "error",
+      "prefer-destructuring": ["error", {"object": true}, {"enforceForRenamedProperties": false}],
+      "no-var": "error",
+      "prefer-const": "error",
+      "prefer-arrow-callback": "error",
+      "object-shorthand": "error",
+
+      "require-jsdoc": ["error", {"require": {"FunctionDeclaration": true, "MethodDefinition": true, "ClassDeclaration": true}}],
+      "require-jsdoc": ["off"]
+    },
+    "globals": [
+      "fire",
+      "metapi",
+      "toastr",
+      "CHAT"
+    ]
+  }
+}
