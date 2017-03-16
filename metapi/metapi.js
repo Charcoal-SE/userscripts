@@ -8,6 +8,17 @@ window.metapi = {};
   var sockets = {};
 
   var api_field_mappings = {};
+  $.ajax({
+    type: 'GET',
+    url: 'https://metasmoke.erwaysoftware.com/api/filter_fields'
+  })
+  .done(function (data) {
+    api_field_mappings = data;
+  })
+  .error(function (jqXhr) {
+    api_field_mappings = null;
+    console.error("Failed to fetch API field mappings from MS API:", jqXhr);
+  });
 
   metapi.debugMode = false;
 
@@ -57,7 +68,7 @@ window.metapi = {};
     };
   };
 
-  metapi.Filter = function (required_fields, key, callback) {
+  metapi.Filter = function (required_fields) {
     function createFilter() {
       var bits = new Array(Object.keys(api_field_mappings).length);
       bits.fill(0);
@@ -77,33 +88,21 @@ window.metapi = {};
       return encodeURIComponent(unsafeFilter);
     }
 
-    if (api_field_mappings === {}) {
-      $.ajax({
-        type: 'GET',
-        url: 'https://metasmoke.erwaysoftware.com/api/filter_fields?key=' + key
-      })
-      .done(function (data) {
-        api_field_mappings = data;
-        var filter = createFilter();
+    if (api_field_mappings === {} || api_field_mappings === null) {
+      return {
+        success: false,
+        error_name: 'missing_data',
+        error_message: 'API field mappings are not available - refer to earlier error messages or call again shortly.',
+        error_code: 410
+      };
+    }
 
-        callback(true, {
-          filter: filter,
-          api_fields: api_field_mappings,
-          included_fields: required_fields
-        });
-      })
-      .error(function (jqXhr) {
-        callback(false, jqXhr.responseText);
-      });
-    }
-    else {
-      var filter = createFilter();
-      callback(true, {
-        filter: filter,
-        api_fields: api_field_mappings,
-        included_fields: required_fields
-      });
-    }
+    return {
+      success: true,
+      filter: createFilter(),
+      included_fields: required_fields,
+      api_field_mappings: api_field_mappings
+    };
   };
 
   metapi.WebSocket = function (address) {
