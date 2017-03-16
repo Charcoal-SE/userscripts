@@ -133,10 +133,10 @@ window.metapi = {};
 
     var ids = toLoad.join(encodeURIComponent(";"));
     var fetchUrl = "";
-    if (typeof ids[0] === "string") {
+    if (typeof toLoad[0] === "string") {
       fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/urls?urls=" + ids + "&key=" + key + optionString;
     }
-    else if (typeof ids[0] === "number") {
+    else if (typeof toLoad[0] === "number") {
       fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/" + ids + "?key=" + key + optionString;
     }
 
