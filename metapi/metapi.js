@@ -128,17 +128,16 @@ window.metapi = {};
       }
     }
 
-    var ids = toLoad.join(encodeURIComponent(";"));
     var fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/";
     var type = "GET";
 
     if (typeof toLoad[0] === "string") {
       fetchUrl += "urls";
-      options.urls = ids;
-      // type = "POST";
+      options.urls = toLoad.join(";");
+      type = "POST";
     }
     else if (typeof toLoad[0] === "number") {
-      fetchUrl += ids;
+      fetchUrl += toLoad.join(encodeURIComponent(";"));
     }
 
     $.ajax({
@@ -150,6 +149,7 @@ window.metapi = {};
       var items = data.items;
       if (items && items.length > 0) {
         for (var k = 0; k < items.length; k++) {
+          // TODO: Properly map the response to the input ids
           metapi.postCache.add(items[k].link, items[k], {overwrite: true}); // Overwrite: "urls to be loaded" aren't cached.
           response.push(new metapi.Response(true, items[k]));
         }
@@ -257,34 +257,34 @@ metapi.getPost(
     "//askubuntu.com/questions/893545",
     "//tex.stackexchange.com/a/358714",
     "//tex.stackexchange.com/a/358713",
-    // "//graphicdesign.stackexchange.com/questions/86886",
-    // "//gaming.stackexchange.com/questions/303249",
-    // "//stackoverflow.com/a/42826194",
-    // "//law.stackexchange.com/questions/17756",
-    // "//apple.stackexchange.com/questions/276457",
-    // "//askubuntu.com/questions/893552",
-    // "//superuser.com/questions/1189191",
-    // "//apple.stackexchange.com/questions/276461",
-    // "//graphicdesign.stackexchange.com/questions/86887",
-    // "//stackoverflow.com/a/42826604",
-    // "//drupal.stackexchange.com/questions/231452",
-    // "//ai.stackexchange.com/a/3000",
-    // "//graphicdesign.stackexchange.com/questions/86888",
-    // "//meta.stackexchange.com/questions/292425",
-    // "//codegolf.stackexchange.com/questions/113019",
-    // "//askubuntu.com/questions/893563",
-    // "//security.stackexchange.com/questions/154021",
-    // "//graphicdesign.stackexchange.com/questions/86889",
-    // "//apple.stackexchange.com/questions/276465",
-    // "//arduino.stackexchange.com/questions/35870",
-    // "//superuser.com/questions/1189195",
-    // "//drupal.stackexchange.com/questions/231455",
-    // "//graphicdesign.stackexchange.com/questions/86890",
-    // "//drupal.stackexchange.com/questions/231456",
-    // "//apple.stackexchange.com/questions/276468",
-    // "//apple.stackexchange.com/questions/276470",
-    // "//bitcoin.stackexchange.com/questions/52165",
-    // "//travel.stackexchange.com/a/89928"
+    "//graphicdesign.stackexchange.com/questions/86886",
+    "//gaming.stackexchange.com/questions/303249",
+    "//stackoverflow.com/a/42826194",
+    "//law.stackexchange.com/questions/17756",
+    "//apple.stackexchange.com/questions/276457",
+    "//askubuntu.com/questions/893552",
+    "//superuser.com/questions/1189191",
+    "//apple.stackexchange.com/questions/276461",
+    "//graphicdesign.stackexchange.com/questions/86887",
+    "//stackoverflow.com/a/42826604",
+    "//drupal.stackexchange.com/questions/231452",
+    "//ai.stackexchange.com/a/3000",
+    "//graphicdesign.stackexchange.com/questions/86888",
+    "//meta.stackexchange.com/questions/292425",
+    "//codegolf.stackexchange.com/questions/113019",
+    "//askubuntu.com/questions/893563",
+    "//security.stackexchange.com/questions/154021",
+    "//graphicdesign.stackexchange.com/questions/86889",
+    "//apple.stackexchange.com/questions/276465",
+    "//arduino.stackexchange.com/questions/35870",
+    "//superuser.com/questions/1189195",
+    "//drupal.stackexchange.com/questions/231455",
+    "//graphicdesign.stackexchange.com/questions/86890",
+    "//drupal.stackexchange.com/questions/231456",
+    "//apple.stackexchange.com/questions/276468",
+    "//apple.stackexchange.com/questions/276470",
+    "//bitcoin.stackexchange.com/questions/52165",
+    "//travel.stackexchange.com/a/89928"
   ],
   "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // (FIRE MS api key, for debugging purposes)
   null,
