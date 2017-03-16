@@ -175,16 +175,24 @@ window.metapi = {};
       var fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/";
       var type = "GET";
       var isNumeric;
+      var requiredFilter;
 
       if (typeof toLoad[0] === "string") {
         fetchUrl += "urls";
         options.urls = toLoad.join(";");
         type = "POST";
         isNumeric = false;
+        requiredFilter = "posts.link";
       }
       else if (typeof toLoad[0] === "number") {
         fetchUrl += toLoad.join(encodeURIComponent(";"));
         isNumeric = true;
+        requiredFilter = "posts.id";
+      }
+
+      var f = options.filter;
+      if (f && (!f.included_fields || f.included_fields.indexOf(requiredFilter) === -1)) {
+        callback(new metapi.Response(false, "An invalid filter is passed in the options."));
       }
 
       $.ajax({
