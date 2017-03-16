@@ -1,12 +1,3 @@
-/**
- * metapi
- * Client-side library for interacting with the MS API.
- *
- * Author:  ArtOfCode
- * Version: 0.3.3-beta
- */
-
-/* globals metapi */
 /* eslint-disable camelcase */ // Don't throw warnings for names like `error_name`.
 
 window.metapi = {};
@@ -15,6 +6,8 @@ window.metapi = {};
   "use strict";
 
   var sockets = {};
+
+  var api_field_mappings = {};
 
   metapi.debugMode = false;
 
@@ -62,6 +55,55 @@ window.metapi = {};
       success: success,
       data: data
     };
+  };
+
+  metapi.Filter = function (required_fields, key, callback) {
+    function createFilter() {
+      var bits = new Array(Object.keys(api_field_mappings).length);
+      bits.fill(0);
+
+      for (var i = 0; i < required_fields.length; i++) {
+        var index = api_field_mappings[i];
+        bits[index] = 1;
+      }
+
+      var unsafeFilter = "";
+      while (bits.length) {
+        var nextByte = bits.splice(0, 8).join("");
+        var charCode = parseInt(nextByte.toString(), 2);
+        unsafeFilter += String.fromCharCode(charCode);
+      }
+
+      return encodeURIComponent(unsafeFilter);
+    }
+
+    if (api_field_mappings === {}) {
+      $.ajax({
+        type: 'GET',
+        url: 'https://metasmoke.erwaysoftware.com/api/filter_fields?key=' + key
+      })
+      .done(function (data) {
+        api_field_mappings = data;
+        var filter = createFilter();
+
+        callback(true, {
+          filter: filter,
+          api_fields: api_field_mappings,
+          included_fields: required_fields
+        });
+      })
+      .error(function (jqXhr) {
+        callback(false, jqXhr.responseText);
+      });
+    }
+    else {
+      var filter = createFilter();
+      callback(true, {
+        filter: filter,
+        api_fields: api_field_mappings,
+        included_fields: required_fields
+      });
+    }
   };
 
   metapi.WebSocket = function (address) {
@@ -211,7 +253,7 @@ window.metapi = {};
   metapi.spamFlagPost = function (id, key, token, callback) {
     $.ajax({
       type: "POST",
-      url: "https://metasmoke.erwaysoftware.com/api/w/post/" + id + "spam_flag?key=" + key + "&token=" + token
+      url: "https://metasmoke.erwaysoftware.com/api/w/post/" + id + "/spam_flag?key=" + key + "&token=" + token
     }).done(function (data) {
       callback(new metapi.Response(true, {backoff: data.backoff}));
     }).error(function (jqXhr) {
@@ -235,7 +277,6 @@ window.metapi = {};
     sock = sockets[key];
 
     sock._conn.onopen = function () {
-      /* eslint-disable no-useless-escape */
       sock.send(JSON.stringify({
         identifier: JSON.stringify({
           channel: "ApiChannel",

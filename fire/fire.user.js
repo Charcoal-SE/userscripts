@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.0
+// @version     0.9.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -18,7 +18,7 @@
   (scope => { // Init
     const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
 
-    const smokeDetectorId = { // this is Smokey's user ID for each supported domain
+    const smokeDetectorId = { // This is Smokey's user ID for each supported domain
       'chat.stackexchange.com': 120914,
       'chat.stackoverflow.com': 3735529,
       'chat.meta.stackexchange.com': 266345
@@ -28,11 +28,11 @@
       metaData: GM_info.script || GM_info['Flag Instantly, Rapidly, Effortlessly'],
       api: {
         ms: {
-          key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // this script's MetaSmoke API key
+          key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
           url: 'https://metasmoke.erwaysoftware.com/api/'
         },
         se: {
-          key: 'NDllMffmzoX8A6RPHEPVXQ((', // this script's Stack Exchange API key
+          key: 'NDllMffmzoX8A6RPHEPVXQ((', // This script's Stack Exchange API key
           url: 'https://api.stackexchange.com/2.2/',
           clientId: 9136
         }
@@ -106,7 +106,7 @@
 
   // Loads MetaSmoke data for a specified post url
   function getDataForUrl(reportedUrl, callback) {
-    const ms = fire.api.ms;
+    const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${reportedUrl}`;
     $.get(url, data => {
       if (data && data.items)
@@ -133,13 +133,13 @@
 
   // Loads all MS data on the page;
   function updateReportCache() { // eslint-disable-line no-unused-vars
-    let urls = $('.fire-button')
+    const urls = $('.fire-button')
       .map((index, element) => $(element).data('url'))
       .toArray()
       .filter(url => !fire.reportCache[url]) // Only get un-cached reports
       .join(encodeURIComponent(';'));
 
-    const ms = fire.api.ms;
+    const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${urls}`;
     $.get(url, response => {
       fire.log('Report cache updated:', response);
@@ -166,7 +166,7 @@
 
     const match = data.link.match(/\d+/);
     if (match && match[0])
-      data.post_id = match[0];
+      [data.post_id] = match;
 
     fire.reportCache[data.link] = data; // Store the data
 
@@ -189,7 +189,7 @@
   function loadStackExchangeSites() {
     const now = new Date().valueOf();
     const hasUpdated = fire.metaData.version === fire.userData.version;
-    let sites = fire.sites;
+    let {sites} = fire;
 
     // If there are no sites or the site data is over 7 days
     if (hasUpdated || !sites || sites.storedAt < now - fire.constants.siteDataCacheTime) {
@@ -223,9 +223,7 @@
 
   // Loads a post
   function loadPost(report) {
-    const parameters = {
-      site: report.site
-    };
+    const parameters = {site: report.site};
 
     getSE(
       `posts/${report.post_id}`,
@@ -233,7 +231,7 @@
       response => {
         if (response.items && response.items.length > 0) {
           report.se = report.se || {};
-          report.se.post = response.items[0];
+          [report.se.post] = response.items;
           loadPostFlagStatus(report);
           loadPostRevisions(report);
         } else {
@@ -246,9 +244,7 @@
 
   // Loads a post's revision history
   function loadPostRevisions(report) {
-    const parameters = {
-      site: report.site
-    };
+    const parameters = {site: report.site};
 
     getSE(
       `posts/${report.post_id}/revisions`,
@@ -275,7 +271,8 @@
           emojiOrImage('pencil', true)
             .attr('title', 'This post has been edited!')
             .after(' ')
-        ).data('has-edit-icon', true);
+        )
+        .data('has-edit-icon', true);
     }
   }
 
@@ -328,7 +325,7 @@
       loadCurrentSEUser(page + 1);
     } else {
       const accounts = fire.userSites;
-      const sites = fire.sites;
+      const {sites} = fire;
 
       accounts.forEach(site => {
         site.apiName = parseSiteUrl(site.site_url);
@@ -343,23 +340,31 @@
     }
   }
 
-  // get call on the Stack Exchange API
+  // Get call on the Stack Exchange API
   function getSE(method, parameters, success, error, always) {
     stackExchangeAjaxCall(method, parameters, {
-      call: $.get, success, error, always
+      call: $.get,
+      success,
+      error,
+      always
     });
   }
 
-  // // post call on the Stack Exchange API
-  // function postSE(method, parameters, success, error, always) {
-  //  stackExchangeAjaxCall(method, parameters, {
-  //    call: $.post, success, error, always
-  //  });
-  // }
+  /*
+  // post call on the Stack Exchange API
+  function postSE(method, parameters, success, error, always) {
+   stackExchangeAjaxCall(method, parameters, {
+     call: $.post
+     success,
+     error,
+     always
+   });
+  }
+  */
 
   // AJAX call on the Stack Exchange API
   function stackExchangeAjaxCall(method, parameters, {call, success, error, always}) {
-    const se = fire.api.se;
+    const {se} = fire.api;
     const type = call === $.get ? 'get' : 'post';
 
     parameters = parameters || {};
@@ -400,14 +405,16 @@
         $.ajax({
           url: `https://metasmoke.erwaysoftware.com/oauth/token?key=${fire.api.ms.key}&code=${metaSmokeCode}`,
           method: 'GET'
-        }).done(({token}) => {
+        })
+        .done(({token}) => {
           setValue('metasmokeWriteToken', token);
           toastr.success('Successfully obtained MetaSmoke write token!');
           closePopup();
 
           if (afterGetToken)
             afterGetToken();
-        }).error(({status}) => {
+        })
+        .error(({status}) => {
           if (status === fire.constants.http.notFound)
             toastr.error('Metasmoke could not find a write token - did you authorize the app?');
           else
@@ -521,8 +528,8 @@
   }
 
   // Set a bool option
-  function boolOptionClickHandler(that, message, key, callback) {
-    const value = $(that).is(':checked');
+  function boolOptionClickHandler(element, message, key, callback) {
+    const value = $(element).is(':checked');
 
     const data = fire.userData;
     data[key] = value;
@@ -551,7 +558,7 @@
         .trigger('mouseleave');
 
       const $button = $(`.fire-popup-header a[fire-key~=${e.keyCode}]:not([disabled])`);
-      const button = $button[0];
+      const [button] = $button;
 
       if (button) {
         if (e.keyCode === c.keys.esc) { // [Esc] key
@@ -626,8 +633,8 @@
           .append(button('Request Token', clickHandlers.requestToken))
           .append(input)
           .append(button('Save', () => clickHandlers.saveToken(input, callback)))
-          .append(_br())
-          .append(_br())
+          .append(br())
+          .append(br())
           .append(_('p', {
             html: 'Alternatively, if you\'re not a "Reviewer", you can run FIRE in read-only mode by disabling feedback.<br />' +
                   'You will still be able to view reports.'
@@ -693,8 +700,8 @@
       .append(createCloseButton(closePopup))
       .append(openOnMSButton)
       .append(openOnSiteButton)
-      .append(_br())
-      .after(_br());
+      .append(br())
+      .after(br());
 
     if (!fire.userData.readOnly) {
       top
@@ -732,7 +739,9 @@
             .append(emojiOrImage('user'))
         )
         .append(_('span', 'fire-reason', {
-          text: `The reported post is a${suffix} ${postType.toLowerCase()}. Reason weight: ${d.reason_weight}\n${d.why}`
+          text: `The reported post is a${suffix} ${
+              postType.toLowerCase()
+            }. Reason weight: ${d.reason_weight}\n${d.why}`
         }))
       )
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
@@ -789,10 +798,8 @@
     fire.settingsAreOpen = true;
 
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
-    const popup = _('div', 'fire-popup', {
-      id: 'fire-settings'
-    })
-    .css({top: '5%', left: w - fire.constants.halfPopupWidth});
+    const popup = _('div', 'fire-popup', {id: 'fire-settings'})
+      .css({top: '5%', left: w - fire.constants.halfPopupWidth});
 
     const top = _('p', 'fire-popup-header')
       .append(
@@ -803,26 +810,21 @@
 
     const toastDurationElements = _('div')
       .append(
-        _('span', {
-          text: 'Notification popup duration:'
-        })
-        .append(_br())
-        .append(_('input', {
-          id: 'toastr_duration',
-          type: 'number',
-          value: fire.userData.toastrDuration,
-          change: toastrDurationHandler,
-          blur: () => toastr.info('Notification duration updated')
-        }))
-        .append(' ms')
+        _('span', {text: 'Notification popup duration:'})
+          .append(br())
+          .append(_('input', {
+            id: 'toastr_duration',
+            type: 'number',
+            value: fire.userData.toastrDuration,
+            change: toastrDurationHandler,
+            blur: () => toastr.info('Notification duration updated')
+          }))
+          .append(' ms')
       );
 
     const toastrClasses = ['top-right', 'bottom-right', 'bottom-left', 'top-left', 'top-full-width', 'bottom-full-width', 'top-center', 'bottom-center'];
     const selected = fire.userData.toastrPosition;
-
-    const positionSelect = _('select', 'fire-position-select', {
-      change: toastrPositionChangeHandler
-    });
+    const positionSelect = _('select', 'fire-position-select', {change: toastrPositionChangeHandler});
 
     for (const val of toastrClasses) {
       positionSelect.append(
@@ -836,7 +838,7 @@
 
     let disableReadonlyButton = $();
     if (fire.userData.readOnly) {
-      disableReadonlyButton = _br().after(
+      disableReadonlyButton = br().after(
         button('Disable read-only mode', clickHandlers.disableReadonly)
       );
     }
@@ -844,20 +846,21 @@
     let requestStackExchangeTokenButton = $();
     if (!fire.userData.stackexchangeWriteToken) {
       requestStackExchangeTokenButton = _('p', 'fire-request-write-token')
-        .append(_br())
+        .append(br())
         .append(_('h3', {text: 'Stack Exchange write token:'}))
-        .append(_('p', {html:
-          'Authorize FIRE with your Stack Exchange account.<br />' +
-          'This allows FIRE to load additional data for reported posts.'
+        .append(_('p', {
+          html:
+            'Authorize FIRE with your Stack Exchange account.<br />' +
+            'This allows FIRE to load additional data for reported posts.'
         }))
         .append(button('Authorize FIRE with Stack Exchange', requestStackExchangeToken));
     }
 
     const positionSelector = _('div')
-      .append(_br())
+      .append(br())
       .append(
         _('span', {text: 'Notification popup position:'})
-          .append(_br())
+          .append(br())
           .append(positionSelect)
         );
 
@@ -868,12 +871,12 @@
             'Enable blur on popup background.',
             'Popup blur:'
           ))
-          .append(_br())
+          .append(br())
           .append(createSettingscheckBox('flag', fire.userData.flag, flagOptionClickHandler,
             'Also submit "Spam" flag with "tpu-" feedback.',
             'Flag on feedback:')
           )
-          .append(_br())
+          .append(br())
           .append(createSettingscheckBox('debug', fire.userData.debug, debugOptionClickHandler,
             'Enable FIRE logging in developer console.',
             'Debug mode:')
@@ -928,7 +931,7 @@
     if (!fire.sendingFeedback && !$(button).attr('disabled')) {
       fire.sendingFeedback = true;
 
-      const ms = fire.api.ms;
+      const {ms} = fire.api;
       const token = fire.userData.metasmokeWriteToken;
       if (data.has_sent_feedback) {
         const message = span('You have already sent feedback to MetaSmoke for this report.');
@@ -950,7 +953,8 @@
           type: 'POST',
           url: `${ms.url}w/post/${data.id}/feedback`,
           data: {type: msVerdict, key: ms.key, token}
-        }).done(() => {
+        })
+        .done(() => {
           const message = span(`Sent feedback "<em>${verdict}"</em> to metasmoke.`);
           if (verdict === 'tpu-' && fire.userData.flag) {
             postMetaSmokeSpamFlag(data, ms, token, message.after('<br /><br />'));
@@ -958,7 +962,8 @@
             toastr.success(message);
             closePopup();
           }
-        }).error(jqXHR => {
+        })
+        .error(jqXHR => {
           if (jqXHR.status === fire.constants.http.unauthorized) {
             toastr.error('Can\'t send feedback to metasmoke - not authenticated.');
 
@@ -970,7 +975,8 @@
             toastr.error('An error occurred sending post feedback to metasmoke.');
             fire.error('An error occurred sending post feedback to metasmoke.', jqXHR);
           }
-        }).always(() => {
+        })
+        .always(() => {
           fire.sendingFeedback = false;
         });
       }
@@ -999,24 +1005,26 @@
         type: 'POST',
         url: `${url}w/post/${data.id}/spam_flag`,
         data: {key, token}
-      }).done(response => {
+      })
+      .done(response => {
         toastr.success(feedbackSuccess.after(span('Successfully flagged the post as "spam".')));
         closePopup();
 
         if (response.backoff) {
           // We've got a backoff. Deal with it...
           // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
-          // re-execute any pending requests that were submitted during that time, afterwards.
+          // Re-execute any pending requests that were submitted during that time, afterwards.
           debugger; // eslint-disable-line no-debugger
           toastr.info('Backoff received');
           fire.info('Backoff received', data, response);
         }
-      }).error(jqXHR => {
+      })
+      .error(jqXHR => {
         toastr.success('Sent feedback <em>"tpu-"</em> to metasmoke.'); // We came from a "feedback" success handler.
 
         if (jqXHR.status === fire.constants.http.conflict) {
           // https://metasmoke.erwaysoftware.com/authentication/status
-          // will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
+          // Will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
           toastr.error(
             'FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
             'Your MetaSmoke account doesn\'t appear to be write-authenticated.<br />' +
@@ -1036,7 +1044,7 @@
             }
           }
 
-          // will give you a 500 with status: 'failed' and a message if the spam flag fails;
+          // Will give you a 500 with status: 'failed' and a message if the spam flag fails;
           toastr.error('Something went wrong while attempting to submit a spam flag');
           fire.error('Something went wrong while attempting to submit a spam flag', data, jqXHR);
           fire.sendingFeedback = false;
@@ -1099,9 +1107,9 @@
 
           toastr.info(
             `You have already sent feedback for this reported post.<br />The post has already been ${performedAction}.`,
-            null, {
-              preventDuplicates: true
-            });
+            null,
+            {preventDuplicates: true}
+          );
         }
       },
       disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)), // eslint-disable-line no-extra-parens
@@ -1117,7 +1125,7 @@
       title: 'Close this popup',
       click: clickHandler,
       'fire-tooltip': 'Close popup',
-      'fire-key': keyCodesToArray(fire.constants.keys.esc) // escape key code,
+      'fire-key': keyCodesToArray(fire.constants.keys.esc) // Escape key code,
     });
   }
 
@@ -1160,7 +1168,7 @@
   }
 
   // Create a linebreak
-  function _br() {
+  function br() {
     return _('br');
   }
 
@@ -1214,7 +1222,7 @@
   function injectExternalScripts() {
     injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
 
-    // toastr is a Javascript library for non-blocking notifications.
+    // Toastr is a Javascript library for non-blocking notifications.
     injectScript(typeof toastr, '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', loadToastrCss, initializeToastr);
     injectScript(typeof metapi, '//charcoal-se.org/userscripts/metapi/metapi.js', registerWebSocket);
 
@@ -1281,11 +1289,12 @@
     $('body')
       .on('mouseenter', anchorSelector, ({currentTarget}) => {
         $('.fire-tooltip').remove();
-        const that = $(currentTarget);
-        that.after(_('span', 'fire-tooltip', {
-          text: that.attr('fire-tooltip')
-        }));
-      }).on('mousemove', anchorSelector, ({clientX, clientY}) => {
+        const element = $(currentTarget);
+        element.after(
+          _('span', 'fire-tooltip', {text: element.attr('fire-tooltip')})
+        );
+      })
+      .on('mousemove', anchorSelector, ({clientX, clientY}) => {
         $('.fire-tooltip').css({
           left: clientX + fire.constants.tooltipOffset,
           top: clientY + fire.constants.tooltipOffsetSmall
@@ -1344,8 +1353,10 @@
 
           fire.log('Decorated existing messages.');
 
-          // TODO: Load SE data for each report
-          // updateReportCache();
+          /*
+          TODO: Load SE data for each report
+          updateReportCache();
+          */
         }
       });
     }, timeout);
@@ -1395,8 +1406,9 @@
 
   // Expands anchor elements in the report's body on hover, to show the href.
   function expandLinksOnHover() {
-    $('.fire-popup-body a')
-      .each((i, element) => $(element).attr('fire-tooltip', element));
+    $('.fire-popup-body a').each((i, element) =>
+      $(element).attr('fire-tooltip', element)
+    );
   }
 
   // Initializes localStorage
