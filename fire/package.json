@@ -1,0 +1,57 @@
+{
+  "name": "charcoal-userscripts",
+  "version": "0.0.0",
+  "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
+  "scripts": {
+    "test": "xo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Charcoal-SE/userscripts.git"
+  },
+  "author": "Charcoal",
+  "license": "(MIT OR Apache-2.0)",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/Charcoal-SE/userscripts/issues"
+  },
+  "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
+  "devDependencies": {
+    "xo": "^0.17.1"
+  },
+  "//": "FIRE overrides",
+  "xo": {
+    "space": true,
+    "envs": [
+      "browser",
+      "es6",
+      "jquery",
+      "greasemonkey"
+    ],
+    "rules": {
+      "quotes": ["error", "single", {"avoidEscape": true}],
+      "camelcase": "off",
+      "max-params": ["warn", 5],
+      "linebreak-style": "off",
+      "curly": ["error", "multi-or-nest", "consistent"],
+      "no-console": "error",
+      "no-extra-parens": "error",
+      "no-prototype-builtins": "error",
+      "complexity": ["error", 12],
+      "consistent-return": "error",
+      "no-else-return": "error",
+      "no-empty-function": "error",
+      "no-magic-numbers": ["error", {
+        "ignore": [0, 1, 2],
+        "ignoreArrayIndexes": true
+      }],
+      "vars-on-top": "error"
+    },
+    "globals": [
+      "fire",
+      "metapi",
+      "toastr",
+      "CHAT"
+    ]
+  }
+}
