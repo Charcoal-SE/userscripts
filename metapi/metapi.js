@@ -119,14 +119,6 @@ window.metapi = {};
       return !pos || item !== ary[pos - 1];
     });
 
-    var useUrls = "";
-    if (typeof ident[0] === "string") {
-      useUrls = "urls?urls=";
-    }
-    else if (typeof ident[0] === "number") {
-      useUrls = "";
-    }
-
     var response = [];
     var toLoad = [];
 
@@ -139,9 +131,14 @@ window.metapi = {};
       }
     }
 
-    var urls = toLoad.join(encodeURIComponent(";"));
-    // TODO: properly format url for ids
-    var fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/" + useUrls + urls + "&key=" + key + optionString;
+    var ids = toLoad.join(encodeURIComponent(";"));
+    var fetchUrl = "";
+    if (typeof ids[0] === "string") {
+      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/urls?urls=" + ids + "&key=" + key + optionString;
+    }
+    else if (typeof ids[0] === "number") {
+      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/" + ids + "?key=" + key + optionString;
+    }
 
     $.ajax({
       type: "GET",
@@ -151,14 +148,8 @@ window.metapi = {};
       var items = data.items;
       if (items.length > 0) {
         for (var k = 0; k < items.length; k++) {
-          debugger;
-          // TODO: Issue: items[k].link does not always match it's ident, causing cache to throw "overwrite" errors
-
-          metapi.postCache.add(items[k].link, items[k]); // , {overwrite: true}
+          metapi.postCache.add(items[k].link, items[k], {overwrite: true}); // Overwrite: "urls to be loaded" aren't cached.
           response.push(new metapi.Response(true, items[k]));
-        }
-        if (response.length === 1) {
-          response = response[0];
         }
         callback(new metapi.Response(true, response));
       } else {
@@ -246,25 +237,3 @@ window.metapi = {};
     sock.addCallback(messageCallback);
   };
 })();
-
-metapi.getPost(
-  [
-    "//bitcoin.stackexchange.com/a/52157",
-    "//bitcoin.stackexchange.com/a/52158", // two answers on same question: return the same `link` in response
-    "//stackoverflow.com/questions/42815054",
-    "//stackoverflow.com/a/42820765",
-    "//stackoverflow.com/a/42821636",
-    "//math.stackexchange.com/a/2188543",
-    "//stackoverflow.com/a/17860792",
-    "//ell.stackexchange.com/questions/122626",
-    "//ell.stackexchange.com/questions/122626", // should be able to handle duplicates
-    "//graphicdesign.stackexchange.com/questions/86874",
-    "//stackoverflow.com/questions/42783310"
-  ],
-  "55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6", // (FIRE MS api key, for debugging purposes)
-  null,
-  function () {
-    console.log(arguments);
-    debugger;
-  }
-);
