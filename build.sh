@@ -2,8 +2,7 @@
 # Charcoal-SE/userscripts build script. Scripts should each have their own directory; if they wish to customise any
 # repo-wide settings, they should also have their own package.json in the directory.
 
-overridden=()
-build_codes=()
+overridden=""
 
 RED="\033[0;31m"
 NORMAL="\033[0m"
@@ -13,14 +12,10 @@ do
   if [ -f $dir"package.json" ]
   then
     echo "Overridden package.json: $dir"
-    overridden+=("$dir")
+    echo "Ignoring: $dir"
+    mv $dir "/tmp/$dir"
+    overridden=$overridden";;$dir"
   fi
-done
-
-for dir in $overridden ;
-do
-  echo "Ignoring: $dir"
-  mv $dir "/tmp/$dir"
 done
 
 echo "Building main project..."
@@ -32,7 +27,8 @@ then
   exit $ecode
 fi
 
-for dir in $overridden ;
+dirs=(${overridden//;;/ })
+for dir in ${dirs[@]} ;
 do
   echo "Building overridden: $dir"
   mv "/tmp/$dir" .
@@ -45,4 +41,5 @@ do
     echo -e "${RED}Exit code${NORMAL}: $ecode"
     exit $ecode
   fi
+  cd ..
 done
