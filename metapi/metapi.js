@@ -222,7 +222,7 @@ window.metapi = {};
   metapi.spamFlagPost = function (id, key, token, callback) {
     $.ajax({
       type: "POST",
-      url: "https://metasmoke.erwaysoftware.com/api/w/post/" + id + "spam_flag?key=" + key + "&token=" + token
+      url: "https://metasmoke.erwaysoftware.com/api/w/post/" + id + "/spam_flag?key=" + key + "&token=" + token
     }).done(function (data) {
       callback(new metapi.Response(true, {backoff: data.backoff}));
     }).error(function (jqXhr) {
