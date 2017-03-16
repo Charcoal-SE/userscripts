@@ -13,6 +13,7 @@
   * Load (external?) HTML?
   * Use template (HTML) strings?
 * Write JSDoc for functions.
+* Ask for confirmation if I click "spam" or "rude" on a post which has been edited.
 
 Points marked with &diams; are related to the "loading" rewrite.
 
