@@ -107,7 +107,7 @@ window.metapi = {};
     };
   };
 
-  metapi.WebSocket = function (address) {
+  metapi.WebSocket = function (address, onOpen) {
     var callbacks = [];
 
     var getCallbacks = function () {
@@ -123,6 +123,11 @@ window.metapi = {};
     };
 
     var conn = new WebSocket(address);
+
+    if (onOpen && typeof onOpen === "function") {
+      conn.onopen = onOpen;
+    }
+
     conn.onmessage = function (data) {
       for (var i = 0; i < callbacks.length; i++) {
         callbacks[i](data);
@@ -242,19 +247,17 @@ window.metapi = {};
   metapi.watchSocket = function (key, messageCallback) {
     var sock;
     if (!sockets.hasOwnProperty(key)) {
-      sockets[key] = new metapi.WebSocket("wss://metasmoke.erwaysoftware.com/cable");
+      sockets[key] = new metapi.WebSocket("wss://metasmoke.erwaysoftware.com/cable", function () {
+        this.send(JSON.stringify({
+          identifier: JSON.stringify({
+            channel: "ApiChannel",
+            key: key
+          }),
+          command: "subscribe"
+        }));
+      });
     }
     sock = sockets[key];
-
-    sock._conn.onopen = function () {
-      sock.send(JSON.stringify({
-        identifier: JSON.stringify({
-          channel: "ApiChannel",
-          key: key
-        }),
-        command: "subscribe"
-      }));
-    };
 
     sock.addCallback(messageCallback);
   };
