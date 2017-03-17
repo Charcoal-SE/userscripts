@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.4
+// @version     0.9.5
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -236,6 +236,10 @@
           loadPostRevisions(report);
         } else {
           report.is_deleted = true;
+          $('.fire-reported-post').addClass('fire-deleted');
+
+          if (report.has_sent_feedback)
+            $('a.fire-feedback-button:not([disabled])').attr('disabled', true);
         }
 
         fire.log('Loaded a post', response);
@@ -699,8 +703,7 @@
       .append(createCloseButton(closePopup))
       .append(openOnMSButton)
       .append(openOnSiteButton)
-      .append(br())
-      .after(br());
+      .append(br());
 
     if (!fire.userData.readOnly) {
       top
@@ -708,7 +711,8 @@
         .append(createFeedbackButton(d, ['2', 'r'], 'rude', 'rude', 'Rude / Abusive'))
         .append(createFeedbackButton(d, ['3', 'v'], 'tp-', 'tp-', 'Vandalism'))
         .append(createFeedbackButton(d, ['4', 'n'], 'naa-', 'naa-', 'Not an Answer / VLQ'))
-        .append(createFeedbackButton(d, ['5', 'f'], 'fp-', 'fp-', 'False Positive'));
+        .append(createFeedbackButton(d, ['5', 'f'], 'fp-', 'fp-', 'False Positive'))
+        .append(br());
     }
 
     let postType;
