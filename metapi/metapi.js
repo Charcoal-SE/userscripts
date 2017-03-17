@@ -74,8 +74,9 @@ window.metapi = {};
       bits.fill(0);
 
       for (var i = 0; i < required_fields.length; i++) {
-        var index = api_field_mappings[i];
+        var index = api_field_mappings[required_fields[i]];
         bits[index] = 1;
+        console.log(index, bits);
       }
 
       var unsafeFilter = "";
@@ -83,6 +84,7 @@ window.metapi = {};
         var nextByte = bits.splice(0, 8).join("");
         var charCode = parseInt(nextByte.toString(), 2);
         unsafeFilter += String.fromCharCode(charCode);
+        console.log(nextByte, charCode, unsafeFilter);
       }
 
       return encodeURIComponent(unsafeFilter);
