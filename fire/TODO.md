@@ -1,7 +1,6 @@
 # TODO:
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
-* Move "why" block up.
 * Add "Rude/Abusive" button:
   * Implement SE "rude" feedback.
 * Load data through metapi.js for cross-script storage. &diams;

@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.2
+// @version     0.9.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -604,8 +604,7 @@
       closePopup();
       closePopup();
       getWriteToken();
-    },
-    toggleReportReason: ({currentTarget}) => $(currentTarget).toggleClass('fire-show-reason')
+    }
   };
 
   // Open a popup to enter the write token
@@ -730,19 +729,15 @@
       .append(_('hr'))
       .append(
         _('div', 'fire-report-info', {
-          title: 'Click to show reason',
-          click: clickHandlers.toggleReportReason
+          'fire-tooltip': emojiOrImage('clipboard')
+            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\nReason weight: ${d.reason_weight}\n\n${d.why}`)
+            .html()
         })
         .append(_('h3', 'fire-type', {text: `${postType}:`}))
         .append(
           _('span', 'fire-username', {text: `${d.username} `, title: 'Username'})
             .append(emojiOrImage('user'))
         )
-        .append(_('span', 'fire-reason', {
-          text: `The reported post is a${suffix} ${
-              postType.toLowerCase()
-            }. Reason weight: ${d.reason_weight}\n${d.why}`
-        }))
       )
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
         .append(d.body.replace(/<script/g, '&lt;script'))
@@ -1205,7 +1200,7 @@
     emoji = fire.constants.emoji[emoji] || emoji;
 
     if (fire.useEmoji)
-      return $(document.createTextNode(emoji));
+      return span(emoji);
 
     const url = 'https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/';
     const hex = emoji.codePointAt(0).toString(fire.constants.hex);
@@ -1215,7 +1210,7 @@
       alt: emoji
     });
 
-    return emojiImage;
+    return span(emojiImage);
   }
 
   // Inject FIRE stylesheet and Toastr library
@@ -1285,22 +1280,22 @@
 
   // Register the "tooltip" hover for anchor elements
   function registerAnchorHover() {
-    const anchorSelector = 'a[fire-tooltip]';
+    const selector = '[fire-tooltip]';
     $('body')
-      .on('mouseenter', anchorSelector, ({currentTarget}) => {
+      .on('mouseenter', selector, ({currentTarget}) => {
         $('.fire-tooltip').remove();
         const element = $(currentTarget);
         element.after(
-          _('span', 'fire-tooltip', {text: element.attr('fire-tooltip')})
+          _('span', 'fire-tooltip', {html: element.attr('fire-tooltip')})
         );
       })
-      .on('mousemove', anchorSelector, ({clientX, clientY}) => {
+      .on('mousemove', selector, ({clientX, clientY}) => {
         $('.fire-tooltip').css({
           left: clientX + fire.constants.tooltipOffset,
           top: clientY + fire.constants.tooltipOffsetSmall
         });
       })
-      .on('mouseleave', anchorSelector,
+      .on('mouseleave', selector,
         () => $('.fire-tooltip').remove()
       );
 
@@ -1473,7 +1468,7 @@
         notFound: 404,
         conflict: 409
       },
-      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄'},
+      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄', clipboard: '📋'},
       emojiSize: 16,
       siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,
