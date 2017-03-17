@@ -12,6 +12,7 @@
 * Improve popup creation:
   * Load (external?) HTML?
   * Use template (HTML) strings?
+  * Popup class that accepts body as parameter.
 * Write JSDoc for functions.
 * Ask for confirmation if I click "spam" or "rude" on a post which has been edited.
 
