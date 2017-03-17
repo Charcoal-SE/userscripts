@@ -273,7 +273,7 @@
       $('.fire-popup-body > h2')
         .prepend(
           emojiOrImage('pencil', true)
-            .attr('title', 'This post has been edited!')
+            .attr('fire-tooltip', 'This post has been edited.')
             .after(' ')
         )
         .data('has-edit-icon', true);
@@ -730,19 +730,11 @@
 
     if (d.has_auto_flagged) {
       title = emojiOrImage('autoflag')
-        .attr('fire-tooltip',
-          emojiOrImage('autoflag')
-            .append(' - You have auto-flagged this post.')
-            .html()
-        )
+        .attr('fire-tooltip', 'You have auto-flagged this post.')
         .append(` ${d.title}`);
     } else if (d.has_flagged) {
       title = emojiOrImage('flag')
-        .attr('fire-tooltip',
-          emojiOrImage('flag')
-            .append(' - You have flagged this post.')
-            .html()
-        )
+        .attr('fire-tooltip', 'You have flagged this post.')
         .append(` ${d.title}`);
     } else {
       title = d.title; // eslint-disable-line prefer-destructuring
