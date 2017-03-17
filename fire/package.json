@@ -37,7 +37,7 @@
       "no-console": "error",
       "no-extra-parens": "error",
       "no-prototype-builtins": "error",
-      "complexity": ["error", 12],
+      "complexity": ["error", 15],
       "consistent-return": "error",
       "no-else-return": "error",
       "no-empty-function": "error",

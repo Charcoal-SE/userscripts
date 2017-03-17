@@ -24,7 +24,7 @@ Basically, now you can _"KILL IT WITH FIRE"_
 [Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).
 
 <!--- http://stackapps.com/apps/oauth/view/9136 --->
-<!--- "🚩" "🗳️" "💣" "🏷️" "🛡️" --->
+<!--- "🗳️" "💣" "🏷️" "🛡️" --->
 <!---
 I've just updated [FIRE](https://github.com/Charcoal-SE/userscripts/tree/master/fire) to [`version`](https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js)!
 --->

@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.3
+// @version     0.9.4
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -722,9 +722,23 @@
       suffix = '';
     }
 
+    let title;
+
+    if (d.has_auto_flagged) {
+      title = emojiOrImage('autoflag')
+        .attr('fire-tooltip', 'You have auto-flagged this post.')
+        .append(` ${d.title}`);
+    } else if (d.has_flagged) {
+      title = emojiOrImage('flag')
+        .attr('fire-tooltip', 'You have flagged this post.')
+        .append(` ${d.title}`);
+    } else {
+      title = d.title; // eslint-disable-line prefer-destructuring
+    }
+
     const body = _('div', 'fire-popup-body')
       .append(_('h2')
-        .append(_('em', {html: d.title, title: 'Question Title'}))
+        .append(_('em', {html: title, title: 'Question Title'}))
       )
       .append(_('hr'))
       .append(
@@ -1468,7 +1482,7 @@
         notFound: 404,
         conflict: 409
       },
-      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄', clipboard: '📋'},
+      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄', clipboard: '📋', flag: '🏳️', autoflag: '🏴'},
       emojiSize: 16,
       siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,

@@ -251,6 +251,9 @@ img.fire-emoji-large {
     pointer-events: none;
     z-index: $zIndex;
     white-space: pre-line;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
   }
 
   &#fire-settings {
