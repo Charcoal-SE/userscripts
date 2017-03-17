@@ -5,12 +5,12 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
 
 ##Quick download links
 
- - [Flag Dialog Smokey Controls (FDSC)](https://github.com/Charcoal-SE/Userscripts/raw/master/fdsc.user.js) ([Instructions](https://github.com/Charcoal-SE/Userscripts/wiki/FDSC))
- - [Gas Mask](https://github.com/Charcoal-SE/Userscripts/raw/master/gas-mask-se.user.js)
- - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms_dark_theme.user.js)
- - [Hide topbar ads](https://github.com/Charcoal-SE/Userscripts/raw/master/hideads.user.js)
- - [Autoflagging information for Charcoal HQ](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging.user.js)
- - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks.user.js) ([Info](https://github.com/Charcoal-SE/userscripts/wiki/AEKS))
+ - [Flag Dialog Smokey Controls (FDSC)](https://github.com/Charcoal-SE/Userscripts/raw/master/fdsc/fdsc.user.js) ([Instructions](https://github.com/Charcoal-SE/Userscripts/wiki/FDSC))
+ - [Gas Mask](https://github.com/Charcoal-SE/Userscripts/raw/master/gas-mask-se/gas-mask-se.user.js)
+ - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms-dark-theme/ms_dark_theme.user.js)
+ - [Hide topbar ads](https://github.com/Charcoal-SE/Userscripts/raw/master/hideads/hideads.user.js)
+ - [Autoflagging information for Charcoal HQ](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging/autoflagging.user.js)
+ - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks/aeks.user.js) ([Info](https://github.com/Charcoal-SE/userscripts/wiki/AEKS))
 
 Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
 
