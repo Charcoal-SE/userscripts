@@ -726,11 +726,19 @@
 
     if (d.has_auto_flagged) {
       title = emojiOrImage('autoflag')
-        .attr('fire-tooltip', 'You have auto-flagged this post.')
+        .attr('fire-tooltip',
+          emojiOrImage('autoflag')
+            .append(' - You have auto-flagged this post.')
+            .html()
+        )
         .append(` ${d.title}`);
     } else if (d.has_flagged) {
       title = emojiOrImage('flag')
-        .attr('fire-tooltip', 'You have flagged this post.')
+        .attr('fire-tooltip',
+          emojiOrImage('flag')
+            .append(' - You have flagged this post.')
+            .html()
+        )
         .append(` ${d.title}`);
     } else {
       title = d.title; // eslint-disable-line prefer-destructuring
@@ -738,7 +746,7 @@
 
     const body = _('div', 'fire-popup-body')
       .append(_('h2')
-        .append(_('em', {html: title, title: 'Question Title'}))
+        .append(_('em', {html: title}))
       )
       .append(_('hr'))
       .append(

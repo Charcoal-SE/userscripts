@@ -21,7 +21,8 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 ## Notes
 
-[Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).
+[Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).  
+[EmojiPedia](http://emojipedia.org/f)
 
 <!--- http://stackapps.com/apps/oauth/view/9136 --->
 <!--- "🗳️" "💣" "🏷️" "🛡️" --->
