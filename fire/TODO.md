@@ -1,7 +1,6 @@
 # TODO:
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
-* Move "why" block up.
 * Add "Rude/Abusive" button:
   * Implement SE "rude" feedback.
 * Load data through metapi.js for cross-script storage. &diams;
@@ -12,6 +11,7 @@
 * Improve popup creation:
   * Load (external?) HTML?
   * Use template (HTML) strings?
+  * Popup class that accepts body as parameter.
 * Write JSDoc for functions.
 * Ask for confirmation if I click "spam" or "rude" on a post which has been edited.
 
@@ -21,13 +21,11 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 ## Notes
 
-[Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).
+[Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).  
+[EmojiPedia](http://emojipedia.org/f)
 
 <!--- http://stackapps.com/apps/oauth/view/9136 --->
+<!--- "🗳️" "💣" "🏷️" "🛡️" --->
 <!---
-"🚩"
-"🗳️"
-"💣"
-"🏷️"
-"🛡️"
+I've just updated [FIRE](https://github.com/Charcoal-SE/userscripts/tree/master/fire) to [`version`](https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js)!
 --->
