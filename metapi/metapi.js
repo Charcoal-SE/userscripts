@@ -301,7 +301,11 @@ window.metapi = {};
 
       var f = options.filter;
       if (f && (!f.included_fields || f.included_fields.indexOf(requiredFilter) === -1)) {
-        callback(new metapi.Response(false, "An invalid filter is passed in the options."));
+        callback(new metapi.Response(false, {
+          error_name: "bad_request",
+          error_code: 400,
+          error_message: "An invalid filter is passed in the options."
+        }));
       }
 
       $.ajax({
