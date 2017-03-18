@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.7
+// @version     0.9.8
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -761,8 +761,8 @@
         .append(d.body.replace(/<script/g, '&lt;script'))
       );
 
-    body.find('pre code').each(() => {
-      this.innerHTML = this.innerHTML
+    body.find('pre code').each((i, element) => {
+      element.innerHTML = element.innerHTML
         .replace(/>/g, '&gt;')
         .replace(/</g, '&lt;')
         .replace(/"/g, '&quot;');
@@ -1362,7 +1362,7 @@
       chat.on('DOMSubtreeModified', () => {
         if (chat.html().length !== 0) { // Chat messages have loaded
           chat.off('DOMSubtreeModified');
-          $(fire.SDMessageSelector).each((...args) => decorateMessage(args[1]));
+          $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
 
           fire.log('Decorated existing messages.');
 
