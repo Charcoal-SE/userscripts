@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */ // Don't throw warnings for names like `error_name`.
-/* global ReconnectingWebSocket */
-window.metapi = window.metapi || {};
+/* global ReconnectingWebSocket, unsafeWindow */
 
-(function () {
+(function (scope) {
   "use strict";
+  scope.metapi = scope.metapi || {};
 
-  if (window.metapi.debug) {
+  if (scope.metapi.debug) {
     console.log("metapi has already been included.");
     return;
   }
@@ -474,4 +474,4 @@ window.metapi = window.metapi || {};
       sock.addCloseCallback(closeCallback);
     }
   };
-})();
+})(unsafeWindow || window);
