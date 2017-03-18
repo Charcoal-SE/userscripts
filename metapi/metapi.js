@@ -251,47 +251,97 @@ window.metapi = {};
    */
   metapi.getPost = function (ident, key, options, callback) {
     options = options || {};
+    options.key = key;
+    options.page = options.page || 1;
 
-    var overwrite = options.hasOwnProperty("forceReload") && delete options["forceReload"];
+    var overwrite = options.hasOwnProperty("forceReload") && options["forceReload"];
+    delete options["forceReload"];
 
-    var optionString = "";
-    var optionNames = Object.keys(options);
-    for (var i = 0; i < optionNames.length; i++) {
-      optionString += "&" + optionNames[i] + "=" + options[optionNames[i]];
+    if (!(ident instanceof Array)) {
+      ident = [ident];
     }
 
-    var cached = metapi.postCache.get(ident);
-    if (cached && !overwrite) {
-      return new metapi.Response(true, cached);
-    }
+    // Filter duplicates
+    ident = ident.sort().filter(function (item, pos, ary) {
+      return !pos || item !== ary[pos - 1];
+    });
 
-    var fetchUrl = "";
-    if (typeof ident === "string") {
-      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/urls?urls=" + ident + "&key=" + key + optionString;
-    }
-    else if (typeof ident === "number") {
-      fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/" + ident + "?key=" + key + optionString;
-    }
+    var response = [];
+    var toLoad = [];
 
-    $.ajax({
-      type: "GET",
-      url: fetchUrl
-    })
-    .done(function (data) {
-      var items = data.items;
-      if (items.length > 0 && items[0]) {
-        metapi.postCache.add(ident, items[0]);
-        callback(new metapi.Response(true, items[0]));
+    for (var j = 0; j < ident.length; j++) {
+      var cached = metapi.postCache.get(ident[j]);
+      if (cached && options.page === 1 && !overwrite) {
+        response.push(cached);
       } else {
+        toLoad.push(ident[j]);
+      }
+    }
+
+    if (toLoad.length === 0) {
+      callback(new metapi.Response(true, response));
+    } else {
+      var fetchUrl = "https://metasmoke.erwaysoftware.com/api/posts/";
+      var type = "GET";
+      var isNumeric;
+      var requiredFilter;
+
+      if (typeof toLoad[0] === "string") {
+        fetchUrl += "urls";
+        options.urls = toLoad.join(";");
+        type = "POST";
+        isNumeric = false;
+        requiredFilter = "posts.link";
+      }
+      else if (typeof toLoad[0] === "number") {
+        fetchUrl += toLoad.join(encodeURIComponent(";"));
+        isNumeric = true;
+        requiredFilter = "posts.id";
+      }
+
+      var f = options.filter;
+      if (f && (!f.included_fields || f.included_fields.indexOf(requiredFilter) === -1)) {
         callback(new metapi.Response(false, {
-          error_name: "no_item",
-          error_code: 404,
-          error_message: "No items were returned or the requested item was null."
+          error_name: "bad_request",
+          error_code: 400,
+          error_message: "An invalid filter is passed in the options."
         }));
       }
-    }).error(function (jqXhr) {
-      callback(new metapi.Response(false, jqXhr.responseText));
-    });
+
+      $.ajax({
+        url: fetchUrl,
+        type: type,
+        data: options
+      })
+      .done(function (data) {
+        var items = data.items;
+        if (items && items.length > 0) {
+          for (var k = 0; k < items.length; k++) {
+            var cacheValue = isNumeric ? items[k].id : items[k].link;
+            metapi.postCache.add(cacheValue, items[k], {overwrite: true}); // Overwrite: "urls to be loaded" aren't cached.
+            response.push(items[k]);
+          }
+
+          if (data.has_more) {
+            options.forceReload = overwrite;
+            options.page++;
+            metapi.getPost(ident, key, options, function (nextPage) {
+              callback(new metapi.Response(true, response.concat(nextPage.data)));
+            });
+          } else {
+            callback(new metapi.Response(true, response));
+          }
+        } else {
+          callback(new metapi.Response(false, {
+            error_name: "no_item",
+            error_code: 404,
+            error_message: "No items were returned or the requested item was null."
+          }));
+        }
+      }).error(function (jqXhr) {
+        callback(new metapi.Response(false, jqXhr.responseText));
+      });
+    }
   };
 
   /**
