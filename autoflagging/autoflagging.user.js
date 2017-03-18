@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.13.1
+// @version     0.13.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
