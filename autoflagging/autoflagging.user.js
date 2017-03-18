@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.13.2
+// @version     0.13.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -15,6 +15,7 @@
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
 // @grant       none
+// @require     https://charcoal-se.org/userscripts/metapi/metapi.js
 // ==/UserScript==
 /* global autoflagging, metapi */
 
@@ -77,12 +78,7 @@
       $.ajaxSetup({cache: false});
     }
 
-    // Load metapi
-    if (window.metapi) {
-      setTimeout(autoflagging.registerSocket);
-    } else {
-      $.getScript("//charcoal-se.org/userscripts/metapi/metapi.js", autoflagging.registerSocket);
-    }
+    setTimeout(autoflagging.registerSocket);
   };
 
   autoflagging.loadExternalScripts();
@@ -507,6 +503,7 @@
 
   // Register a websocket listener.
   autoflagging.registerSocket = function () {
+    autoflagging.trace("autoflagging.registerSocket");
     metapi.watchSocket(autoflagging.key, autoflagging.socketOnMessage, autoflagging.socketOnclose);
   };
 

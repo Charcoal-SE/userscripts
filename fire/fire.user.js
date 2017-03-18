@@ -4,13 +4,14 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.5
+// @version     0.9.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
+// @require     https://charcoal-se.org/userscripts/metapi/metapi.js
 // @grant       none
 // ==/UserScript==
 
@@ -64,6 +65,7 @@
     getCurrentChatUser();
     loadStackExchangeSites();
     injectExternalScripts();
+    registerWebSocket();
     showFireOnExistingMessages();
     registerAnchorHover();
     registerOpenLastReportKey();
@@ -1237,7 +1239,6 @@
 
     // Toastr is a Javascript library for non-blocking notifications.
     injectScript(typeof toastr, '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', loadToastrCss, initializeToastr);
-    injectScript(typeof metapi, '//charcoal-se.org/userscripts/metapi/metapi.js', registerWebSocket);
 
     fire.log('Injected scripts and stylesheets.');
   }

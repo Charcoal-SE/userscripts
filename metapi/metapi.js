@@ -33,6 +33,9 @@ window.metapi = {};
       }
     });
 
+  // I've loaded.
+  localStorage.loadingMetapi = false;
+
   // Public: Enable debug mode by setting this to true. Calls to metapi.debug will log output.
   metapi.debugMode = false;
 
@@ -438,7 +441,7 @@ window.metapi = {};
    *                         websocket
    */
   metapi.watchSocket = function (key, messageCallback, closeCallback) {
-    if (!ReconnectingWebSocket) {
+    if (typeof ReconnectingWebSocket === "undefined") {
       pendingSockets.push({
         key: key,
         messageCallback: messageCallback,
