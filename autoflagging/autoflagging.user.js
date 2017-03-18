@@ -15,7 +15,7 @@
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
 // @grant       none
-// @require     https://charcoal-se.org/userscripts/metapi/metapi.js
+// @require     https://charcoal-se.org/userscripts/metapi/metapi.js?20170318
 // ==/UserScript==
 /* global autoflagging, metapi */
 
