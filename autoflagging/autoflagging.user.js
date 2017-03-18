@@ -25,8 +25,6 @@
   "use strict";
   // console.log("Autoflagging Information started.");
 
-  autoflagging.loadExternalScripts();
-
   // Constants
   var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
   window.autoflagging = {};
@@ -86,6 +84,8 @@
       $.getScript("//charcoal-se.org/userscripts/metapi/metapi.js", autoflagging.registerSocket);
     }
   };
+
+  autoflagging.loadExternalScripts();
 
   /*!
    * Decorates a message DOM element with information from the API or websocket.
