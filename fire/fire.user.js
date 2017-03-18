@@ -110,8 +110,10 @@
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${reportedUrl}`;
     $.get(url, data => {
       if (data && data.items) {
-        if (data.items.length <= 0)
+        if (data.items.length <= 0) {
           toastr.info(`No metasmoke reports found for url:<br />${reportedUrl}`);
+          return;
+        }
 
         callback(data.items[0]);
       }
