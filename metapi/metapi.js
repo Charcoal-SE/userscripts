@@ -1,18 +1,12 @@
 /* eslint-disable camelcase */ // Don't throw warnings for names like `error_name`.
-/* global ReconnectingWebSocket, unsafeWindow */
 
-(function (scope) {
+window.metapi = {};
+
+(function () {
   "use strict";
-  scope.metapi = scope.metapi || {};
-
-  if (scope.metapi.debug) {
-    console.log("metapi has already been included.");
-    return;
-  }
 
   // Private: Dictionary of API keys to metapi.WebSockets
   var sockets = {};
-  var pendingSockets = [];
 
   // Private: Dictionary of MS database field names to bitstring indexes
   var api_field_mappings = {};
@@ -27,18 +21,6 @@
     api_field_mappings = null;
     console.error("Failed to fetch API field mappings from MS API:", jqXhr);
   });
-
-  // Load the ReconnectingWebSocket API and register any pending sockets on load.
-  $.getScript("https://cdn.rawgit.com/joewalnes/reconnecting-websocket/fd7c819b/reconnecting-websocket.js",
-    function () {
-      while (pendingSockets.length) {
-        var options = pendingSockets.shift();
-        metapi.watchSocket(options.key, options.messageCallback);
-      }
-    });
-
-  // I've loaded.
-  localStorage.loadingMetapi = false;
 
   // Public: Enable debug mode by setting this to true. Calls to metapi.debug will log output.
   metapi.debugMode = false;
@@ -191,33 +173,20 @@
    */
   metapi.WebSocket = function (address, onOpen) {
     var callbacks = [];
-    var closeCallbacks = [];
 
     var getCallbacks = function () {
       return callbacks;
-    };
-
-    var getCloseCallbacks = function () {
-      return closeCallbacks;
     };
 
     var addCallback = function (callback) {
       callbacks.push(callback);
     };
 
-    var addCloseCallback = function (callback) {
-      closeCallbacks.push(callback);
-    };
-
     var removeCallback = function (callback) {
       callbacks.pop(callback);
     };
 
-    var removeCloseCallback = function (callback) {
-      closeCallbacks.pop(callback);
-    };
-
-    var conn = new ReconnectingWebSocket(address);
+    var conn = new WebSocket(address);
 
     if (onOpen && typeof onOpen === "function") {
       conn.onopen = onOpen;
@@ -226,12 +195,6 @@
     conn.onmessage = function (data) {
       for (var i = 0; i < callbacks.length; i++) {
         callbacks[i](data);
-      }
-    };
-
-    conn.onclose = function (data) {
-      for (var i = 0; i < closeCallbacks.length; i++) {
-        closeCallbacks[i](data);
       }
     };
 
@@ -249,13 +212,6 @@
       getCallbacks: getCallbacks,
 
       /**
-       * Retrieves an arrary of existing callbacks for the socket close.
-       *
-       * @returns an array of functions, each of which is a socket close
-       */
-      getCloseCallbacks: getCloseCallbacks,
-
-      /**
        * Appends a message callback function to the callbacks list.
        *
        * @param callback  a function with optional data parameter, used as a callback to the message event
@@ -263,25 +219,11 @@
       addCallback: addCallback,
 
       /**
-       * Appends a socket close callback function to the close callbacks list.
-       *
-       * @param callback  a function with optional data parameter, used as a callback to the socket close event
-       */
-      addCloseCallback: addCloseCallback,
-
-      /**
        * Given a reference to a callback function, removes that function from the message callbacks list.
        *
        * @param callback  a reference to a callback function already in the socket's message callbacks list
        */
       removeCallback: removeCallback,
-
-      /**
-       * Given a reference to a close callback function, removes that function from the message close callbacks list.
-       *
-       * @param callback  a reference to a close callback function already in the socket's message close callbacks list
-       */
-      removeCloseCallback: removeCloseCallback,
 
       /**
        * Sends a message through the websocket.
@@ -444,16 +386,7 @@
    * @param messageCallback  a callback function accepting a single data parameter containing a message received on the
    *                         websocket
    */
-  metapi.watchSocket = function (key, messageCallback, closeCallback) {
-    if (typeof ReconnectingWebSocket === "undefined") {
-      pendingSockets.push({
-        key: key,
-        messageCallback: messageCallback,
-        closeCallback: closeCallback
-      });
-      return;
-    }
-
+  metapi.watchSocket = function (key, messageCallback) {
     var sock;
     if (!sockets.hasOwnProperty(key)) {
       sockets[key] = new metapi.WebSocket("wss://metasmoke.erwaysoftware.com/cable", function () {
@@ -469,9 +402,5 @@
     sock = sockets[key];
 
     sock.addCallback(messageCallback);
-
-    if (closeCallback) {
-      sock.addCloseCallback(closeCallback);
-    }
   };
-})(unsafeWindow || window);
+})();

@@ -7,17 +7,17 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.13.3
+// @version     0.13.4
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
+// @require     https://raw.githubusercontent.com/joewalnes/reconnecting-websocket/f8055b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js
 // @grant       none
-// @require     https://charcoal-se.org/userscripts/metapi/metapi.js?20170318_3
 // ==/UserScript==
-/* global autoflagging, metapi */
+/* global autoflagging, ReconnectingWebSocket */
 
 // To enable/disable trace information, type autoflagging.trace(true) or
 // autoflagging.trace(false), respectively, in your browser's console.
@@ -25,6 +25,19 @@
 (function () {
   "use strict";
   // console.log("Autoflagging Information started.");
+
+  // Inject CSS
+  var css = window.document.createElement("link");
+  css.rel = "stylesheet";
+  css.href = "//charcoal-se.org/userscripts/autoflagging/autoflagging.css";
+  document.head.appendChild(css);
+
+  // Load the Emoji support script
+  if (!window.emojiSupportChecker) {
+    $.ajaxSetup({cache: true});
+    $.getScript("//charcoal-se.org/userscripts/emoji/emoji.js");
+    $.ajaxSetup({cache: false});
+  }
 
   // Constants
   var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
@@ -62,26 +75,6 @@
 
   // Error handling
   autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
-
-  // Inject external scripts.
-  autoflagging.loadExternalScripts = function () {
-    // Inject CSS
-    var css = window.document.createElement("link");
-    css.rel = "stylesheet";
-    css.href = "//charcoal-se.org/userscripts/autoflagging/autoflagging.css";
-    document.head.appendChild(css);
-
-    // Load the Emoji support script
-    if (!window.emojiSupportChecker) {
-      $.ajaxSetup({cache: true});
-      $.getScript("//charcoal-se.org/userscripts/emoji/emoji.js");
-      $.ajaxSetup({cache: false});
-    }
-
-    setTimeout(autoflagging.registerSocket);
-  };
-
-  autoflagging.loadExternalScripts();
 
   /*!
    * Decorates a message DOM element with information from the API or websocket.
@@ -439,7 +432,8 @@
 
   // Listen to MS events
   autoflagging.msgQueue = [];
-  autoflagging.socketOnmessage = function (message) {
+  autoflagging.socket = new ReconnectingWebSocket("wss://metasmoke.erwaysoftware.com/cable");
+  autoflagging.socket.onmessage = function (message) {
     function decorate(selector, data) {
       (function _deco() {
         autoflagging.log("Attempting to decorate \"" + selector + "\" with " + JSON.stringify(data));
@@ -496,15 +490,19 @@
     }
   };
 
-  // Websocket close listener
-  autoflagging.socketOnclose = function (close) {
-    autoflagging.trace("WebSocket closed: " + close.code + " - " + close.reason + ".");
+  autoflagging.socket.onopen = function () {
+    autoflagging.trace("WebSocket opened.");
+    // Send authentication
+    autoflagging.socket.send(JSON.stringify({
+      identifier: JSON.stringify({
+        channel: "ApiChannel",
+        key: autoflagging.key
+      }),
+      command: "subscribe"
+    }));
   };
-
-  // Register a websocket listener.
-  autoflagging.registerSocket = function () {
-    autoflagging.trace("autoflagging.registerSocket");
-    metapi.watchSocket(autoflagging.key, autoflagging.socketOnMessage, autoflagging.socketOnclose);
+  autoflagging.socket.onclose = function (close) {
+    autoflagging.trace("WebSocket closed: " + close.code + " - " + close.reason + ".");
   };
 
   // Sometimes, autoflagging information arrives before the chat message.
