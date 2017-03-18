@@ -1,10 +1,14 @@
 /* eslint-disable camelcase */ // Don't throw warnings for names like `error_name`.
 /* global ReconnectingWebSocket */
-
-window.metapi = {};
+window.metapi = window.metapi || {};
 
 (function () {
   "use strict";
+
+  if (window.metapi) {
+    metapi.debug("metapi has already been included.");
+    return;
+  }
 
   // Private: Dictionary of API keys to metapi.WebSockets
   var sockets = {};
