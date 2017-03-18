@@ -272,7 +272,7 @@ window.metapi = {};
     for (var j = 0; j < ident.length; j++) {
       var cached = metapi.postCache.get(ident[j]);
       if (cached && options.page === 1 && !overwrite) {
-        response.push(new metapi.Response(true, cached));
+        response.push(cached);
       } else {
         toLoad.push(ident[j]);
       }
@@ -313,7 +313,6 @@ window.metapi = {};
         var items = data.items;
         if (items && items.length > 0) {
           for (var k = 0; k < items.length; k++) {
-            // TODO: Properly map the response to the input ids
             var cacheValue = isNumeric ? items[k].id : items[k].link;
             metapi.postCache.add(cacheValue, items[k], {overwrite: true}); // Overwrite: "urls to be loaded" aren't cached.
             response.push(items[k]);
