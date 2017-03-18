@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */ // Don't throw warnings for names like `error_name`.
+/* global ReconnectingWebSocket */
 
 window.metapi = {};
 
@@ -21,6 +22,8 @@ window.metapi = {};
     api_field_mappings = null;
     console.error("Failed to fetch API field mappings from MS API:", jqXhr);
   });
+
+  $.getScript("https://raw.githubusercontent.com/joewalnes/reconnecting-websocket/f8055b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js");
 
   // Public: Enable debug mode by setting this to true. Calls to metapi.debug will log output.
   metapi.debugMode = false;
@@ -171,7 +174,7 @@ window.metapi = {};
    * @param address  the address of the websocket to connect to
    * @param onOpen   a callback function for the websocket's open event
    */
-  metapi.WebSocket = function (address, onOpen) {
+  metapi.WebSocket = function (address, onOpen, onClose) {
     var callbacks = [];
 
     var getCallbacks = function () {
@@ -186,10 +189,14 @@ window.metapi = {};
       callbacks.pop(callback);
     };
 
-    var conn = new WebSocket(address);
+    var conn = new ReconnectingWebSocket(address);
 
     if (onOpen && typeof onOpen === "function") {
       conn.onopen = onOpen;
+    }
+
+    if (onClose && typeof onClose === "function") {
+      conn.onclose = onClose;
     }
 
     conn.onmessage = function (data) {
@@ -389,7 +396,7 @@ window.metapi = {};
   metapi.watchSocket = function (key, messageCallback) {
     var sock;
     if (!sockets.hasOwnProperty(key)) {
-      sockets[key] = new metapi.WebSocket("wss://metasmoke.erwaysoftware.com/cable", function () {
+      sockets[key] = new metapi.ReconnectingWebSocket("wss://metasmoke.erwaysoftware.com/cable", function () {
         this.send(JSON.stringify({
           identifier: JSON.stringify({
             channel: "ApiChannel",
