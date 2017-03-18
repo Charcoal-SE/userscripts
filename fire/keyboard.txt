@@ -6,7 +6,7 @@ tp- / vandalism:    [v] / [3]
 naa:                [n] / [4]
 False positive:     [f] / [5]
 
-Submit selected feedback: [Enter] / [Esc]
+Submit selected feedback: [Enter] / [Space]
 
 Open on site:       [o] / [6]
 Open on MetaSmoke:  [m] / [7]
