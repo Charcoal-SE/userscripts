@@ -5,7 +5,7 @@ window.metapi = window.metapi || {};
 (function () {
   "use strict";
 
-  if (window.metapi) {
+  if (window.metapi.debug) {
     metapi.debug("metapi has already been included.");
     return;
   }
