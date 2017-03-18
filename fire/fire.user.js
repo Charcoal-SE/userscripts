@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.8
+// @version     0.9.9
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -109,8 +109,12 @@
     const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${reportedUrl}`;
     $.get(url, data => {
-      if (data && data.items)
+      if (data && data.items) {
+        if (data.items.length <= 0)
+          toastr.info(`No metasmoke reports found for url:<br />${reportedUrl}`);
+
         callback(data.items[0]);
+      }
     });
   }
 
@@ -144,6 +148,9 @@
     $.get(url, response => {
       fire.log('Report cache updated:', response);
       if (response && response.items) {
+        if (response.items.length <= 0)
+          toastr.info('No metasmoke reports found.');
+
         for (const item of response.items)
           parseDataForReport(item, false, null, true);
       }
