@@ -24,8 +24,14 @@ window.metapi = {};
     console.error("Failed to fetch API field mappings from MS API:", jqXhr);
   });
 
+  // Load the ReconnectingWebSocket API and register any pending sockets on load.
   $.getScript("https://cdn.rawgit.com/joewalnes/reconnecting-websocket/fd7c819b/reconnecting-websocket.js",
-    metapi.watchPendingSockets);
+    function () {
+      while (pendingSockets.length) {
+        var options = pendingSockets.shift();
+        metapi.watchSocket(options.key, options.messageCallback);
+      }
+    });
 
   // Public: Enable debug mode by setting this to true. Calls to metapi.debug will log output.
   metapi.debugMode = false;
@@ -193,11 +199,11 @@ window.metapi = {};
     };
 
     var addCloseCallback = function (callback) {
-      callbacks.push(callback);
+      closeCallbacks.push(callback);
     };
 
     var removeCallback = function (callback) {
-      closeCallbacks.pop(callback);
+      callbacks.pop(callback);
     };
 
     var removeCloseCallback = function (callback) {
@@ -459,16 +465,6 @@ window.metapi = {};
 
     if (closeCallback) {
       sock.addCloseCallback(closeCallback);
-    }
-  };
-
-  /**
-   * Registers sockets / listeners for socckets that were requested while an dependency was still loading.
-   */
-  metapi.watchPendingSockets = function () {
-    while (pendingSockets.length) {
-      var options = pendingSockets.shift();
-      metapi.watchSocket(options.key, options.messageCallback);
     }
   };
 })();
