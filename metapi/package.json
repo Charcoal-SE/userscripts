@@ -40,7 +40,6 @@
       ],
       "no-eval": 1,
       "import/no-unassigned-import": 0,
-      "no-global-assign": 0,
       "camelcase": 1,
       "brace-style": 0,
       "no-prototype-builtins": 0,
