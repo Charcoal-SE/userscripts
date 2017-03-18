@@ -491,7 +491,7 @@
   };
 
   autoflagging.socket.onopen = function () {
-    autoflagging.trace("WebSocket opened.");
+    autoflagging.log("WebSocket opened.");
     // Send authentication
     autoflagging.socket.send(JSON.stringify({
       identifier: JSON.stringify({
