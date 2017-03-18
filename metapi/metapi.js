@@ -85,7 +85,7 @@ var mp = function ($) {
        * @param k  the cache key to remove
        */
       this.delete = function (k) {
-        delete store[k];
+        return delete store[k];
       };
 
       return this;

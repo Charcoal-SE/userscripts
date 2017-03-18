@@ -69,5 +69,18 @@ describe("metapi", () => {
         }, ReferenceError);
       });
     });
+
+    describe("delete", () => {
+      it("should remove an existing key", () => {
+        cache.delete("test_key");
+        assert.equal(null, cache.get("test_key"));
+      });
+
+      it("should not care if the key doesn't exist", () => {
+        assert.doesNotThrow(() => {
+          cache.delete("foo");
+        });
+      });
+    });
   });
 });
