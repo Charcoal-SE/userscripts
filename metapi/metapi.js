@@ -271,7 +271,7 @@ window.metapi = {};
 
     for (var j = 0; j < ident.length; j++) {
       var cached = metapi.postCache.get(ident[j]);
-      if (cached && !overwrite) {
+      if (cached && options.page === 1 && !overwrite) {
         response.push(new metapi.Response(true, cached));
       } else {
         toLoad.push(ident[j]);
