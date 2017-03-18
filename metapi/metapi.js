@@ -24,7 +24,7 @@ window.metapi = {};
     console.error("Failed to fetch API field mappings from MS API:", jqXhr);
   });
 
-  $.getScript("https://raw.githubusercontent.com/joewalnes/reconnecting-websocket/f8055b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js",
+  $.getScript("https://cdn.rawgit.com/joewalnes/reconnecting-websocket/fd7c819b/reconnecting-websocket.js",
     metapi.watchPendingSockets);
 
   // Public: Enable debug mode by setting this to true. Calls to metapi.debug will log output.
