@@ -7,16 +7,17 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.12.3
+// @version     0.13
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
+// @require     https://raw.githubusercontent.com/joewalnes/reconnecting-websocket/f8055b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js
 // @grant       none
 // ==/UserScript==
-/* global autoflagging */
+/* global autoflagging, ReconnectingWebSocket */
 
 // To enable/disable trace information, type autoflagging.trace(true) or
 // autoflagging.trace(false), respectively, in your browser's console.
@@ -431,7 +432,7 @@
 
   // Listen to MS events
   autoflagging.msgQueue = [];
-  autoflagging.socket = new WebSocket("wss://metasmoke.erwaysoftware.com/cable");
+  autoflagging.socket = new ReconnectingWebSocket("wss://metasmoke.erwaysoftware.com/cable");
   autoflagging.socket.onmessage = function (message) {
     function decorate(selector, data) {
       (function _deco() {
@@ -490,6 +491,7 @@
   };
 
   autoflagging.socket.onopen = function () {
+    autoflagging.trace("WebSocket opened.");
     // Send authentication
     autoflagging.socket.send(JSON.stringify({
       identifier: JSON.stringify({
@@ -498,6 +500,9 @@
       }),
       command: "subscribe"
     }));
+  };
+  autoflagging.socket.onclose = function (close) {
+    autoflagging.trace("WebSocket closed: " + close.code + " - " + close.reason + ".");
   };
 
   // Sometimes, autoflagging information arrives before the chat message.

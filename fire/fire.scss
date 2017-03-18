@@ -166,39 +166,10 @@ img.fire-emoji-large {
     box-shadow: inset 0 0 10px -3px $shadow-color;
     position: relative;
 
-    .fire-report-info {
-      max-height: 20px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: max-height $transitionTime;
-
-      &.fire-show-reason {
-        max-height: 100px;
-      }
-
-      .fire-username {
-        float: right;
-        font-weight: normal;
-        margin-top: -17px;
-      }
-
-      .fire-reason {
-        display: inline-block;
-        white-space: pre-line;
-        font-size: 0.8em;
-        font-family: $codeFont;
-        position: relative;
-        left: 2px;
-        top: 8px;
-        background-color: $codeBlockColor;
-        border-radius: 3px;
-        padding: 4px;
-        margin: 10px 6px 20px 0;
-        box-shadow: 0 0 10px -1px $shadow-color;
-        max-height: 50px;
-        max-width: 545px;
-        overflow-y: auto;
-      }
+    .fire-report-info .fire-username {
+      float: right;
+      font-weight: normal;
+      margin-top: -17px;
     }
 
     .fire-reported-post {
@@ -279,6 +250,12 @@ img.fire-emoji-large {
     border: 1px solid #bbb;
     pointer-events: none;
     z-index: $zIndex;
+    white-space: pre-line;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    max-width: 50%;
+    cursor: pointer;
   }
 
   &#fire-settings {
