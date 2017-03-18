@@ -272,7 +272,7 @@
     if (!h2.data('has-edit-icon')) {
       $('.fire-popup-body > h2')
         .prepend(
-          emojiOrImage('pencil', true)
+          emojiOrImage('pencil')
             .attr('fire-tooltip', 'This post has been edited.')
             .after(' ')
         )
