@@ -11,7 +11,7 @@
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
-// @require     https://charcoal-se.org/userscripts/metapi/metapi.js?20170318_1
+// @require     https://charcoal-se.org/userscripts/metapi/metapi.js?20170318_2
 // @grant       none
 // ==/UserScript==
 
