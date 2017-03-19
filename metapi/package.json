@@ -30,6 +30,14 @@
       "jquery",
       "node"
     ],
+    "overrides": [
+      {
+        "files": "test/*.js",
+        "rules": {
+          "camelcase": 0
+        }
+      }
+    ],
     "rules": {
       "quotes": [
         0,
@@ -51,7 +59,8 @@
         "error",
         "smart"
       ],
-      "unicorn/filename-case": "off"
+      "unicorn/filename-case": "off",
+      "max-params": [1, 5]
     },
     "globals": [
       "metapi"

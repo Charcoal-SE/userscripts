@@ -100,18 +100,15 @@ var mp = function ($) {
      */
     Response: function (success, data) {
       if (!success) {
-        return {
-          success: success,
-          error_name: data["error_name"],
-          error_code: data["error_code"],
-          error_message: data["error_message"]
-        };
+        this.success = success;
+        this.error_name = data['error_name'];
+        this.error_code = data['error_code'];
+        this.error_message = data['error_message'];
+        return;
       }
 
-      return {
-        success: success,
-        data: data
-      };
+      this.success = success;
+      this.data = data;
     },
 
     /**
@@ -128,7 +125,6 @@ var mp = function ($) {
         for (var i = 0; i < required_fields.length; i++) {
           var index = api_field_mappings[required_fields[i]];
           bits[index] = 1;
-          console.log(index, bits);
         }
 
         var unsafeFilter = "";
@@ -136,41 +132,37 @@ var mp = function ($) {
           var nextByte = bits.splice(0, 8).join("");
           var charCode = parseInt(nextByte.toString(), 2);
           unsafeFilter += String.fromCharCode(charCode);
-          console.log(nextByte, charCode, unsafeFilter);
         }
 
         return encodeURIComponent(unsafeFilter);
       }
 
       if (api_field_mappings === {} || api_field_mappings === null) {
-        return {
-          success: false,
-          error_name: 'missing_data',
-          error_message: 'API field mappings are not available - refer to earlier error messages or call again shortly.',
-          error_code: 410
-        };
+        this.success = false;
+        this.error_name = 'missing_data';
+        this.error_message = 'API field mappings are not available - refer to earlier error messages or call again shortly.';
+        this.error_code = 410;
+        return;
       }
 
-      return {
-        success: true,
+      this.success = true;
 
-        /**
-         * The filter string itself. This string can be passed as the filter query string parameter to a metasmoke API
-         * request.
-         */
-        filter: createFilter(),
+      /**
+       * The filter string itself. This string can be passed as the filter query string parameter to a metasmoke API
+       * request.
+       */
+      this.filter = createFilter();
 
-        /**
-         * Equivalent to the original required_fields list: an array of fields that are included in this filter.
-         */
-        included_fields: required_fields,
+      /**
+       * Equivalent to the original required_fields list: an array of fields that are included in this filter.
+       */
+      this.included_fields = required_fields;
 
-        /**
-         * Equivalent to the internal api_field_mappings dictionary. This maps FQDF names to bitstring indexes, and can
-         * be used by applications to create their own filters.
-         */
-        api_field_mappings: api_field_mappings
-      };
+      /**
+       * Equivalent to the internal api_field_mappings dictionary. This maps FQDF names to bitstring indexes, and can
+       * be used by applications to create their own filters.
+       */
+      this.api_field_mappings = api_field_mappings;
     },
 
     /**
