@@ -377,7 +377,7 @@
   /**
    * loadPostFlagStatus - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
    *
-   * @param  {number} page the page to load.
+   * @param  {number} [page=1] the page to load.
    */
   function loadCurrentSEUser(page = 1) {
     const parameters = {
@@ -1271,8 +1271,8 @@
   /**
    * keyCodesToArray - Structure the keyCodes Array.
    *
-   * @param  {object} keyCodes An number, string, or array of numbers or strings containing keys or keycodes.
-   * @returns {array}          An array of keyCodes mapped from the input chars / keyCodes.
+   * @param   {(number|string|array)} keyCodes An number, string, or array of numbers or strings containing keys or keycodes.
+   * @returns {array.number}                   An array of keyCodes mapped from the input chars / keyCodes.
    */
   function keyCodesToArray(keyCodes) {
     if (!Array.isArray(keyCodes))
@@ -1291,12 +1291,12 @@
   /**
    * createFeedbackButton - Create a feedback button for the top of the popup.
    *
-   * @param   {object} data     the report data.
-   * @param   {array}  keyCodes The keyCodes to use for this button.
-   * @param   {string} text     The text to display for this button.
-   * @param   {string} verdict  This button's MetaSmoke verdict
-   * @param   {string} tooltip  The tooltip to display for this button.
-   * @returns {object}          The constructed feedback button.
+   * @param   {object}                 data     the report data.
+   * @param   {(number|string|array)}  keyCodes The keyCodes to use for this button.
+   * @param   {string}                 text     The text to display for this button.
+   * @param   {string}                 verdict  This button's MetaSmoke verdict
+   * @param   {string}                 tooltip  The tooltip to display for this button.
+   * @returns {object}                          The constructed feedback button.
    */
   function createFeedbackButton(data, keyCodes, text, verdict, tooltip) {
     let count;
@@ -1468,9 +1468,9 @@
   /**
    * emojiOrImage - Returns the emoji if it's supported. Otherwise, return a fallback image.
    *
-   * @param   {string}  emoji   The emoji to render
-   * @param   {boolean} [large] Make it large?
-   * @returns {object}          A jQuery `<span>` DOM node with the specified emoji as string or image.
+   * @param   {string}  emoji         The emoji to render
+   * @param   {boolean} [large=false] Make it large?
+   * @returns {object}                A jQuery `<span>` DOM node with the specified emoji as string or image.
    */
   function emojiOrImage(emoji, large) {
     emoji = fire.constants.emoji[emoji] || emoji;
