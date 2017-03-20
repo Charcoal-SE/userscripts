@@ -21,7 +21,7 @@
   /**
    * anonymous function - Initialize FIRE.
    *
-   * @param  {object} scope The scope to register FIRE on. Usually, `window`.
+   * @param {object} scope The scope to register FIRE on. Usually, `window`.
    */
   (scope => { // Init
     const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
@@ -127,8 +127,8 @@
   /**
    * getDataForUrl - Loads MetaSmoke data for a specified post url.
    *
-   * @param  {string}               reportedUrl The url that's been reported.
-   * @param  {singleReportCallback} callback    An action to perform after the report is loaded.
+   * @param {string}               reportedUrl The url that's been reported.
+   * @param {singleReportCallback} callback    An action to perform after the report is loaded.
    */
   function getDataForUrl(reportedUrl, callback) {
     const {ms} = fire.api;
@@ -159,7 +159,7 @@
   /**
    * loadDataForReport - Loads a report's data when you hover over the FIRE button.
    *
-   * @param  {boolean} openAfterLoad Open the report popup after load?
+   * @param {boolean} openAfterLoad Open the report popup after load?
    */
   function loadDataForReport(openAfterLoad) {
     const $this = $(this);
@@ -198,10 +198,10 @@
   /**
    * parseDataForReport - Parse a report's loaded data.
    *
-   * @param  {object}  data          A MetaSmoke report
-   * @param  {boolean} openAfterLoad Open the report popup after load?
-   * @param  {object}  $this         The clicked FIRE report button
-   * @param  {boolean} skipLoadPost  skip loading additional data fot the post?
+   * @param {object}  data          A MetaSmoke report
+   * @param {boolean} openAfterLoad Open the report popup after load?
+   * @param {object}  $this         The clicked FIRE report button
+   * @param {boolean} skipLoadPost  skip loading additional data fot the post?
    */
   function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
@@ -234,8 +234,8 @@
   /**
    * parseSiteUrl - Parse a site url into a api parameter.
    *
-   * @param  {string} url A report's Stack Exchange link
-   * @returns {string}    The Stack Exchange API name for the report's site.
+   * @param   {string} url A report's Stack Exchange link
+   * @returns {string}     The Stack Exchange API name for the report's site.
    */
   function parseSiteUrl(url) {
     return url.split('.com')[0]
@@ -283,7 +283,7 @@
   /**
    * loadPost - Loads additional information for a post, from the Stack exchange API.
    *
-   * @param  {object} report The MetaSmoke report.
+   * @param {object} report The MetaSmoke report.
    */
   function loadPost(report) {
     const parameters = {site: report.site};
@@ -312,7 +312,7 @@
   /**
    * loadPostRevisions - Loads a post's revision history from the Stack Exchange API.
    *
-   * @param  {object} report The MetaSmoke report.
+   * @param {object} report The MetaSmoke report.
    */
   function loadPostRevisions(report) {
     const parameters = {site: report.site};
@@ -352,7 +352,7 @@
   /**
    * loadPostFlagStatus - Loads a post's flagging status from the Stack Exchange API.
    *
-   * @param  {object} report The MetaSmoke report.
+   * @param {object} report The MetaSmoke report.
    */
   function loadPostFlagStatus(report) {
     const parameters = {
@@ -377,7 +377,7 @@
   /**
    * loadPostFlagStatus - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
    *
-   * @param  {number} [page=1] the page to load.
+   * @param {number} [page=1] the page to load.
    */
   function loadCurrentSEUser(page = 1) {
     const parameters = {
@@ -397,8 +397,8 @@
   /**
    * parseUserResponse - Parse the user response.
    *
-   * @param  {object} response the Stack Exchange `user` response.
-   * @param  {number} page     The page that's been loaed.
+   * @param {object} response the Stack Exchange `user` response.
+   * @param {number} page     The page that's been loaed.
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
@@ -429,11 +429,11 @@
   /**
    * getSE - `GET` call on the Stack Exchange API.
    *
-   * @param  {string}   method     The Stack Exchange api method.
-   * @param  {object}   parameters The parameters to be passed to the Stack Exchange api.
-   * @param  {function} success    The `success` callback.
-   * @param  {function} error      The `error` callback.
-   * @param  {function} always     The `always` callback.
+   * @param {string}   method     The Stack Exchange api method.
+   * @param {object}   parameters The parameters to be passed to the Stack Exchange api.
+   * @param {function} success    The `success` callback.
+   * @param {function} error      The `error` callback.
+   * @param {function} always     The `always` callback.
    */
   function getSE(method, parameters, success, error, always) {
     stackExchangeAjaxCall(method, parameters, {
@@ -551,10 +551,10 @@
   /**
    * chatListener - Chat message event listener. If SmokeDetector reports another post, decorate the message
    *
-   * @param  {object} message            The received message, containing:
-   * @param  {number} message.event_type The message type
-   * @param  {number} message.user_id    The message's userID
-   * @param  {number} message.message_id The message ID
+   * @param {object} message            The received message, containing:
+   * @param {number} message.event_type The message type
+   * @param {number} message.user_id    The message's userID
+   * @param {number} message.message_id The message ID
    */
   function chatListener({event_type, user_id, message_id}) {
     if (event_type === 1 && user_id === fire.smokeDetectorId) {
@@ -568,7 +568,7 @@
   /**
    * decorateMessage - Adds the "FIRE" button to the passed message.
    *
-   * @param  {object} message The message DOM node the button should be added to.
+   * @param {object} message The message DOM node the button should be added to.
    */
   function decorateMessage(message) {
     const m = $(message);
@@ -674,10 +674,10 @@
   /**
    * boolOptionClickHandler - Set a boolean option after a setting checkbox was clicked.
    *
-   * @param  {object}   element    The `input[type=checkbox]`` DOM node that was clicked.
-   * @param  {string}   message    The message to show.
-   * @param  {string}   key        The setting key to save.
-   * @param  {function} [callback] A optional callback.
+   * @param {object}   element    The `input[type=checkbox]`` DOM node that was clicked.
+   * @param {string}   message    The message to show.
+   * @param {string}   key        The setting key to save.
+   * @param {function} [callback] A optional callback.
    */
   function boolOptionClickHandler(element, message, key, callback) {
     const value = $(element).is(':checked');
@@ -694,7 +694,7 @@
   /**
    * keyboardShortcuts - Handle keypress events for the popup.
    *
-   * @param  {object} e the jQuery keyboard event
+   * @param {object} e the jQuery keyboard event
    */
   function keyboardShortcuts(e) {
     const c = fire.constants;
@@ -743,7 +743,7 @@
   /**
    * openReportPopupForMessage - Opens a report popup for a specific message.
    *
-   * @param  {object} message The message DOM node the report should be opened for.
+   * @param {object} message The message DOM node the report should be opened for.
    */
   function openReportPopupForMessage(message) {
     loadDataForReport.call(
@@ -765,8 +765,8 @@
     /**
      * Request a token from the MetaSmoke code.
      *
-     * @param  {object} input      The input DOM node that contains the code.
-     * @param  {function} callback The callback that receives the MetaSmoke code.
+     * @param {object} input      The input DOM node that contains the code.
+     * @param {function} callback The callback that receives the MetaSmoke code.
      */
     saveToken: (input, callback) => {
       const value = input.val();
@@ -786,7 +786,7 @@
   /**
    * writeTokenPopup - Open a popup to enter the write token.
    *
-   * @param  {function} callback The action to perform after getting a write token / chosing read-only mode.
+   * @param {function} callback The action to perform after getting a write token / chosing read-only mode.
    */
   function writeTokenPopup(callback) {
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
@@ -1126,9 +1126,9 @@
   /**
    * postMetaSmokeFeedback - Submit MetaSmoke feedback.
    *
-   * @param  {object} data    The report data.
-   * @param  {string} verdict The chosen verdict.
-   * @param  {object} button  The clicked button.
+   * @param {object} data    The report data.
+   * @param {string} verdict The chosen verdict.
+   * @param {object} button  The clicked button.
    */
   function postMetaSmokeFeedback(data, verdict, button) {
     if (!fire.sendingFeedback && !$(button).attr('disabled')) {
@@ -1291,12 +1291,12 @@
   /**
    * createFeedbackButton - Create a feedback button for the top of the popup.
    *
-   * @param   {object}                 data     the report data.
-   * @param   {(number|string|array)}  keyCodes The keyCodes to use for this button.
-   * @param   {string}                 text     The text to display for this button.
-   * @param   {string}                 verdict  This button's MetaSmoke verdict
-   * @param   {string}                 tooltip  The tooltip to display for this button.
-   * @returns {object}                          The constructed feedback button.
+   * @param   {object}                data     the report data.
+   * @param   {(number|string|array)} keyCodes The keyCodes to use for this button.
+   * @param   {string}                text     The text to display for this button.
+   * @param   {string}                verdict  This button's MetaSmoke verdict
+   * @param   {string}                tooltip  The tooltip to display for this button.
+   * @returns {object}                         The constructed feedback button.
    */
   function createFeedbackButton(data, keyCodes, text, verdict, tooltip) {
     let count;
@@ -1505,7 +1505,7 @@
   /**
    * injectCSS - Inject the specified stylesheet.
    *
-   * @param  {string} path The path to the CSS file.
+   * @param {string} path The path to the CSS file.
    */
   function injectCSS(path) {
     const css = window.document.createElement('link');
@@ -1689,7 +1689,7 @@
   /**
    * socketOnMessage - Handle socket messages.
    *
-   * @param   {object} message The socket message.
+   * @param {object} message The socket message.
    */
   function socketOnMessage(message) {
     const data = JSON.parse(message.data);
@@ -1772,7 +1772,7 @@
   /**
    * clearValue - Removes a value from `fire.userData`, stored in `localStorage`
    *
-   * @param {string} key   the `localStorage` key.
+   * @param {string} key the `localStorage` key.
    */
   function clearValue(key) {
     const data = fire.userData;
