@@ -5,7 +5,7 @@
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
 // @version     0.9.10
-// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
