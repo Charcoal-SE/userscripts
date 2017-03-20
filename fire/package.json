@@ -63,13 +63,12 @@
         {
           "prefer": {"return": "returns"},
           "preferType": {
-            "Boolean": "boolean",
-            "bool": "boolean",
-            "Number": "number",
-            "Object": "object",
-            "Array": "array",
-            "String": "string",
-            "Function": "function",
+            "String": "string", "str": "string",
+            "Number": "number", "int": "number",
+            "Boolean": "boolean", "bool": "boolean",
+            "Object": "object", "obj": "object",
+            "Array": "array", "arr": "array",
+            "Function": "function", "fn": "function", "func": "function",
             "type": "a valid type"
           },
           "requireReturn": false,
