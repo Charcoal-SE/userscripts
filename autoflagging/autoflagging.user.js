@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.13.5
+// @version     0.13.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -72,6 +72,7 @@
   autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/posts/urls?key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
+  autoflagging.hasMoreRegex = /\+\d+ more \(\d+\)/;
 
   // Error handling
   autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
@@ -90,6 +91,45 @@
 
     autoflagging.decorate($message.children(".ai-information"), data);
     autoflagging.decorate($message.find(".meta .ai-information"), data);
+
+    autoflagging.getAllReasons($message, data);
+  };
+
+  /*!
+   * Extend a report message's reasons when the message was cropped.
+   */
+  autoflagging.getAllReasons = function ($message, data) {
+    if (autoflagging.hasMoreRegex.test($message.html())) {
+      $.get(
+        "https://metasmoke.erwaysoftware.com/api/post/" + data.id + "/reasons",
+        {key: autoflagging.key},
+        function (response) {
+          if (response && response.items) {
+            // The textnode containing "] <Reasons> +X more (weight)"
+            var textNode = $message
+              .find(".content")
+              .contents()
+              .filter(function () {
+                return this.nodeType === 3 &&
+                  autoflagging.hasMoreRegex.test($(this).text());
+              });
+
+            var reasons = response.items.map(function (reason) {
+              return reason.reason_name;
+            });
+
+            var fullReason = textNode
+              .text()
+              .replace(/[^\]]+ \(/, " " + reasons.join(", ") + " (");
+
+            // Replace the textnode with the new text.
+            textNode.replaceWith(fullReason);
+          }
+        })
+        .fail(function (xhr) {
+          autoflagging.log("Failed to load reasons: " + xhr.statusText);
+        });
+    }
   };
 
   /*!
