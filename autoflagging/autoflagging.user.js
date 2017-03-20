@@ -104,27 +104,27 @@
         "https://metasmoke.erwaysoftware.com/api/post/" + data.id + "/reasons",
         {key: autoflagging.key},
         function (response) {
-          console.log($message, response);
+          if (response && response.items) {
+            // The textnode containing "] <Reasons> +X more (weight)"
+            var textNode = $message
+              .find(".content")
+              .contents()
+              .filter(function () {
+                return this.nodeType === 3 &&
+                  autoflagging.hasMoreRegex.test($(this).text());
+              });
 
-          // The textnode containing "] <Reasons> +X more (weight)"
-          var textNode = $message
-            .find(".content")
-            .contents()
-            .filter(function () {
-              return this.nodeType === 3 &&
-                autoflagging.hasMoreRegex.test($(this).text());
+            var reasons = response.items.map(function (reason) {
+              return reason.reason_name;
             });
 
-          var reasons = response.map(function (reason) {
-            return reason.reason_name;
-          });
+            var fullReason = textNode
+              .text()
+              .replace(/[^\]]+ \(/, " " + reasons.join(", ") + " (");
 
-          var fullReason = textNode
-            .text()
-            .replace(/[^\]]+ \(/, " " + reasons.join(", ") + " (");
-
-          // Replace the textnode with the new text.
-          textNode.replaceWith(fullReason);
+            // Replace the textnode with the new text.
+            textNode.replaceWith(fullReason);
+          }
         })
         .fail(function (xhr) {
           autoflagging.log("Failed to load reasons: " + xhr.statusText);
