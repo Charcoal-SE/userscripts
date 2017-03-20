@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.9
+// @version     0.9.10
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -14,7 +14,15 @@
 // @grant       none
 // ==/UserScript==
 
+/**
+ * anonymous function - IIFE to prevent accidental pollution of the global scope..
+ */
 (() => {
+  /**
+   * anonymous function - Initialize FIRE.
+   *
+   * @param  {object} scope The scope to register FIRE on. Usually, `window`.
+   */
   (scope => { // Init
     const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
 
@@ -24,6 +32,9 @@
       'chat.meta.stackexchange.com': 266345
     }[location.host];       // From which, we need the current host's ID
 
+    /**
+     * FIRE's global object.
+     */
     scope.fire = {
       metaData: GM_info.script || GM_info['Flag Instantly, Rapidly, Effortlessly'],
       api: {
@@ -47,6 +58,9 @@
       decorateMessage
     };
 
+    /**
+     * Default settings to use in `localStorage`.
+     */
     const defaultLocalStorage = {
       blur: true,
       flag: true,
@@ -72,7 +86,9 @@
     checkHashForWriteToken();
   })(window);
 
-  // Request a Stack Exchange Write token for this app.
+  /**
+   * requestStackExchangeToken - Request a Stack Exchange Write token for this app.
+   */
   function requestStackExchangeToken() {
     const url = `https://stackexchange.com/oauth/dialog?client_id=${fire.api.se.clientId}&scope=${encodeURIComponent('no_expiry')}&redirect_uri=${encodeURIComponent(location.href)}`;
 
@@ -82,7 +98,9 @@
     window.open(url);
   }
 
-  // Check the url hash to see if a write token has been obtained. If so, parse it.
+  /**
+   * checkHashForWriteToken - Check the url hash to see if a write token has been obtained. If so, parse it.
+   */
   function checkHashForWriteToken() {
     if (location.hash && location.hash.length > 0) {
       const result = location.hash.match(/#+access_token=(.+)/);
@@ -95,7 +113,9 @@
     }
   }
 
-  // Check if the write token was successfully obtained
+  /**
+   * checkWriteTokenSuccess - Check if the write token was successfully obtained.
+   */
   function checkWriteTokenSuccess() {
     if (fire.userData.stackexchangeWriteToken) {
       toastr.success('Successfully obtained Stack Exchange write token!');
@@ -104,7 +124,12 @@
     }
   }
 
-  // Loads MetaSmoke data for a specified post url
+  /**
+   * getDataForUrl - Loads MetaSmoke data for a specified post url.
+   *
+   * @param  {string}               reportedUrl The url that's been reported.
+   * @param  {singleReportCallback} callback    An action to perform after the report is loaded.
+   */
   function getDataForUrl(reportedUrl, callback) {
     const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${reportedUrl}`;
@@ -120,13 +145,22 @@
     });
   }
 
-  // Checks if the list of users on this flag report contains the current user.
+  /**
+   * listHasCurrentUser - Checks if the list of users on this flag report contains the current user.
+   *
+   * @param   {object} flags A report's (auto-)flags, where it's `users` array has to be checked.
+   * @returns {boolean}      `true` if the current user is found in the flag list.
+   */
   function listHasCurrentUser(flags) {
     return flags &&
       flags.users.some(({username}) => username === fire.chatUser.name);
   }
 
-  // Loads a report's data when you hover over the FIRE button.
+  /**
+   * loadDataForReport - Loads a report's data when you hover over the FIRE button.
+   *
+   * @param  {boolean} openAfterLoad Open the report popup after load?
+   */
   function loadDataForReport(openAfterLoad) {
     const $this = $(this);
     const url = $this.data('url');
@@ -137,7 +171,9 @@
       $this.click();
   }
 
-  // Loads all MS data on the page;
+  /**
+   * updateReportCache - Loads all MS data on the page.
+   */
   function updateReportCache() { // eslint-disable-line no-unused-vars
     const urls = $('.fire-button')
       .map((index, element) => $(element).data('url'))
@@ -159,7 +195,14 @@
     });
   }
 
-  // Parse a report's loaded data
+  /**
+   * parseDataForReport - Parse a report's loaded data.
+   *
+   * @param  {object}  data          A MetaSmoke report
+   * @param  {boolean} openAfterLoad Open the report popup after load?
+   * @param  {object}  $this         The clicked FIRE report button
+   * @param  {boolean} skipLoadPost  skip loading additional data fot the post?
+   */
   function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
     data.site = parseSiteUrl(data.link);
@@ -188,13 +231,20 @@
       $this.click();
   }
 
-  // Parse a site url into a api parameter
+  /**
+   * parseSiteUrl - Parse a site url into a api parameter.
+   *
+   * @param  {string} url A report's Stack Exchange link
+   * @returns {string}    The Stack Exchange API name for the report's site.
+   */
   function parseSiteUrl(url) {
     return url.split('.com')[0]
       .replace(/\.stackexchange|(https?:)?\/+/g, '');
   }
 
-  // Loads a list of all Stack Exchange Sites.
+  /**
+   * loadStackExchangeSites - Loads a list of all Stack Exchange Sites.
+   */
   function loadStackExchangeSites() {
     const now = new Date().valueOf();
     const hasUpdated = fire.metaData.version === fire.userData.version;
@@ -230,7 +280,11 @@
     }
   }
 
-  // Loads a post
+  /**
+   * loadPost - Loads additional information for a post, from the Stack exchange API.
+   *
+   * @param  {object} report The MetaSmoke report.
+   */
   function loadPost(report) {
     const parameters = {site: report.site};
 
@@ -255,7 +309,11 @@
       });
   }
 
-  // Loads a post's revision history
+  /**
+   * loadPostRevisions - Loads a post's revision history from the Stack Exchange API.
+   *
+   * @param  {object} report The MetaSmoke report.
+   */
   function loadPostRevisions(report) {
     const parameters = {site: report.site};
 
@@ -275,7 +333,9 @@
       });
   }
 
-  // Render a "Edited" icon
+  /**
+   * showEditedIcon - Render a "Edited" icon on a opened report popup.
+   */
   function showEditedIcon() {
     const h2 = $('.fire-popup-body > h2');
     if (!h2.data('has-edit-icon')) {
@@ -289,7 +349,11 @@
     }
   }
 
-  // Loads a post's flagging status
+  /**
+   * loadPostFlagStatus - Loads a post's flagging status from the Stack Exchange API.
+   *
+   * @param  {object} report The MetaSmoke report.
+   */
   function loadPostFlagStatus(report) {
     const parameters = {
       site: report.site,
@@ -310,7 +374,11 @@
       });
   }
 
-  // Loads the current SE user and what sites they're registered at.
+  /**
+   * loadPostFlagStatus - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
+   *
+   * @param  {number} page the page to load.
+   */
   function loadCurrentSEUser(page = 1) {
     const parameters = {
       page,
@@ -326,7 +394,12 @@
     );
   }
 
-  // Parse the user response.
+  /**
+   * parseUserResponse - Parse the user response.
+   *
+   * @param  {object} response the Stack Exchange `user` response.
+   * @param  {number} page     The page that's been loaed.
+   */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
     if (page === 1)
@@ -353,7 +426,15 @@
     }
   }
 
-  // Get call on the Stack Exchange API
+  /**
+   * getSE - `GET` call on the Stack Exchange API.
+   *
+   * @param  {string}   method     The Stack Exchange api method.
+   * @param  {object}   parameters The parameters to be passed to the Stack Exchange api.
+   * @param  {function} success    The `success` callback.
+   * @param  {function} error      The `error` callback.
+   * @param  {function} always     The `always` callback.
+   */
   function getSE(method, parameters, success, error, always) {
     stackExchangeAjaxCall(method, parameters, {
       call: $.get,
@@ -363,8 +444,16 @@
     });
   }
 
+  /**
+   * getSE - `POST` call on the Stack Exchange API.
+   *
+   * @param  {string}   method     The Stack Exchange api method.
+   * @param  {object}   parameters The parameters to be passed to the Stack Exchange api.
+   * @param  {function} success    The `success` callback.
+   * @param  {function} error      The `error` callback.
+   * @param  {function} always     The `always` callback.
+   */
   /*
-  // post call on the Stack Exchange API
   function postSE(method, parameters, success, error, always) {
    stackExchangeAjaxCall(method, parameters, {
      call: $.post
@@ -375,7 +464,18 @@
   }
   */
 
-  // AJAX call on the Stack Exchange API
+  /**
+   * stackExchangeAjaxCall - Perform an AJAX call on the Stack Exchange API.
+   *
+   * @param   {string}   method         The Stack Exchange api method.
+   * @param   {object}   parameters     The parameters to be passed to the Stack Exchange api.
+   * @param   {object}   config         The AJAX call configuration object, containing:
+   * @param   {function} config.call    The jquery AJAX call to use.
+   * @param   {function} config.success The `success` callback.
+   * @param   {function} config.error   The `error` callback.
+   * @param   {function} config.always  The `always` callback.
+   * @returns {jqXHR}                   The jqXHR Promise.
+   */
   function stackExchangeAjaxCall(method, parameters, {call, success, error, always}) {
     const {se} = fire.api;
     const type = call === $.get ? 'get' : 'post';
@@ -408,7 +508,11 @@
     return ajaxCall;
   }
 
-  // Gets a MetaSmoke write token
+  /**
+   * getWriteToken - Gets a MetaSmoke write token.
+   *
+   * @param  {function} [callback] A optional function to run after the write token was obtained.
+   */
   function getWriteToken(callback) {
     setValue('readOnly', false);
     const afterGetToken = callback;
@@ -444,7 +548,14 @@
     });
   }
 
-  // Chat message event listener. If SmokeDetector reports another post, decorate the message
+  /**
+   * chatListener - Chat message event listener. If SmokeDetector reports another post, decorate the message
+   *
+   * @param  {object} message            The received message, containing:
+   * @param  {number} message.event_type The message type
+   * @param  {number} message.user_id    The message's userID
+   * @param  {number} message.message_id The message ID
+   */
   function chatListener({event_type, user_id, message_id}) {
     if (event_type === 1 && user_id === fire.smokeDetectorId) {
       setTimeout(() => {
@@ -454,7 +565,11 @@
     }
   }
 
-  // Adds the "FIRE" button to the passed message
+  /**
+   * decorateMessage - Adds the "FIRE" button to the passed message.
+   *
+   * @param  {object} message The message DOM node the button should be added to.
+   */
   function decorateMessage(message) {
     const m = $(message);
     if (m.find('.fire-button').length === 0) {
@@ -493,12 +608,20 @@
     }
   }
 
-  // Filter a jQuery list on the element text.
+  /**
+   * filterOnContents - Filter a jQuery list on the element text.
+   *
+   * @param   {object} $object A jQuery list of DOM elements
+   * @param   {string} text    The text the element should contain.
+   * @returns {object}         The filtered list
+   */
   function filterOnContents($object, text) {
     return $object.filter((i, element) => $(element).text() === text);
   }
 
-  // Set the toastr class
+  /**
+   * toastrPositionChangeHandler - Set the toastr position class.
+   */
   function toastrPositionChangeHandler() {
     const value = $(this).val();
 
@@ -511,7 +634,9 @@
     fire.userData = data;
   }
 
-  // Update the toastr duration
+  /**
+   * toastrDurationHandler - Update the toastr popup duration.
+   */
   function toastrDurationHandler() {
     const value = $(this).val();
 
@@ -523,24 +648,37 @@
     fire.userData = data;
   }
 
-  // Set the "Blur" option
+  /**
+   * blurOptionClickHandler - Set the "Blur" option for the popup modal.
+   */
   function blurOptionClickHandler() {
     boolOptionClickHandler(this, 'Blur', 'blur', () => {
       $('#container').toggleClass('fire-blur', fire.userData.blur);
     });
   }
 
-  // Set the "Flag" option
+  /**
+   * flagOptionClickHandler - Set the "Flag" option for "tpu-" feedback.
+   */
   function flagOptionClickHandler() {
     boolOptionClickHandler(this, 'Flagging on "tpu-" feedback', 'flag');
   }
 
-  // Set the "Debug" option
+  /**
+   * debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
+   */
   function debugOptionClickHandler() {
     boolOptionClickHandler(this, 'Debug mode', 'debug');
   }
 
-  // Set a bool option
+  /**
+   * boolOptionClickHandler - Set a boolean option after a setting checkbox was clicked.
+   *
+   * @param  {object}   element    The `input[type=checkbox]`` DOM node that was clicked.
+   * @param  {string}   message    The message to show.
+   * @param  {string}   key        The setting key to save.
+   * @param  {function} [callback] A optional callback.
+   */
   function boolOptionClickHandler(element, message, key, callback) {
     const value = $(element).is(':checked');
 
@@ -553,7 +691,11 @@
       callback();
   }
 
-  // Handle keypress events for the popup
+  /**
+   * keyboardShortcuts - Handle keypress events for the popup.
+   *
+   * @param  {object} e the jQuery keyboard event
+   */
   function keyboardShortcuts(e) {
     const c = fire.constants;
     if (e.keyCode === c.keys.enter || e.keyCode === c.keys.space) {
@@ -598,7 +740,11 @@
     }
   }
 
-  // Opens a report popup for a specific message
+  /**
+   * openReportPopupForMessage - Opens a report popup for a specific message.
+   *
+   * @param  {object} message The message DOM node the report should be opened for.
+   */
   function openReportPopupForMessage(message) {
     loadDataForReport.call(
       $(message).find('.fire-button'),
@@ -606,13 +752,30 @@
     );
   }
 
+  /**
+   * Click handlers for the settings window.
+   */
   const clickHandlers = {
-    requestToken: () => window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank'),
+    /**
+     * Open the "Request authorization" MetaSmoke page.
+     */
+    requestToken: () => {
+      window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank');
+    },
+    /**
+     * Request a token from the MetaSmoke code.
+     *
+     * @param  {object} input      The input DOM node that contains the code.
+     * @param  {function} callback The callback that receives the MetaSmoke code.
+     */
     saveToken: (input, callback) => {
       const value = input.val();
       if (value && value.length === fire.constants.metaSmokeCodeLength)
         callback(value);
     },
+    /**
+     * Close all popup windows and open the "Request write token" popup.
+     */
     disableReadonly: () => {
       closePopup();
       closePopup();
@@ -620,7 +783,11 @@
     }
   };
 
-  // Open a popup to enter the write token
+  /**
+   * writeTokenPopup - Open a popup to enter the write token.
+   *
+   * @param  {function} callback The action to perform after getting a write token / chosing read-only mode.
+   */
   function writeTokenPopup(callback) {
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const input = _('input', 'fire-popup-input', {
@@ -662,7 +829,9 @@
     $(document).keydown(keyboardShortcuts);
   }
 
-  // Build a popup and show it.
+  /**
+   * openReportPopup - Build a report popup and show it.
+   */
   function openReportPopup() {
     if (fire.isOpen && $('.fire-popup').length > 0)
       return; // Don't open the popup twice.
@@ -812,7 +981,9 @@
     );
   }
 
-  // Opens a popup to change fire's settings
+  /**
+   * openSettingsPopup - Opens a popup to change fire's settings.
+   */
   function openSettingsPopup() {
     if (fire.settingsAreOpen)
       return; // Don't open the settings twice.
@@ -889,17 +1060,17 @@
     const container = _('div')
       .append(
         _('div', 'fire-settings-section fire-settings-left')
-          .append(createSettingscheckBox('blur', fire.userData.blur, blurOptionClickHandler,
+          .append(createSettingsCheckBox('blur', fire.userData.blur, blurOptionClickHandler,
             'Enable blur on popup background.',
             'Popup blur:'
           ))
           .append(br())
-          .append(createSettingscheckBox('flag', fire.userData.flag, flagOptionClickHandler,
+          .append(createSettingsCheckBox('flag', fire.userData.flag, flagOptionClickHandler,
             'Also submit "Spam" flag with "tpu-" feedback.',
             'Flag on feedback:')
           )
           .append(br())
-          .append(createSettingscheckBox('debug', fire.userData.debug, debugOptionClickHandler,
+          .append(createSettingsCheckBox('debug', fire.userData.debug, debugOptionClickHandler,
             'Enable FIRE logging in developer console.',
             'Debug mode:')
           )
@@ -921,7 +1092,11 @@
       .fadeIn('fast');
   }
 
-  // Close the popup
+  /**
+   * closePopup - Close the popup.
+   *
+   * @returns {object} The previously closed popup's button (if any) so it can be re-opened.
+   */
   function closePopup() {
     fire.sendingFeedback = false;
     if (fire.settingsAreOpen) {
@@ -942,13 +1117,19 @@
       const previous = fire.isOpen;
       delete fire.isOpen;
 
-      return previous; // Return the previously closed popup's button so it can be re-opened
+      return previous;
     }
 
     return null;
   }
 
-  // Submit MS feedback
+  /**
+   * postMetaSmokeFeedback - Submit MetaSmoke feedback.
+   *
+   * @param  {object} data    The report data.
+   * @param  {string} verdict The chosen verdict.
+   * @param  {object} button  The clicked button.
+   */
   function postMetaSmokeFeedback(data, verdict, button) {
     if (!fire.sendingFeedback && !$(button).attr('disabled')) {
       fire.sendingFeedback = true;
@@ -1005,7 +1186,17 @@
     }
   }
 
-  // Flag the post as spam
+  /**
+   * postMetaSmokeSpamFlag - Flag the post as spam.
+   *
+   * @param   {object} data            The report data.
+   * @param   {object} api             API configuration object, containing:
+   * @param   {string} api.url         The API url.
+   * @param   {string} api.key         The API key.
+   * @param   {string} token           The MetaSmoke write token.
+   * @param   {object} feedbackSuccess A jQuery DOM node containing the feedback success message.
+   * @returns {undefined}              returns undefined to break out of the function.
+   */
   function postMetaSmokeSpamFlag(data, {url, key}, token, feedbackSuccess) {
     /* TODO: fix this
     let site = fire.sites[data.site];
@@ -1077,7 +1268,12 @@
     closePopup();
   }
 
-  // Structure the keyCodes Array.
+  /**
+   * keyCodesToArray - Structure the keyCodes Array.
+   *
+   * @param  {object} keyCodes An number, string, or array of numbers or strings containing keys or keycodes.
+   * @returns {array}          An array of keyCodes mapped from the input chars / keyCodes.
+   */
   function keyCodesToArray(keyCodes) {
     if (!Array.isArray(keyCodes))
       keyCodes = [keyCodes];
@@ -1092,7 +1288,16 @@
     return keyCodes;
   }
 
-  // Create a feedback button for the top of the popup
+  /**
+   * createFeedbackButton - Create a feedback button for the top of the popup.
+   *
+   * @param   {object} data     the report data.
+   * @param   {array}  keyCodes The keyCodes to use for this button.
+   * @param   {string} text     The text to display for this button.
+   * @param   {string} verdict  This button's MetaSmoke verdict
+   * @param   {string} tooltip  The tooltip to display for this button.
+   * @returns {object}          The constructed feedback button.
+   */
   function createFeedbackButton(data, keyCodes, text, verdict, tooltip) {
     let count;
     let hasSubmittedFeedback;
@@ -1140,7 +1345,12 @@
     });
   }
 
-  // Create a button to close a popup
+  /**
+   * createCloseButton - Create a button to close a popup.
+   *
+   * @param   {function} clickHandler The button's `click` handler.
+   * @returns {object}                The constructed "close" button.
+   */
   function createCloseButton(clickHandler) {
     return _('a', 'button fire-close-button', {
       text: 'Close',
@@ -1151,8 +1361,17 @@
     });
   }
 
-  // Creates a input[type=checkbox] for the settings
-  function createSettingscheckBox(id, value, handler, labelText, headerText) {
+  /**
+   * createSettingsCheckBox - Creates a input[type=checkbox] for the settings.
+   *
+   * @param   {string}   id         The option's name.
+   * @param   {boolean}  value      The option's current value.
+   * @param   {function} handler    The option's click handler.
+   * @param   {string}   labelText  The text to show next to the checkbox.
+   * @param   {string}   headerText The header to show above the checkbox.
+   * @returns {object}              The constructed settings checkbox.
+   */
+  function createSettingsCheckBox(id, value, handler, labelText, headerText) {
     const checkBox = _('input', {
       id: `checkbox_${id}`,
       type: 'checkbox',
@@ -1171,7 +1390,14 @@
       .append(label);
   }
 
-  // Wrapper to create a new element with a specified class.
+  /**
+   * _ - Wrapper to create a new element with a specified class.
+   *
+   * @param   {string} tagName    The tag to create.
+   * @param   {string} [cssClass] The tag's css class. Optional. If this is an object, this is assumed to be `options`.
+   * @param   {object} [options]  The options to use for the created element.
+   * @returns {object}            A jQuery DOM node.
+   */
   function _(tagName, cssClass, options) {
     if (typeof cssClass === 'object') {
       options = cssClass;
@@ -1189,17 +1415,32 @@
     return $(`<${tagName}/>`, options);
   }
 
-  // Create a linebreak
+  /**
+   * br - Create a linebreak.
+   *
+   * @returns {object} A jQuery `<br />` DOM node.
+   */
   function br() {
     return _('br');
   }
 
-  // Create a `<span>` with the specified contents.
+  /**
+   * span - Create a `<span>` with the specified contents.
+   *
+   * @param   {object} contents A jQuery DOM node to use insert into the span.
+   * @returns {object}          A jQuery `<span>` DOM node with the specified contents.
+   */
   function span(contents) {
     return _('span', {html: contents});
   }
 
-  // Create a button
+  /**
+   * button - Create a button.
+   *
+   * @param   {string}   text         The button's text
+   * @param   {function} clickHandler The button's click handler.
+   * @returns {object}                A jQuery `<button>` DOM node.
+   */
   function button(text, clickHandler) {
     return _('a', 'button', {
       text,
@@ -1207,7 +1448,9 @@
     });
   }
 
-  // Detect Emoji support in this browser
+  /**
+   * hasEmojiSupport - Detect Emoji support in this browser.
+   */
   function hasEmojiSupport() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -1222,7 +1465,13 @@
     fire.log('Emoji support detected:', fire.useEmoji);
   }
 
-  // Returns the emoji if it's supported. Otherwise, return a fallback image.
+  /**
+   * emojiOrImage - Returns the emoji if it's supported. Otherwise, return a fallback image.
+   *
+   * @param   {string}  emoji   The emoji to render
+   * @param   {boolean} [large] Make it large?
+   * @returns {object}          A jQuery `<span>` DOM node with the specified emoji as string or image.
+   */
   function emojiOrImage(emoji, large) {
     emoji = fire.constants.emoji[emoji] || emoji;
 
@@ -1240,7 +1489,9 @@
     return span(emojiImage);
   }
 
-  // Inject FIRE stylesheet and Toastr library
+  /**
+   * injectExternalScripts - Inject FIRE stylesheet and Toastr library.
+   */
   function injectExternalScripts() {
     injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
 
@@ -1251,7 +1502,11 @@
     fire.log('Injected scripts and stylesheets.');
   }
 
-  // Inject the specified stylesheet
+  /**
+   * injectCSS - Inject the specified stylesheet.
+   *
+   * @param  {string} path The path to the CSS file.
+   */
   function injectCSS(path) {
     const css = window.document.createElement('link');
     css.rel = 'stylesheet';
@@ -1259,7 +1514,14 @@
     document.head.appendChild(css);
   }
 
-  // Inject the specified script
+  /**
+   * injectScript - Inject the specified script.
+   *
+   * @param {string}   name       The global name to check against before injecting the script. Exapme: (`typeof myInjectedGlobal`)
+   * @param {string}   path       The script's path.
+   * @param {function} [callback] An optional "success" callback.
+   * @param {function} [always]   An optional "always" callback.
+   */
   function injectScript(name, path, callback, always) {
     if (name === 'undefined') {
       $.ajaxSetup({cache: true});
@@ -1272,12 +1534,16 @@
     }
   }
 
-  // Load toastr css
+  /**
+   * loadToastrCss - Load toastr css.
+   */
   function loadToastrCss() {
     injectCSS('//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css');
   }
 
-  // Set toastr options
+  /**
+   * initializeToastr - Set toastr options.
+   */
   function initializeToastr() {
     toastr.options = {
       closeButton: true,
@@ -1292,7 +1558,9 @@
     fire.log('Toastr included, notification options set.');
   }
 
-  // Open the last report on [Ctrl]+[Space]
+  /**
+   * registerOpenLastReportKey - Open the last report on [Ctrl]+[Space].
+   */
   function registerOpenLastReportKey() {
     $(document).on('keydown', ({keyCode, ctrlKey}) => {
       if (keyCode === fire.constants.keys.space && ctrlKey) {
@@ -1305,7 +1573,9 @@
     fire.log('Registered "Open last report" key.');
   }
 
-  // Register the "tooltip" hover for anchor elements
+  /**
+   * registerAnchorHover - Register the "tooltip" hover for anchor elements.
+   */
   function registerAnchorHover() {
     const selector = '[fire-tooltip]';
     $('body')
@@ -1329,13 +1599,21 @@
     fire.log('Registered anchor hover tooltip.');
   }
 
-  // Register a websocket listener
+  /**
+   * registerWebSocket - Register a websocket listener.
+   */
   function registerWebSocket() {
     metapi.watchSocket(fire.api.ms.key, socketOnMessage);
     fire.log('Websocket initialized.');
   }
 
-  // Adds a property on `fire` that's stored in `localStorage`
+  /**
+   * registerForLocalStorage - Adds a property on `fire` that's stored in `localStorage`.
+   *
+   * @param {object} object          The object to register the property on.
+   * @param {string} key             The key to use on the object.
+   * @param {string} localStorageKey The key to use in `localStorage`.
+   */
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
       get: () => JSON.parse(localStorage.getItem(localStorageKey)),
@@ -1343,7 +1621,9 @@
     });
   }
 
-  // Registers logging functions on `fire`
+  /**
+   * registerLoggingFunctions - Registers logging functions on `fire`.
+   */
   function registerLoggingFunctions() {
     fire.log = getLogger('log');
     fire.info = getLogger('info');
@@ -1351,7 +1631,9 @@
     fire.error = getLogger('error');
   }
 
-  // Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked
+  /**
+   * showFireOnExistingMessages - Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked.
+   */
   function showFireOnExistingMessages() {
     $('#getmore, #getmore-mine')
       .click(() => decorateExistingMessages(fire.constants.loadAllMessagesDelay));
@@ -1364,7 +1646,11 @@
     fire.log('Registered loadDataForReport');
   }
 
-  // Decorate messages that exist on page load
+  /**
+   * decorateExistingMessages - Decorate messages that exist on page load.
+   *
+   * @param {number} timeout The time to wait before trying to decorate the messages.
+   */
   function decorateExistingMessages(timeout) {
     setTimeout(() => {
       const chat = $('#chat');
@@ -1376,7 +1662,7 @@
           fire.log('Decorated existing messages.');
 
           /*
-          TODO: Load SE data for each report
+          TODO: Load Stack Exchange data for each report
           updateReportCache();
           */
         }
@@ -1384,7 +1670,12 @@
     }, timeout);
   }
 
-  // Gets a log wrapper for the specified console function.
+  /**
+   * getLogger - Gets a log wrapper for the specified console function.
+   *
+   * @param   {function} fn the console function to wrap in a `debug` condition.
+   * @returns {function}    A fire-wrapped console function.
+   */
   function getLogger(fn) {
     return (...args) => {
       if ((fire.userData || localStorage['fire-user-data']).debug) {
@@ -1395,7 +1686,11 @@
     };
   }
 
-  // Handle socket messages
+  /**
+   * socketOnMessage - Handle socket messages.
+   *
+   * @param   {object} message The socket message.
+   */
   function socketOnMessage(message) {
     const data = JSON.parse(message.data);
 
@@ -1426,14 +1721,21 @@
     }
   }
 
-  // Expands anchor elements in the report's body on hover, to show the href.
+  /**
+   * expandLinksOnHover - Expands anchor elements in the report's body on hover, to show the href.
+   */
   function expandLinksOnHover() {
     $('.fire-popup-body a').each((i, element) =>
       $(element).attr('fire-tooltip', element)
     );
   }
 
-  // Initializes localStorage
+  /**
+   * initLocalStorage - Initializes `localStorage`.
+   *
+   * @param {function} hOP            `Object.hasOwnProperty` bound securely.
+   * @param {objects}  defaultStorage localStorage's default settings.
+   */
   function initLocalStorage(hOP, defaultStorage) {
     registerForLocalStorage(fire, 'userData', 'fire-user-data');
     registerForLocalStorage(fire, 'userSites', 'fire-user-sites');
@@ -1455,21 +1757,32 @@
     fire.log('Initialized localStorage.');
   }
 
-  // Sets a value on `fire.userData`, stored in `localStorage`
+  /**
+   * setValue - Sets a value on `fire.userData`, stored in `localStorage`.
+   *
+   * @param {string} key   the `localStorage` key.
+   * @param {object} value the value to set.
+   */
   function setValue(key, value) {
     const data = fire.userData;
     data[key] = value;
     fire.userData = data;
   }
 
-  // Removes a value from `fire.userData`, stored in `localStorage`
+  /**
+   * clearValue - Removes a value from `fire.userData`, stored in `localStorage`
+   *
+   * @param {string} key   the `localStorage` key.
+   */
   function clearValue(key) {
     const data = fire.userData;
     delete data[key];
     fire.userData = data;
   }
 
-  // Gets the currently logged-in user.
+  /**
+   * getCurrentChatUser - Gets the currently logged-in user.
+   */
   function getCurrentChatUser() {
     setTimeout(() => { // This code was too fast for FireFox
       CHAT.RoomUsers
@@ -1482,7 +1795,9 @@
     });
   }
 
-  // Sets constants
+  /**
+   * setFireConstants - Sets constants to be used in `fire`.
+   */
   function setFireConstants() {
     fire.constants = {
       keys: {
@@ -1508,3 +1823,10 @@
     };
   }
 })();
+
+/**
+ * This is a callback that is passed a single report's data.
+ *
+ * @callback singleReportCallback
+ * @param {object} reportData The data for the loaded report.
+ */
