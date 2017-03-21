@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.10
+// @version     0.9.11
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -34,9 +34,24 @@
 
     /**
      * FIRE's global object.
+     *
+     * @global
+     * @module fire
      */
     scope.fire = {
+      /**
+       * The userscript's metadata
+       *
+       * @public
+       * @memberof module:fire
+       */
       metaData: GM_info.script || GM_info['Flag Instantly, Rapidly, Effortlessly'],
+      /**
+       * The userscript's api urls and keys
+       *
+       * @public
+       * @memberof module:fire
+       */
       api: {
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
@@ -88,6 +103,9 @@
 
   /**
    * requestStackExchangeToken - Request a Stack Exchange Write token for this app.
+   *
+   * @private
+   * @memberof module:fire
    */
   function requestStackExchangeToken() {
     const url = `https://stackexchange.com/oauth/dialog?client_id=${fire.api.se.clientId}&scope=${encodeURIComponent('no_expiry')}&redirect_uri=${encodeURIComponent(location.href)}`;
@@ -100,6 +118,9 @@
 
   /**
    * checkHashForWriteToken - Check the url hash to see if a write token has been obtained. If so, parse it.
+   *
+   * @private
+   * @memberof module:fire
    */
   function checkHashForWriteToken() {
     if (location.hash && location.hash.length > 0) {
@@ -115,6 +136,9 @@
 
   /**
    * checkWriteTokenSuccess - Check if the write token was successfully obtained.
+   *
+   * @private
+   * @memberof module:fire
    */
   function checkWriteTokenSuccess() {
     if (fire.userData.stackexchangeWriteToken) {
@@ -126,6 +150,9 @@
 
   /**
    * getDataForUrl - Loads MetaSmoke data for a specified post url.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {string}               reportedUrl The url that's been reported.
    * @param {singleReportCallback} callback    An action to perform after the report is loaded.
@@ -148,6 +175,9 @@
   /**
    * listHasCurrentUser - Checks if the list of users on this flag report contains the current user.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {object} flags A report's (auto-)flags, where it's `users` array has to be checked.
    * @returns {boolean}      `true` if the current user is found in the flag list.
    */
@@ -158,6 +188,9 @@
 
   /**
    * loadDataForReport - Loads a report's data when you hover over the FIRE button.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {boolean} openAfterLoad Open the report popup after load?
    */
@@ -173,6 +206,9 @@
 
   /**
    * updateReportCache - Loads all MS data on the page.
+   *
+   * @private
+   * @memberof module:fire
    */
   function updateReportCache() { // eslint-disable-line no-unused-vars
     const urls = $('.fire-button')
@@ -197,6 +233,9 @@
 
   /**
    * parseDataForReport - Parse a report's loaded data.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object}  data          A MetaSmoke report
    * @param {boolean} openAfterLoad Open the report popup after load?
@@ -234,16 +273,22 @@
   /**
    * parseSiteUrl - Parse a site url into a api parameter.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {string} url A report's Stack Exchange link
    * @returns {string}     The Stack Exchange API name for the report's site.
    */
   function parseSiteUrl(url) {
-    return url.split('.com')[0]
+    return url.split(/\.com|\.net/)[0]
       .replace(/\.stackexchange|(https?:)?\/+/g, '');
   }
 
   /**
    * loadStackExchangeSites - Loads a list of all Stack Exchange Sites.
+   *
+   * @private
+   * @memberof module:fire
    */
   function loadStackExchangeSites() {
     const now = new Date().valueOf();
@@ -283,6 +328,9 @@
   /**
    * loadPost - Loads additional information for a post, from the Stack exchange API.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {object} report The MetaSmoke report.
    */
   function loadPost(report) {
@@ -312,6 +360,9 @@
   /**
    * loadPostRevisions - Loads a post's revision history from the Stack Exchange API.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {object} report The MetaSmoke report.
    */
   function loadPostRevisions(report) {
@@ -335,6 +386,9 @@
 
   /**
    * showEditedIcon - Render a "Edited" icon on a opened report popup.
+   *
+   * @private
+   * @memberof module:fire
    */
   function showEditedIcon() {
     const h2 = $('.fire-popup-body > h2');
@@ -351,6 +405,9 @@
 
   /**
    * loadPostFlagStatus - Loads a post's flagging status from the Stack Exchange API.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} report The MetaSmoke report.
    */
@@ -377,6 +434,9 @@
   /**
    * loadPostFlagStatus - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {number} [page=1] the page to load.
    */
   function loadCurrentSEUser(page = 1) {
@@ -396,6 +456,9 @@
 
   /**
    * parseUserResponse - Parse the user response.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} response the Stack Exchange `user` response.
    * @param {number} page     The page that's been loaed.
@@ -429,6 +492,9 @@
   /**
    * getSE - `GET` call on the Stack Exchange API.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {string}   method     The Stack Exchange api method.
    * @param {object}   parameters The parameters to be passed to the Stack Exchange api.
    * @param {function} success    The `success` callback.
@@ -446,6 +512,9 @@
 
   /**
    * getSE - `POST` call on the Stack Exchange API.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param  {string}   method     The Stack Exchange api method.
    * @param  {object}   parameters The parameters to be passed to the Stack Exchange api.
@@ -466,6 +535,9 @@
 
   /**
    * stackExchangeAjaxCall - Perform an AJAX call on the Stack Exchange API.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {string}   method         The Stack Exchange api method.
    * @param   {object}   parameters     The parameters to be passed to the Stack Exchange api.
@@ -511,6 +583,9 @@
   /**
    * getWriteToken - Gets a MetaSmoke write token.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param  {function} [callback] A optional function to run after the write token was obtained.
    */
   function getWriteToken(callback) {
@@ -549,7 +624,11 @@
   }
 
   /**
-   * chatListener - Chat message event listener. If SmokeDetector reports another post, decorate the message
+   * chatListener - Chat message event listener.
+   * If SmokeDetector reports another post, decorate the message.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} message            The received message, containing:
    * @param {number} message.event_type The message type
@@ -567,6 +646,9 @@
 
   /**
    * decorateMessage - Adds the "FIRE" button to the passed message.
+   *
+   * @public
+   * @memberof module:fire
    *
    * @param {object} message The message DOM node the button should be added to.
    */
@@ -611,6 +693,9 @@
   /**
    * filterOnContents - Filter a jQuery list on the element text.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {object} $object A jQuery list of DOM elements
    * @param   {string} text    The text the element should contain.
    * @returns {object}         The filtered list
@@ -621,6 +706,9 @@
 
   /**
    * toastrPositionChangeHandler - Set the toastr position class.
+   *
+   * @private
+   * @memberof module:fire
    */
   function toastrPositionChangeHandler() {
     const value = $(this).val();
@@ -636,6 +724,9 @@
 
   /**
    * toastrDurationHandler - Update the toastr popup duration.
+   *
+   * @private
+   * @memberof module:fire
    */
   function toastrDurationHandler() {
     const value = $(this).val();
@@ -650,6 +741,9 @@
 
   /**
    * blurOptionClickHandler - Set the "Blur" option for the popup modal.
+   *
+   * @private
+   * @memberof module:fire
    */
   function blurOptionClickHandler() {
     boolOptionClickHandler(this, 'Blur', 'blur', () => {
@@ -659,6 +753,9 @@
 
   /**
    * flagOptionClickHandler - Set the "Flag" option for "tpu-" feedback.
+   *
+   * @private
+   * @memberof module:fire
    */
   function flagOptionClickHandler() {
     boolOptionClickHandler(this, 'Flagging on "tpu-" feedback', 'flag');
@@ -666,6 +763,9 @@
 
   /**
    * debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
+   *
+   * @private
+   * @memberof module:fire
    */
   function debugOptionClickHandler() {
     boolOptionClickHandler(this, 'Debug mode', 'debug');
@@ -673,6 +773,9 @@
 
   /**
    * boolOptionClickHandler - Set a boolean option after a setting checkbox was clicked.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object}   element    The `input[type=checkbox]`` DOM node that was clicked.
    * @param {string}   message    The message to show.
@@ -693,6 +796,9 @@
 
   /**
    * keyboardShortcuts - Handle keypress events for the popup.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} e the jQuery keyboard event
    */
@@ -743,6 +849,9 @@
   /**
    * openReportPopupForMessage - Opens a report popup for a specific message.
    *
+   * @public
+   * @memberof module:fire
+   *
    * @param {object} message The message DOM node the report should be opened for.
    */
   function openReportPopupForMessage(message) {
@@ -754,16 +863,23 @@
 
   /**
    * Click handlers for the settings window.
+   *
+   * @private
+   * @memberof module:fire
    */
   const clickHandlers = {
     /**
      * Open the "Request authorization" MetaSmoke page.
+     *
+     * @private
      */
     requestToken: () => {
       window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank');
     },
     /**
      * Request a token from the MetaSmoke code.
+     *
+     * @private
      *
      * @param {object} input      The input DOM node that contains the code.
      * @param {function} callback The callback that receives the MetaSmoke code.
@@ -775,6 +891,8 @@
     },
     /**
      * Close all popup windows and open the "Request write token" popup.
+     *
+     * @private
      */
     disableReadonly: () => {
       closePopup();
@@ -785,6 +903,9 @@
 
   /**
    * writeTokenPopup - Open a popup to enter the write token.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {function} callback The action to perform after getting a write token / chosing read-only mode.
    */
@@ -831,6 +952,9 @@
 
   /**
    * openReportPopup - Build a report popup and show it.
+   *
+   * @private
+   * @memberof module:fire
    */
   function openReportPopup() {
     if (fire.isOpen && $('.fire-popup').length > 0)
@@ -857,7 +981,7 @@
     }
 
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
-    const site = fire.sites[d.site];
+    const site = fire.sites[d.site] || fire.sites[`${d.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
 
     const openOnSiteButton = _('a', 'fire-site-logo', {
@@ -983,6 +1107,9 @@
 
   /**
    * openSettingsPopup - Opens a popup to change fire's settings.
+   *
+   * @private
+   * @memberof module:fire
    */
   function openSettingsPopup() {
     if (fire.settingsAreOpen)
@@ -1095,6 +1222,9 @@
   /**
    * closePopup - Close the popup.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @returns {object} The previously closed popup's button (if any) so it can be re-opened.
    */
   function closePopup() {
@@ -1125,6 +1255,9 @@
 
   /**
    * postMetaSmokeFeedback - Submit MetaSmoke feedback.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} data    The report data.
    * @param {string} verdict The chosen verdict.
@@ -1188,6 +1321,9 @@
 
   /**
    * postMetaSmokeSpamFlag - Flag the post as spam.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {object} data            The report data.
    * @param   {object} api             API configuration object, containing:
@@ -1271,6 +1407,9 @@
   /**
    * keyCodesToArray - Structure the keyCodes Array.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {(number|string|array)} keyCodes An number, string, or array of numbers or strings containing keys or keycodes.
    * @returns {array.number}                   An array of keyCodes mapped from the input chars / keyCodes.
    */
@@ -1290,6 +1429,9 @@
 
   /**
    * createFeedbackButton - Create a feedback button for the top of the popup.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {object}                data     the report data.
    * @param   {(number|string|array)} keyCodes The keyCodes to use for this button.
@@ -1348,6 +1490,9 @@
   /**
    * createCloseButton - Create a button to close a popup.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {function} clickHandler The button's `click` handler.
    * @returns {object}                The constructed "close" button.
    */
@@ -1363,6 +1508,9 @@
 
   /**
    * createSettingsCheckBox - Creates a input[type=checkbox] for the settings.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {string}   id         The option's name.
    * @param   {boolean}  value      The option's current value.
@@ -1393,6 +1541,9 @@
   /**
    * _ - Wrapper to create a new element with a specified class.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {string} tagName    The tag to create.
    * @param   {string} [cssClass] The tag's css class. Optional. If this is an object, this is assumed to be `options`.
    * @param   {object} [options]  The options to use for the created element.
@@ -1418,6 +1569,9 @@
   /**
    * br - Create a linebreak.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @returns {object} A jQuery `<br />` DOM node.
    */
   function br() {
@@ -1426,6 +1580,9 @@
 
   /**
    * span - Create a `<span>` with the specified contents.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {object} contents A jQuery DOM node to use insert into the span.
    * @returns {object}          A jQuery `<span>` DOM node with the specified contents.
@@ -1436,6 +1593,9 @@
 
   /**
    * button - Create a button.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {string}   text         The button's text
    * @param   {function} clickHandler The button's click handler.
@@ -1450,6 +1610,9 @@
 
   /**
    * hasEmojiSupport - Detect Emoji support in this browser.
+   *
+   * @private
+   * @memberof module:fire
    */
   function hasEmojiSupport() {
     const canvas = document.createElement('canvas');
@@ -1467,6 +1630,9 @@
 
   /**
    * emojiOrImage - Returns the emoji if it's supported. Otherwise, return a fallback image.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param   {string}  emoji         The emoji to render
    * @param   {boolean} [large=false] Make it large?
@@ -1491,6 +1657,9 @@
 
   /**
    * injectExternalScripts - Inject FIRE stylesheet and Toastr library.
+   *
+   * @private
+   * @memberof module:fire
    */
   function injectExternalScripts() {
     injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
@@ -1505,6 +1674,9 @@
   /**
    * injectCSS - Inject the specified stylesheet.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {string} path The path to the CSS file.
    */
   function injectCSS(path) {
@@ -1516,6 +1688,9 @@
 
   /**
    * injectScript - Inject the specified script.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {string}   name       The global name to check against before injecting the script. Exapme: (`typeof myInjectedGlobal`)
    * @param {string}   path       The script's path.
@@ -1536,6 +1711,9 @@
 
   /**
    * loadToastrCss - Load toastr css.
+   *
+   * @private
+   * @memberof module:fire
    */
   function loadToastrCss() {
     injectCSS('//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css');
@@ -1543,6 +1721,9 @@
 
   /**
    * initializeToastr - Set toastr options.
+   *
+   * @private
+   * @memberof module:fire
    */
   function initializeToastr() {
     toastr.options = {
@@ -1560,6 +1741,9 @@
 
   /**
    * registerOpenLastReportKey - Open the last report on [Ctrl]+[Space].
+   *
+   * @private
+   * @memberof module:fire
    */
   function registerOpenLastReportKey() {
     $(document).on('keydown', ({keyCode, ctrlKey}) => {
@@ -1575,6 +1759,9 @@
 
   /**
    * registerAnchorHover - Register the "tooltip" hover for anchor elements.
+   *
+   * @private
+   * @memberof module:fire
    */
   function registerAnchorHover() {
     const selector = '[fire-tooltip]';
@@ -1601,6 +1788,9 @@
 
   /**
    * registerWebSocket - Register a websocket listener.
+   *
+   * @private
+   * @memberof module:fire
    */
   function registerWebSocket() {
     metapi.watchSocket(fire.api.ms.key, socketOnMessage);
@@ -1609,6 +1799,9 @@
 
   /**
    * registerForLocalStorage - Adds a property on `fire` that's stored in `localStorage`.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} object          The object to register the property on.
    * @param {string} key             The key to use on the object.
@@ -1623,6 +1816,9 @@
 
   /**
    * registerLoggingFunctions - Registers logging functions on `fire`.
+   *
+   * @private
+   * @memberof module:fire
    */
   function registerLoggingFunctions() {
     fire.log = getLogger('log');
@@ -1633,6 +1829,9 @@
 
   /**
    * showFireOnExistingMessages - Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked.
+   *
+   * @private
+   * @memberof module:fire
    */
   function showFireOnExistingMessages() {
     $('#getmore, #getmore-mine')
@@ -1648,6 +1847,9 @@
 
   /**
    * decorateExistingMessages - Decorate messages that exist on page load.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {number} timeout The time to wait before trying to decorate the messages.
    */
@@ -1673,6 +1875,9 @@
   /**
    * getLogger - Gets a log wrapper for the specified console function.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param   {function} fn the console function to wrap in a `debug` condition.
    * @returns {function}    A fire-wrapped console function.
    */
@@ -1688,6 +1893,9 @@
 
   /**
    * socketOnMessage - Handle socket messages.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {object} message The socket message.
    */
@@ -1723,6 +1931,9 @@
 
   /**
    * expandLinksOnHover - Expands anchor elements in the report's body on hover, to show the href.
+   *
+   * @private
+   * @memberof module:fire
    */
   function expandLinksOnHover() {
     $('.fire-popup-body a').each((i, element) =>
@@ -1732,6 +1943,9 @@
 
   /**
    * initLocalStorage - Initializes `localStorage`.
+   *
+   * @private
+   * @memberof module:fire
    *
    * @param {function} hOP            `Object.hasOwnProperty` bound securely.
    * @param {objects}  defaultStorage localStorage's default settings.
@@ -1760,6 +1974,9 @@
   /**
    * setValue - Sets a value on `fire.userData`, stored in `localStorage`.
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {string} key   the `localStorage` key.
    * @param {object} value the value to set.
    */
@@ -1772,6 +1989,9 @@
   /**
    * clearValue - Removes a value from `fire.userData`, stored in `localStorage`
    *
+   * @private
+   * @memberof module:fire
+   *
    * @param {string} key the `localStorage` key.
    */
   function clearValue(key) {
@@ -1782,6 +2002,9 @@
 
   /**
    * getCurrentChatUser - Gets the currently logged-in user.
+   *
+   * @private
+   * @memberof module:fire
    */
   function getCurrentChatUser() {
     setTimeout(() => { // This code was too fast for FireFox
@@ -1797,8 +2020,14 @@
 
   /**
    * setFireConstants - Sets constants to be used in `fire`.
+   *
+   * @private
+   * @memberof module:fire
    */
   function setFireConstants() {
+    /**
+     * @memberof module:fire
+     */
     fire.constants = {
       keys: {
         enter: 13,
