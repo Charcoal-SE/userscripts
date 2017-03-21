@@ -612,7 +612,7 @@
   }
 
   /**
-   * chatListener - Chat message event listener. If SmokeDetector reports another post, decorate the message
+   * chatListener - Chat message event listener.
    * If SmokeDetector reports another post, decorate the message.
    *
    * @private
