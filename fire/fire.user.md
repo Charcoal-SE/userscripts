@@ -81,7 +81,7 @@ FIRE's global object.
     * [`~singleReportCallback`](#module_fire..singleReportCallback) : <code>function</code>
 
 
--
+---
 
 <a name="module_fire.metaData"></a>
 
@@ -91,7 +91,7 @@ The userscript's metadata
 **Kind**: static property of <code>[fire](#module_fire)</code>  
 **Access**: public  
 
--
+---
 
 <a name="module_fire.api"></a>
 
@@ -101,14 +101,14 @@ The userscript's api urls and keys
 **Kind**: static property of <code>[fire](#module_fire)</code>  
 **Access**: public  
 
--
+---
 
 <a name="module_fire.fire.constants"></a>
 
 ### `fire.fire.constants`
 **Kind**: static property of <code>[fire](#module_fire)</code>  
 
--
+---
 
 <a name="module_fire.clickHandlers"></a>
 
@@ -124,7 +124,7 @@ Click handlers for the settings window.
     * [`.disableReadonly()`](#module_fire.clickHandlers.disableReadonly) ℗
 
 
--
+---
 
 <a name="module_fire.clickHandlers.requestToken"></a>
 
@@ -134,7 +134,7 @@ Open the "Request authorization" MetaSmoke page.
 **Kind**: static method of <code>[clickHandlers](#module_fire.clickHandlers)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.clickHandlers.saveToken"></a>
 
@@ -150,7 +150,7 @@ Request a token from the MetaSmoke code.
 | callback | <code>function</code> | The callback that receives the MetaSmoke code. |
 
 
--
+---
 
 <a name="module_fire.clickHandlers.disableReadonly"></a>
 
@@ -160,7 +160,7 @@ Close all popup windows and open the "Request write token" popup.
 **Kind**: static method of <code>[clickHandlers](#module_fire.clickHandlers)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.requestStackExchangeToken"></a>
 
@@ -170,7 +170,7 @@ requestStackExchangeToken - Request a Stack Exchange Write token for this app.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.checkHashForWriteToken"></a>
 
@@ -180,7 +180,7 @@ checkHashForWriteToken - Check the url hash to see if a write token has been obt
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.checkWriteTokenSuccess"></a>
 
@@ -190,7 +190,7 @@ checkWriteTokenSuccess - Check if the write token was successfully obtained.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.getDataForUrl"></a>
 
@@ -206,7 +206,7 @@ getDataForUrl - Loads MetaSmoke data for a specified post url.
 | callback | <code>singleReportCallback</code> | An action to perform after the report is loaded. |
 
 
--
+---
 
 <a name="module_fire.listHasCurrentUser"></a>
 
@@ -222,7 +222,7 @@ listHasCurrentUser - Checks if the list of users on this flag report contains th
 | flags | <code>object</code> | A report's (auto-)flags, where it's `users` array has to be checked. |
 
 
--
+---
 
 <a name="module_fire.loadDataForReport"></a>
 
@@ -237,7 +237,7 @@ loadDataForReport - Loads a report's data when you hover over the FIRE button.
 | openAfterLoad | <code>boolean</code> | Open the report popup after load? |
 
 
--
+---
 
 <a name="module_fire.updateReportCache"></a>
 
@@ -247,7 +247,7 @@ updateReportCache - Loads all MS data on the page.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.parseDataForReport"></a>
 
@@ -265,7 +265,7 @@ parseDataForReport - Parse a report's loaded data.
 | skipLoadPost | <code>boolean</code> | skip loading additional data fot the post? |
 
 
--
+---
 
 <a name="module_fire.parseSiteUrl"></a>
 
@@ -281,7 +281,7 @@ parseSiteUrl - Parse a site url into a api parameter.
 | url | <code>string</code> | A report's Stack Exchange link |
 
 
--
+---
 
 <a name="module_fire.loadStackExchangeSites"></a>
 
@@ -291,7 +291,7 @@ loadStackExchangeSites - Loads a list of all Stack Exchange Sites.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.loadPost"></a>
 
@@ -306,7 +306,7 @@ loadPost - Loads additional information for a post, from the Stack exchange API.
 | report | <code>object</code> | The MetaSmoke report. |
 
 
--
+---
 
 <a name="module_fire.loadPostRevisions"></a>
 
@@ -321,7 +321,7 @@ loadPostRevisions - Loads a post's revision history from the Stack Exchange API.
 | report | <code>object</code> | The MetaSmoke report. |
 
 
--
+---
 
 <a name="module_fire.showEditedIcon"></a>
 
@@ -331,7 +331,7 @@ showEditedIcon - Render a "Edited" icon on a opened report popup.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.loadPostFlagStatus"></a>
 
@@ -346,7 +346,7 @@ loadPostFlagStatus - Loads a post's flagging status from the Stack Exchange API.
 | report | <code>object</code> | The MetaSmoke report. |
 
 
--
+---
 
 <a name="module_fire.loadCurrentSEUser"></a>
 
@@ -361,7 +361,7 @@ loadPostFlagStatus - Loads the current Stack Exchange user and what sites they'r
 | [page] | <code>number</code> | <code>1</code> | the page to load. |
 
 
--
+---
 
 <a name="module_fire.parseUserResponse"></a>
 
@@ -377,7 +377,7 @@ parseUserResponse - Parse the user response.
 | page | <code>number</code> | The page that's been loaed. |
 
 
--
+---
 
 <a name="module_fire.getSE"></a>
 
@@ -396,7 +396,7 @@ getSE - `GET` call on the Stack Exchange API.
 | always | <code>function</code> | The `always` callback. |
 
 
--
+---
 
 <a name="module_fire.stackExchangeAjaxCall"></a>
 
@@ -418,7 +418,7 @@ stackExchangeAjaxCall - Perform an AJAX call on the Stack Exchange API.
 | config.always | <code>function</code> | The `always` callback. |
 
 
--
+---
 
 <a name="module_fire.getWriteToken"></a>
 
@@ -433,7 +433,7 @@ getWriteToken - Gets a MetaSmoke write token.
 | [callback] | <code>function</code> | A optional function to run after the write token was obtained. |
 
 
--
+---
 
 <a name="module_fire.chatListener"></a>
 
@@ -451,7 +451,7 @@ chatListener - Chat message event listener.If SmokeDetector reports another pos
 | message.message_id | <code>number</code> | The message ID |
 
 
--
+---
 
 <a name="module_fire.decorateMessage"></a>
 
@@ -466,7 +466,7 @@ decorateMessage - Adds the "FIRE" button to the passed message.
 | message | <code>object</code> | The message DOM node the button should be added to. |
 
 
--
+---
 
 <a name="module_fire.filterOnContents"></a>
 
@@ -483,7 +483,7 @@ filterOnContents - Filter a jQuery list on the element text.
 | text | <code>string</code> | The text the element should contain. |
 
 
--
+---
 
 <a name="module_fire.toastrPositionChangeHandler"></a>
 
@@ -493,7 +493,7 @@ toastrPositionChangeHandler - Set the toastr position class.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.toastrDurationHandler"></a>
 
@@ -503,7 +503,7 @@ toastrDurationHandler - Update the toastr popup duration.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.blurOptionClickHandler"></a>
 
@@ -513,7 +513,7 @@ blurOptionClickHandler - Set the "Blur" option for the popup modal.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.flagOptionClickHandler"></a>
 
@@ -523,7 +523,7 @@ flagOptionClickHandler - Set the "Flag" option for "tpu-" feedback.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.debugOptionClickHandler"></a>
 
@@ -533,7 +533,7 @@ debugOptionClickHandler - Set the "Debug" option to show logs in the dev console
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.boolOptionClickHandler"></a>
 
@@ -551,7 +551,7 @@ boolOptionClickHandler - Set a boolean option after a setting checkbox was click
 | [callback] | <code>function</code> | A optional callback. |
 
 
--
+---
 
 <a name="module_fire.keyboardShortcuts"></a>
 
@@ -566,7 +566,7 @@ keyboardShortcuts - Handle keypress events for the popup.
 | e | <code>object</code> | the jQuery keyboard event |
 
 
--
+---
 
 <a name="module_fire.openReportPopupForMessage"></a>
 
@@ -581,7 +581,7 @@ openReportPopupForMessage - Opens a report popup for a specific message.
 | message | <code>object</code> | The message DOM node the report should be opened for. |
 
 
--
+---
 
 <a name="module_fire.writeTokenPopup"></a>
 
@@ -596,7 +596,7 @@ writeTokenPopup - Open a popup to enter the write token.
 | callback | <code>function</code> | The action to perform after getting a write token / chosing read-only mode. |
 
 
--
+---
 
 <a name="module_fire.openReportPopup"></a>
 
@@ -606,7 +606,7 @@ openReportPopup - Build a report popup and show it.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.openSettingsPopup"></a>
 
@@ -616,7 +616,7 @@ openSettingsPopup - Opens a popup to change fire's settings.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.closePopup"></a>
 
@@ -627,7 +627,7 @@ closePopup - Close the popup.
 **Returns**: <code>object</code> - The previously closed popup's button (if any) so it can be re-opened.  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.postMetaSmokeFeedback"></a>
 
@@ -644,7 +644,7 @@ postMetaSmokeFeedback - Submit MetaSmoke feedback.
 | button | <code>object</code> | The clicked button. |
 
 
--
+---
 
 <a name="module_fire.postMetaSmokeSpamFlag"></a>
 
@@ -665,7 +665,7 @@ postMetaSmokeSpamFlag - Flag the post as spam.
 | feedbackSuccess | <code>object</code> | A jQuery DOM node containing the feedback success message. |
 
 
--
+---
 
 <a name="module_fire.keyCodesToArray"></a>
 
@@ -681,7 +681,7 @@ keyCodesToArray - Structure the keyCodes Array.
 | keyCodes | <code>number</code> &#124; <code>string</code> &#124; <code>array</code> | An number, string, or array of numbers or strings containing keys or keycodes. |
 
 
--
+---
 
 <a name="module_fire.createFeedbackButton"></a>
 
@@ -701,7 +701,7 @@ createFeedbackButton - Create a feedback button for the top of the popup.
 | tooltip | <code>string</code> | The tooltip to display for this button. |
 
 
--
+---
 
 <a name="module_fire.createCloseButton"></a>
 
@@ -717,7 +717,7 @@ createCloseButton - Create a button to close a popup.
 | clickHandler | <code>function</code> | The button's `click` handler. |
 
 
--
+---
 
 <a name="module_fire.createSettingsCheckBox"></a>
 
@@ -737,7 +737,7 @@ createSettingsCheckBox - Creates a input[type=checkbox] for the settings.
 | headerText | <code>string</code> | The header to show above the checkbox. |
 
 
--
+---
 
 <a name="module_fire._"></a>
 
@@ -755,7 +755,7 @@ _ - Wrapper to create a new element with a specified class.
 | [options] | <code>object</code> | The options to use for the created element. |
 
 
--
+---
 
 <a name="module_fire.br"></a>
 
@@ -766,7 +766,7 @@ br - Create a linebreak.
 **Returns**: <code>object</code> - A jQuery `<br />` DOM node.  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.span"></a>
 
@@ -782,7 +782,7 @@ span - Create a `<span>` with the specified contents.
 | contents | <code>object</code> | A jQuery DOM node to use insert into the span. |
 
 
--
+---
 
 <a name="module_fire.button"></a>
 
@@ -799,7 +799,7 @@ button - Create a button.
 | clickHandler | <code>function</code> | The button's click handler. |
 
 
--
+---
 
 <a name="module_fire.hasEmojiSupport"></a>
 
@@ -809,7 +809,7 @@ hasEmojiSupport - Detect Emoji support in this browser.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.emojiOrImage"></a>
 
@@ -826,7 +826,7 @@ emojiOrImage - Returns the emoji if it's supported. Otherwise, return a fallback
 | [large] | <code>boolean</code> | <code>false</code> | Make it large? |
 
 
--
+---
 
 <a name="module_fire.injectExternalScripts"></a>
 
@@ -836,7 +836,7 @@ injectExternalScripts - Inject FIRE stylesheet and Toastr library.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.injectCSS"></a>
 
@@ -851,7 +851,7 @@ injectCSS - Inject the specified stylesheet.
 | path | <code>string</code> | The path to the CSS file. |
 
 
--
+---
 
 <a name="module_fire.injectScript"></a>
 
@@ -869,7 +869,7 @@ injectScript - Inject the specified script.
 | [always] | <code>function</code> | An optional "always" callback. |
 
 
--
+---
 
 <a name="module_fire.loadToastrCss"></a>
 
@@ -879,7 +879,7 @@ loadToastrCss - Load toastr css.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.initializeToastr"></a>
 
@@ -889,7 +889,7 @@ initializeToastr - Set toastr options.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.registerOpenLastReportKey"></a>
 
@@ -899,7 +899,7 @@ registerOpenLastReportKey - Open the last report on [Ctrl]+[Space].
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.registerAnchorHover"></a>
 
@@ -909,7 +909,7 @@ registerAnchorHover - Register the "tooltip" hover for anchor elements.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.registerWebSocket"></a>
 
@@ -919,7 +919,7 @@ registerWebSocket - Register a websocket listener.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.registerForLocalStorage"></a>
 
@@ -936,7 +936,7 @@ registerForLocalStorage - Adds a property on `fire` that's stored in `localStora
 | localStorageKey | <code>string</code> | The key to use in `localStorage`. |
 
 
--
+---
 
 <a name="module_fire.registerLoggingFunctions"></a>
 
@@ -946,7 +946,7 @@ registerLoggingFunctions - Registers logging functions on `fire`.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.showFireOnExistingMessages"></a>
 
@@ -956,7 +956,7 @@ showFireOnExistingMessages - Adds the "FIRE" button to all existing messages and
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.decorateExistingMessages"></a>
 
@@ -971,7 +971,7 @@ decorateExistingMessages - Decorate messages that exist on page load.
 | timeout | <code>number</code> | The time to wait before trying to decorate the messages. |
 
 
--
+---
 
 <a name="module_fire.getLogger"></a>
 
@@ -987,7 +987,7 @@ getLogger - Gets a log wrapper for the specified console function.
 | fn | <code>function</code> | the console function to wrap in a `debug` condition. |
 
 
--
+---
 
 <a name="module_fire.socketOnMessage"></a>
 
@@ -1002,7 +1002,7 @@ socketOnMessage - Handle socket messages.
 | message | <code>object</code> | The socket message. |
 
 
--
+---
 
 <a name="module_fire.expandLinksOnHover"></a>
 
@@ -1012,7 +1012,7 @@ expandLinksOnHover - Expands anchor elements in the report's body on hover, to s
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.initLocalStorage"></a>
 
@@ -1028,7 +1028,7 @@ initLocalStorage - Initializes `localStorage`.
 | defaultStorage | <code>objects</code> | localStorage's default settings. |
 
 
--
+---
 
 <a name="module_fire.setValue"></a>
 
@@ -1044,7 +1044,7 @@ setValue - Sets a value on `fire.userData`, stored in `localStorage`.
 | value | <code>object</code> | the value to set. |
 
 
--
+---
 
 <a name="module_fire.clearValue"></a>
 
@@ -1059,7 +1059,7 @@ clearValue - Removes a value from `fire.userData`, stored in `localStorage`
 | key | <code>string</code> | the `localStorage` key. |
 
 
--
+---
 
 <a name="module_fire.getCurrentChatUser"></a>
 
@@ -1069,7 +1069,7 @@ getCurrentChatUser - Gets the currently logged-in user.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire.setFireConstants"></a>
 
@@ -1079,7 +1079,7 @@ setFireConstants - Sets constants to be used in `fire`.
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
--
+---
 
 <a name="module_fire..singleReportCallback"></a>
 
@@ -1093,5 +1093,5 @@ This is a callback that is passed a single report's data.
 | reportData | <code>object</code> | The data for the loaded report. |
 
 
--
+---
 
