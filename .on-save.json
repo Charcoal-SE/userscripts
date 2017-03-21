@@ -2,7 +2,7 @@
   {
     "srcDir": "",
     "destDir": "",
-    "files": "**/fire.user.js",
+    "files": "fire/fire.user.js",
     "command": "jsdoc2md ${srcFile} --separators --partial jsdoc2md/separator.hbs --name-format --member-index-format list --private> ${destFileWithoutExtension}.md"
   }
 ]
