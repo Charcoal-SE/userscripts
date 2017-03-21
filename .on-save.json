@@ -1,0 +1,8 @@
+[
+  {
+    "srcDir": "",
+    "destDir": "",
+    "files": "**/*.user.js",
+    "command": "jsdoc2md ${srcFile} --separators --name-format  --member-index-format list --private> ${destFileWithoutExtension}.md"
+  }
+]

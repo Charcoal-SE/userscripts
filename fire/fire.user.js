@@ -39,7 +39,19 @@
      * @module fire
      */
     scope.fire = {
+      /**
+       * The userscript's metadata
+       *
+       * @public
+       * @memberof module:fire
+       */
       metaData: GM_info.script || GM_info['Flag Instantly, Rapidly, Effortlessly'],
+      /**
+       * The userscript's api urls and keys
+       *
+       * @public
+       * @memberof module:fire
+       */
       api: {
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
