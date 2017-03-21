@@ -981,7 +981,7 @@
     }
 
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
-    const site = fire.sites[d.site];
+    const site = fire.sites[d.site] || fire.sites[`${d.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
 
     const openOnSiteButton = _('a', 'fire-site-logo', {
