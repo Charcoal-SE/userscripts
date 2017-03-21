@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
-    "test": "xo"
+    "test": "xo",
+    "docs": "jsdoc2md fire.user.js --separators --name-format> jsdoc.md"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,8 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "xo": "^0.17.1"
+    "xo": "^0.17.1",
+    "jsdoc-to-markdown": "^3.0.0"
   },
   "//": "FIRE overrides",
   "xo": {
