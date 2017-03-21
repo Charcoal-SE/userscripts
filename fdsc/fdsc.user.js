@@ -7,7 +7,7 @@
 // @contributor rene
 // @attribution Brock Adams (https://github.com/BrockA)
 // @version     1.14.0
-// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://*.stackexchange.com/*
@@ -25,6 +25,7 @@
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // @grant       none
 // ==/UserScript==
+
 /* global fdsc, $, xdLocalStorage, confirm */
 /* eslint-disable max-nested-callbacks */
 
