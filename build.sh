@@ -43,7 +43,3 @@ do
   fi
   cd ..
 done
-
-echo "Extracting userscript meta blocks."
-./extractUserScriptMeta.sh
-echo "Done extracting userscript meta blocks."
