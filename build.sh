@@ -45,5 +45,5 @@ do
 done
 
 echo "Extracting userscript meta blocks."
-
-extractUserScriptMeta.sh
+./extractUserScriptMeta.sh
+echo "Done extracting userscript meta blocks."
