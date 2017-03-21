@@ -5,7 +5,7 @@
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
 // @version     1.1.0
-// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks/aeks.user.js
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks/aeks.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/aeks/aeks.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
 // @match       *://*.stackexchange.com/*
