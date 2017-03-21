@@ -4,7 +4,8 @@
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
     "test": "xo",
-    "docs": "jsdoc2md fire.user.js --separators --name-format> jsdoc.md"
+    "docs": "jsdoc2md fire.user.js --separators --name-format> jsdoc.md",
+    "prepublish": "if which docs ; then docs ; else echo 'no docs' ; fi"
   },
   "repository": {
     "type": "git",
