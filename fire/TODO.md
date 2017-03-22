@@ -1,4 +1,5 @@
 # TODO:
+* ___Bug: FIRE doesn't open the report after getting a MS write token.___
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Add "Rude/Abusive" button:
