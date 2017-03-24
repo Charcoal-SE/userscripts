@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.12
+// @version     0.9.13
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -1043,20 +1043,23 @@
     }
 
     const body = _('div', 'fire-popup-body')
-      .append(_('h2')
-        .append(_('em', {html: title}))
-      )
-      .append(_('hr'))
       .append(
-        _('div', 'fire-report-info', {
+        _('div', {
           'fire-tooltip': emojiOrImage('clipboard')
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\nReason weight: ${d.reason_weight}\n\n${d.why}`)
             .html()
         })
-        .append(_('h3', 'fire-type', {text: `${postType}:`}))
+        .append(_('h2')
+          .append(_('em', {html: title}))
+        )
+        .append(_('hr'))
         .append(
-          _('span', 'fire-username', {text: `${d.username} `, title: 'Username'})
-            .append(emojiOrImage('user'))
+          _('div', 'fire-report-info')
+          .append(_('h3', 'fire-type', {text: `${postType}:`}))
+          .append(
+            _('span', 'fire-username', {text: `${d.username} `, title: 'Username'})
+              .append(emojiOrImage('user'))
+          )
         )
       )
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)

@@ -20,6 +20,10 @@ Points marked with &diams; are related to the "loading" rewrite.
 
 Basically, now you can _"KILL IT WITH FIRE"_
 
+# version history
+
+- 0.9.13 - Extended "why" tooltip hoverable area to include question title.
+
 ## Notes
 
 [Documentation for metapi](https://github.com/Charcoal-SE/userscripts/wiki/metapi-API-documentation).  
