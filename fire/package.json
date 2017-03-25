@@ -59,6 +59,7 @@
       "prefer-const": "error",
       "prefer-arrow-callback": "error",
       "object-shorthand": "error",
+      "capitalized-comments": "off",
       "valid-jsdoc": ["error",
         {
           "prefer": {"return": "returns"},

@@ -678,7 +678,7 @@ keyCodesToArray - Structure the keyCodes Array.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keyCodes | <code>number</code> &#124; <code>string</code> &#124; <code>array</code> | An number, string, or array of numbers or strings containing keys or keycodes. |
+| keyCodes | <code>number</code> \| <code>string</code> \| <code>array</code> | An number, string, or array of numbers or strings containing keys or keycodes. |
 
 
 ---
@@ -695,7 +695,7 @@ createFeedbackButton - Create a feedback button for the top of the popup.
 | Param | Type | Description |
 | --- | --- | --- |
 | data | <code>object</code> | the report data. |
-| keyCodes | <code>number</code> &#124; <code>string</code> &#124; <code>array</code> | The keyCodes to use for this button. |
+| keyCodes | <code>number</code> \| <code>string</code> \| <code>array</code> | The keyCodes to use for this button. |
 | text | <code>string</code> | The text to display for this button. |
 | verdict | <code>string</code> | This button's MetaSmoke verdict |
 | tooltip | <code>string</code> | The tooltip to display for this button. |
