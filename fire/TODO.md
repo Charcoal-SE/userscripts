@@ -23,6 +23,7 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 # version history
 
+- 0.9.17 - Bugfix: Edited icon wasn't shown.
 - 0.9.16 - Bugfix: Default storage before reading from it.
 - 0.9.15 - Bugfix: Fire has no local data on first install.
 - 0.9.14 - Adds the "ai-deleted" class to reports that have been deleted, but haven't been marked as such, yet.
