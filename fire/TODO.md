@@ -4,6 +4,7 @@
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Add "Rude/Abusive" button:
   * Implement SE "rude" feedback.
+* Cast "NAA" flag fro "NAA" feedback.
 * Load data through metapi.js for cross-script storage. &diams;
 * Improve MS feedback error handling.
   * Respect passed "Backoff" params. &diams;
