@@ -1,6 +1,5 @@
 # TODO:
 * ___Bug: FIRE doesn't open the report after getting a MS write token.___
-* ___Bug: FIRE Thinks you already flagged a post when you haven't.___
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Add "Rude/Abusive" button:
@@ -24,6 +23,7 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 # version history
 
+- 0.9.18 - Bugfix: Edited icon was shown twice, hasFlagged icon was shown when you hadn't flagged.
 - 0.9.17 - Bugfix: Edited icon wasn't shown.
 - 0.9.16 - Bugfix: Default storage before reading from it.
 - 0.9.15 - Bugfix: Fire has no local data on first install.

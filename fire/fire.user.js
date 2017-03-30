@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.17
+// @version     0.9.18
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -395,9 +395,9 @@
    * @memberof module:fire
    */
   function showEditedIcon() {
-    const h2 = $('.fire-popup-body > h2');
+    const h2 = $('.fire-popup-body > div > h2');
     if (!h2.data('has-edit-icon')) {
-      $('.fire-popup-body > div > h2')
+      h2
         .prepend(
           emojiOrImage('pencil')
             .attr('fire-tooltip', 'This post has been edited.')
@@ -429,7 +429,9 @@
       parameters,
       response => {
         report.se.available_flags = response.items;
-        report.has_flagged = response.items && response.items.some(({has_flagged, title}) => !has_flagged && title === 'spam');
+        report.has_flagged = response.items && response.items.some(
+          ({has_flagged, title}) => has_flagged && title === 'spam'
+        );
 
         fire.log('Loaded a post\'s flag status', response);
       });
