@@ -1,5 +1,6 @@
 # TODO:
 * ___Bug: FIRE doesn't open the report after getting a MS write token.___
+* ___Bug: FIRE Thinks you already flagged a post when you haven't.___
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Add "Rude/Abusive" button:
