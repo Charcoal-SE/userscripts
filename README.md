@@ -9,7 +9,8 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
  - [Gas Mask](https://github.com/Charcoal-SE/Userscripts/raw/master/gas-mask-se/gas-mask-se.user.js)
  - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms-dark-theme/ms_dark_theme.user.js)
  - [Hide topbar ads](https://github.com/Charcoal-SE/Userscripts/raw/master/hideads/hideads.user.js)
- - [Autoflagging information for Charcoal HQ](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging/autoflagging.user.js)
+ - [Autoflagging information for Charcoal HQ (AIM)](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging/autoflagging.user.js)
+ - [Feedback Instantly, Rapidly, Effortlessly (FIRE)](https://github.com/Charcoal-SE/Userscripts/raw/master/fire/fire.user.js)
  - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks/aeks.user.js) ([Info](https://github.com/Charcoal-SE/userscripts/wiki/AEKS))
 
 Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
