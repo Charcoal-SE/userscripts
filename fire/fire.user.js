@@ -45,7 +45,7 @@
        * @public
        * @memberof module:fire
        */
-      metaData: GM_info.script || GM_info['Flag Instantly, Rapidly, Effortlessly'],
+      metaData: GM_info.script || GM_info['Feedback Instantly, Rapidly, Effortlessly'],
       /**
        * The userscript's api urls and keys
        *
