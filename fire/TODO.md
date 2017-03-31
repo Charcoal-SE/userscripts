@@ -14,7 +14,7 @@
   * Load (external?) HTML?
   * Use template (HTML) strings?
   * Popup class that accepts body as parameter.
-* Write JSDoc for functions.
+* Extend / wrap toastr functions to also log to console if debug.
 * Ask for confirmation if I click "spam" or "rude" on a post which has been edited.
 
 Points marked with &diams; are related to the "loading" rewrite.
