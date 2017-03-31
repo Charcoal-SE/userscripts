@@ -23,6 +23,7 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 # version history
 
+- 0.9.19 - Compatibility: Add fire to the global scope, but don't override it if it already exists.
 - 0.9.18 - Bugfix: Edited icon was shown twice, hasFlagged icon was shown when you hadn't flagged.
 - 0.9.17 - Bugfix: Edited icon wasn't shown.
 - 0.9.16 - Bugfix: Default storage before reading from it.

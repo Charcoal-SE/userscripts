@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.18
+// @version     0.9.19
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -18,6 +18,8 @@
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
  */
 (() => {
+  let fire;
+
   /**
    * anonymous function - Initialize FIRE.
    *
@@ -38,7 +40,7 @@
      * @global
      * @module fire
      */
-    scope.fire = {
+    fire = {
       /**
        * The userscript's metadata
        *
@@ -72,6 +74,13 @@
       openReportPopupForMessage,
       decorateMessage
     };
+
+    /**
+     * Add fire to the global scope, but don't override it if it already exists.
+     */
+    if (!hOP(scope, 'fire'))
+      scope.fire = fire;
+    scope.fireNoConflict = fire;
 
     /**
      * Default settings to use in `localStorage`.
