@@ -689,7 +689,7 @@
           reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
 
         if (reportedUrl.startsWith('//github.com') ||
-          reportedUrl.includes('erwaysoftware.com') ||
+          reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
           reportedUrl.includes('/users/'))
           return;
 
