@@ -12,3 +12,5 @@ Open on site:       [o] / [6]
 Open on MetaSmoke:  [m] / [7]
 Settings:           [s]
 Close popup:        [Esc]
+
+Open latest report: [Ctrl] + [Space]
