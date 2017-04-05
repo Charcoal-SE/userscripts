@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.20
+// @version     0.9.21
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -360,8 +360,13 @@
           report.is_deleted = true;
           $('.fire-reported-post').addClass('fire-deleted');
 
-          if (typeof autoflagging !== 'undefined') // eslint-disable-line no-undef
+          if (typeof autoflagging !== 'undefined') { // eslint-disable-line no-undef
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
+
+            // The post is deleted, but MetaSmoke doesn't know it yet.
+            if (fire.userData.metasmokeWriteToken)
+              metapi.deletedPost(report.id, fire.api.ms.key, fire.userData.metasmokeWriteToken, $.noop);
+          }
 
           if (report.has_sent_feedback)
             $('a.fire-feedback-button:not([disabled])').attr('disabled', true);

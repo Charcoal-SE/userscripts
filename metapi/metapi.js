@@ -404,6 +404,33 @@ var mp = function ($) {
     },
 
     /**
+     * Marks a Smokey report as "deleted" via the metasmoke API.
+     *
+     * @param id        the numeric MS ID of the report to mark as deleted
+     * @param key       the requester's MS API key
+     * @param token     a valid MS API write token for the user marking the reported post
+     * @param callback  a callback function accepting a metapi.Response as a single parameter
+     */
+    deletedPost: function (id, key, token, callback) {
+      $.ajax({
+        type: "POST",
+        url: "https://metasmoke.erwaysoftware.com/api/w/post/" + id + "/deleted?key=" + key + "&token=" + token
+      }).done(function (data) {
+        callback(new metapi.Response(true, {backoff: data.backoff}));
+      }).error(function (jqXhr) {
+        if (jqXhr.status === 409) {
+          callback(new metapi.Response(false, jqXhr.responseText));
+        } else if (jqXhr.status === 500) {
+          callback(new metapi.Response(false, {
+            error_name: "feedback_failed",
+            error_code: 500,
+            error_message: jqXhr.responseText.message
+          }));
+        }
+      });
+    },
+
+    /**
      * Casts a spam flag on a post via the metasmoke API. This also creates a FlagLog record on metasmoke, to track
      * flags being cast via the API.
      *

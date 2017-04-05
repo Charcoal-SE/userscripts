@@ -1,7 +1,7 @@
 {
-  "name": "charcoal-userscripts",
-  "version": "0.0.0",
-  "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
+  "name": "fire",
+  "version": "0.9.21",
+  "description": "FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.",
   "scripts": {
     "test": "xo"
   },
