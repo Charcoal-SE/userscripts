@@ -24,6 +24,7 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 # version history
 
+- 0.9.23 - Added version to the popup footer, with update link.
 - 0.9.22 - Added support for keypad keys.
 - 0.9.21 - Added logic to mark a deleted post as deleted on metapi.
 - 0.9.20 - Added the "The Spam Blot" chatroom.
