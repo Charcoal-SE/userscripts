@@ -1,5 +1,6 @@
 # TODO:
 * ___Bug: FIRE doesn't open the report after getting a MS write token.___
+* ___Don't render images in the report (setting)___
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Add "Rude/Abusive" button:

@@ -7,7 +7,6 @@ FIRE's global object.
 * [fire](#module_fire)
     * [`.metaData`](#module_fire.metaData)
     * [`.api`](#module_fire.api)
-    * [`.fire.constants`](#module_fire.fire.constants)
     * [`.clickHandlers`](#module_fire.clickHandlers) ℗
         * [`.requestToken()`](#module_fire.clickHandlers.requestToken) ℗
         * [`.saveToken(input, callback)`](#module_fire.clickHandlers.saveToken) ℗
@@ -77,7 +76,7 @@ FIRE's global object.
     * [`.setValue(key, value)`](#module_fire.setValue) ℗
     * [`.clearValue(key)`](#module_fire.clearValue) ℗
     * [`.getCurrentChatUser()`](#module_fire.getCurrentChatUser) ℗
-    * [`.setFireConstants()`](#module_fire.setFireConstants) ℗
+    * [`.getFireConstants()`](#module_fire.getFireConstants) ⇒ <code>object</code> ℗
     * [`~singleReportCallback`](#module_fire..singleReportCallback) : <code>function</code>
 
 
@@ -100,13 +99,6 @@ The userscript's api urls and keys
 
 **Kind**: static property of <code>[fire](#module_fire)</code>  
 **Access**: public  
-
----
-
-<a name="module_fire.fire.constants"></a>
-
-### `fire.fire.constants`
-**Kind**: static property of <code>[fire](#module_fire)</code>  
 
 ---
 
@@ -678,7 +670,7 @@ keyCodesToArray - Structure the keyCodes Array.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keyCodes | <code>number</code> \| <code>string</code> \| <code>array</code> | An number, string, or array of numbers or strings containing keys or keycodes. |
+| keyCodes | <code>number</code> &#124; <code>string</code> &#124; <code>array</code> | An number, string, or array of numbers or strings containing keys or keycodes. |
 
 
 ---
@@ -695,7 +687,7 @@ createFeedbackButton - Create a feedback button for the top of the popup.
 | Param | Type | Description |
 | --- | --- | --- |
 | data | <code>object</code> | the report data. |
-| keyCodes | <code>number</code> \| <code>string</code> \| <code>array</code> | The keyCodes to use for this button. |
+| keyCodes | <code>number</code> &#124; <code>string</code> &#124; <code>array</code> | The keyCodes to use for this button. |
 | text | <code>string</code> | The text to display for this button. |
 | verdict | <code>string</code> | This button's MetaSmoke verdict |
 | tooltip | <code>string</code> | The tooltip to display for this button. |
@@ -1071,12 +1063,13 @@ getCurrentChatUser - Gets the currently logged-in user.
 
 ---
 
-<a name="module_fire.setFireConstants"></a>
+<a name="module_fire.getFireConstants"></a>
 
-### `fire.setFireConstants()` ℗
-setFireConstants - Sets constants to be used in `fire`.
+### `fire.getFireConstants()` ⇒ <code>object</code> ℗
+getFireConstants - Gets constants to be used in `fire`.
 
 **Kind**: static method of <code>[fire](#module_fire)</code>  
+**Returns**: <code>object</code> - FIRE's constants  
 **Access**: private  
 
 ---

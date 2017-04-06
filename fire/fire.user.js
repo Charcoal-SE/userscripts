@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.21
+// @version     0.9.22
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -34,6 +34,8 @@
       'chat.stackoverflow.com': 3735529,
       'chat.meta.stackexchange.com': 266345
     }[location.host];       // From which, we need the current host's ID
+
+    const constants = getFireConstants();
 
     /**
      * FIRE's global object.
@@ -66,10 +68,11 @@
           clientId: 9136
         }
       },
+      constants,
       smokeDetectorId,
       SDMessageSelector: `.user-${smokeDetectorId} .message `,
-      openOnSiteCodes: keyCodesToArray(['6', 'o']),
-      openOnMSCodes: keyCodesToArray(['7', 'm']),
+      openOnSiteCodes: keyCodesToArray(['6', 'o', numpad('6', constants)]),
+      openOnMSCodes: keyCodesToArray(['7', 'm', numpad('7', constants)]),
       buttonKeyCodes: [],
       reportCache: {},
       openReportPopupForMessage,
@@ -96,7 +99,6 @@
       version: fire.metaData.version
     };
 
-    setFireConstants();
     registerLoggingFunctions();
     hasEmojiSupport();
     initLocalStorage(hOP, defaultLocalStorage);
@@ -1030,11 +1032,11 @@
 
     if (!fire.userData.readOnly) {
       top
-        .append(createFeedbackButton(d, ['1', 'k'], 'spam', 'tpu-', 'True positive'))
-        .append(createFeedbackButton(d, ['2', 'r'], 'rude', 'rude', 'Rude / Abusive'))
-        .append(createFeedbackButton(d, ['3', 'v'], 'tp-', 'tp-', 'Vandalism'))
-        .append(createFeedbackButton(d, ['4', 'n'], 'naa-', 'naa-', 'Not an Answer / VLQ'))
-        .append(createFeedbackButton(d, ['5', 'f'], 'fp-', 'fp-', 'False Positive'))
+        .append(createFeedbackButton(d, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'True positive'))
+        .append(createFeedbackButton(d, ['2', 'r', numpad('2')], 'rude', 'rude', 'Rude / Abusive'))
+        .append(createFeedbackButton(d, ['3', 'v', numpad('3')], 'tp-', 'tp-', 'Vandalism'))
+        .append(createFeedbackButton(d, ['4', 'n', numpad('4')], 'naa-', 'naa-', 'Not an Answer / VLQ'))
+        .append(createFeedbackButton(d, ['5', 'f', numpad('5')], 'fp-', 'fp-', 'False Positive'))
         .append(br());
     }
 
@@ -1449,6 +1451,18 @@
     });
 
     return keyCodes;
+  }
+
+  /**
+   * numpad - Get the numpad keyCode for the passed number.
+   *
+   * @param {number|string} num The value to get the keyCode for.
+   * @param {object} constants An optional reference to FIRE's constants, for when `fire` is not yet declared.
+   *
+   * @returns {number} the keypad keyCode for the passed number.
+   */
+  function numpad(num, constants) {
+    return String(num).charCodeAt(0) + (constants || fire.constants).numpadOffset;
   }
 
   /**
@@ -2043,16 +2057,18 @@
   }
 
   /**
-   * setFireConstants - Sets constants to be used in `fire`.
+   * getFireConstants - Gets constants to be used in `fire`.
    *
    * @private
    * @memberof module:fire
+   *
+   * @returns {object} FIRE's constants
    */
-  function setFireConstants() {
+  function getFireConstants() {
     /**
      * @memberof module:fire
      */
-    fire.constants = {
+    return {
       keys: {
         enter: 13,
         esc: 27,
@@ -2068,6 +2084,7 @@
       siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,
       metaSmokeCodeLength: 7,
+      numpadOffset: 48,
       buttonFade: 100,
       loadAllMessagesDelay: 500,
       tooltipOffset: 20,
