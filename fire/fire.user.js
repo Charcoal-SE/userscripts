@@ -1103,6 +1103,7 @@
     const versionLink = _('a', 'fire-version-link', {
       text: fire.metaData.version,
       href: fire.metaData.downloadURL,
+      target: '_self',
       title: 'Update'
     });
 
