@@ -24,6 +24,9 @@ Basically, now you can _"KILL IT WITH FIRE"_
 
 # version history
 
+- 0.9.22 - Added support for keypad keys.
+- 0.9.21 - Added logic to mark a deleted post as deleted on metapi.
+- 0.9.20 - Added the "The Spam Blot" chatroom.
 - 0.9.19 - Compatibility: Add fire to the global scope, but don't override it if it already exists.
 - 0.9.18 - Bugfix: Edited icon was shown twice, hasFlagged icon was shown when you hadn't flagged.
 - 0.9.17 - Bugfix: Edited icon wasn't shown.
