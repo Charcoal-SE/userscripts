@@ -54,3 +54,126 @@ To open the reported post on it's site:
 4. That window redirects to this chat with an access token in the url hash.
 5. Fire sees the hash, saves your token, then closes the new window.
 6. You go back to the old window, it detects a token, and shows you a "success" message.
+
+# Version History
+
+|0.9    ||
+| ---   |---
+|0.9.23 |Added version to the popup footer, with update link.
+|0.9.22 |Added support for keypad keys.
+|0.9.21 |Added logic to mark a deleted post as deleted on metapi.
+|0.9.20 |Added the "The Spam Blot" chatroom.
+|0.9.19 |Compatibility: Add fire to the global scope, but don't override it if it already exists.
+|0.9.18 |Bugfix: Edited icon was shown twice, hasFlagged icon was shown when you hadn't flagged.
+|0.9.17 |Bugfix: Edited icon wasn't shown.
+|0.9.16 |Bugfix: Default storage before reading from it.
+|0.9.15 |Bugfix: Fire has no local data on first install.
+|0.9.14 |Adds the "ai-deleted" class to reports that have been deleted, but haven't been marked as such, yet.
+|0.9.13 |Extended "why" tooltip hoverable area to include question title.
+|0.9.12 |Bugfix: New posts always have 1 revision.
+|0.9.11 |Bugfix: .net fallback.
+|0.9.10 |Added JSDoc.
+|0.9.9  |"No metasmoke reports found" error message.
+|0.9.8  |Bugfix: don't use `this` in ES6.
+|0.9.7  |Revert metapi for websocket in FIRE.
+|0.9.6  |Fixing overriding metapi.
+|0.9.2-5|Emoji compatibility, Render reported post as deleted, flag status on report, updating lint rules, constants.
+|0.9.1  |Fixing some ES6 modification bugs.
+|0.9.0  |ES6.
+
+|0.8    ||
+| ---   |---
+|0.8.1  |Show "tpu-" instead of "rude".
+|0.8.0  |Reworked script / CSS injection.
+
+|0.7    ||
+| ---   |---
+|0.7.16 |Added "debug mode" toggle in settings.
+|0.7.15 |Bugfix: Max-height due to moved buttons.
+|0.7.14 |Clear sites cache on FIRE version change.
+|0.7.13 |Title narrower.
+|0.7.12 |Keyboard shortcuts.
+|0.7.11 |Keyboard shortcuts.
+|0.7.10 |Disable account check: doesn't work.
+|0.7.9  |Bugfix: broken anchor hovers.
+|0.7.8  |Keyboard shortcuts, "rude" feedback button.
+|0.7.7  |Account check.
+|0.7.6  |Bugfix: Edit icon wasn't rendered correctly.
+|0.7.5  |Bugfix: ClosePopup selectors.
+|0.7.4  |Allow hash in page url.
+|0.7.3  |Bugfix: Arrow functions -> parameters.
+|0.7.2  |Prefer arrow functions.
+|0.7.1  |Extended SE integration: Load post revision / deletion status.
+|0.7.0  |Implemented SE API.
+
+|0.6    ||
+| ---   |---
+|0.6.7  |CSS tweaks.
+|0.6.6  |Allow for longer reason fields.
+|0.6.5  |CSS tweaks.
+|0.6.4  |Missing semicolon.
+|0.6.3  |Prettify report reason.
+|0.6.2  |Add MS reason to report popup.
+|0.6.1  |Add MS reason to report popup.
+|0.6.0  |Added "read-only" mode.
+
+|0.5    ||
+| ---   |---
+|0.5.9  |Reduce code duplication, better match for report message.
+|0.5.8  |Removing title "new reports" count: Conflicts with chat's title changes.
+|0.5.7  |Adding title "new reports" count.
+|0.5.6  |Exposed method to open a report for a message
+|0.5.5  |Rollback: Timestamp check didn't work.
+|0.5.4  |Added logging functions.
+|0.5.3  |Don't show on "tpu-" feedback.
+|0.5.2  |Refactor steps.
+|0.5.1  |Changed header emoji size.
+|0.5.0  |Added "Flag on tpu- feedback" option.
+
+|0.4    ||
+| ---   |---
+|0.4.14 |Don't show FIRE button on "SD start-up" messages.
+|0.4.13 |Don't rely on link contents
+|0.4.12 |Bugfix: Fire is broken when there is no MS link
+|0.4.11 |Get FIRE metadata from the userscript's metadata block.
+|0.4.10 |GUI tweaks.
+|0.4.9  |Usability, maintainability.
+|0.4.8  |Refactor, added username to report.
+|0.4.7  |Fixed some openPopup issues.
+|0.4.6  |Debounced feedback.
+|0.4.5  |Make the title a little less obnoxious.
+|0.4.4  |Bugfix: FIRE couldn't open.
+|0.4.3  |Bugfixes.
+|0.4.2  |Fixing emoji bug.
+|0.4.1  |Removing debugger statement.
+|0.4.0  |Reworked report data loading with cache.
+
+|0.3    ||
+| ---   |---
+|0.3.12 |Large emoji option.
+|0.3.11 |Emoji fall-back.
+|0.3.10 |Don't use EmojiOne for FIRE.
+|0.3.9  |Adding Emoji library, error fixes.
+|0.3.8  |<kbd>Esc</kbd> key to close settings.
+|0.3.7  |Caching.
+|0.3.6  |Animate settings button.
+|0.3.5  |Button transitions.
+|0.3.4  |Naming: notifications.
+|0.3.3  |Replace notification radios with dropdown.
+|0.3.2  |CSS loading test.  
+|0.3.1  |Load CSS based on FIRE version.
+|0.3.0  |Added FIRE settings page.
+
+|0.2    ||
+| ---   |---
+|0.2.6  |Button hover same colour as button.
+|0.2.5  |Feedback / Flagging improvements.
+|0.2.4  |Pre-flagging checks.
+|0.2.3  |Cleaning up some functions.
+|0.2.2  |Feedback modifications.
+|0.2.1  |Feedback bugfixes.
+|0.2.0  |Added Feedback.
+
+|0.1    ||
+| ---   |---
+|0.1.0  |Initial setup: FIRE popup / Report message listener.
