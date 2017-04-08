@@ -637,7 +637,7 @@
         });
       } else {
         setValue('readOnly', true);
-        toastr.info('FIRE is not in read-only mode.');
+        toastr.info('FIRE is now in read-only mode.');
         closePopup();
 
         if (afterGetToken)
