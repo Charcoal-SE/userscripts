@@ -179,6 +179,10 @@ img.fire-emoji-large {
       &.fire-deleted {
         background-color: #f4eaea;
       }
+
+      img[src^='http://placehold.it'] {
+        cursor: pointer;
+      }
     }
 
     a {
