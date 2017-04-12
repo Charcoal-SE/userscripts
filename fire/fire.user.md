@@ -38,6 +38,7 @@ FIRE's global object.
     * [`.blurOptionClickHandler()`](#module_fire.blurOptionClickHandler) ℗
     * [`.flagOptionClickHandler()`](#module_fire.flagOptionClickHandler) ℗
     * [`.debugOptionClickHandler()`](#module_fire.debugOptionClickHandler) ℗
+    * [`.imageOptionClickHandler()`](#module_fire.imageOptionClickHandler) ℗
     * [`.boolOptionClickHandler(element, message, key, [callback])`](#module_fire.boolOptionClickHandler) ℗
     * [`.keyboardShortcuts(e)`](#module_fire.keyboardShortcuts) ℗
     * [`.openReportPopupForMessage(message)`](#module_fire.openReportPopupForMessage)
@@ -520,6 +521,16 @@ flagOptionClickHandler - Set the "Flag" option for "tpu-" feedback.
 <a name="module_fire.debugOptionClickHandler"></a>
 
 ### `fire.debugOptionClickHandler()` ℗
+debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
+
+**Kind**: static method of <code>[fire](#module_fire)</code>  
+**Access**: private  
+
+---
+
+<a name="module_fire.imageOptionClickHandler"></a>
+
+### `fire.imageOptionClickHandler()` ℗
 debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
 
 **Kind**: static method of <code>[fire](#module_fire)</code>  

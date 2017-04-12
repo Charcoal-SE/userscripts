@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.23
+// @version     0.9.24
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -93,6 +93,7 @@
       blur: true,
       flag: true,
       debug: false,
+      hideImages: true,
       toastrPosition: 'top-right',
       toastrDuration: 2500,
       readOnly: false,
@@ -795,6 +796,16 @@
   }
 
   /**
+   * debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
+   *
+   * @private
+   * @memberof module:fire
+   */
+  function imageOptionClickHandler() {
+    boolOptionClickHandler(this, 'Hiding images on reports', 'hideImages');
+  }
+
+  /**
    * boolOptionClickHandler - Set a boolean option after a setting checkbox was clicked.
    *
    * @private
@@ -1124,6 +1135,8 @@
       .appendTo('body')
       .fadeIn('fast');
 
+    hideReportImages();
+
     if (d.revision_count > 1)
       showEditedIcon();
 
@@ -1137,6 +1150,20 @@
       '.fire-popup-body pre',
       ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
     );
+  }
+
+  /**
+   * hideReportImages - Hides images in a report.
+   */
+  function hideReportImages() {
+    if (fire.userData.hideImages) {
+      $('.fire-reported-post img').each((i, element) => {
+        const img = $(element);
+        img.data('src', element.src);
+        img.one('click', () => img.attr('src', img.data('src')));
+        element.src = 'http://placehold.it/550x100//ffffff?text=Click+to+show+image.';
+      });
+    }
   }
 
   /**
@@ -1234,6 +1261,11 @@
           .append(createSettingsCheckBox('debug', fire.userData.debug, debugOptionClickHandler,
             'Enable FIRE logging in developer console.',
             'Debug mode:')
+          )
+          .append(br())
+          .append(createSettingsCheckBox('hideImages', fire.userData.hideImages, imageOptionClickHandler,
+            'Hide images in reported messages.',
+            'Hiding images on reports:')
           )
           .append(disableReadonlyButton)
       )
