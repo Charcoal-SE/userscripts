@@ -796,7 +796,7 @@
   }
 
   /**
-   * debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
+   * imageOptionClickHandler - Set the "HideImages" option to hide or show images in reports.
    *
    * @private
    * @memberof module:fire
