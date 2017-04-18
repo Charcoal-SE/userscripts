@@ -1,6 +1,7 @@
 {
   "name": "ms-dark-theme",
   "version": "0.1.2",
+  "private": true,
   "scripts": {
     "test": "xo"
   },
