@@ -1725,7 +1725,7 @@
     if (fire.useEmoji)
       return span(emoji);
 
-    const url = 'https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/';
+    const url = 'https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/';
     const hex = emoji.codePointAt(0).toString(fire.constants.hex);
 
     const emojiImage = _('img', `fire-emoji${large ? '-large' : ''}`, {
