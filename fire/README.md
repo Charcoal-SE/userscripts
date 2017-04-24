@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |0.9    ||
 | ---   |---
+|0.9.27 |Bugfix: Don't show FIRE icon on !!/help messages.
 |0.9.26 |EmojiOne's paths changed.
 |0.9.25 |Bugfix: don't open image url when showing the original image.
 |0.9.24 |Fire now hides images in reported posts, by default.

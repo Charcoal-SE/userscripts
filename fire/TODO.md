@@ -1,7 +1,7 @@
 # TODO:
 * ___Bug: FIRE doesn't open the report after getting a MS write token.___
 * ___Bug: If you’re typing a message, then [k] the spam, hitting [return] sends the message instead of the feedback.___
-* ___Don't render images in the report (setting)___
+* Add `.fire-done` class to FIRE buttons for which the reported post was deleted / flagged, and feedback was sent.
 * Re-structure document
   * Wrap similar functions in objects, like `popups.openSettings()`
 * Add "Rude/Abusive" button:

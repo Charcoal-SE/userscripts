@@ -80,6 +80,11 @@ img.fire-emoji-large {
 .fire-button {
   cursor: pointer;
 
+  &.fire-done {
+    filter: grayscale(100%);
+    opacity: 0.5;
+  }
+
   .fire-emoji {
     position: relative;
     top: -2px;
