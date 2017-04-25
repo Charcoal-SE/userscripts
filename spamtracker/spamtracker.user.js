@@ -653,7 +653,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
       lastMessageObserver.disconnect();
     }
     const children = elm.getElementsByClassName("message");
-    if (children.length) {
+    if (children.length !== 0) {
       processChatMessage(children[children.length - 1]);
     }
     lastMessageObserver = new MutationObserver(() =>
@@ -667,7 +667,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
      */
   const registerMonologObserver = function (elm) {
     const children = elm.getElementsByClassName("messages");
-    if (children.length) {
+    if (children.length !== 0) {
       registerMessageObserver(children[children.length - 1]);
     } else {
       const observer = new MutationObserver(() => {
@@ -684,7 +684,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
   const registerObserver = function () {
     Notification.requestPermission();
     const children = target.getElementsByClassName("monologue");
-    if (children.length) {
+    if (children.length !== 0) {
       registerMonologObserver(children[children.length - 1]);
     }
     const observer = new MutationObserver(() =>
