@@ -34,57 +34,6 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
     superuser: "//cdn-chat.sstatic.net/chat/su.mp3",
     askubuntu: "//cdn-chat.sstatic.net/chat/ubuntu.mp3"
   };
-  const css =
-        ".spamtracker-popup-bg {" +
-        "  position: fixed;" +
-        "  width: 100%;" +
-        "  height: 100%;" +
-        "  top: 0;" +
-        "  left: 0;" +
-        "  background-color: rgba(0, 0, 0, 0.5);" +
-        "  z-index: 100;" +
-        "  text-align: center;" +
-        "}" +
-        ".spamtracker-popup-bg.hidden {" +
-        "  display: none;" +
-        "}" +
-        ".spamtracker-popup-bg:before {" +
-        "  content:''; " +
-        "  display:inline-block; " +
-        "  height:100%; " +
-        "  vertical-align:middle;" +
-        "}" +
-        ".spamtracker-popup {" +
-        "  width: 800px;" +
-        "  display: inline-block;" +
-        "  background: white;" +
-        "  padding: 20px;" +
-        "  border-radius: 10px;" +
-        "  vertical-align: middle;" +
-        "  box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.5);" +
-        "}" +
-        ".spamtracker-header {" +
-        "  border-top-left-radius: 10px;" +
-        "  border-top-right-radius: 10px;" +
-        "  background-color: gray;" +
-        "  margin: -20px -20px 1rem;" +
-        "  padding: 10px;" +
-        "  font-size: 3em;" +
-        "}" +
-        ".spamtracker-header-btn {" +
-        "  width: 10rem;" +
-        "}" +
-        ".spamtracker-header-btn-close {" +
-        "  width: 4rem;" +
-        "  float: right;" +
-        "}" +
-        ".spamtracker-header-btn-bar {" +
-        "}" +
-        ".spamtracker-tab {" +
-        "}" +
-        ".spamtracker-table {" +
-        "  width: 100%;" +
-        "}";
 
     // Settings
   let useSound = true;
@@ -411,7 +360,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
                     GM_getResourceURL("DataTablesSortBoth")
                 )
         );
-    addStyleString(css);
+    addStyleUrl("//charcoal-se.org/userscripts/fire/fire.css");
 
         // Footerbar
     const insertRef = document.getElementById("footer-legal");
