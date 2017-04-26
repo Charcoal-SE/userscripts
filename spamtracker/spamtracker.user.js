@@ -389,7 +389,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
                     GM_getResourceURL("DataTablesSortBoth")
                 )
         );
-    addStyleUrl("//charcoal-se.org/userscripts/fire/fire.css");
+    addStyleUrl("//charcoal-se.org/userscripts/spamtracker/spamtracker.css");
 
         // Footerbar
     const insertRef = document.getElementById("footer-legal");
