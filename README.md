@@ -12,6 +12,7 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
  - [Autoflagging information for Charcoal HQ (AIM)](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging/autoflagging.user.js)
  - [Feedback Instantly, Rapidly, Effortlessly (FIRE)](https://github.com/Charcoal-SE/Userscripts/raw/master/fire/fire.user.js)
  - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks/aeks.user.js) ([Info](https://github.com/Charcoal-SE/userscripts/wiki/AEKS))
+ - [Spam Tracker](https://github.com/Charcoal-SE/userscripts/blob/master/spamtracker/spamtracker.user.js)
 
 Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
 
