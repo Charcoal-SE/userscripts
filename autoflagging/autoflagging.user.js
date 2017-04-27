@@ -265,6 +265,15 @@
   autoflagging.decorate.autoflag.location = "after";
 
   /*!
+   * Adds reason weight to message
+   */
+  autoflagging.decorate.weight = function ($weight, weight) {
+    $weight.text(" • " + weight).attr("title", "Reason Weight");
+  };
+  autoflagging.decorate.weight.key = "reason_weight";
+  autoflagging.decorate.weight.location = "after";
+
+  /*!
    * Adds feedback information to a feedback DOM element.
    */
   autoflagging.decorate.feedback = function ($feedback, data) {
