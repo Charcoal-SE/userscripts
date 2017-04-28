@@ -30,3 +30,12 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
+
+There is a script in package.json that can be run with `npm run get-meta <file>`.
+This script will generate <script>.meta.js files containing only the script’s
+metadata, so the whole script doesn't have to be downloaded to check for updates.
+Example use:
+```js
+// @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
+// @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
+```
