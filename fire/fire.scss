@@ -225,6 +225,11 @@ img.fire-emoji-large {
       &.fire-expanded {
         max-height: 400px;
       }
+
+      &.fire-markdown {
+        max-height: none;
+        white-space: pre-wrap;
+      }
     }
   } // End body
 

@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     0.9.27
+// @version     0.9.28
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -94,6 +94,7 @@
       flag: true,
       debug: false,
       hideImages: true,
+      showMarkdown: false,
       toastrPosition: 'top-right',
       toastrDuration: 2500,
       readOnly: false,
@@ -348,7 +349,10 @@
    * @param {object} report The MetaSmoke report.
    */
   function loadPost(report) {
-    const parameters = {site: report.site};
+    const parameters = {
+      site: report.site,
+      filter: '!9YdnSGVVT'
+    };
 
     getSE(
       `posts/${report.post_id}`,
@@ -807,6 +811,16 @@
   }
 
   /**
+   * markdownOptionClickHandler - Set the "ShowMarkdown" option to show report markdown instead of rendered HTML..
+   *
+   * @private
+   * @memberof module:fire
+   */
+  function markdownOptionClickHandler() {
+    boolOptionClickHandler(this, 'Show markdown', 'showMarkdown');
+  }
+
+  /**
    * boolOptionClickHandler - Set a boolean option after a setting checkbox was clicked.
    *
    * @private
@@ -1077,6 +1091,16 @@
       title = d.title; // eslint-disable-line prefer-destructuring
     }
 
+    let reportBody;
+    let showingMarkdown = false;
+
+    if (fire.userData.showMarkdown && d.se && d.se.post && d.se.post.body_markdown) {
+      reportBody = _('pre', 'fire-markdown', {html: d.se.post.body_markdown});
+      showingMarkdown = true;
+    } else {
+      reportBody = d.body.replace(/<script/g, '&lt;script');
+    }
+
     const body = _('div', 'fire-popup-body')
       .append(
         _('div', {
@@ -1090,7 +1114,7 @@
         .append(_('hr'))
         .append(
           _('div', 'fire-report-info')
-          .append(_('h3', 'fire-type', {text: `${postType}:`}))
+          .append(_('h3', 'fire-type', {text: `${postType + (showingMarkdown ? ' (markdown)' : '')}:`}))
           .append(
             _('span', 'fire-username', {text: `${d.username} `, title: 'Username'})
               .append(emojiOrImage('user'))
@@ -1098,15 +1122,17 @@
         )
       )
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
-        .append(d.body.replace(/<script/g, '&lt;script'))
+        .append(reportBody)
       );
 
-    body.find('pre code').each((i, element) => {
-      element.innerHTML = element.innerHTML
-        .replace(/>/g, '&gt;')
-        .replace(/</g, '&lt;')
-        .replace(/"/g, '&quot;');
-    });
+    if (!showingMarkdown) {
+      body.find('pre code').each((i, element) => {
+        element.innerHTML = element.innerHTML
+          .replace(/>/g, '&gt;')
+          .replace(/</g, '&lt;')
+          .replace(/"/g, '&quot;');
+      });
+    }
 
     _('div', 'fire-popup-modal')
       .appendTo('body')
@@ -1229,7 +1255,13 @@
     }
 
     let requestStackExchangeTokenButton = $();
-    if (!fire.userData.stackexchangeWriteToken) {
+    let showMarkdownCheckBox = $();
+
+    if (fire.userData.stackexchangeWriteToken) {
+      showMarkdownCheckBox = createSettingsCheckBox('showMarkdown', fire.userData.showMarkdown, markdownOptionClickHandler,
+          'Show report markdown instead of rendered HTML. This only works for posts that aren\'t deleted',
+          'Show markdown:');
+    } else {
       requestStackExchangeTokenButton = _('p', 'fire-request-write-token')
         .append(br())
         .append(_('h3', {text: 'Stack Exchange write token:'}))
@@ -1271,6 +1303,8 @@
             'Hide images in reported messages.',
             'Hiding images on reports:')
           )
+          .append(br())
+          .append(showMarkdownCheckBox)
           .append(disableReadonlyButton)
       )
       .append(
