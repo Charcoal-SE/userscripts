@@ -4,7 +4,7 @@
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
     "test": "xo",
-    "get-meta": "sed -e '/./{H;$!d;}' -e 'x;/UserScript/!d;' $1 | awk '!/^$/' > ${1/.user./.meta.}"
+    "get-meta": "bash ./extractScriptMetadata.sh"
   },
   "repository": {
     "type": "git",
