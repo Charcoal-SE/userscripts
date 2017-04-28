@@ -3,7 +3,7 @@
     "srcDir": "",
     "destDir": "",
     "files": "**/*.user.js",
-    "command": "extractScriptMetadata.sh ${srcFile}"
+    "command": "npm run get-meta -- ${srcFile}"
   },
   {
     "srcDir": "",
