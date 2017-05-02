@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.1  |Prevent link highlight shadow from overlapping preceding lines.
 |1.0.0  |Removed "markdown" option, made links more obvious.
 
 |0.9    ||
