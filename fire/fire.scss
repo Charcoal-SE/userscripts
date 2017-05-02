@@ -188,6 +188,14 @@ img.fire-emoji-large {
       img[src^='http://placehold.it'] {
         cursor: pointer;
       }
+
+      a {
+        font-weight: bold;
+        text-decoration: underline;
+        padding: 2px 5px;
+        border-radius: 3px;
+        box-shadow: 0 0 10px -2px $shadow-color;
+      }
     }
 
     a {

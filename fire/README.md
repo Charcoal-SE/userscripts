@@ -57,6 +57,10 @@ To open the reported post on it's site:
 
 # Version History
 
+|1.0    ||
+| ---   |---
+|1.0.0  |Removed "markdown" option, made links more obvious.
+
 |0.9    ||
 | ---   |---
 |0.9.28 |Option to show markdown instead of rendered post.

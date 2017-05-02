@@ -39,7 +39,6 @@ FIRE's global object.
     * [`.flagOptionClickHandler()`](#module_fire.flagOptionClickHandler) ℗
     * [`.debugOptionClickHandler()`](#module_fire.debugOptionClickHandler) ℗
     * [`.imageOptionClickHandler()`](#module_fire.imageOptionClickHandler) ℗
-    * [`.markdownOptionClickHandler()`](#module_fire.markdownOptionClickHandler) ℗
     * [`.boolOptionClickHandler(element, message, key, [callback])`](#module_fire.boolOptionClickHandler) ℗
     * [`.keyboardShortcuts(e)`](#module_fire.keyboardShortcuts) ℗
     * [`.openReportPopupForMessage(message)`](#module_fire.openReportPopupForMessage)
@@ -533,16 +532,6 @@ debugOptionClickHandler - Set the "Debug" option to show logs in the dev console
 
 ### `fire.imageOptionClickHandler()` ℗
 imageOptionClickHandler - Set the "HideImages" option to hide or show images in reports.
-
-**Kind**: static method of <code>[fire](#module_fire)</code>  
-**Access**: private  
-
----
-
-<a name="module_fire.markdownOptionClickHandler"></a>
-
-### `fire.markdownOptionClickHandler()` ℗
-markdownOptionClickHandler - Set the "ShowMarkdown" option to show report markdown instead of rendered HTML..
 
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
