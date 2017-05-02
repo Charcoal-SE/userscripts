@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.14.7
+// @version     0.14.8
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -142,26 +142,6 @@
     // Remove spinner
     $element.find(".ai-spinner").remove();
     $element.addClass("ai-loaded");
-
-    // Insert reason weight
-    if (typeof data.reason_weight != "undefined") {
-      $element.siblings(".content").contents().each(function (index, node) {
-        // Text node?
-        if (node.nodeType !== 3) {
-          return;
-        }
-        // Text node with reasons (but no weight added yet)?
-        // I'd like to test it with this regex: ^ ].*(?>!\)): $
-        // but it doesn't compile in JS.
-        var text = node.textContent;
-        if (!text.startsWith(" ]") || !text.endsWith(": ") || text.endsWith("): ")) {
-          return;
-        }
-        // Insert weight
-        node.textContent = text.substr(0, text.length - 2) +
-          " (" + data.reason_weight + "): ";
-      });
-    }
 
     var names = {
       before: "prepend",
