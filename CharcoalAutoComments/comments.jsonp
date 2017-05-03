@@ -10,7 +10,7 @@ callback(
   },
   {
     "name": "[A] Rude",
-    "description": "**Warning - please do not use obscenities in your posts.** It's been removed for you. Note that other users may have flagged your post as "rude or abusive" leading to possible rep loss or suspension. Please Be Nice: *Avoid vulgar terms and anything sexually suggestive*"
+    "description": "**Warning - please do not use obscenities in your posts.** It's been removed for you. Note that other users may have flagged your post as "rude or abusive" leading to possible rep loss or suspension. Please [Be Nice](https://$SITEURL$/help/be-nice): *Avoid vulgar terms and anything sexually suggestive*"
   },
   {
     "name": "[A] Nothing but a URL (and isn't spam)",
