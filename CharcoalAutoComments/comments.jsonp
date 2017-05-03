@@ -2,7 +2,7 @@ callback(
 [
   {
     "name": "[Q] Vandalism",
-    "description": "Please do not vandalize your posts. Once you've posted a question, you have licensed the content to the $SITENAME$ community at large (under the CC-by-SA license). If you would like to disassociate this post from your account, see [What is the proper route for a disassociation request](http://meta.stackoverflow.com/questions/323395/what-is-the-proper-route-for-a-dissociation-request)?"
+    "description": "Please do not vandalize your posts. Once you've posted a question, you have licensed the content to the $SITENAME$ community at large (under the CC-by-SA license). If you would like to disassociate this post from your account, see [What is the proper route for a disassociation request](https://meta.stackoverflow.com/questions/323395)?"
   },
   {
     "name": "[A] No Disclosure",
