@@ -14,6 +14,6 @@ callback(
   },
   {
     "name": "[A] Nothing but a URL (and isn't spam)",
-    "description": "Whilst this may theoretically answer the question, [it would be preferable](https://meta.stackexchange.com/questions/8231) to include the essential parts of the answer here, and provide the link for reference."
+    "description": "While this may theoretically answer the question, [it would be preferable](https://meta.stackexchange.com/questions/8231) to include the essential parts of the answer here, and provide the link for reference."
   }
 ])
