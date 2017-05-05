@@ -413,7 +413,7 @@
    * @memberof module:fire
    */
   function showEditedIcon() {
-    const h2 = $('.fire-popup-body > div > h2');
+    const h2 = $('.fire-popup-body > div.fire-post-title > h2');
     if (!h2.data('has-edit-icon')) {
       h2
         .prepend(
@@ -1080,7 +1080,7 @@
     const reportBody = d.body.replace(/<script/g, '&lt;script');
     const body = _('div', 'fire-popup-body')
       .append(
-        _('div', {
+        _('div', 'fire-post-title', {
           'fire-tooltip': emojiOrImage('clipboard')
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\nReason weight: ${d.reason_weight}\n\n${d.why}`)
             .html()
