@@ -33,7 +33,7 @@
         animation: ping-pulse 0.75s ease-out;
       }
     }
-    @for ($name, $color) in (green: #0a0, yellow: #aa0, red: #a00) {
+    @each $name, $color in (green: #0a0, yellow: #aa0, red: #a00) {
       &.smokey-#{$name} .ping {
         color: $color;
       }
