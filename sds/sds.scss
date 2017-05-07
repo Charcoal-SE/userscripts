@@ -14,12 +14,12 @@
       display: none;
     }
     .ping {
+      background: currentColor;
       &, &::after {
         display: inline-block;
         width: 10px;
         height: 10px;
         border-radius: 8px;
-        background: currentColor;
         position: relative;
         transition: color 0.2s;
       }
@@ -30,7 +30,7 @@
         left: 0;
       }
       &.ping-pulse::after {
-        animation: ping-pulse 0.75s ease-out;
+        animation: ping-pulse 2s ease-out;
       }
     }
     @each $name, $color in (green: #0a0, yellow: #aa0, red: #a00) {
