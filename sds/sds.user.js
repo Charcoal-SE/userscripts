@@ -17,7 +17,7 @@
 
 (function () {
   // Inject CSS
-  const css = window.document.createElement("style");
+  const css = window.document.createElement("link");
   css.rel = "stylesheet";
   css.href = "//charcoal-se.org/userscripts/sds/sds.css";
   document.head.appendChild(css);
