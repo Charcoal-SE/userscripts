@@ -1,6 +1,9 @@
 // ==UserScript==
 // @name        Hide ads
+// @namespace   https://github.com/Charcoal-SE/
+// @author      Glorfindel
 // @description Hides advertisements so that the flag link doesn't jump while loading the page
+// @see-also    https://meta.stackexchange.com/a/289896/285368
 // @match       *://*.stackexchange.com/*
 // @match       *://*.stackoverflow.com/*
 // @match       *://*.superuser.com/*
@@ -13,6 +16,6 @@
 // @exclude     *://chat.stackoverflow.com/*
 // @exclude     *://blog.stackoverflow.com/*
 // @exclude     *://*.area51.stackexchange.com/*
-// @version     1
+// @version     1.0
 // @grant       none
 // ==/UserScript==
