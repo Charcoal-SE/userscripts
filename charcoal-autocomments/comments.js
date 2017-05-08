@@ -1,4 +1,4 @@
-/* eslint-disable-next-line no-undef */
+/* globals callback */
 callback(
   [
     {
