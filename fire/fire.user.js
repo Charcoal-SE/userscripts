@@ -945,7 +945,6 @@
    * @param {function} callback The action to perform after getting a write token / chosing read-only mode.
    */
   function writeTokenPopup(callback) {
-    const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const input = _('input', 'fire-popup-input', {
       type: 'text',
       maxlength: '7',
@@ -957,7 +956,7 @@
       .click(closePopup);
 
     _('div', 'fire-popup')
-      .css({top: '5%', left: w - fire.constants.halfPopupWidth})
+      .css({top: '5%', left: getPopupLeft()})
       .append(
         _('div', 'fire-popup-header')
           .append(_('p', {
@@ -1015,7 +1014,6 @@
       return;
     }
 
-    const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const site = fire.sites[d.site] || fire.sites[`${d.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
 
@@ -1128,7 +1126,7 @@
     });
 
     _('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
-      .css({top: '5%', left: w - fire.constants.halfPopupWidth})
+      .css({top: '5%', left: getPopupLeft()})
       .append(top)
       .append(body)
       .append(settingsButton)
@@ -1183,9 +1181,8 @@
 
     fire.settingsAreOpen = true;
 
-    const w = (window.innerWidth - $('#sidebar').width()) / 2;
     const popup = _('div', 'fire-popup', {id: 'fire-settings'})
-      .css({top: '5%', left: w - fire.constants.halfPopupWidth});
+      .css({top: '5%', left: getPopupLeft()});
 
     const top = _('p', 'fire-popup-header')
       .append(
@@ -1323,6 +1320,19 @@
     }
 
     return null;
+  }
+
+  /**
+   * getPopupLeft - Gets the `left` position for the popup.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @returns {number} The `left` position for the popup.
+   */
+  function getPopupLeft() {
+    const w = (window.innerWidth - $('#sidebar').width()) / 2;
+    return Math.max(fire.constants.minPopupLeft, w - fire.constants.halfPopupWidth);
   }
 
   /**
@@ -2135,7 +2145,8 @@
       loadAllMessagesDelay: 500,
       tooltipOffset: 20,
       tooltipOffsetSmall: 5,
-      halfPopupWidth: 300
+      halfPopupWidth: 300,
+      minPopupLeft: 10
     };
   }
 })();

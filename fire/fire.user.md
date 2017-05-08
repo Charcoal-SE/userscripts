@@ -46,6 +46,7 @@ FIRE's global object.
     * [`.openReportPopup()`](#module_fire.openReportPopup) ℗
     * [`.openSettingsPopup()`](#module_fire.openSettingsPopup) ℗
     * [`.closePopup()`](#module_fire.closePopup) ⇒ <code>object</code> ℗
+    * [`.getPopupLeft()`](#module_fire.getPopupLeft) ⇒ <code>number</code> ℗
     * [`.postMetaSmokeFeedback(data, verdict, button)`](#module_fire.postMetaSmokeFeedback) ℗
     * [`.postMetaSmokeSpamFlag(data, api, token, feedbackSuccess)`](#module_fire.postMetaSmokeSpamFlag) ⇒ <code>undefined</code> ℗
     * [`.keyCodesToArray(keyCodes)`](#module_fire.keyCodesToArray) ⇒ <code>array.number</code> ℗
@@ -628,6 +629,17 @@ closePopup - Close the popup.
 
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - The previously closed popup's button (if any) so it can be re-opened.  
+**Access**: private  
+
+---
+
+<a name="module_fire.getPopupLeft"></a>
+
+### `fire.getPopupLeft()` ⇒ <code>number</code> ℗
+getPopupLeft - Gets the `left` position for the popup.
+
+**Kind**: static method of <code>[fire](#module_fire)</code>  
+**Returns**: <code>number</code> - The `left` position for the popup.  
 **Access**: private  
 
 ---
