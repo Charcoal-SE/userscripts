@@ -413,9 +413,9 @@
    * @memberof module:fire
    */
   function showEditedIcon() {
-    const h2 = $('.fire-popup-body > div.fire-post-title > h2');
-    if (!h2.data('has-edit-icon')) {
-      h2
+    const title = $('.fire-post-title');
+    if (!title.data('has-edit-icon')) {
+      title
         .prepend(
           emojiOrImage('pencil')
             .attr('fire-tooltip', 'This post has been edited.')
