@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.3  |Fix edit icon appearing in post
 |1.0.2  |Properly escape HTML in inline code.
 |1.0.1  |Prevent link highlight shadow from overlapping preceding lines.
 |1.0.0  |Removed "markdown" option, made links more obvious.
