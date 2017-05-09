@@ -24,6 +24,7 @@ FIRE's global object.
     * [`.loadPost(report)`](#module_fire.loadPost) ℗
     * [`.loadPostRevisions(report)`](#module_fire.loadPostRevisions) ℗
     * [`.showEditedIcon()`](#module_fire.showEditedIcon) ℗
+    * [`.showReputation(reputation)`](#module_fire.showReputation) ℗
     * [`.loadPostFlagStatus(report)`](#module_fire.loadPostFlagStatus) ℗
     * [`.loadCurrentSEUser([page])`](#module_fire.loadCurrentSEUser) ℗
     * [`.parseUserResponse(response, page)`](#module_fire.parseUserResponse) ℗
@@ -324,6 +325,21 @@ showEditedIcon - Render a "Edited" icon on a opened report popup.
 
 **Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
+
+---
+
+<a name="module_fire.showReputation"></a>
+
+### `fire.showReputation(reputation)` ℗
+showReputation - Shows a user's reputation in the report.
+
+**Kind**: static method of <code>[fire](#module_fire)</code>  
+**Access**: private  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| reputation | <code>number</code> | The user's reputation. |
+
 
 ---
 

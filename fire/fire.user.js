@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.4
+// @version     1.0.5
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -357,6 +357,7 @@
         if (response.items && response.items.length > 0) {
           report.se = report.se || {};
           [report.se.post] = response.items;
+          showReputation(report.se.post.owner.reputation);
           loadPostFlagStatus(report);
           loadPostRevisions(report);
         } else {
@@ -423,6 +424,23 @@
         )
         .data('has-edit-icon', true);
     }
+  }
+
+  /**
+   * showReputation - Shows a user's reputation in the report.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param {number} reputation The user's reputation.
+   */
+  function showReputation(reputation) {
+    const rep = $('.fire-user-reputation');
+
+    rep.text(`(${reputation})`);
+
+    if (reputation !== 1)
+      rep.addClass('fire-has-rep');
   }
 
   /**
@@ -1075,7 +1093,13 @@
       title = d.title; // eslint-disable-line prefer-destructuring
     }
 
-    const reportBody = d.body.replace(/<script/g, '&lt;script');
+    const reportBody = $('<div/>')
+      .text(d.body)                                                         // Escape everything.
+      .html()                                                               // Get the escaped HTML
+      .replace(/&lt;(\/?(a|p|code|pre|strong|ul|li|img).*?)&gt;/g, '<$1>'); // Unescape ehitelisted tags/
+
+    const userName = `${d.username} <span class="fire-user-reputation"></span> `;
+
     const body = _('div', 'fire-popup-body')
       .append(
         _('div', {
@@ -1091,7 +1115,7 @@
           _('div', 'fire-report-info')
           .append(_('h3', 'fire-type', {text: `${postType}:`}))
           .append(
-            _('span', 'fire-username', {text: `${d.username} `, title: 'Username'})
+            _('span', 'fire-username', {html: userName, title: 'Username'})
               .append(emojiOrImage('user'))
           )
         )
@@ -1099,13 +1123,6 @@
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
         .append(reportBody)
       );
-
-    body.find('pre code, code').each((i, element) => {
-      element.innerHTML = element.innerHTML
-        .replace(/>/g, '&gt;')
-        .replace(/</g, '&lt;')
-        .replace(/"/g, '&quot;');
-    });
 
     _('div', 'fire-popup-modal')
       .appendTo('body')
@@ -1143,6 +1160,9 @@
     $('#container').toggleClass('fire-blur', fire.userData.blur);
 
     expandLinksOnHover();
+
+    if (d.se && d.se.post)
+      showReputation(d.se.post.owner.reputation);
 
     $(document).keydown(keyboardShortcuts);
     $(document).on(

@@ -1,6 +1,8 @@
 ---
 ---
 
+@import "compass"
+
 $blur: blur(2px);
 $zIndex: 100;
 
@@ -175,6 +177,14 @@ img.fire-emoji-large {
       float: right;
       font-weight: normal;
       margin-top: -17px;
+
+      .fire-user-reputation {
+        font-size: 0.8em;
+
+        &.fire-has-rep {
+          background-image: radial-gradient(ellipse at center, rgba(255, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 75%);
+        }
+      }
     }
 
     .fire-reported-post {
