@@ -437,7 +437,7 @@
   function showReputation(reputation) {
     const rep = $('.fire-user-reputation');
 
-    rep.text(`(${reputation}) `);
+    rep.text(` (${reputation}) `);
 
     if (reputation !== 1)
       rep.addClass('fire-has-rep');
@@ -1098,7 +1098,7 @@
       .html()                                                               // Get the escaped HTML
       .replace(/&lt;(\/?(a|p|code|pre|strong|ul|li|img).*?)&gt;/g, '<$1>'); // Unescape ehitelisted tags/
 
-    const userName = `${d.username} <span class="fire-user-reputation"></span> `;
+    const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
     const body = _('div', 'fire-popup-body')
       .append(
