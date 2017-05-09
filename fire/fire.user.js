@@ -437,7 +437,7 @@
   function showReputation(reputation) {
     const rep = $('.fire-user-reputation');
 
-    rep.text(`(${reputation})`);
+    rep.text(`(${reputation}) `);
 
     if (reputation !== 1)
       rep.addClass('fire-has-rep');
