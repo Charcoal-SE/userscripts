@@ -22,25 +22,26 @@
   css.href = "//charcoal-se.org/userscripts/sds/sds.css";
   document.head.appendChild(css);
 
+  const apiKey = "05f3eb1fb4edd821e32299f5b2e65f78bc53ed4fa0415b034d0e84b4e273329e";
+
+  $.get("//metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
+    data.items.forEach(smokey => {
+      addData(smokey, getDot(smokey));
+    });
+  });
+
   const ActionCable = window.actioncable;
   const cable = ActionCable.createConsumer("wss://metasmoke.erwaysoftware.com/cable");
   const $pings = $("<span />").addClass("pings-container");
   $("#roomname").after($pings);
   cable.subscriptions.create("PingsChannel", {
     received({smokey}) {
-      console.log(smokey);
-      let $dot = $pings.children(".smokey-" + smokey.id);
-      if ($dot.length === 0) {
-        $dot = $("<span />").addClass("smokey smokey-" + smokey.id);
-        $dot.append($("<span />").addClass("ping"));
-        $dot.appendTo($pings);
-      }
-      $dot.toggleClass("smokey-standby", smokey.is_standby);
+      console.log("smokey", smokey);
+      const $dot = getDot(smokey);
       const $ping = $dot.find(".ping");
       $ping.removeClass("ping-pulse");
       requestAnimationFrame(() => $ping.addClass("ping-pulse"));
-      $dot.attr("data-location", smokey.location);
-      $dot.attr("data-last-ping", smokey.last_ping);
+      addData(smokey, $dot);
       updatePing($dot);
     }
   });
@@ -49,6 +50,22 @@
       updatePing($(this));
     });
   }, 1000);
+
+  function getDot(smokey) {
+    let $dot = $pings.children(".smokey-" + smokey.id);
+    if ($dot.length === 0) {
+      $dot = $("<span />").addClass("smokey smokey-" + smokey.id);
+      $dot.append($("<span />").addClass("ping"));
+      $dot.appendTo($pings);
+    }
+    return $dot;
+  }
+  function addData(smokey, $dot) {
+    $dot.attr("data-location", smokey.location);
+    $dot.attr("data-last-ping", smokey.last_ping);
+    $dot.toggleClass("smokey-standby", smokey.is_standby);
+  }
+
   const colorClasses = "green/yellow/red/dead".split("/").map(color => `smokey-${color}`);
   function updatePing($dot) {
     let diff = Number(new Date()) - new Date($dot.attr("data-last-ping"));
