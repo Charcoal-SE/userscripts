@@ -3,7 +3,7 @@
 // @namespace   https://github.com/Charcoal-SE/
 // @description Show the status of all SmokeDetector instances
 // @author      J F
-// @version     0.0.1
+// @version     0.0.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
