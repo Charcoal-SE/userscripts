@@ -115,7 +115,7 @@
           }
         })
         .fail(function (xhr) {
-          debug("Failed to load reasons: " + xhr.statusText);
+          debug("Failed to load reasons:", xhr);
         });
     }
   };
@@ -381,7 +381,7 @@
         autoflagging.callAPI(urls, ++page);
       }
     }).fail(function (xhr) {
-      autoflagging.notify("Failed to load data: " + xhr.statusText);
+      autoflagging.notify("Failed to load data:", xhr);
     });
   };
 
