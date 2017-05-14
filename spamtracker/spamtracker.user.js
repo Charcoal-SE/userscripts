@@ -28,7 +28,7 @@
 unsafeWindow.Spamtracker = (function (target, siterooms, window) {
   "use strict";
   const createDebug = window.debug;
-  const debug = createDebug("spamtracker");
+  const debug = createDebug("spamtracker:debug");
   debug.warn = createDebug("spamtracker:warn");
   debug.info = createDebug("spamtracker:info");
 
