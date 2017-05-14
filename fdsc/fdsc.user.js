@@ -115,7 +115,7 @@
     * have to see how much of a problem that is.
     */
     fdsc.getWriteToken = function (afterFlag, callback) {
-      debug("get write token");
+      debug("entering getWriteToken");
       window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
 
       function getInput() {
@@ -166,7 +166,8 @@
     * can be obtained using `fdsc.getWriteToken()`.
     */
     fdsc.sendFeedback = function (feedbackType, postId) {
-      debug("send feedback with write token", fdsc.msWriteToken);
+      debug("entering sendFeedback");
+      debug("write token:", fdsc.msWriteToken);
       var token;
       if (typeof (fdsc.msWriteToken) === "object") {
         token = fdsc.msWriteToken.value;
@@ -228,7 +229,8 @@
       if (StackExchange.options.user.isModerator) {
         return;
       }
-      debug("report post with write token", fdsc.msWriteToken);
+      debug("entering reportPost");
+      debug("write token:", fdsc.msWriteToken);
       var token;
       if (typeof (fdsc.msWriteToken) === "object") {
         token = fdsc.msWriteToken.value;
