@@ -19,12 +19,12 @@
   // Inject CSS
   const css = window.document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "//charcoal-se.org/userscripts/sds/sds.css";
+  css.href = "https://charcoal-se.org/userscripts/sds/sds.css";
   document.head.appendChild(css);
 
   const apiKey = "05f3eb1fb4edd821e32299f5b2e65f78bc53ed4fa0415b034d0e84b4e273329e";
 
-  $.get("//metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
+  $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
     data.items.forEach(smokey => {
       addData(smokey, getDot(smokey));
     });
