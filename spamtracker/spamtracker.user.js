@@ -20,12 +20,19 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        unsafeWindow
+// @require      https://wzrd.in/standalone/debug@%5E2.6.6
 // ==/UserScript==
 /* global GM_info, Notification, GM_setValue, GM_getValue, unsafeWindow, GM_getResourceText, GM_getResourceURL */
 /* eslint-disable prefer-const, no-use-before-define */
 
 unsafeWindow.Spamtracker = (function (target, siterooms, window) {
   "use strict";
+  const createDebug = window.debug;
+  const debug = createDebug("spamtracker");
+  debug.warn = createDebug("spamtracker:warn");
+  debug.info = createDebug("spamtracker:info");
+  debug.error = createDebug("spamtracker:error");
+
     // Defaults
   const defaultSounds = {
     metastackexchange: "//cdn-chat.sstatic.net/chat/meta2.mp3",
@@ -80,7 +87,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
     restoreCallback();
     preloadSoundList(false);
     createDOMNodesForGui();
-    info("Started!");
+    debug.info("Started!");
   };
 
   const loadSeSites = function () {
@@ -91,7 +98,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
             new Date() - seSites.lastUpdate > ONE_MONTH
         ) {
       const xhttp = new XMLHttpRequest();
-      info("Requesting api.stackexchange.com/2.2/sites");
+      debug.info("Requesting api.stackexchange.com/2.2/sites");
       xhttp.onreadystatechange = () => {
         if (xhttp.readyState === 4 && xhttp.status === 200) {
           seSites.sites = sortByKey(
@@ -125,7 +132,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
         sound[url] = new Audio(url);
         // eslint-disable-next-line no-unused-vars
         sound[url].addEventListener("error", cause => {
-          error("Failed to load: ", url);
+          debug.error("Failed to load: ", url);
         });
       }
       return true;
@@ -162,20 +169,6 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
       prepareSound(soundUrl);
     }
   };
-
-  const logPrepare = function (level, type) {
-    return (...message) => {
-      if (level <= debugLevel) {
-        message.unshift("[SpamtrackerReboot][" + type + "]");
-        console.log.apply(console.log, message);
-      }
-    };
-  };
-
-  const error = logPrepare(0, "error");
-  const warn = logPrepare(1, "warn");
-  const info = logPrepare(2, "info");
-  const debug = logPrepare(3, "debug");
 
   const makeElement = function (type, classes = [], text = "") {
     const elm = document.createElement(type);
@@ -500,7 +493,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
             userSounds[soundName] ||
             defaultSounds[defaultSound];
     if (!sound[soundUrl]) {
-      warn(
+      debug.warn(
                 "Sound " +
                     soundUrl +
                     " was not ready when we needed it, coming from " +

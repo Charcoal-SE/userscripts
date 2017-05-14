@@ -5,8 +5,9 @@
 // @author      ArtOfCode
 // @contributor angussidney
 // @contributor rene
+// @contributor J F
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.14.0
+// @version     1.14.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -23,6 +24,7 @@
 // @exclude     *://blog.stackoverflow.com/*
 // @exclude     *://*.area51.stackexchange.com/*
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
+// @require     https://wzrd.in/standalone/debug@%5E2.6.6
 // @grant       none
 // ==/UserScript==
 
@@ -31,6 +33,8 @@
 
 (function () {
   "use strict";
+  const createDebug = window.debug;
+  const debug = createDebug("fdsc");
 
   var userscript = function ($) {
     window.fdsc = {};
@@ -111,12 +115,12 @@
     * have to see how much of a problem that is.
     */
     fdsc.getWriteToken = function (afterFlag, callback) {
-      console.log("getWriteToken");
+      debug("get write token");
       window.open("https://metasmoke.erwaysoftware.com/oauth/request?key=" + fdsc.metasmokeKey, "_blank");
 
       function getInput() {
         fdsc.input("Once you've authenticated FDSC with metasmoke, you'll be given a code; enter it here.", function (code) {
-          console.log("input callback: " + code);
+          debug("input callback: " + code);
           $.ajax({
             url: "https://metasmoke.erwaysoftware.com/oauth/token?key=" + fdsc.metasmokeKey + "&code=" + code,
             method: "GET"
@@ -138,7 +142,7 @@
                 transient: true,
                 transientTimeout: 10000
               });
-              console.log(jqXHR.status, jqXHR.responseText);
+              debug("getting write token failed", jqXHR);
             }
           });
         });
@@ -162,8 +166,7 @@
     * can be obtained using `fdsc.getWriteToken()`.
     */
     fdsc.sendFeedback = function (feedbackType, postId) {
-      console.log("sendFeedback");
-      console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
+      debug("send feedback with write token", fdsc.msWriteToken);
       var token;
       if (typeof (fdsc.msWriteToken) === "object") {
         token = fdsc.msWriteToken.value;
@@ -185,7 +188,7 @@
           transient: true,
           transientTimeout: 10000
         });
-        console.log(data);
+        debug("feedback sent:", data);
         $(window.event.target).attr("data-fdsc-ms-id", null);
         fdsc.postFound = null;
       }).error(function (jqXHR) {
@@ -209,7 +212,7 @@
             transient: true,
             transientTimeout: 10000
           });
-          console.log(jqXHR.status, jqXHR.responseText);
+          debug("feedback failed:", jqXHR);
         }
         $(window.event.target).attr("data-fdsc-ms-id", null);
         fdsc.postFound = null;
@@ -225,8 +228,7 @@
       if (StackExchange.options.user.isModerator) {
         return;
       }
-      console.log("reportPost");
-      console.log("fdsc.msWriteToken: ", fdsc.msWriteToken);
+      debug("report post with write token", fdsc.msWriteToken);
       var token;
       if (typeof (fdsc.msWriteToken) === "object") {
         token = fdsc.msWriteToken.value;
@@ -248,7 +250,7 @@
           transient: true,
           transientTimeout: 10000
         });
-        console.log(data);
+        debug("post reported", data);
       }).error(function (jqXHR) {
         if (jqXHR.status === 401) {
           StackExchange.helpers.showErrorMessage($(".topbar"), "Can't report post to metasmoke - not authenticated.", {
@@ -270,7 +272,7 @@
             transient: true,
             transientTimeout: 10000
           });
-          console.log(jqXHR.status, jqXHR.responseText);
+          debug("report failed:", jqXHR);
         }
       });
     };
@@ -283,7 +285,7 @@
       initCallback: function () {
         xdLocalStorage.getItem("fdsc_msWriteToken", function (data) {
           fdsc.msWriteToken = data.value;
-          console.log("fdsc.msWriteToken: ", data.value);
+          debug("write token", data.value);
         });
 
         $(".flag-post-link").on("click", function (clickEvent) {
@@ -303,7 +305,7 @@
 
                 function registerFeedbackButton(buttonSelector, feedback, logMessage) {
                   $(buttonSelector).on("click", function (ev) {
-                    console.log(logMessage);
+                    debug("feedback clicked:", logMessage);
                     ev.preventDefault();
                     if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                       fdsc.getWriteToken(true, function () {
@@ -362,7 +364,7 @@
                     $("#get-write-token").on("click", function (ev) {
                       ev.preventDefault();
                       fdsc.getWriteToken(false, function () {
-                        console.log(clickEvent);
+                        debug("click event", clickEvent);
 
                         $(".popup-close a").click();
                         $(clickEvent.currentTarget).click();

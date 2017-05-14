@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.14.9
+// @version     0.14.10
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -17,6 +17,7 @@
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
 // @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
 // @require     https://cdn.rawgit.com/joewalnes/reconnecting-websocket/f8055b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js
+// @require     https://wzrd.in/standalone/debug@%5E2.6.6
 // @grant       none
 // ==/UserScript==
 
@@ -27,7 +28,12 @@
 
 (function () {
   "use strict";
-  // console.log("Autoflagging Information started.");
+  const createDebug = window.debug;
+  const debug = createDebug("aim");
+  debug.decorate = createDebug("aim:decorate");
+  debug.ws = createDebug("aim:ws");
+  debug.queue = createDebug("aim:queue");
+  debug("started");
 
   // Inject CSS
   var css = window.document.createElement("link");
@@ -45,26 +51,6 @@
   // Constants
   var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
   window.autoflagging = {};
-  autoflagging.traceKey = "autoflagging-trace";
-  autoflagging.trace = function (enable) {
-    // Enable/disable trace
-    if (enable) {
-      console.log("Autoflagging trace enabled.");
-      window.localStorage.setItem(autoflagging.traceKey, "true");
-    } else {
-      console.log("Autoflagging trace disabled.");
-      window.localStorage.removeItem(autoflagging.traceKey);
-    }
-    return enable;
-  };
-  autoflagging.log = function (object) {
-    // Trace enabled?
-    if (window.localStorage.getItem(autoflagging.traceKey) !== "true") {
-      return;
-    }
-    console.log("Time: " + new Date().toISOString().substring(11, 23));
-    console.log(object);
-  };
   autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
     "chat.stackexchange.com": 120914,
     "chat.stackoverflow.com": 3735529,
@@ -89,8 +75,7 @@
    * `element` is a message (i.e. has the .message class)
    */
   autoflagging.decorateMessage = function ($message, data) {
-    autoflagging.log("DECORATE " + JSON.stringify(data));
-    autoflagging.log($message);
+    debug.decorate(JSON.stringify(data), $message);
 
     autoflagging.decorate($message.children(".ai-information"), data);
     autoflagging.decorate($message.find(".meta .ai-information"), data);
@@ -130,7 +115,7 @@
           }
         })
         .fail(function (xhr) {
-          autoflagging.log("Failed to load reasons: " + xhr.statusText);
+          debug("Failed to load reasons: " + xhr.statusText);
         });
     }
   };
@@ -339,8 +324,7 @@
    * message itself and to the 'meta'-element shown on hovering over the message.
    */
   autoflagging.addSpinnerToMessage = function ($message) {
-    autoflagging.log("ADD SPINNER");
-    autoflagging.log($message);
+    debug("add spinner to", $message);
     autoflagging.addSpinner($message);
     autoflagging.addSpinner($message.find(".meta"), true);
   };
@@ -366,13 +350,13 @@
    * It will use the results to decorate the Smokey reports which are already on the page.
    */
   autoflagging.callAPI = function (urls, page) {
-    autoflagging.log("Call API");
+    debug("Call API");
     if (page == null) {
       page = 1;
     }
     var autoflagData = {};
     var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
-    autoflagging.log("URL: " + url);
+    debug("URL:", url);
     $.get(url, function (data) {
       // Group information by link
       for (var i = 0; i < data.items.length; i++) {
@@ -468,13 +452,12 @@
   autoflagging.socket.onmessage = function (message) {
     function decorate(selector, data) {
       (function _deco() {
-        autoflagging.log("Attempting to decorate \"" + selector + "\" with " + JSON.stringify(data));
-        autoflagging.log($(selector).parents(".message"));
+        debug.decorate("Attempting to decorate \"" + selector + "\" with", data, "message:", $(selector).parents(".message"));
         if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
           autoflagging.decorateMessage($(selector).parents(".message"), data);
         } else {
           // MS is faster than chat; add the decorate operation to the queue
-          autoflagging.log("Queueing " + selector);
+          debug.queue("Queueing", selector);
           autoflagging.msgQueue.push(_deco);
         }
       })();
@@ -489,31 +472,31 @@
         break;
       default: {
         // Analyze socket message
-        autoflagging.log(jsonData.message);
+        debug.ws("got message", jsonData.message);
         var flagLog = jsonData.message.flag_log;
         var deletionLog = jsonData.message.deletion_log;
         var feedback = jsonData.message.feedback;
         var notFlagged = jsonData.message.not_flagged;
         if (typeof flagLog != "undefined") {
           // Autoflagging information
-          autoflagging.log(flagLog.user_name + " autoflagged " + flagLog.post.link);
+          debug.ws(flagLog.user, "autoflagged", flagLog.post);
           let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
           decorate(selector, flagLog.post);
         } else if (typeof deletionLog != "undefined") {
           // Deletion log
-          autoflagging.log(deletionLog.post_link + " deleted");
+          debug.ws("deleted:", deletionLog);
           let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
           $(selector).parents(".content").addClass("ai-deleted");
         } else if (typeof feedback != "undefined") {
           // Feedback
-          autoflagging.log(feedback.user_name + " posted " + feedback.symbol + " on " + feedback.post_link, feedback); // feedback_type
+          debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // feedback_type
           let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
           decorate(selector, {
             feedbacks: [feedback]
           });
         } else if (typeof notFlagged != "undefined") {
           // Not flagged
-          autoflagging.log(notFlagged.post.link + " not flagged");
+          debug.ws(notFlagged.post, "not flagged");
           let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
           decorate(selector, notFlagged.post);
         }
@@ -523,7 +506,7 @@
   };
 
   autoflagging.socket.onopen = function () {
-    autoflagging.log("WebSocket opened.");
+    debug.ws("WebSocket opened.");
     // Send authentication
     autoflagging.socket.send(JSON.stringify({
       identifier: JSON.stringify({
@@ -534,7 +517,7 @@
     }));
   };
   autoflagging.socket.onclose = function (close) {
-    autoflagging.log("WebSocket closed: " + close.code + " - " + close.reason + ".");
+    debug.ws("WebSocket closed:", close);
   };
 
   // Sometimes, autoflagging information arrives before the chat message.
@@ -554,8 +537,8 @@
         var args = arguments;
         q.forEach(function (f) {
           setTimeout(function () {
-            autoflagging.log("Resolving queue: " + JSON.stringify(args));
-            autoflagging.log(f);
+            debug.queue("Resolving queue: " + JSON.stringify(args));
+            debug(f);
             f.apply(self, args);
           }, 100);
         });
