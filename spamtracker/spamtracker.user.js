@@ -31,7 +31,6 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
   const debug = createDebug("spamtracker");
   debug.warn = createDebug("spamtracker:warn");
   debug.info = createDebug("spamtracker:info");
-  debug.error = createDebug("spamtracker:error");
 
     // Defaults
   const defaultSounds = {
@@ -132,7 +131,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
         sound[url] = new Audio(url);
         // eslint-disable-next-line no-unused-vars
         sound[url].addEventListener("error", cause => {
-          debug.error("Failed to load: ", url);
+          console.error("SpamTracker failed to load", url);
         });
       }
       return true;
@@ -493,8 +492,8 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
             userSounds[soundName] ||
             defaultSounds[defaultSound];
     if (!sound[soundUrl]) {
-      debug.warn(
-                "Sound " +
+      console.error(
+                "SpamTracker: Sound " +
                     soundUrl +
                     " was not ready when we needed it, coming from " +
                     soundName
