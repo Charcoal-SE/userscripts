@@ -75,7 +75,7 @@
    * `element` is a message (i.e. has the .message class)
    */
   autoflagging.decorateMessage = function ($message, data) {
-    debug.decorate(JSON.stringify(data), $message);
+    debug.decorate(data, $message);
 
     autoflagging.decorate($message.children(".ai-information"), data);
     autoflagging.decorate($message.find(".meta .ai-information"), data);
@@ -537,8 +537,7 @@
         var args = arguments;
         q.forEach(function (f) {
           setTimeout(function () {
-            debug.queue("Resolving queue: " + JSON.stringify(args));
-            debug(f);
+            debug.queue("Resolving queue:", f, args);
             f.apply(self, args);
           }, 100);
         });
