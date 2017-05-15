@@ -21,14 +21,14 @@
 // @grant       none
 // ==/UserScript==
 
-/* global autoflagging, ReconnectingWebSocket */
+/* global autoflagging, ReconnectingWebSocket, unsafeWindow */
 
 // To enable/disable trace information, type autoflagging.trace(true) or
 // autoflagging.trace(false), respectively, in your browser's console.
 
 (function () {
   "use strict";
-  const createDebug = window.debug;
+  const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
   const debug = createDebug("aim");
   debug.decorate = createDebug("aim:decorate");
   debug.ws = createDebug("aim:ws");

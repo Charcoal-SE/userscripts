@@ -17,7 +17,7 @@
 // ==/UserScript==
 
 (function () {
-  const createDebug = window.debug;
+  const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
   const debug = createDebug("sds");
   debug.ping = createDebug("sds:ping");
   // Inject CSS

@@ -33,7 +33,7 @@
 
 (function () {
   "use strict";
-  const createDebug = window.debug;
+  const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
   const debug = createDebug("fdsc");
 
   var userscript = function ($) {
