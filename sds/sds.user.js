@@ -15,6 +15,7 @@
 // @require     https://wzrd.in/standalone/debug@%5E2.6.6
 // @grant       none
 // ==/UserScript==
+/* global unsafeWindow */
 
 (function () {
   const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;

@@ -28,7 +28,7 @@
 // @grant       none
 // ==/UserScript==
 
-/* global fdsc, $, xdLocalStorage, confirm */
+/* global fdsc, $, xdLocalStorage, confirm, unsafeWindow */
 /* eslint-disable max-nested-callbacks */
 
 (function () {
