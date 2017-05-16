@@ -59,7 +59,6 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
-|1.0.9  |Bugfix: got incorrect post ID for reports where the url contains a number.
 |1.0.8  |Log toastr messages to the console.
 |1.0.7  |Show "loading" error notification if FIRE fails to load a MS report.
 |1.0.6  |Fixing incorrect escaping of HTML: Whitelisted some tags.
