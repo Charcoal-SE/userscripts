@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.11 |Bugfix: `decorateExistingMessages` timing.
 |1.0.10 |Bugfix: got incorrect post ID for reports where the url contains a number.
 |1.0.9  |Add SoBotics room.
 |1.0.8  |Log toastr messages to the console.

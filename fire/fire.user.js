@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.10
+// @version     1.0.11
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -1977,7 +1977,7 @@
     // Load report data on fire button hover
     $('body').on('mouseenter', '.fire-button', loadDataForReport);
 
-    fire.log('Registered loadDataForReport');
+    fire.log('Registered `loadDataForReport` and `decorateExistingMessages`');
   }
 
   /**
@@ -1989,11 +1989,13 @@
    * @param {number} timeout The time to wait before trying to decorate the messages.
    */
   function decorateExistingMessages(timeout) {
-    setTimeout(() => {
-      const chat = $('#chat');
-      chat.on('DOMSubtreeModified', () => {
+    const chat = $('#chat');
+
+    chat.one('DOMSubtreeModified', () => {
+      // We need another timeout here, because the first modification occurs before
+      // the new (old) chat messages are loaded.
+      setTimeout(() => {
         if (chat.html().length !== 0) { // Chat messages have loaded
-          chat.off('DOMSubtreeModified');
           $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
 
           fire.log('Decorated existing messages.');
@@ -2003,8 +2005,8 @@
           updateReportCache();
           */
         }
-      });
-    }, timeout);
+      }, timeout);
+    });
   }
 
   /**
