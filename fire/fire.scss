@@ -193,9 +193,12 @@ img.fire-emoji-large {
         background-color: #f4eaea;
       }
 
-      img[src^='http://placehold.it'] {
-        cursor: pointer;
+      img {
         max-width: 100%;
+
+        &[src^='http://placehold.it'] {
+          cursor: pointer;
+        }
       }
 
       a {
