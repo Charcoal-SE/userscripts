@@ -25,9 +25,9 @@
 /* global GM_info, Notification, GM_setValue, GM_getValue, unsafeWindow, GM_getResourceText, GM_getResourceURL */
 /* eslint-disable prefer-const, no-use-before-define */
 
-unsafeWindow.Spamtracker = (function (target, siterooms, window) {
+unsafeWindow.Spamtracker = (function (target, siterooms, window, originalWindow) {
   "use strict";
-  const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
+  const createDebug = typeof originalWindow === "undefined" ? window.debug : originalWindow.debug || window.debug;
   const debug = createDebug("spamtracker:debug");
   debug.warn = createDebug("spamtracker:warn");
   debug.info = createDebug("spamtracker:info");
@@ -49,7 +49,6 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
   let defaultSound = "metastackexchange";
   let perSiteSounds = {};
   let maxNotifications = 2;
-  let debugLevel = 0;
 
   // Metadata
   // eslint-disable-next-line camelcase
@@ -121,7 +120,6 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
     userSounds = getConfigOption("sounds", userSounds, true);
     perSiteSounds = getConfigOption("sounds-per-site", perSiteSounds, true);
     enabled = getConfigOption("enabled", true, false);
-    debugLevel = getConfigOption("debug", debugLevel, false, false);
     defaultSound = getConfigOption("defaultsound", defaultSound, true);
   };
 
@@ -608,11 +606,6 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
     return true;
   };
 
-  const setDebugLevel = function (level) {
-    debugLevel = level - 0;
-    setConfigOption("debug", debugLevel, false);
-  };
-
     /**
      * Register an observer on the .messages element
      */
@@ -718,12 +711,12 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window) {
   const self = {
     setCallback,
     restoreCallback,
-    processChatMessage,
-    setDebugLevel
+    processChatMessage
   };
   return self;
 })(
     document.getElementById("chat"),
     document.getElementById("siterooms"),
-    unsafeWindow
+    unsafeWindow,
+    window
 );
