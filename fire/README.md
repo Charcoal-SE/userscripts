@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.13 |Fixing "Decorate existing messages" for FireFox
 |1.0.12 |Reducing the max size of a rendered image.
 |1.0.11 |Bugfix: `decorateExistingMessages` timing.
 |1.0.10 |Bugfix: got incorrect post ID for reports where the url contains a number.
