@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.15 |Bugfix: Escape HTML in report titles.
 |1.0.14 |Bugfix: Ignore case on whitelisted tags.
 |1.0.13 |Fixing "Decorate existing messages" for FireFox
 |1.0.12 |Reducing the max size of a rendered image.
