@@ -90,7 +90,7 @@ FIRE's global object.
 ### `fire.metaData`
 The userscript's metadata
 
-**Kind**: static property of [<code>fire</code>](#module_fire)  
+**Kind**: static property of <code>[fire](#module_fire)</code>  
 **Access**: public  
 
 ---
@@ -100,7 +100,7 @@ The userscript's metadata
 ### `fire.api`
 The userscript's api urls and keys
 
-**Kind**: static property of [<code>fire</code>](#module_fire)  
+**Kind**: static property of <code>[fire](#module_fire)</code>  
 **Access**: public  
 
 ---
@@ -110,7 +110,7 @@ The userscript's api urls and keys
 ### `fire.clickHandlers` ℗
 Click handlers for the settings window.
 
-**Kind**: static constant of [<code>fire</code>](#module_fire)  
+**Kind**: static constant of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 * [`.clickHandlers`](#module_fire.clickHandlers) ℗
@@ -126,7 +126,7 @@ Click handlers for the settings window.
 #### `clickHandlers.requestToken()` ℗
 Open the "Request authorization" MetaSmoke page.
 
-**Kind**: static method of [<code>clickHandlers</code>](#module_fire.clickHandlers)  
+**Kind**: static method of <code>[clickHandlers](#module_fire.clickHandlers)</code>  
 **Access**: private  
 
 ---
@@ -136,7 +136,7 @@ Open the "Request authorization" MetaSmoke page.
 #### `clickHandlers.saveToken(input, callback)` ℗
 Request a token from the MetaSmoke code.
 
-**Kind**: static method of [<code>clickHandlers</code>](#module_fire.clickHandlers)  
+**Kind**: static method of <code>[clickHandlers](#module_fire.clickHandlers)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -152,7 +152,7 @@ Request a token from the MetaSmoke code.
 #### `clickHandlers.disableReadonly()` ℗
 Close all popup windows and open the "Request write token" popup.
 
-**Kind**: static method of [<code>clickHandlers</code>](#module_fire.clickHandlers)  
+**Kind**: static method of <code>[clickHandlers](#module_fire.clickHandlers)</code>  
 **Access**: private  
 
 ---
@@ -162,7 +162,7 @@ Close all popup windows and open the "Request write token" popup.
 ### `fire.requestStackExchangeToken()` ℗
 requestStackExchangeToken - Request a Stack Exchange Write token for this app.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -172,7 +172,7 @@ requestStackExchangeToken - Request a Stack Exchange Write token for this app.
 ### `fire.checkHashForWriteToken()` ℗
 checkHashForWriteToken - Check the url hash to see if a write token has been obtained. If so, parse it.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -182,7 +182,7 @@ checkHashForWriteToken - Check the url hash to see if a write token has been obt
 ### `fire.checkWriteTokenSuccess()` ℗
 checkWriteTokenSuccess - Check if the write token was successfully obtained.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -192,7 +192,7 @@ checkWriteTokenSuccess - Check if the write token was successfully obtained.
 ### `fire.getDataForUrl(reportedUrl, callback)` ℗
 getDataForUrl - Loads MetaSmoke data for a specified post url.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -208,7 +208,7 @@ getDataForUrl - Loads MetaSmoke data for a specified post url.
 ### `fire.listHasCurrentUser(flags)` ⇒ <code>boolean</code> ℗
 listHasCurrentUser - Checks if the list of users on this flag report contains the current user.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>boolean</code> - `true` if the current user is found in the flag list.  
 **Access**: private  
 
@@ -224,7 +224,7 @@ listHasCurrentUser - Checks if the list of users on this flag report contains th
 ### `fire.loadDataForReport(openAfterLoad)` ℗
 loadDataForReport - Loads a report's data when you hover over the FIRE button.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -239,7 +239,7 @@ loadDataForReport - Loads a report's data when you hover over the FIRE button.
 ### `fire.updateReportCache()` ℗
 updateReportCache - Loads all MS data on the page.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -249,7 +249,7 @@ updateReportCache - Loads all MS data on the page.
 ### `fire.parseDataForReport(data, openAfterLoad, $this, skipLoadPost)` ℗
 parseDataForReport - Parse a report's loaded data.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -267,7 +267,7 @@ parseDataForReport - Parse a report's loaded data.
 ### `fire.parseSiteUrl(url)` ⇒ <code>string</code> ℗
 parseSiteUrl - Parse a site url into a api parameter.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>string</code> - The Stack Exchange API name for the report's site.  
 **Access**: private  
 
@@ -283,7 +283,7 @@ parseSiteUrl - Parse a site url into a api parameter.
 ### `fire.loadStackExchangeSites()` ℗
 loadStackExchangeSites - Loads a list of all Stack Exchange Sites.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -293,7 +293,7 @@ loadStackExchangeSites - Loads a list of all Stack Exchange Sites.
 ### `fire.loadPost(report)` ℗
 loadPost - Loads additional information for a post, from the Stack exchange API.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -308,7 +308,7 @@ loadPost - Loads additional information for a post, from the Stack exchange API.
 ### `fire.loadPostRevisions(report)` ℗
 loadPostRevisions - Loads a post's revision history from the Stack Exchange API.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -323,7 +323,7 @@ loadPostRevisions - Loads a post's revision history from the Stack Exchange API.
 ### `fire.showEditedIcon()` ℗
 showEditedIcon - Render a "Edited" icon on a opened report popup.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -333,7 +333,7 @@ showEditedIcon - Render a "Edited" icon on a opened report popup.
 ### `fire.showReputation(reputation)` ℗
 showReputation - Shows a user's reputation in the report.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -348,7 +348,7 @@ showReputation - Shows a user's reputation in the report.
 ### `fire.loadPostFlagStatus(report)` ℗
 loadPostFlagStatus - Loads a post's flagging status from the Stack Exchange API.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -363,7 +363,7 @@ loadPostFlagStatus - Loads a post's flagging status from the Stack Exchange API.
 ### `fire.loadCurrentSEUser([page])` ℗
 loadPostFlagStatus - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Default | Description |
@@ -378,7 +378,7 @@ loadPostFlagStatus - Loads the current Stack Exchange user and what sites they'r
 ### `fire.parseUserResponse(response, page)` ℗
 parseUserResponse - Parse the user response.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -394,7 +394,7 @@ parseUserResponse - Parse the user response.
 ### `fire.getSE(method, parameters, success, error, always)` ℗
 getSE - `GET` call on the Stack Exchange API.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -413,7 +413,7 @@ getSE - `GET` call on the Stack Exchange API.
 ### `fire.stackExchangeAjaxCall(method, parameters, config)` ⇒ <code>jqXHR</code> ℗
 stackExchangeAjaxCall - Perform an AJAX call on the Stack Exchange API.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>jqXHR</code> - The jqXHR Promise.  
 **Access**: private  
 
@@ -435,7 +435,7 @@ stackExchangeAjaxCall - Perform an AJAX call on the Stack Exchange API.
 ### `fire.getWriteToken([callback])` ℗
 getWriteToken - Gets a MetaSmoke write token.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -448,10 +448,9 @@ getWriteToken - Gets a MetaSmoke write token.
 <a name="module_fire.chatListener"></a>
 
 ### `fire.chatListener(message)` ℗
-chatListener - Chat message event listener.
-If SmokeDetector reports another post, decorate the message.
+chatListener - Chat message event listener.If SmokeDetector reports another post, decorate the message.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -469,7 +468,7 @@ If SmokeDetector reports another post, decorate the message.
 ### `fire.decorateMessage(message)`
 decorateMessage - Adds the "FIRE" button to the passed message.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: public  
 
 | Param | Type | Description |
@@ -484,7 +483,7 @@ decorateMessage - Adds the "FIRE" button to the passed message.
 ### `fire.filterOnContents($object, text)` ⇒ <code>object</code> ℗
 filterOnContents - Filter a jQuery list on the element text.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - The filtered list  
 **Access**: private  
 
@@ -501,7 +500,7 @@ filterOnContents - Filter a jQuery list on the element text.
 ### `fire.toastrPositionChangeHandler()` ℗
 toastrPositionChangeHandler - Set the toastr position class.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -511,7 +510,7 @@ toastrPositionChangeHandler - Set the toastr position class.
 ### `fire.toastrDurationHandler()` ℗
 toastrDurationHandler - Update the toastr popup duration.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -521,7 +520,7 @@ toastrDurationHandler - Update the toastr popup duration.
 ### `fire.blurOptionClickHandler()` ℗
 blurOptionClickHandler - Set the "Blur" option for the popup modal.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -531,7 +530,7 @@ blurOptionClickHandler - Set the "Blur" option for the popup modal.
 ### `fire.flagOptionClickHandler()` ℗
 flagOptionClickHandler - Set the "Flag" option for "tpu-" feedback.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -541,7 +540,7 @@ flagOptionClickHandler - Set the "Flag" option for "tpu-" feedback.
 ### `fire.debugOptionClickHandler()` ℗
 debugOptionClickHandler - Set the "Debug" option to show logs in the dev console.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -551,7 +550,7 @@ debugOptionClickHandler - Set the "Debug" option to show logs in the dev console
 ### `fire.imageOptionClickHandler()` ℗
 imageOptionClickHandler - Set the "HideImages" option to hide or show images in reports.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -561,7 +560,7 @@ imageOptionClickHandler - Set the "HideImages" option to hide or show images in 
 ### `fire.boolOptionClickHandler(element, message, key, [callback])` ℗
 boolOptionClickHandler - Set a boolean option after a setting checkbox was clicked.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -579,7 +578,7 @@ boolOptionClickHandler - Set a boolean option after a setting checkbox was click
 ### `fire.keyboardShortcuts(e)` ℗
 keyboardShortcuts - Handle keypress events for the popup.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -594,7 +593,7 @@ keyboardShortcuts - Handle keypress events for the popup.
 ### `fire.openReportPopupForMessage(message)`
 openReportPopupForMessage - Opens a report popup for a specific message.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: public  
 
 | Param | Type | Description |
@@ -609,7 +608,7 @@ openReportPopupForMessage - Opens a report popup for a specific message.
 ### `fire.writeTokenPopup(callback)` ℗
 writeTokenPopup - Open a popup to enter the write token.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -624,7 +623,7 @@ writeTokenPopup - Open a popup to enter the write token.
 ### `fire.openReportPopup()` ℗
 openReportPopup - Build a report popup and show it.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -634,7 +633,7 @@ openReportPopup - Build a report popup and show it.
 ### `fire.openSettingsPopup()` ℗
 openSettingsPopup - Opens a popup to change fire's settings.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -644,7 +643,7 @@ openSettingsPopup - Opens a popup to change fire's settings.
 ### `fire.closePopup()` ⇒ <code>object</code> ℗
 closePopup - Close the popup.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - The previously closed popup's button (if any) so it can be re-opened.  
 **Access**: private  
 
@@ -655,7 +654,7 @@ closePopup - Close the popup.
 ### `fire.getPopupLeft()` ⇒ <code>number</code> ℗
 getPopupLeft - Gets the `left` position for the popup.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>number</code> - The `left` position for the popup.  
 **Access**: private  
 
@@ -666,7 +665,7 @@ getPopupLeft - Gets the `left` position for the popup.
 ### `fire.postMetaSmokeFeedback(data, verdict, button)` ℗
 postMetaSmokeFeedback - Submit MetaSmoke feedback.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -683,7 +682,7 @@ postMetaSmokeFeedback - Submit MetaSmoke feedback.
 ### `fire.postMetaSmokeSpamFlag(data, api, token, feedbackSuccess)` ⇒ <code>undefined</code> ℗
 postMetaSmokeSpamFlag - Flag the post as spam.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>undefined</code> - returns undefined to break out of the function.  
 **Access**: private  
 
@@ -704,7 +703,7 @@ postMetaSmokeSpamFlag - Flag the post as spam.
 ### `fire.keyCodesToArray(keyCodes)` ⇒ <code>array.number</code> ℗
 keyCodesToArray - Structure the keyCodes Array.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>array.number</code> - An array of keyCodes mapped from the input chars / keyCodes.  
 **Access**: private  
 
@@ -720,7 +719,7 @@ keyCodesToArray - Structure the keyCodes Array.
 ### `fire.createFeedbackButton(data, keyCodes, text, verdict, tooltip)` ⇒ <code>object</code> ℗
 createFeedbackButton - Create a feedback button for the top of the popup.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - The constructed feedback button.  
 **Access**: private  
 
@@ -740,7 +739,7 @@ createFeedbackButton - Create a feedback button for the top of the popup.
 ### `fire.createCloseButton(clickHandler)` ⇒ <code>object</code> ℗
 createCloseButton - Create a button to close a popup.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - The constructed "close" button.  
 **Access**: private  
 
@@ -756,7 +755,7 @@ createCloseButton - Create a button to close a popup.
 ### `fire.createSettingsCheckBox(id, value, handler, labelText, headerText)` ⇒ <code>object</code> ℗
 createSettingsCheckBox - Creates a input[type=checkbox] for the settings.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - The constructed settings checkbox.  
 **Access**: private  
 
@@ -776,7 +775,7 @@ createSettingsCheckBox - Creates a input[type=checkbox] for the settings.
 ### `fire._(tagName, [cssClass], [options])` ⇒ <code>object</code> ℗
 _ - Wrapper to create a new element with a specified class.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - A jQuery DOM node.  
 **Access**: private  
 
@@ -794,7 +793,7 @@ _ - Wrapper to create a new element with a specified class.
 ### `fire.br()` ⇒ <code>object</code> ℗
 br - Create a linebreak.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - A jQuery `<br />` DOM node.  
 **Access**: private  
 
@@ -805,7 +804,7 @@ br - Create a linebreak.
 ### `fire.span(contents)` ⇒ <code>object</code> ℗
 span - Create a `<span>` with the specified contents.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - A jQuery `<span>` DOM node with the specified contents.  
 **Access**: private  
 
@@ -821,7 +820,7 @@ span - Create a `<span>` with the specified contents.
 ### `fire.button(text, clickHandler)` ⇒ <code>object</code> ℗
 button - Create a button.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - A jQuery `<button>` DOM node.  
 **Access**: private  
 
@@ -838,7 +837,7 @@ button - Create a button.
 ### `fire.hasEmojiSupport()` ℗
 hasEmojiSupport - Detect Emoji support in this browser.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -848,7 +847,7 @@ hasEmojiSupport - Detect Emoji support in this browser.
 ### `fire.emojiOrImage(emoji, [large])` ⇒ <code>object</code> ℗
 emojiOrImage - Returns the emoji if it's supported. Otherwise, return a fallback image.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - A jQuery `<span>` DOM node with the specified emoji as string or image.  
 **Access**: private  
 
@@ -865,7 +864,7 @@ emojiOrImage - Returns the emoji if it's supported. Otherwise, return a fallback
 ### `fire.injectExternalScripts()` ℗
 injectExternalScripts - Inject FIRE stylesheet and Toastr library.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -875,7 +874,7 @@ injectExternalScripts - Inject FIRE stylesheet and Toastr library.
 ### `fire.injectCSS(path)` ℗
 injectCSS - Inject the specified stylesheet.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -890,7 +889,7 @@ injectCSS - Inject the specified stylesheet.
 ### `fire.injectScript(name, path, [callback], [always])` ℗
 injectScript - Inject the specified script.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -908,7 +907,7 @@ injectScript - Inject the specified script.
 ### `fire.loadToastrCss()` ℗
 loadToastrCss - Load toastr css.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -918,7 +917,7 @@ loadToastrCss - Load toastr css.
 ### `fire.initializeToastr()` ℗
 initializeToastr - Set toastr options.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -928,7 +927,7 @@ initializeToastr - Set toastr options.
 ### `fire.registerOpenLastReportKey()` ℗
 registerOpenLastReportKey - Open the last report on [Ctrl]+[Space].
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -938,7 +937,7 @@ registerOpenLastReportKey - Open the last report on [Ctrl]+[Space].
 ### `fire.registerAnchorHover()` ℗
 registerAnchorHover - Register the "tooltip" hover for anchor elements.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -948,7 +947,7 @@ registerAnchorHover - Register the "tooltip" hover for anchor elements.
 ### `fire.registerWebSocket()` ℗
 registerWebSocket - Register a websocket listener.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -958,7 +957,7 @@ registerWebSocket - Register a websocket listener.
 ### `fire.registerForLocalStorage(object, key, localStorageKey)` ℗
 registerForLocalStorage - Adds a property on `fire` that's stored in `localStorage`.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -975,7 +974,7 @@ registerForLocalStorage - Adds a property on `fire` that's stored in `localStora
 ### `fire.registerLoggingFunctions()` ℗
 registerLoggingFunctions - Registers logging functions on `fire`.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -985,7 +984,7 @@ registerLoggingFunctions - Registers logging functions on `fire`.
 ### `fire.showFireOnExistingMessages()` ℗
 showFireOnExistingMessages - Adds the "FIRE" button to all existing messages and registers an event listener to do so after "load older messages" is clicked.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -995,7 +994,7 @@ showFireOnExistingMessages - Adds the "FIRE" button to all existing messages and
 ### `fire.decorateExistingMessages(timeout)` ℗
 decorateExistingMessages - Decorate messages that exist on page load.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -1010,7 +1009,7 @@ decorateExistingMessages - Decorate messages that exist on page load.
 ### `fire.getLogger(fn)` ⇒ <code>function</code> ℗
 getLogger - Gets a log wrapper for the specified console function.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>function</code> - A fire-wrapped console function.  
 **Access**: private  
 
@@ -1026,7 +1025,7 @@ getLogger - Gets a log wrapper for the specified console function.
 ### `fire.socketOnMessage(message)` ℗
 socketOnMessage - Handle socket messages.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -1041,7 +1040,7 @@ socketOnMessage - Handle socket messages.
 ### `fire.expandLinksOnHover()` ℗
 expandLinksOnHover - Expands anchor elements in the report's body on hover, to show the href.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -1051,7 +1050,7 @@ expandLinksOnHover - Expands anchor elements in the report's body on hover, to s
 ### `fire.initLocalStorage(hOP, defaultStorage)` ℗
 initLocalStorage - Initializes `localStorage`.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -1067,7 +1066,7 @@ initLocalStorage - Initializes `localStorage`.
 ### `fire.setValue(key, value)` ℗
 setValue - Sets a value on `fire.userData`, stored in `localStorage`.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -1083,7 +1082,7 @@ setValue - Sets a value on `fire.userData`, stored in `localStorage`.
 ### `fire.clearValue(key)` ℗
 clearValue - Removes a value from `fire.userData`, stored in `localStorage`
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 | Param | Type | Description |
@@ -1098,7 +1097,7 @@ clearValue - Removes a value from `fire.userData`, stored in `localStorage`
 ### `fire.getCurrentChatUser()` ℗
 getCurrentChatUser - Gets the currently logged-in user.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Access**: private  
 
 ---
@@ -1108,7 +1107,7 @@ getCurrentChatUser - Gets the currently logged-in user.
 ### `fire.getFireConstants()` ⇒ <code>object</code> ℗
 getFireConstants - Gets constants to be used in `fire`.
 
-**Kind**: static method of [<code>fire</code>](#module_fire)  
+**Kind**: static method of <code>[fire](#module_fire)</code>  
 **Returns**: <code>object</code> - FIRE's constants  
 **Access**: private  
 
@@ -1119,7 +1118,7 @@ getFireConstants - Gets constants to be used in `fire`.
 ### `fire~singleReportCallback` : <code>function</code>
 This is a callback that is passed a single report's data.
 
-**Kind**: inner typedef of [<code>fire</code>](#module_fire)  
+**Kind**: inner typedef of <code>[fire](#module_fire)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
