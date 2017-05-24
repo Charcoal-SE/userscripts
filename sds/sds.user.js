@@ -3,7 +3,7 @@
 // @namespace   https://github.com/Charcoal-SE/
 // @description Show the status of all SmokeDetector instances
 // @author      J F
-// @version     0.0.2
+// @version     0.0.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -12,10 +12,15 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
 // @require     https://wzrd.in/standalone/actioncable@5.1.0
+// @require     https://wzrd.in/standalone/debug@%5E2.6.6
 // @grant       none
 // ==/UserScript==
+/* global unsafeWindow */
 
 (function () {
+  const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
+  const debug = createDebug("sds");
+  debug.ping = createDebug("sds:ping");
   // Inject CSS
   const css = window.document.createElement("link");
   css.rel = "stylesheet";
@@ -36,7 +41,7 @@
   $("#roomname").after($pings);
   cable.subscriptions.create("PingsChannel", {
     received({smokey}) {
-      console.log("smokey", smokey);
+      debug.ping(smokey);
       const $dot = getDot(smokey);
       const $ping = $dot.find(".ping");
       $ping.removeClass("ping-pulse");

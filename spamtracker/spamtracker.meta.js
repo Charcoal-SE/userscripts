@@ -20,4 +20,5 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        unsafeWindow
+// @require      https://wzrd.in/standalone/debug@%5E2.6.6
 // ==/UserScript==

@@ -5,8 +5,9 @@
 // @author      ArtOfCode
 // @contributor angussidney
 // @contributor rene
+// @contributor J F
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.14.0
+// @version     1.14.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -23,5 +24,6 @@
 // @exclude     *://blog.stackoverflow.com/*
 // @exclude     *://*.area51.stackexchange.com/*
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
+// @require     https://wzrd.in/standalone/debug@%5E2.6.6
 // @grant       none
 // ==/UserScript==
