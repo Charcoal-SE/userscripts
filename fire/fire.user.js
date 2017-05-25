@@ -247,7 +247,7 @@
         if (response.items.length <= 0)
           toastr.info('No metasmoke reports found.');
 
-        for (const item of response.items)
+        for (let item of response.items)
           parseDataForReport(item, false, null, true);
       }
     });
@@ -335,7 +335,7 @@
         'sites',
         parameters,
         ({items}) => {
-          for (const item of items)
+          for (let item of items)
             sites[item.api_site_parameter] = item;
 
           sites.storedAt = now; // Set the storage timestamp
@@ -1242,7 +1242,7 @@
     const selected = fire.userData.toastrPosition;
     const positionSelect = _('select', 'fire-position-select', {change: toastrPositionChangeHandler});
 
-    for (const val of toastrClasses) {
+    for (let val of toastrClasses) {
       positionSelect.append(
         _('option', {
           value: val,
@@ -2105,7 +2105,7 @@
       fire.info('Debug mode enabled.');
 
     const data = fire.userData;
-    for (const key in defaultStorage) {
+    for (let key in defaultStorage) {
       if (hOP(defaultStorage, key) && !hOP(data, key))
         data[key] = defaultStorage[key];
     }
