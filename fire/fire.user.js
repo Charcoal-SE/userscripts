@@ -1112,7 +1112,6 @@
       .replace(/&lt;(\/?([abpsu]|[hb]r|[uo]l|li|h\d|code|pre|strong|em|img).*?)&gt;/gi, '<$1>')
       .replace(/<(\/ ?)?script/gi, '&lt;$1script')
       .replace(/script>/gi, 'script&gt;');
-      debugger;
 
     const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
