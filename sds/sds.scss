@@ -3,6 +3,13 @@
 .pings-container {
   margin-left: 1em;
   position: absolute;
+  height: 100%;
+  #mob & {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 3px;
+    box-sizing: border-box;
+  }
 
   .smokey {
     margin-right: 0.5em;

@@ -38,7 +38,7 @@
   const ActionCable = window.actioncable;
   const cable = ActionCable.createConsumer("wss://metasmoke.erwaysoftware.com/cable");
   const $pings = $("<span />").addClass("pings-container");
-  $("#roomname").after($pings);
+  $("#roomname,#rooms-dropdown").after($pings);
   cable.subscriptions.create("PingsChannel", {
     received({smokey}) {
       debug.ping(smokey);
