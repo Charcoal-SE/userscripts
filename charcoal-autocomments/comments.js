@@ -28,9 +28,9 @@ callback(
     {
       name: "[A] Requests to OP for further information",
       description: "This is really a comment, not an answer. With a bit more rep, [you will be able to post comments](https://$SITEURL$/privileges/comment). For the moment I've added the comment for you, and I'm flagging this post for deletion."
-    }
+    },
     {
       name: "[A] Vandalism",
       description: "Please do not vandalize your posts. Once you've posted an answer, you have licensed the content to the $SITENAME$ community at large (under the CC-by-SA license). If you would like to disassociate this post from your account, see [What is the proper route for a disassociation request](https://meta.stackoverflow.com/questions/323395)?"
-    },
+    }
   ]);
