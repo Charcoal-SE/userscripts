@@ -302,7 +302,7 @@
       var title = (items[defaultKey] || []).join(", ");
       var titles = Object.keys(items)
                          .map(function (key) {
-                           if (key === defaultKey) {
+                           if (key.replace(/-$/, '') === defaultKey.replace(/-$/, '')) {
                              return undefined;
                            }
                            return key + ": " + items[key].join(", ");
