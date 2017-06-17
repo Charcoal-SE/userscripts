@@ -84,3 +84,8 @@ div.message {
     content: " " url(https://charcoal-se.org/userscripts/emoji/naa-2x.png)
   }
 }
+
+.mob #chat .monologue .message {
+  /* fix messages collapsing to the bottom of the monlogue */
+  position: relative;
+}
