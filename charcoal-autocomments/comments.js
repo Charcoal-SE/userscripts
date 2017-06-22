@@ -22,6 +22,10 @@ callback(
       description: "While this may theoretically answer the question, [it would be preferable](https://meta.stackexchange.com/questions/8231) to include the essential parts of the answer here and provide the link for reference."
     },
     {
+      name: "[Q,A] Repeated spamming of URL, with disclosure",
+      description: "Please read [How to not be a spammer](https://$SITEURL$/help/promotion)"
+    },
+    {
       name: "[A] Requests to OP for further information",
       description: "This is really a comment, not an answer. With a bit more rep, [you will be able to post comments](https://$SITEURL$/privileges/comment). For the moment I've added the comment for you, and I'm flagging this post for deletion."
     }
