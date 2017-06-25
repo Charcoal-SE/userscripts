@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.17 |Bugfix: Escape style tags in posts.
 |1.0.16 |Bugfix: Escape script tags in posts.
 |1.0.15 |Bugfix: Escape HTML in report titles.
 |1.0.14 |Bugfix: Ignore case on whitelisted tags.
