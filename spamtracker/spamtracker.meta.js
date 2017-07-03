@@ -20,5 +20,5 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        unsafeWindow
-// @require      https://charcoal-se.org/userscripts/vendor/debug.js
+// @require      https://charcoal-se.org/userscripts/vendor/debug.min.js
 // ==/UserScript==

@@ -20,7 +20,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        unsafeWindow
-// @require      https://charcoal-se.org/userscripts/vendor/debug.js
+// @require      https://charcoal-se.org/userscripts/vendor/debug.min.js
 // ==/UserScript==
 /* global GM_info, Notification, GM_setValue, GM_getValue, unsafeWindow, GM_getResourceText, GM_getResourceURL */
 /* eslint-disable prefer-const, no-use-before-define */
