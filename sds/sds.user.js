@@ -29,17 +29,18 @@
 
   const apiKey = "05f3eb1fb4edd821e32299f5b2e65f78bc53ed4fa0415b034d0e84b4e273329e";
 
-  $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
-    data.items.forEach(smokey => {
-      addData(smokey, getDot(smokey));
-    });
-  });
-
   const ActionCable = window.actioncable;
   const cable = ActionCable.createConsumer("wss://metasmoke.erwaysoftware.com/cable");
   const $pings = $("<span />").addClass("pings-container");
   $("#roomname,#rooms-dropdown").after($pings);
   cable.subscriptions.create("PingsChannel", {
+    connected() {
+      $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
+        data.items.forEach(smokey => {
+          addData(smokey, getDot(smokey));
+        });
+      });
+    },
     received({smokey}) {
       debug.ping(smokey);
       const $dot = getDot(smokey);
