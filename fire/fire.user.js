@@ -951,6 +951,8 @@
       const value = input.val();
       if (value && value.length === fire.constants.metaSmokeCodeLength)
         callback(value);
+
+      closePopup();
     },
     /**
      * Close all popup windows and open the "Request write token" popup.
