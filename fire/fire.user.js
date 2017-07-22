@@ -975,7 +975,7 @@
   function writeTokenPopup(callback) {
     const input = _('input', 'fire-popup-input', {
       type: 'text',
-      maxlength: '7',
+      maxlength: '8',
       placeholder: 'Enter code here'
     });
 
@@ -2191,7 +2191,7 @@
       emojiSize: 16,
       siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,
-      metaSmokeCodeLength: 7,
+      metaSmokeCodeLength: 8,
       numpadOffset: 48,
       buttonFade: 100,
       loadAllMessagesDelay: 500,
