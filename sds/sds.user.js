@@ -3,7 +3,7 @@
 // @namespace   https://github.com/Charcoal-SE/
 // @description Show the status of all SmokeDetector instances
 // @author      J F
-// @version     0.0.5
+// @version     0.0.6
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -43,7 +43,11 @@
       )
   ).append($pings);
   $("#roomtitle,#rooms-dropdown").after($sds);
-  cable.subscriptions.create("PingsChannel", {
+  cable.subscriptions.create({
+    channel: "APIChannel",
+    key: apiKey,
+    events: "smoke_detectors"
+  }, {
     connected() {
       $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
         data.items.forEach(smokey => {
@@ -51,14 +55,27 @@
         });
       });
     },
-    received({smokey}) {
-      debug.ping(smokey);
-      const $dot = getDot(smokey);
-      const $ping = $dot.find(".ping");
-      $ping.removeClass("ping-pulse");
-      requestAnimationFrame(() => $ping.addClass("ping-pulse"));
-      addData(smokey, $dot);
-      updatePing($dot);
+    received({event_type: eventType, event_class: eventClass, object}) {
+      switch (eventClass) {
+        case "SmokeDetector":
+          switch (eventType) {
+            case "update": {
+              debug.ping(object);
+              const $dot = getDot(object);
+              const $ping = $dot.find(".ping");
+              $ping.removeClass("ping-pulse");
+              requestAnimationFrame(() => $ping.addClass("ping-pulse"));
+              addData(object, $dot);
+              updatePing($dot);
+              break;
+            }
+            default:
+              debug(`igoring ${eventClass}#${eventType}:`, object);
+          }
+          break;
+        default:
+          debug(`igoring ${eventClass}#${eventType}:`, object);
+      }
     }
   });
   setInterval(() => {
