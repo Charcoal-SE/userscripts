@@ -31,14 +31,18 @@
 
   const ActionCable = window.actioncable;
   const cable = ActionCable.createConsumer("wss://metasmoke.erwaysoftware.com/cable");
-  const $pings = $("<span />").addClass("pings-container");
-  $pings.append($("<span />").attr({
-    "data-tooltip": "SmokeDetector Status",
-    "data-tooltip-top": true
-  }).append($("<img />").attr({
-    src: "https://i.stack.imgur.com/WyV1l.png?s=32&g=1",
-  })));
-  $("#roomtitle,#rooms-dropdown").after($pings);
+  const $sds = $("<div />").addClass("sds-container");
+  const $pings = $("<div />").addClass("pings-container");
+  $sds.append(
+    $("<span />")
+      .attr("data-tooltip", "SmokeDetector Status")
+      .append(
+        $("<img />").attr({
+          src: "https://i.stack.imgur.com/WyV1l.png?s=32&g=1",
+        })
+      )
+  ).append($pings);
+  $("#roomtitle,#rooms-dropdown").after($sds);
   cable.subscriptions.create("PingsChannel", {
     connected() {
       $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
