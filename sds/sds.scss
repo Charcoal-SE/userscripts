@@ -7,14 +7,27 @@
 }
 
 .pings-container {
-  margin-left: 1em;
-  position: absolute;
-  height: 100%;
+  margin-top: -5px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+
   .mob & {
     display: inline-flex;
-    align-items: center;
+    margin: 0;
+    margin-left: 0.5em;
     padding-top: 3px;
     box-sizing: border-box;
+  }
+
+  img {
+    height: 1.5em;
+    float: left;
+    margin-right: 0.5em;
+
+    .mob & {
+      display: none;
+    }
   }
 
   .smokey {
