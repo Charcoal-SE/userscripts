@@ -51,7 +51,7 @@
     events: "smoke_detectors"
   }, {
     connected() {
-      debug('WebSocket connected');
+      debug("WebSocket connected");
       loadPings();
     },
     received({event_type: eventType, event_class: eventClass, object}) {
@@ -120,11 +120,11 @@
     $dot.addClass(color);
     $dot.attr("data-tooltip", $dot.attr("data-location") + " • " + prettyDate($dot.attr("data-last-ping"), true));
   }
-  
+
   function loadPings() {
-    debug('Loading instances...');
+    debug("Loading instances...");
     $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
-      debug('Loaded instances from API:', data);
+      debug("Loaded instances from API:", data);
       data.items.forEach(smokey => {
         addData(smokey, getDot(smokey));
       });
