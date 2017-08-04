@@ -43,17 +43,16 @@
       )
   ).append($pings);
   $("#roomtitle,#rooms-dropdown").after($sds);
+
+  loadPings();
   cable.subscriptions.create({
     channel: "APIChannel",
     key: apiKey,
     events: "smoke_detectors"
   }, {
     connected() {
-      $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
-        data.items.forEach(smokey => {
-          addData(smokey, getDot(smokey));
-        });
-      });
+      debug('WebSocket connected');
+      loadPings();
     },
     received({event_type: eventType, event_class: eventClass, object}) {
       switch (eventClass) {
@@ -120,6 +119,16 @@
     $dot.removeClass(toRemove.join(" "));
     $dot.addClass(color);
     $dot.attr("data-tooltip", $dot.attr("data-location") + " • " + prettyDate($dot.attr("data-last-ping"), true));
+  }
+  
+  function loadPings() {
+    debug('Loading instances...');
+    $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
+      debug('Loaded instances from API:', data);
+      data.items.forEach(smokey => {
+        addData(smokey, getDot(smokey));
+      });
+    });
   }
 
   function prettyDate(date, formatShortDates) {
