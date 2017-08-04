@@ -46,7 +46,7 @@
 
   loadPings();
   cable.subscriptions.create({
-    channel: "APIChannel",
+    channel: "ApiChannel",
     key: apiKey,
     events: "smoke_detectors"
   }, {
