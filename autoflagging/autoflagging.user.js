@@ -17,7 +17,7 @@
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
 // @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
 // @match       *://chat.stackexchange.com/rooms/201/ask-ubuntu-general-room*
-// @require     https://cdn.rawgit.com/joewalnes/reconnecting-websocket/f8055b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js
+// @require     https://cdn.rawgit.com/joewalnes/reconnecting-websocket/f80355b77ba75e5d564ffb50d20a483bdd7edccdf/reconnecting-websocket.min.js
 // @require     https://charcoal-se.org/userscripts/vendor/debug.min.js
 // @grant       none
 // ==/UserScript==
@@ -341,7 +341,7 @@
     if ($element.parent().children(":first-child").hasClass("timestamp") && $element.is(":nth-child(2)")) {
       // don’t overlap the timestamp
       $element.css({
-        minHeight: "3em"
+        clear: "both"
       });
     }
   };
