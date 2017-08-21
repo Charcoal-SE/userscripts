@@ -28,5 +28,9 @@ callback(
     {
       name: "[A] Requests to OP for further information",
       description: "This is really a comment, not an answer. With a bit more rep, [you will be able to post comments](https://$SITEURL$/privileges/comment). For the moment I've added the comment for you, and I'm flagging this post for deletion."
-    }
+    },
+    {
+      name: "[Q,A] [Russian] This is spam. Please flag as such",
+      description: "Я рассматриваю это как спам. Пожалуйста, отметьте как спам."
+    },
   ]);
