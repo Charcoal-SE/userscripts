@@ -59,6 +59,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.19 |Build Validation fix.
 |1.0.18 |Bugfix: FireFox still has issues loading the current user.
 |1.0.17 |Bugfix: Escape style tags in posts.
 |1.0.16 |Bugfix: Escape script tags in posts.
