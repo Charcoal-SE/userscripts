@@ -12,7 +12,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 
 # Features
 - Open a popup for any SmokeDetector report by clicking the "Fire" or "🔥" button in the report.
-  ![fire.png]
+  ![Fire icon on report](fire.png)
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
 - The popup will contain:
   - The reported post's contents.
@@ -63,10 +63,10 @@ To open the reported post on it's site:
 
 # Common Failures
 
-1. When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
-2. Forgetting to authorize FIRE. See the previous section.
-3. If you are a moderator on a site, it will refuse to flag on your behalf as a security precaution.
-4. If you are not a registered user on a site, flagging will fail because of that.
+ - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
+ - Forgetting to authorize FIRE. See the previous section.
+ - FIRE will not submit flags on any site where you are a diamond moderator (♦) as a security precaution. However, it will still work on all other sites.
+ - Flagging will fail if you are not registered on the particular site.
 
 # Version History
 
