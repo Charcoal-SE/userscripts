@@ -1,12 +1,18 @@
 # 🔥 FIRE!
 
-This is still a "work in progress".  
-As of this moment, the userscript does post flags _and_ MS feedback.
+Feedback Instantly, Effortlessly, and Rapidly (FIRE)
+is a userscript which allows you to react to SmokeDetector spam reports in chat
+without leaving the chat room.
+
+This is still a "work in progress".
+
+As of this moment, the userscript posts flags _and_ MS feedback.
 
 ---
 
 # Features
 - Open a popup for any SmokeDetector report by clicking the "Fire" or "🔥" button in the report.
+  ![Fire icon on report](fire.png)
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
 - The popup will contain:
   - The reported post's contents.
@@ -54,6 +60,13 @@ To open the reported post on it's site:
 4. That window redirects to this chat with an access token in the url hash.
 5. Fire sees the hash, saves your token, then closes the new window.
 6. You go back to the old window, it detects a token, and shows you a "success" message.
+
+# Common Failures
+
+ - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
+ - Forgetting to authorize FIRE. See the previous section.
+ - FIRE will not submit flags on any site where you are a diamond moderator (♦) as a security precaution. However, it will still work on all other sites.
+ - Flagging will fail if you are not registered on the particular site.
 
 # Version History
 
