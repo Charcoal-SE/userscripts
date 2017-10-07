@@ -13,7 +13,8 @@
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
 // @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
-// @match       *://chat.stackexchange.com/rooms/201/ask-ubuntu-general-room*
+// @match       *://chat.stackexchange.com/rooms/201/*
+// @match       *://chat.stackexchange.com/rooms/3877/*
 // @grant       none
 // ==/UserScript==
 
