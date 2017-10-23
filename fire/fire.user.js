@@ -723,7 +723,7 @@
 
         if (urlOnReportLink)
           reportedUrl = reportLink[0].href.split('url=').pop();
-        else if(reportLink.nextAll('a')[0])
+        else if (reportLink.nextAll('a')[0])
           reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
         else
           return;
