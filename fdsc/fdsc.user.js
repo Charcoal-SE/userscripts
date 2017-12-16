@@ -177,7 +177,7 @@
 
       $.ajax({
         type: "POST",
-        url: "https://metasmoke.erwaysoftware.com/api/w/post/" + postId + "/feedback",
+        url: "https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/" + postId + "/create",
         data: {
           type: feedbackType,
           key: fdsc.metasmokeKey,
@@ -240,7 +240,7 @@
 
       $.ajax({
         type: "POST",
-        url: "https://metasmoke.erwaysoftware.com/api/w/post/report",
+        url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/report",
         data: {
           post_link: postUrl, // eslint-disable-line camelcase
           key: fdsc.metasmokeKey,
@@ -297,7 +297,7 @@
               container = $(clickEvent.target).parents(".question, .answer").first();
               fdsc.ajaxPromise = $.ajax({
                 type: "GET",
-                url: "https://metasmoke.erwaysoftware.com/api/posts/urls",
+                url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls",
                 data: {
                   urls: fdsc.constructUrl(container),
                   key: fdsc.metasmokeKey

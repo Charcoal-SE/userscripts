@@ -123,7 +123,7 @@
 
   function loadPings() {
     debug("Loading instances...");
-    $.get("https://metasmoke.erwaysoftware.com/api/smoke_detectors?key=" + apiKey, data => {
+    $.get("https://metasmoke.erwaysoftware.com/api/v2.0/smokeys?key=" + apiKey, data => {
       debug("Loaded instances from API:", data);
       data.items.forEach(smokey => {
         addData(smokey, getDot(smokey));

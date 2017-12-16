@@ -63,7 +63,7 @@
       api: {
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
-          url: 'https://metasmoke.erwaysoftware.com/api/'
+          url: 'https://metasmoke.erwaysoftware.com/api/v2.0/'
         },
         se: {
           key: 'NDllMffmzoX8A6RPHEPVXQ((', // This script's Stack Exchange API key
@@ -1411,7 +1411,7 @@
 
         $.ajax({
           type: 'POST',
-          url: `${ms.url}w/post/${data.id}/feedback`,
+          url: `${ms.url}feedbacks/post/${data.id}/create`,
           data: {type: msVerdict, key: ms.key, token}
         })
         .done(() => {
