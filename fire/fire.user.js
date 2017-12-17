@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.21
+// @version     1.0.22
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -63,7 +63,8 @@
       api: {
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
-          url: 'https://metasmoke.erwaysoftware.com/api/v2.0/'
+          url: 'https://metasmoke.erwaysoftware.com/api/v2.0/',
+          urlV1: 'https://metasmoke.erwaysoftware.com/api/'
         },
         se: {
           key: 'NDllMffmzoX8A6RPHEPVXQ((', // This script's Stack Exchange API key
@@ -175,7 +176,7 @@
    */
   function getDataForUrl(reportedUrl, callback) {
     const {ms} = fire.api;
-    const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${reportedUrl}`;
+    const url = `${ms.url}posts/urls?key=${ms.key}&filter=IGLOGHLGHHMNGHKJNMJGMFGJFOGMML&page=1&urls=${reportedUrl}`;
     $.get(url)
       .done(data => {
         if (data && data.items) {
@@ -183,8 +184,11 @@
             toastr.info(`No metasmoke reports found for url:<br />${reportedUrl}`);
             return;
           }
-
-          callback(data.items[0]);
+          const feedbacksUrl = `${ms.url}feedbacks/post/${data.items[0].id}?key=${ms.key}&filter=JJLFFNFONIHIHMJFJJFLGJJKFOMOLFNGNKOJMKKIMOHF&page=1`;
+          $.get(feedbacksUrl).done(feedbacks => {
+            data.items[0].feedbacks = feedbacks.items;
+            callback(data.items[0]);
+          });
         }
       })
       .fail(
@@ -206,7 +210,7 @@
    * @returns {boolean}      `true` if the current user is found in the flag list.
    */
   function listHasCurrentUser(flags) {
-    return flags &&
+    return flags && Array.isArray(flags.users) &&
       flags.users.some(({username}) => username === fire.chatUser.name);
   }
 
@@ -242,15 +246,24 @@
       .join(',');
 
     const {ms} = fire.api;
-    const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${urls}`;
+    const url = `${ms.url}posts/urls?key=${ms.key}&filter=IGLOGHLGHHMNGHKJNMJGMFGJFOGMML&page=1&urls=${urls}`;
     $.get(url, response => {
       fire.log('Report cache updated:', response);
       if (response && response.items) {
         if (response.items.length <= 0)
           toastr.info('No metasmoke reports found.');
-
+        const itemsById = {};
         for (const item of response.items)
-          parseDataForReport(item, false, null, true);
+          itemsById[item.id] = item;
+        // May need to handle the posibility that there will be multiple pages
+        const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=JJLFFNFONIHIHMJFJJFLGJJKFOMOLFNGNKOJMKKIMOHF`;
+        $.get(feedbacksUrl).done(feedbacks => {
+          // Add the feedbacks to each main item.
+          for (const feedback of feedbacks.items)
+            itemsById[feedback.id] = feedback;
+          for (const item of response.items)
+            parseDataForReport(item, false, null, true);
+        });
       }
     });
   }
@@ -276,9 +289,13 @@
     data.has_manual_flagged = listHasCurrentUser(data.manual_flags);
     data.has_flagged = data.has_auto_flagged || data.has_manual_flagged;
 
-    data.has_sent_feedback = data.feedbacks.some( // Feedback has been sent already
-      ({user_name}) => user_name === fire.chatUser.name
-    );
+    if (Array.isArray(data.feedbacks)) { // Has feedback
+      data.has_sent_feedback = data.feedbacks.some( // Feedback has been sent already
+        ({user_name}) => user_name === fire.chatUser.name
+      );
+    } else {
+      data.has_sent_feedback = false;
+    }
 
     const match = data.link.match(/.*\/(\d+)/);
     if (match && match[1])
@@ -1411,7 +1428,7 @@
 
         $.ajax({
           type: 'POST',
-          url: `${ms.url}feedbacks/post/${data.id}/create`,
+          url: `${ms.urlV1}w/post/${data.id}/feedback`, // V2.0 appears broken at this time. Using V1.
           data: {type: msVerdict, key: ms.key, token}
         })
         .done(() => {
@@ -1476,7 +1493,7 @@
     } else {
       $.ajax({
         type: 'POST',
-        url: `${url}w/post/${data.id}/spam_flag`,
+        url: `${url}posts/${data.id}/flag`,
         data: {key, token}
       })
       .done(response => {
@@ -1507,7 +1524,12 @@
           fire.error('Not write-authenticated', data, jqXHR);
         } else {
           if (jqXHR.responseText) {
-            const response = JSON.parse(jqXHR.responseText);
+            let response;
+            try {
+              response = JSON.parse(jqXHR.responseText);
+            } catch (err) {
+              response = {message: jqXHR.responseText};
+            }
 
             if (response.message === 'Spam flag option not present') {
               toastr.info('This post could not be flagged.<br />' +
