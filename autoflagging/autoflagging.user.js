@@ -408,7 +408,7 @@
         // Show spinner
         if (url !== null) {
           if (urls !== "") {
-            urls += "%3B";
+            urls += ",";
           }
           autoflagging.addSpinnerToMessage($(this));
           urls += url;

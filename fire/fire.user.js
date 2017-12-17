@@ -239,7 +239,7 @@
       .map((index, element) => $(element).data('url'))
       .toArray()
       .filter(url => !fire.reportCache[url]) // Only get un-cached reports
-      .join(encodeURIComponent(';'));
+      .join(',');
 
     const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&page=1&urls=${urls}`;
