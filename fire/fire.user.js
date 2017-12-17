@@ -64,7 +64,7 @@
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
           url: 'https://metasmoke.erwaysoftware.com/api/v2.0/',
-          urlV1: 'https://metasmoke.erwaysoftware.com/api/',
+          urlV1: 'https://metasmoke.erwaysoftware.com/api/'
         },
         se: {
           key: 'NDllMffmzoX8A6RPHEPVXQ((', // This script's Stack Exchange API key
@@ -252,20 +252,17 @@
       if (response && response.items) {
         if (response.items.length <= 0)
           toastr.info('No metasmoke reports found.');
-        var itemsById = {};
-        for (const item of response.items) {
-            itemsById[item.id] = item;
-        }
-        //Need to handle the posibility that there will be multiple pages
+        const itemsById = {};
+        for (const item of response.items)
+          itemsById[item.id] = item;
+        // May need to handle the posibility that there will be multiple pages
         const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=JJLFFNFONIHIHMJFJJFLGJJKFOMOLFNGNKOJMKKIMOHF`;
         $.get(feedbacksUrl).done(feedbacks => {
-          //Add the feedbacks to each main item.
-          for (const feedback of feedbacks.items) {
-              itemsById[feedback.id] = feedback;
-          }
-          for (const item of response.items) {
+          // Add the feedbacks to each main item.
+          for (const feedback of feedbacks.items)
+            itemsById[feedback.id] = feedback;
+          for (const item of response.items)
             parseDataForReport(item, false, null, true);
-          }
         });
       }
     });
@@ -1431,7 +1428,7 @@
 
         $.ajax({
           type: 'POST',
-          url: `${ms.urlV1}w/post/${data.id}/feedback`, //V2.0 appears broken at this time. Using V1.
+          url: `${ms.urlV1}w/post/${data.id}/feedback`, // V2.0 appears broken at this time. Using V1.
           data: {type: msVerdict, key: ms.key, token}
         })
         .done(() => {
@@ -1530,7 +1527,7 @@
             let response;
             try {
               response = JSON.parse(jqXHR.responseText);
-            } catch (e) {
+            } catch (err) {
               response = {message: jqXHR.responseText};
             }
 
