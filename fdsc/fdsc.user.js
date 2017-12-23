@@ -6,8 +6,9 @@
 // @contributor angussidney
 // @contributor rene
 // @contributor J F
+// @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.14.2
+// @version     1.15
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -300,10 +301,11 @@
                 url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls",
                 data: {
                   urls: fdsc.constructUrl(container),
+                  filter: "GKNJKLILHNFMJLFKINGJJHJOLGFHJF",
                   key: fdsc.metasmokeKey
                 }
-              }).done(function (data) {
-                data = data.items;
+              }).done(function (data_) {
+                data_ = data_.items;
 
                 function registerFeedbackButton(buttonSelector, feedback, logMessage) {
                   $(buttonSelector).on("click", function (ev) {
@@ -321,58 +323,78 @@
                   });
                 }
 
-                if (data.length > 0 && data[0].id) {
-                  $(nodeEvent.target).attr("data-fdsc-ms-id", data[0].id);
+                if (data_.length > 0 && data_[0].id) {
+                  $(nodeEvent.target).attr("data-fdsc-ms-id", data_[0].id);
                   fdsc.postFound = true;
-                  var isAutoflagged = data[0].autoflagged.flagged === true;
+                  var isAutoflagged = data_[0].autoflagged.flagged === true;
                   var isFlagged = $(".popup .already-flagged").length > 0;
-
                   if (isAutoflagged) {
                     fdsc.autoflagged = "autoflagged";
                   } else {
                     fdsc.autoflagged = "not autoflagged";
                   }
-                  var tps = data[0].count_tp;
-                  var fps = data[0].count_fp;
-                  var naa = data[0].count_naa;
-                  var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
-                  var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
-                  var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
-                  var writeTokenButton = false;
+                  
+                  // Retrieve feedback
+                  $.get("https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/" + data_[0].id + 
+                        "?key=" + fdsc.metasmokeKey, function (data) {
+                    console.log(data);
+                    // Determine # of feedbacks for each type
+                    var tps = 0;
+                    var fps = 0;
+                    var naa = 0;
+                    for (var i = 0; i < data.items.length; i++) {
+                      switch (data.items[0].feedback_type.charAt(0)) {
+                        case "t":
+                          tps++;
+                          break;
+                        case "f":
+                          fps++;
+                          break;
+                        case "n":
+                          naa++;
+                          break;
+                      }
+                    }                    
+                    
+                    var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
+                    var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
+                    var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
+                    var writeTokenButton = false;
 
-                  if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
-                    status += " - <a href='#' id='get-write-token'>get write token</a></div>";
-                    writeTokenButton = true;
-                  }
+                    if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
+                      status += " - <a href='#' id='get-write-token'>get write token</a></div>";
+                      writeTokenButton = true;
+                    }
 
-                  if (isFlagged || isAutoflagged) {
-                    status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
-                  }
+                    if (isFlagged || isAutoflagged) {
+                      status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
+                    }
 
-                  if (tps === 0) {
-                    status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a></div>";
-                  } else {
-                    // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
-                    // Hence, do not display the false positive button
-                    status += "</div>";
-                  }
-                  $(".popup-actions").prepend(status);
-                  // On click of the false positive button
-                  registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
-                  // On click of the confirm autoflag
-                  registerFeedbackButton("#autoflag-tp", "tpu-", "Reporting as true positive");
+                    if (tps === 0) {
+                      status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a></div>";
+                    } else {
+                      // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
+                      // Hence, do not display the false positive button
+                      status += "</div>";
+                    }
+                    $(".popup-actions").prepend(status);
+                    // On click of the false positive button
+                    registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
+                    // On click of the confirm autoflag
+                    registerFeedbackButton("#autoflag-tp", "tpu-", "Reporting as true positive");
 
-                  if (writeTokenButton) {
-                    $("#get-write-token").on("click", function (ev) {
-                      ev.preventDefault();
-                      fdsc.getWriteToken(false, function () {
-                        debug("click event", clickEvent);
+                    if (writeTokenButton) {
+                      $("#get-write-token").on("click", function (ev) {
+                        ev.preventDefault();
+                        fdsc.getWriteToken(false, function () {
+                          debug("click event", clickEvent);
 
-                        $(".popup-close a").click();
-                        $(clickEvent.currentTarget).click();
-                      }); // Add a "Get write token" link.
-                    });
-                  }
+                          $(".popup-close a").click();
+                          $(clickEvent.currentTarget).click();
+                        }); // Add a "Get write token" link.
+                      });
+                    }
+                  });                  
                 } else {
                   fdsc.postFound = false;
                 }

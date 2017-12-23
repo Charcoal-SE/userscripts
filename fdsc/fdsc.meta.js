@@ -6,8 +6,9 @@
 // @contributor angussidney
 // @contributor rene
 // @contributor J F
+// @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.14.2
+// @version     1.15
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
