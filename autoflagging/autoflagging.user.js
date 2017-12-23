@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.16.1
+// @version     0.17
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -59,7 +59,8 @@
   };
   autoflagging.smokeyID = autoflagging.smokeyIds[location.host];
   autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
-  autoflagging.baseURL = "https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls?key=" + autoflagging.key;
+  autoflagging.apiURL = "https://metasmoke.erwaysoftware.com/api/v2.0";
+  autoflagging.baseURL = autoflagging.apiURL + "/posts/urls?filter=GMNHLIKKJKKGMKJFMJIMGHNHJILFOL&key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u(sers)?\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
   autoflagging.hasMoreRegex = /\+\d+ more \(\d+\)/;
@@ -366,15 +367,52 @@
 
       // Loop over all Smokey reports and decorate them
       $(autoflagging.selector).each(function () {
+        var $element = $(this);
         var postURL = autoflagging.getPostURL(this);
-        if (typeof autoflagData[postURL] == "undefined") {
+        var postData = autoflagData[postURL];
+        if (typeof postData == "undefined") {
           return;
         }
-        autoflagging.decorateMessage($(this), autoflagData[postURL]);
         // Post deleted?
-        if (autoflagData[postURL].deleted_at != null) {
+        if (postData.deleted_at != null) {
           $(this).find(".content").toggleClass("ai-deleted");
         }
+
+        if (postData.autoflagged === true) {
+          // Get flagging data
+          url = autoflagging.apiURL + "/posts/" + postData.id + "/flags?key=" + autoflagging.key;
+          debug("URL:", url);
+          $.get(url, function (flaggingData) {
+            autoflagging.decorateMessage($element, flaggingData.items[0]);
+          }).fail(function (xhr) {
+            autoflagging.notify("Failed to load data:", xhr);
+          });
+        } else {
+          // No autoflags
+          autoflagging.decorateMessage($element, {autoflagged: {flagged: false, users: []}});
+        }
+
+        // Get feedback
+        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HOHLOMHNFMIFMGJJHNMIHLKLIFHIHNKFOMJJMLKOOHOL&key=" + autoflagging.key;
+        debug("URL:", url);
+        $.get(url, function (feedbackData) {
+          autoflagging.decorateMessage($element, {feedbacks: feedbackData.items});
+        }).fail(function (xhr) {
+          autoflagging.notify("Failed to load data:", xhr);
+        });
+
+        // Get weight
+        url = autoflagging.apiURL + "/posts/" + postData.id + "/reasons?key=" + autoflagging.key;
+        debug("URL:", url);
+        $.get(url, function (reasonsData) {
+          var totalWeight = 0;
+          for (var i = 0; i < reasonsData.items.length; i++) {
+            totalWeight += reasonsData.items[i].weight;
+          }
+          autoflagging.decorateMessage($element, {reason_weight: totalWeight});
+        }).fail(function (xhr) {
+          autoflagging.notify("Failed to load data:", xhr);
+        });
       });
 
       if (data.has_more) {
@@ -435,7 +473,7 @@
           var url = autoflagging.getPostURL(this);
           if (url !== null) {
             if (urls !== "") {
-              urls += "%3B";
+              urls += ",";
             }
             autoflagging.addSpinnerToMessage($(this));
             urls += url;
