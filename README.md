@@ -6,7 +6,6 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
 ## Quick download links
 
  - [Flag Dialog Smokey Controls (FDSC)](https://github.com/Charcoal-SE/Userscripts/raw/master/fdsc/fdsc.user.js) ([Instructions](https://github.com/Charcoal-SE/Userscripts/wiki/FDSC))
- - [Gas Mask](https://github.com/Charcoal-SE/Userscripts/raw/master/gas-mask-se/gas-mask-se.user.js)
  - [Dark Theme for metasmoke](https://github.com/Charcoal-SE/Userscripts/blob/master/ms-dark-theme/ms_dark_theme.user.js)
  - [Hide topbar ads](https://github.com/Charcoal-SE/Userscripts/raw/master/hideads/hideads.user.js)
  - [Autoflagging information for Charcoal HQ (AIM)](https://github.com/Charcoal-SE/Userscripts/raw/master/autoflagging/autoflagging.user.js)
