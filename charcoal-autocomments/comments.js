@@ -3,7 +3,7 @@ callback(
   [
     {
       name: "[Q,A] Vandalism",
-      description: "Please do not vandalise your posts. Once you have submitted a post, you have licensed the content to the $SITENAME$ community at large (under the CC BY-SA license)."
+      description: "Please do not vandalise your posts. Once you have submitted a post, you have licensed the content to the $SITENAME$ community at large ([under the CC BY-SA license](https://creativecommons.org/licenses/by-sa/3.0/)). By SE policy, any vandalism will be reverted."
     },
     {
       name: "[Q,A] Rude",
