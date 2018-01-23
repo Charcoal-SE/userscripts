@@ -333,9 +333,9 @@
                   } else {
                     fdsc.autoflagged = "not autoflagged";
                   }
-                  
+
                   // Retrieve feedback
-                  $.get("https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/" + data_[0].id + 
+                  $.get("https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/" + data_[0].id +
                         "?key=" + fdsc.metasmokeKey, function (data) {
                     console.log(data);
                     // Determine # of feedbacks for each type
@@ -353,9 +353,11 @@
                         case "n":
                           naa++;
                           break;
+                        default:
+                          break;
                       }
-                    }                    
-                    
+                    }
+
                     var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
                     var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
                     var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: <span style='color:darkgreen'>" + tps + " tp</span>, <span style='color:red'>" + fps + " fp</span>, <span style='color:#7c5500'>" + naa + " naa</span>, " + fdsc.autoflagged + "</strong>";
@@ -394,7 +396,7 @@
                         }); // Add a "Get write token" link.
                       });
                     }
-                  });                  
+                  });
                 } else {
                   fdsc.postFound = false;
                 }
