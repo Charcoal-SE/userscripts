@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.17
+// @version     0.18
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -64,6 +64,7 @@
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u(sers)?\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
   autoflagging.hasMoreRegex = /\+\d+ more \(\d+\)/;
+  autoflagging.hasNotificationRegex = /<\/code> \(@.*\)$/;
 
   // Error handling
   autoflagging.notify = Notifier().notify; // eslint-disable-line new-cap
@@ -81,6 +82,10 @@
 
     autoflagging.decorate($message.children(".ai-information"), data);
     autoflagging.decorate($message.find(".meta .ai-information"), data);
+
+    // Remove @ notifications
+    var content = $message.find(".content").html().replace(autoflagging.hasNotificationRegex, "");
+    $message.find(".content").html(content);
 
     autoflagging.getAllReasons($message, data);
   };
