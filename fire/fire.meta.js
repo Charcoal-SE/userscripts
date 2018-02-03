@@ -15,5 +15,6 @@
 // @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
 // @match       *://chat.stackexchange.com/rooms/201/*
 // @match       *://chat.stackexchange.com/rooms/3877/*
+// @match       *://chat.stackexchange.com/rooms/61165/*
 // @grant       none
 // ==/UserScript==
