@@ -72,10 +72,9 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
-|1.0.24 |Improved settings button rotation.
 |1.0.23 |Added the ["The Awkward Silence"](https://chat.stackexchange.com/rooms/61165/the-awkward-silence) room.
-|1.0.22 |SD API V2.0 bugfixed.
-|1.0.21 |SD API V2.0.
+|1.0.22 |SD API V2.0 bugfixed
+|1.0.21 |SD API V2.0
 |1.0.20 |Bugfix: FIRE crash on "SmokeDetector started" message.
 |1.0.19 |Build Validation fix.
 |1.0.18 |Bugfix: FireFox still has issues loading the current user.
