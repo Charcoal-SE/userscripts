@@ -7,8 +7,11 @@ Firstly, install the user script. Once you've done that, make sure you refresh t
 
 ## How can I change the sound?
 Click the 'SPAM' link on the right hand side of the room (as depicted below):
+
 ![SPAM link](spam.png)
+
 Then select an item from the drop down menu:
+
 ![SPAM dropdown](dropdown.png)
 
 ## Something wrong?
