@@ -38,7 +38,7 @@ var pingReportsOnly = true;
 // Regex for matching reports:
 var reportRegex = /\[ <a[^>]+>SmokeDetector<\/a> \| <a[^>]+>MS<\/a> ] /;
 
-$(document).ready(function() {
+$(document).ready(function () {
   // Add our function to the CHAT event handler:
   CHAT.addEventHandlerHook(chatMessageRecieved);
 
@@ -48,7 +48,7 @@ $(document).ready(function() {
 
   $("#jplayer").append("<audio id='jp_audio_clavinova' preload='metadata' src='https://adhenderson.co.uk/sounds/clavinova.mp3'></audio><audio id='jp_audio_vibraphone' preload='metadata' src='https://adhenderson.co.uk/sounds/vibraphone.mp3'></audio><audio id='jp_audio_piano' preload='metadata' src='https://adhenderson.co.uk/sounds/piano.mp3'></audio>");
 
-  $("#spamOptions").click(function() {
+  $("#spamOptions").click(function () {
     toggleSpamOptions();
   });
 });
@@ -94,10 +94,10 @@ function toggleSpamOptions() {
     var storedSound = JSON.parse(localStorage.getItem("SPAM-settings")).notificationSound;
     $("#" + storedSound + "Option").attr("selected", true);
 
-    $("#closeSpamOptions").click(function() {
+    $("#closeSpamOptions").click(function () {
       toggleSpamOptions();
     });
-    $("#spamSoundSelect").change(function() {
+    $("#spamSoundSelect").change(function () {
       playSpamSound(this.value);
       setSpamSound(this.value);
     });
