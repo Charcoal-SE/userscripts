@@ -9,13 +9,10 @@
 // @grant       none
 // ==/UserScript==
 
-// A list of IDs that can be chosen to follow:
-var henders = 2233391;
-
 // Set the constant by passing in an object and then selecting which key to use based on the current host:
 const smokeyID = {
-	'chat.stackexchange.com':120914,
-	'chat.stackoverflow.com':3735529,
+  'chat.stackexchange.com':120914,
+  'chat.stackoverflow.com':3735529,
 }[window.location.host];
 
 // If there is no sound set, set the default one:
@@ -26,13 +23,12 @@ if(localStorage.getItem('SPAM-settings') == null){
   };
   
   localStorage.setItem('SPAM-settings', JSON.stringify(defaultSpamSettings));
-  
 }
 
 /*
-    One day this will be selectable so you can choose which ID you want notifying about. 
+  One day this will be selectable so you can choose which ID you want notifying about. 
     
-    For example, this could equally ping you for FireAlarm, Queen etc... 
+  For example, this could equally ping you for FireAlarm, Queen etc... 
 */
 var userID = smokeyID;
 
@@ -54,65 +50,63 @@ $(document).ready(function(){
   $('#jplayer').append('<audio id="jp_audio_clavinova" preload="metadata" src="https://adhenderson.co.uk/sounds/clavinova.mp3"></audio><audio id="jp_audio_vibraphone" preload="metadata" src="https://adhenderson.co.uk/sounds/vibraphone.mp3"></audio><audio id="jp_audio_piano" preload="metadata" src="https://adhenderson.co.uk/sounds/piano.mp3"></audio>');
   
   $('#spamOptions').click(function(){
-     toggleSpamOptions();
+    toggleSpamOptions();
   });
-
 });
 /*
-    This function is called when a new chat event fires. 
-    
-        - Check that the event is of type 1 (message posted)
-        - Check the message is from userID specified
+  This function is called when a new chat event fires.     
+    - Check that the event is of type 1 (message posted)
+    - Check the message is from userID specified
 */
 function chatMessageRecieved({event_type, user_id, content}){
-    // First, check the event_type is 1 (message posted):
-    if(event_type != 1){
-        // It isn't a 'message posted' event:
-        return false;
-    }
+  // First, check the event_type is 1 (message posted):
+  if(event_type != 1){
+  // It isn't a 'message posted' event:
+    return false;
+  }
     
-    //Check the user_id the one we expect it to be:
-    if(userID == user_id){
-        // This is the id we were looking for (in most cases Smokey):
-        // Is reports only true?
-        if(pingReportsOnly){
-            // Only pinging for reports, attempt to match the report:
-            var matchResult = content.match(reportRegex);
+  //Check the user_id the one we expect it to be:
+  if(userID == user_id){
+    // This is the id we were looking for (in most cases Smokey):
+    // Is reports only true?
+    if(pingReportsOnly){
+      // Only pinging for reports, attempt to match the report:
+      var matchResult = content.match(reportRegex);
             
-            if(matchResult === null){
-                // No match for regex, return false:
-                return false;    
-            }
-        }
-        // Play the ping sound:
-        playSpamSound();
-        
+      if(matchResult === null){
+        // No match for regex, return false:
+        return false;    
+      }
     }
+    // Play the ping sound:
+    playSpamSound();   
+  }
 }
 
 /*
     This function shows / hides the spam settings menu.
 */
 function toggleSpamOptions(){
-    var spamOptionsMenu = "<div id='spamOptionsMenu' class='spamSettings'><div style='position: absolute; right: 10px;'><a id='closeSpamOptions' href='#' onclick='return false;'>Close</a></div><h2>Spam Options</h2><strong>Notification Sound</strong>:<div><select id='spamSoundSelect'><option id='defaultOption' class='SPAM-option' value='default'>Default</option><option id='pianoOption' class='SPAM-option' value='piano'>Piano</option><option id='clavinovaOption' class='SPAM-option' value='clavinova'>Clavinova</option><option id='vibraphoneOption' class='SPAM-option' value='vibraphone'>Vibraphone</option></select></div> </div>";
+  var spamOptionsMenu = "<div id='spamOptionsMenu' class='spamSettings'><div style='position: absolute; right: 10px;'><a id='closeSpamOptions' href='#' onclick='return false;'>Close</a></div><h2>Spam Options</h2><strong>Notification Sound</strong>:<div><select id='spamSoundSelect'><option id='defaultOption' class='SPAM-option' value='default'>Default</option><option id='pianoOption' class='SPAM-option' value='piano'>Piano</option><option id='clavinovaOption' class='SPAM-option' value='clavinova'>Clavinova</option><option id='vibraphoneOption' class='SPAM-option' value='vibraphone'>Vibraphone</option></select></div> </div>";
     
-    if($('#spamOptionsMenu').length < 1){
-      $('#spamOptions').after(spamOptionsMenu);
-      
-      var storedSound = JSON.parse(localStorage.getItem('SPAM-settings')).notificationSound;
-      $('#'+storedSound+'Option').attr('selected', true);
-      
-      $('#closeSpamOptions').click(function(){
-        toggleSpamOptions();
-      });
-      $('#spamSoundSelect').change(function(){
-        playSpamSound(this.value);
-        setSpamSound(this.value);
-      });
-    } else {
-     // Get rid of the menu if it already exists:
-     $('#spamOptionsMenu').remove();
-    }
+  if($('#spamOptionsMenu').length < 1){
+    $('#spamOptions').after(spamOptionsMenu);
+    
+    var storedSound = JSON.parse(localStorage.getItem('SPAM-settings')).notificationSound;
+    $('#'+storedSound+'Option').attr('selected', true);
+    
+    $('#closeSpamOptions').click(function(){
+      toggleSpamOptions();
+    });
+    $('#spamSoundSelect').change(function(){
+      playSpamSound(this.value);
+      setSpamSound(this.value);
+    });
+    
+  } else {
+    // Get rid of the menu if it already exists:
+    $('#spamOptionsMenu').remove();
+  }
 }
 
 function setSpamSound(sound){
@@ -125,7 +119,6 @@ function setSpamSound(sound){
 
   $('.SPAM-option').attr('selected', false);
   $('#'+sound+'Option').attr('selected', true);
-
 }
 
 function playSpamSound(sound){
@@ -145,6 +138,5 @@ function playSpamSound(sound){
   } else {
     // Play the sound specified:
     $('#'+soundMap[sound])[0].play();
-    
   }
 }
