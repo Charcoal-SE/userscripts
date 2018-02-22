@@ -1171,7 +1171,7 @@
 
     const versionLink = _('a', 'fire-version-link', {
       text: fire.metaData.version,
-      href: `{fire.metaData.downloadURL}?{new Date().getTime()}`,
+      href: `${fire.metaData.downloadURL}?${new Date().getTime()}`,
       target: '_self',
       title: 'Update'
     });
