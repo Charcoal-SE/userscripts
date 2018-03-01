@@ -7,7 +7,7 @@ callback(
     },
     {
       name: "[Q,A] Rude",
-      description: "**Warning - please do not use obscenities in your posts.** Note that other users may have flagged your post as **rude or abusive** leading to possible rep loss or suspension. Please [Be Nice](https://$SITEURL$/help/be-nice): *Avoid vulgar terms and anything sexually suggestive*"
+      description: "Please remember that we have a **[Be Nice](https://$SITEURL$/help/be-nice)** policy on $SITENAME$; this includes not using profanity or obscenities in your posts. In the future, please keep all posts profanity-free. In the meantime, I've edited this post to keep it in line with the policies. Thanks for understanding."
     },
     {
       name: "[A] No Disclosure",
