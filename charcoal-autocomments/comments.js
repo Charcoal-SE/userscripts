@@ -11,7 +11,7 @@ callback(
     },
     {
       name: "[A] No Disclosure",
-      description: "Please note if you want to promote your own product/blog you **must disclose your affiliation in the answer**, otherwise, your answer may be flagged as spam. If you are not affiliated with the site, I recommend you say so to prevent this. Please read [How to not be a spammer](https://$SITEURL$/help/promotion)"
+      description: "Hello, welcome to $SITENAME$! Please just note if you want to promote or recommend your own product/blog, there are some [guidelines in place](https://$SITEURL$/help/promotion) for doing so. Following them will help you avoid giving the impression that you're spamming. Could you please [edit] to explicitly state your affiliation? Thanks. (If you're not actually affiliated, it may be worth mentioning that as well.)"
     },
     {
       name: "[A] Nothing but a URL, and no disclosure",
