@@ -23,7 +23,7 @@ callback(
     },
     {
       name: "[Q,A] Repeated spamming of URL, with disclosure",
-      description: "Please read [How to not be a spammer](https://$SITEURL$/help/promotion)"
+      description: "I've noticed that you've linked to your own product/site several times in your answers now. Please just note if you want to promote or recommend your own product/blog, there are some [guidelines in place](https://$SITEURL$/help/promotion) for doing so. In particular, I'd like to call your attention to this line: \"Post good, relevant answers, and if some (**but not all**) happen to be about your product or website, that’s okay.\" Posting about other topics as well is a good way to avoid being mistaken for a spammer."
     },
     {
       name: "[A] Requests to OP for further information",
