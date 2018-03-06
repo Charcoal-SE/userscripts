@@ -10,12 +10,16 @@ callback(
       description: "Please remember that we have a **[Be Nice](https://$SITEURL$/help/be-nice)** policy on $SITENAME$; this includes not using profanity or obscenities in your posts. In the future, please keep all posts profanity-free. In the meantime, I've edited this post to keep it in line with the policies. Thanks for understanding."
     },
     {
+      name: "[Q,A] Rude - Not Edited",
+      description: "Please remember that we have a **[Be Nice](https://$SITEURL$/help/be-nice)** policy on $SITENAME$; this includes not using profanity or obscenities in your posts. In the future, please keep all posts profanity-free."
+    },
+    {
       name: "[A] No Disclosure",
-      description: "Hello, welcome to $SITENAME$! Please just note if you want to promote or recommend your own product/blog, there are some [guidelines in place](https://$SITEURL$/help/promotion) for doing so. Following them will help you avoid giving the impression that you're spamming. Could you please [edit] to explicitly state your affiliation? Thanks. (If you're not actually affiliated, it may be worth mentioning that as well.)"
+      description: "Please just note if you want to promote or recommend your own product/blog, there are some [guidelines in place](https://$SITEURL$/help/promotion) for doing so. Following them will help you avoid giving the impression that you're spamming. Could you please [edit] to explicitly state your affiliation? Thanks. (If you're not actually affiliated, it may be worth mentioning that as well.)"
     },
     {
       name: "[A] Nothing but a URL, and no disclosure",
-      description: "While this may theoretically answer the question, [it would be preferable](https://meta.stackexchange.com/questions/8231) to include the essential parts of the answer here and provide the link for reference. Also please note that if you want to promote your own product/blog you **must disclose your affiliation in the answer**, otherwise your answer may be flagged as spam. If you are not affiliated with the site, I recommend you say so to prevent this. Please read [How to not be a spammer](https://$SITEURL$/help/promotion)"
+      description: "While this may theoretically answer the question, [it would be preferable](https://meta.stackexchange.com/questions/8231) to include the essential parts of the answer here and provide the link for reference. Also please just note if you want to promote or recommend your own product/blog, there are some [guidelines in place](https://$SITEURL$/help/promotion) for doing so. Following them will help you avoid giving the impression that you're spamming. Could you please [edit] to explicitly state your affiliation? Thanks."
     },
     {
       name: "[A] Nothing but a URL and has disclosure",
