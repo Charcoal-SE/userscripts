@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        🔥 Feedback Instantly, Rapidly, Effortlessly
+// @name        🔥 FIRE: Feedback Instantly, Rapidly, Effortlessly
 // @namespace   https://github.com/Charcoal-SE/
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
