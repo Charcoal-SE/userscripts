@@ -6,6 +6,7 @@
 // @version     0.1.1
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
+// @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
 // @grant       none
 // ==/UserScript==
 
@@ -13,6 +14,7 @@
 const smokeyID = {
   "chat.stackexchange.com": 120914,
   "chat.stackoverflow.com": 3735529,
+  "chat.meta.stackexchange.com": 266345,
 }[window.location.host];
 
 // If there is no sound set, set the default one:
