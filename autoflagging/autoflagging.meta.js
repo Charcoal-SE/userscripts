@@ -17,6 +17,7 @@
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
 // @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
 // @match       *://chat.stackexchange.com/rooms/201/ask-ubuntu-general-room*
+// @match       *://chat.stackexchange.com/rooms/3877/raiders-of-the-lost-downboat*
 // @require     https://cdn.rawgit.com/joewalnes/reconnecting-websocket/fd7c819bb15eeee3452c17e317c0a3664c442965/reconnecting-websocket.min.js
 // @require     https://charcoal-se.org/userscripts/vendor/debug.min.js
 // @grant       none
