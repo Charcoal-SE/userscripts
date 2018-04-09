@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.20
+// @version     0.21
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -18,6 +18,7 @@
 // @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
 // @match       *://chat.stackexchange.com/rooms/201/ask-ubuntu-general-room*
 // @match       *://chat.stackexchange.com/rooms/3877/raiders-of-the-lost-downboat*
+// @match       *://chat.meta.stackexchange.com/rooms/1181/the-fire-department*
 // @require     https://cdn.rawgit.com/joewalnes/reconnecting-websocket/fd7c819bb15eeee3452c17e317c0a3664c442965/reconnecting-websocket.min.js
 // @require     https://charcoal-se.org/userscripts/vendor/debug.min.js
 // @grant       none
