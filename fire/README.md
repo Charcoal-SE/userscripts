@@ -72,6 +72,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.27 |Added the ["The Fire Department"](https://chat.meta.stackexchange.com/rooms/1181/the-fire-department) room.
 |1.0.26 |Bugfix: property escape `<link rel="stylesheet"`
 |1.0.25 |Added cache breaker to update link.
 |1.0.24 |Added FIRE icon to the userscript.
