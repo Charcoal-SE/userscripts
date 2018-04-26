@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.27
+// @version     1.0.28
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -740,18 +740,21 @@
 
       if (reportLink.length > 0) { // This is a report
         let reportedUrl;
+        let isReportedUrlValid = false;
 
-        if (urlOnReportLink)
-          reportedUrl = reportLink[0].href.split('url=').pop();
-        else if (reportLink.nextAll('a')[0])
+        if (urlOnReportLink) {
+          reportedUrl = reportLink[0].href.split('url=')[1]; // eslint-disable-line prefer-destructuring
+          isReportedUrlValid = Boolean(reportedUrl);
+        }
+        if ((!urlOnReportLink || !isReportedUrlValid) && reportLink.nextAll('a')[0]) {
           reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
-        else
-          return;
+          isReportedUrlValid = !(reportedUrl.startsWith('//github.com') ||
+            reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
+            reportedUrl.includes('/users/') ||
+            reportedUrl.includes('charcoal-se.org'));
+        }
 
-        if (reportedUrl.startsWith('//github.com') ||
-          reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
-          reportedUrl.includes('/users/') ||
-          reportedUrl.includes('charcoal-se.org'))
+        if (!isReportedUrlValid)
           return;
 
         const fireButton = _('span', 'fire-button', {
