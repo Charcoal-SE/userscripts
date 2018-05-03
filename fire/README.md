@@ -18,16 +18,16 @@ As of this moment, the userscript posts flags _and_ MS feedback.
   - The reported post's contents.
     - All links in a post will show their target url when you hover your mouse over them.
     - Code blocks in the post can be expanded by clicking on them.
-  - 4 feedback buttons.
-    - [tpu-], [tp-], [naa-], [fp-], for Spam, vandalism, NAA/VLQ, false postitive.
-    - These can be selected with <kbd>1</kbd>-<kbd>4</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
-    - The buttons can contain a number. This indicates how many users have sent that type of feedback.
-    - If the buttons are faded out, you've already sent feedback for this report, so you can't send feedback again.
+  - 5 feedback buttons.
+    - `[spam]`, `[rude]`, `[tp-]`, `[naa-]`, `[fp-]`, for spam, rude/abusive, vandalism, NAA/VLQ, false postitive.
+    - These can be selected with <kbd>1</kbd>-<kbd>5</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
+    - The buttons can contain a number in parentheses. This indicates how many users have sent that type of feedback.
   - A header for the post's site
-    - Clicking this header or pressing <kbd>5</kbd> will open the reported post on the site.
+    - Clicking this header or pressing <kbd>6</kbd> will open the reported post on the site.
   - A "Close" button.
-- When you submit `tpu-` feedback, the post will _also_ be flagged as "spam" on the SE network.
+- When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network (configurable setting).
   - Provided you [have authorized MetaSmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account.
+- `rude` feedbacks "tpu-", just like `spam`, but without casting any flags. The number of both kinds of feedback will be displayed in `spam`, as they're equal to MetaSmoke.
 - The popup modal's blur can be toggled with <kbd>B</kbd>
 - The popup be closed by pressing <kbd>Esc</kbd> or by clicking outside of the popup.
 
