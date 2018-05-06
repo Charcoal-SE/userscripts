@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.28
+// @version     1.0.29
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -179,7 +179,7 @@
    */
   function getDataForUrl(reportedUrl, callback) {
     const {ms} = fire.api;
-    const url = `${ms.url}posts/urls?key=${ms.key}&filter=IGLOGHLGHHMNGHKJNMJGMFGJFOGMML&page=1&urls=${reportedUrl}`;
+    const url = `${ms.url}posts/urls?key=${ms.key}&filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&page=1&urls=${reportedUrl}`;
     $.get(url)
       .done(data => {
         if (data && data.items) {
@@ -187,7 +187,7 @@
             toastr.info(`No metasmoke reports found for url:<br />${reportedUrl}`);
             return;
           }
-          const feedbacksUrl = `${ms.url}feedbacks/post/${data.items[0].id}?key=${ms.key}&filter=JJLFFNFONIHIHMJFJJFLGJJKFOMOLFNGNKOJMKKIMOHF&page=1`;
+          const feedbacksUrl = `${ms.url}feedbacks/post/${data.items[0].id}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&page=1`;
           $.get(feedbacksUrl).done(feedbacks => {
             data.items[0].feedbacks = feedbacks.items;
             callback(data.items[0]);
@@ -249,7 +249,7 @@
       .join(',');
 
     const {ms} = fire.api;
-    const url = `${ms.url}posts/urls?key=${ms.key}&filter=IGLOGHLGHHMNGHKJNMJGMFGJFOGMML&page=1&urls=${urls}`;
+    const url = `${ms.url}posts/urls?key=${ms.key}&filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&page=1&urls=${urls}`;
     $.get(url, response => {
       fire.log('Report cache updated:', response);
       if (response && response.items) {
@@ -259,7 +259,7 @@
         for (const item of response.items)
           itemsById[item.id] = item;
         // May need to handle the posibility that there will be multiple pages
-        const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=JJLFFNFONIHIHMJFJJFLGJJKFOMOLFNGNKOJMKKIMOHF`;
+        const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF`;
         $.get(feedbacksUrl).done(feedbacks => {
           // Add the feedbacks to each main item.
           for (const feedback of feedbacks.items)

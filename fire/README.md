@@ -72,6 +72,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.29 |Update MS API filters due to MS changes.
 |1.0.28 |Adapt to new SmokeDetector report URL format.
 |1.0.27 |Added the ["The Fire Department"](https://chat.meta.stackexchange.com/rooms/1181/the-fire-department) room.
 |1.0.26 |Bugfix: property escape `<link rel="stylesheet"`
