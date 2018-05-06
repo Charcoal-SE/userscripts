@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.21
+// @version     0.22
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -62,7 +62,7 @@
   autoflagging.smokeyID = autoflagging.smokeyIds[location.host];
   autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
   autoflagging.apiURL = "https://metasmoke.erwaysoftware.com/api/v2.0";
-  autoflagging.baseURL = autoflagging.apiURL + "/posts/urls?filter=GMNHLIKKJKKGMKJFMJIMGHNHJILFOL&key=" + autoflagging.key;
+  autoflagging.baseURL = autoflagging.apiURL + "/posts/urls?filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
   autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u(sers)?\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
   autoflagging.hasMoreRegex = /\+\d+ more \(\d+\)/;
@@ -402,7 +402,7 @@
         }
 
         // Get feedback
-        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HOHLOMHNFMIFMGJJHNMIHLKLIFHIHNKFOMJJMLKOOHOL&key=" + autoflagging.key;
+        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&key=" + autoflagging.key;
         debug("URL:", url);
         $.get(url, function (feedbackData) {
           autoflagging.decorateMessage($element, {feedbacks: feedbackData.items});
