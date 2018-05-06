@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.15
+// @version     1.16
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -301,7 +301,7 @@
                 url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls",
                 data: {
                   urls: fdsc.constructUrl(container),
-                  filter: "GKNJKLILHNFMJLFKINGJJHJOLGFHJF",
+                  filter: "HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ",
                   key: fdsc.metasmokeKey
                 }
               }).done(function (data_) {
