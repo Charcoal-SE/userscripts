@@ -7,7 +7,7 @@
 // @contributor angussidney
 // @contributor ArtOfCode
 // @contributor Cerbrus
-// @version     0.22
+// @version     0.23
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -91,12 +91,14 @@
       lastTextNode.parentNode.removeChild(lastTextNode);
     }
 
-    autoflagging.getAllReasons($message, data);
+    // Temporarily disabled following https://chat.stackexchange.com/transcript/message/44456641#44456641
+    // autoflagging.getAllReasons($message, data);
   };
 
   /*!
    * Extend a report message's reasons when the message was cropped.
    */
+  /* Temporarily disabled following https://chat.stackexchange.com/transcript/message/44456641#44456641
   autoflagging.getAllReasons = function ($message, data) {
     if (autoflagging.hasMoreRegex.test($message.html())) {
       $.get(
@@ -130,6 +132,7 @@
         });
     }
   };
+  */
 
   /*!
    * Adds the AIM information to the provided element.
