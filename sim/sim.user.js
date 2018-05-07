@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.0.1
+// @version      0.1.1
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @match       *://*.stackexchange.com/*
@@ -146,7 +146,7 @@
       const feedbacksJson = await feedbacksResp.json();
 
       const feedbacks = feedbacksJson.items;
-      const uniques = [...(new Set(feedbacks.map(f => f.feedback_type)))];
+      const uniques = [...(new Set(feedbacks.map(f => f.feedback_type.charAt(0))))];
       let fbType;
       if (uniques.length === 1) {
         fbType = feedbacks[0].feedback_type;
