@@ -13,6 +13,7 @@ A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.
  - [Feedback Instantly, Rapidly, Effortlessly (FIRE)](https://github.com/Charcoal-SE/Userscripts/raw/master/fire/fire.user.js)
  - [Automatically Enable Keyboard Shortcuts (AEKS)](https://github.com/Charcoal-SE/Userscripts/raw/master/aeks/aeks.user.js) ([Info](https://github.com/Charcoal-SE/userscripts/wiki/AEKS))
  - [Spam Tracker](https://github.com/Charcoal-SE/userscripts/blob/master/spamtracker/spamtracker.user.js)
+ - [SmokeDetector Info for Moderators (SIM)](https://github.com/Charcoal-SE/userscripts/blob/master/sim/sim.user.js)
 
 Other obselete/discontinued scripts are avaliable for download by clicking the 'Raw' button on their source code.
 
