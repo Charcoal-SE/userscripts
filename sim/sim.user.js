@@ -79,13 +79,13 @@
 
   const displayDialog = postData => {
     const container = $(`<div class="popup sim-popup"></div>`);
-    container.append(`<h2>This post was <strong>${!postData.caught ? 'not ' : ''}caught</strong> by SmokeDetector</h2>`);
+    container.append(`<h2>This post was <strong>${postData.caught ? '' : 'not '}caught</strong> by SmokeDetector</h2>`);
     if (postData.caught) {
       container.append(`<p>It was classified as <strong>${postData.feedback}</strong> by Charcoal volunteers.</p>`);
 
       const autoflags = $(`<div></div>`);
       autoflags.append(`<h2>Autoflags</h2>`);
-      autoflags.append(`<p>This post was <strong>${!postData.autoflagged ? 'not ' : ''} autoflagged</strong>.</p>`);
+      autoflags.append(`<p>This post was <strong>${postData.autoflagged ? '' : 'not '} autoflagged</strong>.</p>`);
       if (postData.autoflagged) {
         autoflags.append(`<p>Flags from the following users were used:</p>`);
         const users = $(`<ul></ul>`);
