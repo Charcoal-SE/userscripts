@@ -13,6 +13,7 @@
 // @include       *://*superuser.com/*
 // @include       *://*stackapps.com/*
 // @include       *://*askubuntu.com/*
+// @exclude       *://*stackoverflow.com/c/*
 // @version       1.3
 // ==/UserScript==
 
