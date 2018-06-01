@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.1.1
+// @version      0.2.1
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @match       *://*.stackexchange.com/*
@@ -81,6 +81,7 @@
     const container = $(`<div class="popup sim-popup"></div>`);
     container.append(`<h2>This post was <strong>${postData.caught ? '' : 'not '}caught</strong> by SmokeDetector</h2>`);
     if (postData.caught) {
+      container.append(`<p><a href="https://metasmoke.erwaysoftware.com/post/${postData.id}">metasmoke record</a></p>`);
       container.append(`<p>It was classified as <strong>${postData.feedback}</strong> by Charcoal volunteers.</p>`);
 
       const autoflags = $(`<div></div>`);
