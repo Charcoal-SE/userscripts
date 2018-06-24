@@ -23,10 +23,10 @@
 // @grant       none
 // ==/UserScript==
 
-(function () {
+(function() {
   "use strict";
 
-  const userscript = function ($) {
+  const userscript = function($) {
     function log(message) {
       if (console && console.log) {
         console.log(message);
@@ -37,7 +37,9 @@
 
     // AEKS has already ran on this site, or the user doesn't have an account here.
     if (!userLink || localStorage.aeksFinished) {
-      log("AEKS cancelled: User has no account or AEKS already finished on this site.");
+      log(
+        "AEKS cancelled: User has no account or AEKS already finished on this site."
+      );
       return;
     }
 
@@ -45,17 +47,13 @@
       {name: "fkey", value: localStorage["se:fkey"].split(",")[0]},
       {name: "key", value: "85"}, // 85 is the id for the keyboard shortcuts setting.
       {name: "value", value: "true"}, // Enable that setting
-      {name: "forUserId", value: userLink.match(/\d+/)[0]}
+      {name: "forUserId", value: userLink.match(/\d+/)[0]},
     ];
 
-    $.post(
-      "/users/save-preference",
-      params,
-      () => {
-        localStorage.aeksFinished = true;
-        log("AEKS finished on this site.");
-      }
-    );
+    $.post("/users/save-preference", params, () => {
+      localStorage.aeksFinished = true;
+      log("AEKS finished on this site.");
+    });
   };
 
   const aeksScript = document.createElement("script");

@@ -18,24 +18,33 @@
 // ==/UserScript==
 
 const style = document.createElement("style");
-style.textContent = ".post-text img:not(.gasmask-treated){visibility:hidden}" +
-                    ".post-text img{cursor:pointer}";
+style.textContent =
+  ".post-text img:not(.gasmask-treated){visibility:hidden}" +
+  ".post-text img{cursor:pointer}";
 document.head.appendChild(style);
 
 const timer = setInterval(() => {
   if (document.readyState === "complete") {
     clearInterval(timer);
   }
-  const newImgs = document.querySelectorAll(".post-text img:not(.gasmask-treating)");
+  const newImgs = document.querySelectorAll(
+    ".post-text img:not(.gasmask-treating)"
+  );
   [].forEach.call(newImgs, img => {
     let post = img;
-    while (!post.classList.contains("postcell") && !post.classList.contains("answercell")) {
+    while (
+      !post.classList.contains("postcell") &&
+      !post.classList.contains("answercell")
+    ) {
       post = post.parentElement;
     }
-    const repElem = post.querySelector(".post-signature:last-child .reputation-score");
+    const repElem = post.querySelector(
+      ".post-signature:last-child .reputation-score"
+    );
     if (repElem.textContent === "1") {
       const origSrc = img.src;
-      img.src = "https://upload.wikimedia.org/wikipedia/commons/5/57/Gas_mask.svg";
+      img.src =
+        "https://upload.wikimedia.org/wikipedia/commons/5/57/Gas_mask.svg";
       img.width = 200;
       img.addEventListener("click", function handler(event) {
         img.src = origSrc;

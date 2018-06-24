@@ -1,4 +1,4 @@
-(function (scope) {
+(function(scope) {
   "use strict";
   scope.emojiSupportChecker = true;
 
@@ -6,7 +6,7 @@
     // Detect Emoji support in this browser
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+    const smiley = String.fromCodePoint(0x1f604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
 
     ctx.textBaseline = "top";
     ctx.font = "32px Arial";
@@ -28,18 +28,19 @@
   // Returns the emoji if it's supported. Otherwise, return a fallback image.
   // usage: `emojiOrImage("🔥", "emoji-class-name", true)`
   // Returns a jQuery-wrapped text node or a jQuery-wrapped image.
-  scope.emojiOrImage = function (emoji, cssClass, large) {
+  scope.emojiOrImage = function(emoji, cssClass, large) {
     if (scope.hasEmojiSupport) {
       return $(document.createTextNode(emoji));
     }
 
-    const url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
+    const url =
+      "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
     const hex = emoji.codePointAt(0).toString(16);
 
     const emojiImage = $("<img/>", {
       class: cssClass + (large ? "-large" : ""),
       src: url + hex + ".png",
-      alt: emoji
+      alt: emoji,
     });
 
     return emojiImage;
