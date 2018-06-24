@@ -216,9 +216,9 @@
         break;
     }
     data.youFlagged =
-      data.users.filter(user => {
-        return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
-      }).length === 1;
+      data.users.filter(
+        user => user[site + "_chat_id"] === CHAT.CURRENT_USER_ID
+      ).length === 1;
 
     if ($autoflag.find(".ai-you-flagged").length === 0) {
       $autoflag.prepend(
@@ -237,9 +237,7 @@
       data.users.forEach(user => {
         uniqUsers[user.stackexchange_chat_id] = user;
       });
-      data.users = Object.keys(uniqUsers).map(key => {
-        return uniqUsers[key];
-      });
+      data.users = Object.keys(uniqUsers).map(key => uniqUsers[key]);
     }
     $autoflag.data("users", data.users);
 
@@ -261,11 +259,7 @@
         "title",
         data.flagged
           ? "Flagged by " +
-            data.users
-              .map(user => {
-                return user.username || user.user_name;
-              })
-              .join(", ")
+            data.users.map(user => user.username || user.user_name).join(", ")
           : "Not Autoflagged"
       );
     $autoflag.data("users", data.users);
@@ -311,9 +305,7 @@
     };
     for (const type in allFeedbacks) {
       if (hOP(allFeedbacks, type) && Array.isArray(allFeedbacks[type])) {
-        const users = allFeedbacks[type].map(user => {
-          return user.user_name;
-        });
+        const users = allFeedbacks[type].map(user => user.user_name);
 
         if (type.indexOf("t") !== -1) {
           simpleFeedbacks.k[type] = users;
@@ -353,12 +345,8 @@
     defaultKey
   ) {
     const count = Object.keys(items)
-      .map(key => {
-        return items[key].length;
-      })
-      .reduce((a, b) => {
-        return a + b;
-      }, 0);
+      .map(key => items[key].length)
+      .reduce((a, b) => a + b, 0);
     if (count) {
       const title = (items[defaultKey] || []).join(", ");
       let titles = Object.keys(items).map(key => {
@@ -368,9 +356,7 @@
         return key + ": " + items[key].join(", ");
       });
       titles.unshift(title);
-      titles = titles.filter(x => {
-        return x;
-      });
+      titles = titles.filter(x => x);
       $feedback.append(
         $("<span/>")
           .addClass("ai-feedback-info")

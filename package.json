@@ -29,6 +29,7 @@
       "jquery"
     ],
     "rules": {
+      "arrow-body-style": "error",
       "camelcase": 1,
       "no-prototype-builtins": 0,
       "dot-notation": 0,
