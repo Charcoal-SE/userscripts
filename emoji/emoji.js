@@ -4,9 +4,9 @@
 
   try {
     // Detect Emoji support in this browser
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    var smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const smiley = String.fromCodePoint(0x1F604); // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
 
     ctx.textBaseline = "top";
     ctx.font = "32px Arial";
@@ -17,7 +17,7 @@
   }
 
   if (!scope.hasEmojiSupport) {
-    var css = window.document.createElement("link");
+    const css = window.document.createElement("link");
     css.rel = "stylesheet";
     css.href = "https://charcoal-se.org/userscripts/emoji/emojifont.css";
     document.head.appendChild(css);
@@ -33,10 +33,10 @@
       return $(document.createTextNode(emoji));
     }
 
-    var url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
-    var hex = emoji.codePointAt(0).toString(16);
+    const url = "https://raw.githubusercontent.com/Ranks/emojione/master/assets/png/";
+    const hex = emoji.codePointAt(0).toString(16);
 
-    var emojiImage = $("<img/>", {
+    const emojiImage = $("<img/>", {
       class: cssClass + (large ? "-large" : ""),
       src: url + hex + ".png",
       alt: emoji

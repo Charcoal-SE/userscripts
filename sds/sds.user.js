@@ -134,10 +134,11 @@
   function prettyDate(date, formatShortDates) {
     // https://dev.stackoverflow.com/content/js/realtime-se.js
     if (typeof date == "string") {
+      // eslint-disable-next-line capitalized-comments
       // if (date == null || date.length !== 20) {
       //   return;
       // }
-      // // firefox requires ISO 8601 formated dates
+      // // Firefox requires ISO 8601 formated dates
       // date = date.substr(0, 10) + "T" + date.substr(11, 10);
       date = new Date(date);
     }
@@ -150,15 +151,16 @@
     }
 
     switch (true) {
-      case diff < 1: // used to be 2
+      case diff < 1: // Used to be 2
         return "just now";
-      case diff < 90:// used to be 60
+      case diff < 90: // Used to be 60
         return (formatShortDates ?
           n => n.seconds + "s ago" :
           n => n.seconds === 1 ? n.seconds + " sec ago" : n.seconds + " secs ago"
         )({
           seconds: Math.floor(diff)
         });
+      // eslint-disable-next-line capitalized-comments
       // case diff < 120:
       //   return formatShortDates ? "1m ago" : "1 min ago"
       case diff < 3600:
@@ -168,6 +170,7 @@
         )({
           minutes: Math.floor(diff / 60)
         });
+      // eslint-disable-next-line capitalized-comments
       // case diff < 7200:
       //   return formatShortDates ? "1h ago" : "1 hour ago"
       case diff < 86400:

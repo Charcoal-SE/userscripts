@@ -39,7 +39,7 @@
   debug("started");
 
   // Inject CSS
-  var css = window.document.createElement("link");
+  const css = window.document.createElement("link");
   css.rel = "stylesheet";
   css.href = "//charcoal-se.org/userscripts/autoflagging/autoflagging.css";
   document.head.appendChild(css);
@@ -52,15 +52,15 @@
   }
 
   // Constants
-  var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
+  const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
   window.autoflagging = {};
-  autoflagging.smokeyIds = { // this is Smokey's user ID for each supported domain
+  autoflagging.smokeyIds = { // This is Smokey's user ID for each supported domain
     "chat.stackexchange.com": 120914,
     "chat.stackoverflow.com": 3735529,
     "chat.meta.stackexchange.com": 266345,
   };
   autoflagging.smokeyID = autoflagging.smokeyIds[location.host];
-  autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // this script's MetaSmoke API key
+  autoflagging.key = "d897aa9f315174f081309cef13dfd7caa4ddfec1c2f8641204506636751392a4"; // This script's MetaSmoke API key
   autoflagging.apiURL = "https://metasmoke.erwaysoftware.com/api/v2.0";
   autoflagging.baseURL = autoflagging.apiURL + "/posts/urls?filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
@@ -86,7 +86,7 @@
     autoflagging.decorate($message.find(".meta .ai-information"), data);
 
     // Remove @ notifications
-    var lastTextNode = $message.find(".content").get(0).lastChild;
+    const lastTextNode = $message.find(".content").get(0).lastChild;
     if (autoflagging.hasNotificationRegex.test(lastTextNode.nodeValue)) {
       lastTextNode.parentNode.removeChild(lastTextNode);
     }
@@ -143,7 +143,7 @@
     $element.find(".ai-spinner").remove();
     $element.addClass("ai-loaded");
 
-    var names = {
+    const names = {
       before: "prepend",
       after: "append"
     };
@@ -151,8 +151,8 @@
     // The decorate operation consists currently of two parts:
     // - autoflag
     // - feedback
-    Object.keys(autoflagging.decorate).forEach(function (key) {
-      var f = autoflagging.decorate[key];
+    Object.keys(autoflagging.decorate).forEach(key => {
+      const f = autoflagging.decorate[key];
       if ($element.find(".ai-" + key).length === 0) {
         $element[names[f.location]]($("<" + (f.el || "span") + "/>").addClass("ai-" + key));
       }
@@ -188,7 +188,7 @@
    */
   autoflagging.decorate.autoflag = function ($autoflag, data, post) {
     // Determine if you (i.e. the current user) autoflagged this post.
-    var site = "";
+    let site = "";
     switch (location.hostname) {
       case "chat.stackexchange.com":
         site = "stackexchange";
@@ -203,7 +203,7 @@
         console.error("Invalid site for autoflagging: " + location.hostname);
         break;
     }
-    data.youFlagged = data.users.filter(function (user) {
+    data.youFlagged = data.users.filter(user => {
       return user[site + "_chat_id"] === CHAT.CURRENT_USER_ID;
     }).length === 1;
 
@@ -216,11 +216,11 @@
 
     if ($autoflag.data("users")) {
       data.users = $autoflag.data("users").concat(data.users);
-      var uniqUsers = {};
-      data.users.forEach(function (user) {
+      const uniqUsers = {};
+      data.users.forEach(user => {
         uniqUsers[user.stackexchange_chat_id] = user;
       });
-      data.users = Object.keys(uniqUsers).map(function (key) {
+      data.users = Object.keys(uniqUsers).map(key => {
         return uniqUsers[key];
       });
     }
@@ -232,13 +232,13 @@
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
     $autoflag.find(".ai-flag-count")
-             .text(data.flagged ? String(data.users.length) : "")
-             .toggleClass("ai-not-autoflagged", !data.flagged)
-             .attr("title", data.flagged ?
-               "Flagged by " + data.users.map(function (user) {
-                 return user.username || user.user_name;
-               }).join(", ") :
-               "Not Autoflagged");
+      .text(data.flagged ? String(data.users.length) : "")
+      .toggleClass("ai-not-autoflagged", !data.flagged)
+      .attr("title", data.flagged ?
+        "Flagged by " + data.users.map(user => {
+          return user.username || user.user_name;
+        }).join(", ") :
+        "Not Autoflagged");
     $autoflag.data("users", data.users);
   };
   autoflagging.decorate.autoflag.key = "autoflagged";
@@ -257,7 +257,7 @@
    * Adds feedback information to a feedback DOM element.
    */
   autoflagging.decorate.feedback = function ($feedback, data) {
-    data.forEach(function (item) {
+    data.forEach(item => {
       autoflagging.decorate.feedback._each($feedback, item);
     });
   };
@@ -269,18 +269,18 @@
    */
   autoflagging.decorate.feedback._each = function ($feedback, data) {
     // Group feedback by type
-    var allFeedbacks = $feedback.data("feedbacks") || {};
+    const allFeedbacks = $feedback.data("feedbacks") || {};
     allFeedbacks[data.feedback_type] = (allFeedbacks[data.feedback_type] || []).concat(data);
     $feedback.data("feedbacks", allFeedbacks);
 
-    var simpleFeedbacks = {
+    const simpleFeedbacks = {
       k: {},
       f: {},
       n: {}
     };
-    for (var type in allFeedbacks) {
-      if (hOP(allFeedbacks, type) && allFeedbacks[type] instanceof Array) {
-        var users = allFeedbacks[type].map(function (user) {
+    for (const type in allFeedbacks) {
+      if (hOP(allFeedbacks, type) && Array.isArray(allFeedbacks[type])) {
+        const users = allFeedbacks[type].map(user => {
           return user.user_name;
         });
 
@@ -305,24 +305,24 @@
    * Adds feedback of one type (tpu-, naa-, fp-) to a feedback DOM element.
    */
   autoflagging.decorate.feedback.addFeedback = function (items, $feedback, defaultKey) {
-    var count = Object.keys(items)
-                      .map(function (key) {
-                        return items[key].length;
-                      })
-                      .reduce(function (a, b) {
-                        return a + b;
-                      }, 0);
+    const count = Object.keys(items)
+      .map(key => {
+        return items[key].length;
+      })
+      .reduce((a, b) => {
+        return a + b;
+      }, 0);
     if (count) {
-      var title = (items[defaultKey] || []).join(", ");
-      var titles = Object.keys(items)
-                         .map(function (key) {
-                           if (key.replace(/-$/, "") === defaultKey.replace(/-$/, "")) {
-                             return undefined;
-                           }
-                           return key + ": " + items[key].join(", ");
-                         });
+      const title = (items[defaultKey] || []).join(", ");
+      let titles = Object.keys(items)
+        .map(key => {
+          if (key.replace(/-$/, "") === defaultKey.replace(/-$/, "")) {
+            return undefined;
+          }
+          return key + ": " + items[key].join(", ");
+        });
       titles.unshift(title);
-      titles = titles.filter(function (x) {
+      titles = titles.filter(x => {
         return x;
       });
       $feedback.append(
@@ -352,7 +352,7 @@
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
     if ($element.parent().children(":first-child").hasClass("timestamp") && $element.is(":nth-child(2)")) {
-      // don’t overlap the timestamp
+      // Don’t overlap the timestamp
       $element.css({
         clear: "both"
       });
@@ -368,20 +368,20 @@
     if (page == null) {
       page = 1;
     }
-    var autoflagData = {};
-    var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
+    const autoflagData = {};
+    let url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
     debug("URL:", url);
-    $.get(url, function (data) {
+    $.get(url, data => {
       // Group information by link
-      for (var i = 0; i < data.items.length; i++) {
+      for (let i = 0; i < data.items.length; i++) {
         autoflagData[data.items[i].link] = data.items[i];
       }
 
       // Loop over all Smokey reports and decorate them
       $(autoflagging.selector).each(function () {
-        var $element = $(this);
-        var postURL = autoflagging.getPostURL(this);
-        var postData = autoflagData[postURL];
+        const $element = $(this);
+        const postURL = autoflagging.getPostURL(this);
+        const postData = autoflagData[postURL];
         if (typeof postData == "undefined") {
           return;
         }
@@ -394,9 +394,9 @@
           // Get flagging data
           url = autoflagging.apiURL + "/posts/" + postData.id + "/flags?key=" + autoflagging.key;
           debug("URL:", url);
-          $.get(url, function (flaggingData) {
+          $.get(url, flaggingData => {
             autoflagging.decorateMessage($element, flaggingData.items[0]);
-          }).fail(function (xhr) {
+          }).fail(xhr => {
             autoflagging.notify("Failed to load data:", xhr);
           });
         } else {
@@ -407,22 +407,22 @@
         // Get feedback
         url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&key=" + autoflagging.key;
         debug("URL:", url);
-        $.get(url, function (feedbackData) {
+        $.get(url, feedbackData => {
           autoflagging.decorateMessage($element, {feedbacks: feedbackData.items});
-        }).fail(function (xhr) {
+        }).fail(xhr => {
           autoflagging.notify("Failed to load data:", xhr);
         });
 
         // Get weight
         url = autoflagging.apiURL + "/posts/" + postData.id + "/reasons?key=" + autoflagging.key;
         debug("URL:", url);
-        $.get(url, function (reasonsData) {
-          var totalWeight = 0;
-          for (var i = 0; i < reasonsData.items.length; i++) {
+        $.get(url, reasonsData => {
+          let totalWeight = 0;
+          for (let i = 0; i < reasonsData.items.length; i++) {
             totalWeight += reasonsData.items[i].weight;
           }
           autoflagging.decorateMessage($element, {reason_weight: totalWeight});
-        }).fail(function (xhr) {
+        }).fail(xhr => {
           autoflagging.notify("Failed to load data:", xhr);
         });
       });
@@ -431,7 +431,7 @@
         // There are more items on the next 'page'
         autoflagging.callAPI(urls, ++page);
       }
-    }).fail(function (xhr) {
+    }).fail(xhr => {
       autoflagging.notify("Failed to load data:", xhr);
     });
   };
@@ -440,21 +440,21 @@
    * Returns the post URL in a Smokey report message (if there is any).
    */
   autoflagging.getPostURL = function (selector) {
-    var matches = autoflagging.messageRegex.exec($(selector).html());
+    const matches = autoflagging.messageRegex.exec($(selector).html());
     return matches && matches[2];
   };
 
   // Wait for the chat messages to be loaded.
-  var chat = $("#chat");
-  chat.on("DOMSubtreeModified", function () {
+  const chat = $("#chat");
+  chat.on("DOMSubtreeModified", () => {
     if (chat.html().length !== 0) {
       // Chat messages loaded
       chat.off("DOMSubtreeModified");
 
       // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
-      var urls = "";
+      let urls = "";
       $(autoflagging.selector).each(function () {
-        var url = autoflagging.getPostURL(this);
+        const url = autoflagging.getPostURL(this);
         // Show spinner
         if (url !== null) {
           if (urls !== "") {
@@ -474,15 +474,15 @@
 
   // Add autoflagging information to older messages as they are loaded
   $("#getmore, #getmore-mine").click(function () {
-    $(this).one("DOMSubtreeModified", function () {
+    $(this).one("DOMSubtreeModified", () => {
       // We need another timeout here, because the first modification occurs before
       // the new (old) chat messages are loaded.
-      setTimeout(function () {
-        var urls = "";
+      setTimeout(() => {
+        let urls = "";
         $(autoflagging.selector).filter(function () {
           return !$(this).find(".ai-information").length;
         }).each(function () {
-          var url = autoflagging.getPostURL(this);
+          const url = autoflagging.getPostURL(this);
           if (url !== null) {
             if (urls !== "") {
               urls += ",";
@@ -500,7 +500,7 @@
   // Listen to MS events
   autoflagging.msgQueue = [];
   autoflagging.socket = new ReconnectingWebSocket("wss://metasmoke.erwaysoftware.com/cable");
-  autoflagging.socket.onmessage = function (message) {
+  autoflagging.socket.addEventListener("message", message => {
     function decorate(selector, data) {
       (function _deco() {
         debug.decorate("Attempting to decorate \"" + selector + "\" with", data, "message:", $(selector).parents(".message"));
@@ -515,7 +515,7 @@
     }
 
     // Parse message
-    var jsonData = JSON.parse(message.data);
+    const jsonData = JSON.parse(message.data);
     switch (jsonData.type) {
       case "confirm_subscription":
       case "ping":
@@ -524,39 +524,36 @@
       default: {
         // Analyze socket message
         debug.ws("got message", jsonData.message);
-        var flagLog = jsonData.message.flag_log;
-        var deletionLog = jsonData.message.deletion_log;
-        var feedback = jsonData.message.feedback;
-        var notFlagged = jsonData.message.not_flagged;
+        const {flag_log: flagLog, deletion_log: deletionLog, feedback, not_flagged: notFlagged} = jsonData.message;
         if (typeof flagLog != "undefined") {
           // Autoflagging information
           debug.ws(flagLog.user, "autoflagged", flagLog.post);
-          let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
+          const selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
           decorate(selector, flagLog.post);
         } else if (typeof deletionLog != "undefined") {
           // Deletion log
           debug.ws("deleted:", deletionLog);
-          let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
+          const selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
           $(selector).parents(".content").addClass("ai-deleted");
         } else if (typeof feedback != "undefined") {
           // Feedback
-          debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // feedback_type
-          let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
+          debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // Feedback_type
+          const selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
           decorate(selector, {
             feedbacks: [feedback]
           });
         } else if (typeof notFlagged != "undefined") {
           // Not flagged
           debug.ws(notFlagged.post, "not flagged");
-          let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
+          const selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
           decorate(selector, notFlagged.post);
         }
         break;
       }
     }
-  };
+  });
 
-  autoflagging.socket.onopen = function () {
+  autoflagging.socket.addEventListener("open", () => {
     debug.ws("WebSocket opened.");
     // Send authentication
     autoflagging.socket.send(JSON.stringify({
@@ -566,7 +563,7 @@
       }),
       command: "subscribe"
     }));
-  };
+  });
   autoflagging.socket.onclose = function (close) {
     debug.ws("WebSocket closed:", close);
   };
@@ -575,19 +572,18 @@
   // The code below makes sure the queued decorations are executed.
   CHAT.addEventHandlerHook(function (e) {
     if (e.event_type === 1 && e.user_id === autoflagging.smokeyID) {
-      var self = this;
-      setTimeout(function () {
-        var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
+      const self = this;
+      setTimeout((...args) => {
+        const matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
         if (!matches) {
           return;
         }
 
         // Resolve queue
-        var q = autoflagging.msgQueue;
+        const q = autoflagging.msgQueue;
         autoflagging.msgQueue = [];
-        var args = arguments;
-        q.forEach(function (f) {
-          setTimeout(function () {
+        q.forEach(f => {
+          setTimeout(() => {
             debug.queue("Resolving queue:", f, args);
             f.apply(self, args);
           }, 100);

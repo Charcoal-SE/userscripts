@@ -26,14 +26,14 @@
 (function () {
   "use strict";
 
-  var userscript = function ($) {
+  const userscript = function ($) {
     function log(message) {
       if (console && console.log) {
         console.log(message);
       }
     }
 
-    var userLink = $(".my-profile, .profile-me").attr("href");
+    const userLink = $(".my-profile, .profile-me").attr("href");
 
     // AEKS has already ran on this site, or the user doesn't have an account here.
     if (!userLink || localStorage.aeksFinished) {
@@ -41,9 +41,9 @@
       return;
     }
 
-    var params = [
+    const params = [
       {name: "fkey", value: localStorage["se:fkey"].split(",")[0]},
-      {name: "key", value: "85"},     // 85 is the id for the keyboard shortcuts setting.
+      {name: "key", value: "85"}, // 85 is the id for the keyboard shortcuts setting.
       {name: "value", value: "true"}, // Enable that setting
       {name: "forUserId", value: userLink.match(/\d+/)[0]}
     ];
@@ -51,14 +51,14 @@
     $.post(
       "/users/save-preference",
       params,
-      function () {
+      () => {
         localStorage.aeksFinished = true;
         log("AEKS finished on this site.");
       }
     );
   };
 
-  var aeksScript = document.createElement("script");
+  const aeksScript = document.createElement("script");
   aeksScript.type = "application/javascript";
   aeksScript.text = "(" + userscript + ")(jQuery);";
   document.body.appendChild(aeksScript);
