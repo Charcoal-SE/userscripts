@@ -64,7 +64,7 @@
   autoflagging.apiURL = "https://metasmoke.erwaysoftware.com/api/v2.0";
   autoflagging.baseURL = autoflagging.apiURL + "/posts/urls?filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
-  autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a> by (?:<a href="[^"]+\/u(sers)?\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
+  autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\):)? <a href="([^"]+)">(.+?)<\/a>.* by (?:<a href="[^"]+\/u(sers)?\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
   autoflagging.hasMoreRegex = /\+\d+ more \(\d+\)/;
   autoflagging.hasNotificationRegex = /^ \(@.*\)$/;
 
