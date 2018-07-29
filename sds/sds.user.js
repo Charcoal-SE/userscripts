@@ -17,8 +17,11 @@
 // ==/UserScript==
 /* global unsafeWindow */
 
-(function () {
-  const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
+(function() {
+  const createDebug =
+    typeof unsafeWindow === "undefined"
+      ? window.debug
+      : unsafeWindow.debug || window.debug;
   const debug = createDebug("sds");
   debug.ping = createDebug("sds:ping");
   // Inject CSS
@@ -27,58 +30,66 @@
   css.href = "https://charcoal-se.org/userscripts/sds/sds.css";
   document.head.appendChild(css);
 
-  const apiKey = "05f3eb1fb4edd821e32299f5b2e65f78bc53ed4fa0415b034d0e84b4e273329e";
+  const apiKey =
+    "05f3eb1fb4edd821e32299f5b2e65f78bc53ed4fa0415b034d0e84b4e273329e";
 
   const ActionCable = window.actioncable;
-  const cable = ActionCable.createConsumer("wss://metasmoke.erwaysoftware.com/cable");
+  const cable = ActionCable.createConsumer(
+    "wss://metasmoke.erwaysoftware.com/cable"
+  );
   const $sds = $("<div />").addClass("sds-container");
   const $pings = $("<div />").addClass("pings-container");
-  $sds.append(
-    $("<span />")
-      .attr("data-tooltip", "SmokeDetector Status")
-      .append(
-        $("<img />").attr({
-          src: "https://i.stack.imgur.com/WyV1l.png?s=32&g=1",
-        })
-      )
-  ).append($pings);
+  $sds
+    .append(
+      $("<span />")
+        .attr("data-tooltip", "SmokeDetector Status")
+        .append(
+          $("<img />").attr({
+            src: "https://i.stack.imgur.com/WyV1l.png?s=32&g=1",
+          })
+        )
+    )
+    .append($pings);
   $("#roomtitle,#rooms-dropdown").after($sds);
 
   loadPings();
-  cable.subscriptions.create({
-    channel: "ApiChannel",
-    key: apiKey,
-    events: "smoke_detectors"
-  }, {
-    connected() {
-      debug("WebSocket connected");
-      loadPings();
+  cable.subscriptions.create(
+    {
+      channel: "ApiChannel",
+      key: apiKey,
+      events: "smoke_detectors",
     },
-    received({event_type: eventType, event_class: eventClass, object}) {
-      switch (eventClass) {
-        case "SmokeDetector":
-          switch (eventType) {
-            case "update": {
-              debug.ping(object);
-              const $dot = getDot(object);
-              const $ping = $dot.find(".ping");
-              $ping.removeClass("ping-pulse");
-              requestAnimationFrame(() => $ping.addClass("ping-pulse"));
-              addData(object, $dot);
-              updatePing($dot);
-              break;
+    {
+      connected() {
+        debug("WebSocket connected");
+        loadPings();
+      },
+      received({event_type: eventType, event_class: eventClass, object}) {
+        switch (eventClass) {
+          case "SmokeDetector":
+            switch (eventType) {
+              case "update": {
+                debug.ping(object);
+                const $dot = getDot(object);
+                const $ping = $dot.find(".ping");
+                $ping.removeClass("ping-pulse");
+                requestAnimationFrame(() => $ping.addClass("ping-pulse"));
+                addData(object, $dot);
+                updatePing($dot);
+                break;
+              }
+              default:
+                debug(`igoring ${eventClass}#${eventType}:`, object);
             }
-            default:
-              debug(`igoring ${eventClass}#${eventType}:`, object);
-          }
-          break;
-        default:
-          debug(`igoring ${eventClass}#${eventType}:`, object);
-      }
+            break;
+          default:
+            debug(`igoring ${eventClass}#${eventType}:`, object);
+        }
+      },
     }
-  });
+  );
   setInterval(() => {
-    $(".pings-container .smokey").each(function () {
+    $(".pings-container .smokey").each(function() {
       updatePing($(this));
     });
   }, 1000);
@@ -98,11 +109,13 @@
     $dot.toggleClass("smokey-standby", smokey.is_standby);
   }
 
-  const colorClasses = "green/yellow/red/dead".split("/").map(color => `smokey-${color}`);
+  const colorClasses = "green/yellow/red/dead"
+    .split("/")
+    .map(color => `smokey-${color}`);
   function updatePing($dot) {
     let diff = Number(new Date()) - new Date($dot.attr("data-last-ping"));
     diff /= 1000;
-    const color = (function () {
+    const color = (function() {
       switch (true) {
         case diff < 90:
           return "smokey-green";
@@ -118,31 +131,40 @@
     toRemove.splice(colorClasses.indexOf(color), 1);
     $dot.removeClass(toRemove.join(" "));
     $dot.addClass(color);
-    $dot.attr("data-tooltip", $dot.attr("data-location") + " • " + prettyDate($dot.attr("data-last-ping"), true));
+    $dot.attr(
+      "data-tooltip",
+      $dot.attr("data-location") +
+        " • " +
+        prettyDate($dot.attr("data-last-ping"), true)
+    );
   }
 
   function loadPings() {
     debug("Loading instances...");
-    $.get("https://metasmoke.erwaysoftware.com/api/v2.0/smokeys?key=" + apiKey, data => {
-      debug("Loaded instances from API:", data);
-      data.items.forEach(smokey => {
-        addData(smokey, getDot(smokey));
-      });
-    });
+    $.get(
+      "https://metasmoke.erwaysoftware.com/api/v2.0/smokeys?key=" + apiKey,
+      data => {
+        debug("Loaded instances from API:", data);
+        data.items.forEach(smokey => {
+          addData(smokey, getDot(smokey));
+        });
+      }
+    );
   }
 
   function prettyDate(date, formatShortDates) {
     // https://dev.stackoverflow.com/content/js/realtime-se.js
     if (typeof date == "string") {
+      // eslint-disable-next-line capitalized-comments
       // if (date == null || date.length !== 20) {
       //   return;
       // }
-      // // firefox requires ISO 8601 formated dates
+      // // Firefox requires ISO 8601 formated dates
       // date = date.substr(0, 10) + "T" + date.substr(11, 10);
       date = new Date(date);
     }
 
-    const diff = (((new Date()).getTime() - date.getTime()) / 1000);
+    const diff = (new Date().getTime() - date.getTime()) / 1000;
     const dayDiff = Math.floor(diff / 86400);
 
     if (isNaN(dayDiff) || dayDiff < 0 || dayDiff >= 31) {
@@ -150,32 +172,38 @@
     }
 
     switch (true) {
-      case diff < 1: // used to be 2
+      case diff < 1: // Used to be 2
         return "just now";
-      case diff < 90:// used to be 60
-        return (formatShortDates ?
-          n => n.seconds + "s ago" :
-          n => n.seconds === 1 ? n.seconds + " sec ago" : n.seconds + " secs ago"
-        )({
-          seconds: Math.floor(diff)
+      case diff < 90: // Used to be 60
+        return (formatShortDates
+          ? n => n.seconds + "s ago"
+          : n =>
+              n.seconds === 1
+                ? n.seconds + " sec ago"
+                : n.seconds + " secs ago")({
+          seconds: Math.floor(diff),
         });
+      // eslint-disable-next-line capitalized-comments
       // case diff < 120:
       //   return formatShortDates ? "1m ago" : "1 min ago"
       case diff < 3600:
-        return (formatShortDates ?
-          n => n.minutes + "m ago" :
-          n => n.minutes === 1 ? n.minutes + " min ago" : n.minutes + " mins ago"
-        )({
-          minutes: Math.floor(diff / 60)
+        return (formatShortDates
+          ? n => n.minutes + "m ago"
+          : n =>
+              n.minutes === 1
+                ? n.minutes + " min ago"
+                : n.minutes + " mins ago")({
+          minutes: Math.floor(diff / 60),
         });
+      // eslint-disable-next-line capitalized-comments
       // case diff < 7200:
       //   return formatShortDates ? "1h ago" : "1 hour ago"
       case diff < 86400:
-        return (formatShortDates ?
-          n => n.hours + "h ago" :
-          n => n.hours === 1 ? n.hours + " hour ago" : n.hours + " hours ago"
-        )({
-          hours: Math.floor(diff / 3600)
+        return (formatShortDates
+          ? n => n.hours + "h ago"
+          : n =>
+              n.hours === 1 ? n.hours + " hour ago" : n.hours + " hours ago")({
+          hours: Math.floor(diff / 3600),
         });
       default:
         return "> 1 day ago";

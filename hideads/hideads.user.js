@@ -21,10 +21,11 @@
 // ==/UserScript==
 
 console.log("Hide ads");
-var link = window.document.createElement("link");
+const link = window.document.createElement("link");
 link.rel = "stylesheet";
 link.type = "text/css";
-link.href = "data:text/css," +
-            // Selectors start here
-            ".adzerk-vote { display: none; }";
+link.href =
+  "data:text/css," +
+  // Selectors start here
+  ".adzerk-vote { display: none; }";
 document.getElementsByTagName("HEAD")[0].appendChild(link);
