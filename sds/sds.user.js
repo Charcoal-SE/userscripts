@@ -3,7 +3,7 @@
 // @namespace   https://github.com/Charcoal-SE/
 // @description Show the status of all SmokeDetector instances
 // @author      J F
-// @version     0.0.6
+// @version     0.0.7
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/sds/sds.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -38,7 +38,7 @@
       .attr("data-tooltip", "SmokeDetector Status")
       .append(
         $("<img />").attr({
-          src: "https://i.stack.imgur.com/WyV1l.png?s=32&g=1",
+          src: "https://i.stack.imgur.com/7cmCt.png?s=32&g=1",
         })
       )
   ).append($pings);
