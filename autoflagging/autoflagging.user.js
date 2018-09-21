@@ -125,7 +125,7 @@
   autoflagging.getAllReasons = function ($message, data) {
     if (autoflagging.hasMoreRegex.test($message.html())) {
       $.get(
-        "https://metasmoke.erwaysoftware.com/api/v2.0/post/" + data.id + "/reasons",
+        "https://metasmoke.erwaysoftware.com/api/v2.0/post/" + data.id + "/reasons?per_page=30",
         {key: autoflagging.key},
         function (response) {
           if (response && response.items) {
@@ -408,6 +408,8 @@
       page = 1;
     }
     var autoflagData = {};
+    // With a large value of per_page this can timeout the request. 20 appeared to work here, but 30 got timeouts.
+    //  IMO, it's better to leave this as the default 10, rather than risk timeouts.
     var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
     debug("URL:", url);
     $.get(url, function (data) {
@@ -444,7 +446,7 @@
         }
 
         // Get feedback
-        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&key=" + autoflagging.key;
+        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&key=" + autoflagging.key + "&per_page=20";
         debug("URL:", url);
         $.get(url, function (feedbackData) {
           autoflagging.decorateMessage($element, {feedbacks: feedbackData.items});
@@ -453,7 +455,7 @@
         });
 
         // Get weight
-        url = autoflagging.apiURL + "/posts/" + postData.id + "/reasons?key=" + autoflagging.key;
+        url = autoflagging.apiURL + "/posts/" + postData.id + "/reasons?key=" + autoflagging.key + "&per_page=30";
         debug("URL:", url);
         $.get(url, function (reasonsData) {
           var totalWeight = 0;
