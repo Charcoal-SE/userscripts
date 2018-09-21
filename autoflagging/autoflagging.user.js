@@ -8,7 +8,7 @@
 // @contributor ArtOfCode
 // @contributor Cerbrus
 // @contributor Makyen
-// @version     0.24
+// @version     0.25
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -32,6 +32,7 @@
 // @match       *://chat.stackexchange.com/rooms/38932/*
 // @match       *://chat.stackexchange.com/rooms/47869/*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
+// @match       *://chat.stackexchange.com/rooms/58631/*
 // @match       *://chat.stackexchange.com/rooms/59281/*
 // @match       *://chat.stackexchange.com/rooms/61165/*
 // @match       *://chat.stackexchange.com/rooms/65945/*
@@ -124,7 +125,7 @@
   autoflagging.getAllReasons = function ($message, data) {
     if (autoflagging.hasMoreRegex.test($message.html())) {
       $.get(
-        "https://metasmoke.erwaysoftware.com/api/v2.0/post/" + data.id + "/reasons",
+        "https://metasmoke.erwaysoftware.com/api/v2.0/post/" + data.id + "/reasons?per_page=30",
         {key: autoflagging.key},
         function (response) {
           if (response && response.items) {
@@ -292,6 +293,22 @@
   autoflagging.decorate.feedback._each = function ($feedback, data) {
     // Group feedback by type
     var allFeedbacks = $feedback.data("feedbacks") || {};
+    // Don't show multiple feedbacks by the same user. New feedbacks override old feedbacks.
+    //   Unfortunately, MS only sends the user_name with WebScocket feedbacks, which makes
+    //   this incorrect if there is an actual duplicate username.
+    //   In addition, it is possible, under some conditions, for MS to have more than one
+    //   feedback from the same user, which this will hide.
+    const currentUsername = data.user_name;
+    Object.keys(allFeedbacks).forEach(function (feedbackType) {
+      if (Array.isArray(allFeedbacks[feedbackType])) {
+        allFeedbacks[feedbackType] = allFeedbacks[feedbackType].filter(function (testFeedback) {
+          return testFeedback.user_name !== currentUsername;
+        });
+        if (allFeedbacks[feedbackType].length === 0) {
+          delete allFeedbacks[feedbackType];
+        }
+      }
+    });
     allFeedbacks[data.feedback_type] = (allFeedbacks[data.feedback_type] || []).concat(data);
     $feedback.data("feedbacks", allFeedbacks);
 
@@ -391,6 +408,8 @@
       page = 1;
     }
     var autoflagData = {};
+    // With a large value of per_page this can timeout the request. 20 appeared to work here, but 30 got timeouts.
+    //  IMO, it's better to leave this as the default 10, rather than risk timeouts.
     var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
     debug("URL:", url);
     $.get(url, function (data) {
@@ -419,7 +438,7 @@
           $.get(url, function (flaggingData) {
             autoflagging.decorateMessage($element, flaggingData.items[0]);
           }).fail(function (xhr) {
-            autoflagging.notify("Failed to load data:", xhr);
+            autoflagging.notify("AIM: Failed to load MS flag data:", xhr);
           });
         } else {
           // No autoflags
@@ -427,16 +446,16 @@
         }
 
         // Get feedback
-        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&key=" + autoflagging.key;
+        url = autoflagging.apiURL + "/feedbacks/post/" + postData.id + "?filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&key=" + autoflagging.key + "&per_page=20";
         debug("URL:", url);
         $.get(url, function (feedbackData) {
           autoflagging.decorateMessage($element, {feedbacks: feedbackData.items});
         }).fail(function (xhr) {
-          autoflagging.notify("Failed to load data:", xhr);
+          autoflagging.notify("AIM: Failed to load MS feedback data:", xhr);
         });
 
         // Get weight
-        url = autoflagging.apiURL + "/posts/" + postData.id + "/reasons?key=" + autoflagging.key;
+        url = autoflagging.apiURL + "/posts/" + postData.id + "/reasons?key=" + autoflagging.key + "&per_page=30";
         debug("URL:", url);
         $.get(url, function (reasonsData) {
           var totalWeight = 0;
@@ -445,7 +464,7 @@
           }
           autoflagging.decorateMessage($element, {reason_weight: totalWeight});
         }).fail(function (xhr) {
-          autoflagging.notify("Failed to load data:", xhr);
+          autoflagging.notify("AIM: Failed to load MS reason data:", xhr);
         });
       });
 
@@ -454,7 +473,7 @@
         autoflagging.callAPI(urls, ++page);
       }
     }).fail(function (xhr) {
-      autoflagging.notify("Failed to load data:", xhr);
+      autoflagging.notify("AIM: Failed to load MS post data:", xhr);
     });
   };
 

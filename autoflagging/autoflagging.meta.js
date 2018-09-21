@@ -8,7 +8,7 @@
 // @contributor ArtOfCode
 // @contributor Cerbrus
 // @contributor Makyen
-// @version     0.24
+// @version     0.25
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -32,6 +32,7 @@
 // @match       *://chat.stackexchange.com/rooms/38932/*
 // @match       *://chat.stackexchange.com/rooms/47869/*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
+// @match       *://chat.stackexchange.com/rooms/58631/*
 // @match       *://chat.stackexchange.com/rooms/59281/*
 // @match       *://chat.stackexchange.com/rooms/61165/*
 // @match       *://chat.stackexchange.com/rooms/65945/*
