@@ -435,7 +435,7 @@
           $.get(url, function (flaggingData) {
             autoflagging.decorateMessage($element, flaggingData.items[0]);
           }).fail(function (xhr) {
-            autoflagging.notify("Failed to load data:", xhr);
+            autoflagging.notify("AIM: Failed to load MS flag data:", xhr);
           });
         } else {
           // No autoflags
@@ -448,7 +448,7 @@
         $.get(url, function (feedbackData) {
           autoflagging.decorateMessage($element, {feedbacks: feedbackData.items});
         }).fail(function (xhr) {
-          autoflagging.notify("Failed to load data:", xhr);
+          autoflagging.notify("AIM: Failed to load MS feedback data:", xhr);
         });
 
         // Get weight
@@ -461,7 +461,7 @@
           }
           autoflagging.decorateMessage($element, {reason_weight: totalWeight});
         }).fail(function (xhr) {
-          autoflagging.notify("Failed to load data:", xhr);
+          autoflagging.notify("AIM: Failed to load MS reason data:", xhr);
         });
       });
 
@@ -470,7 +470,7 @@
         autoflagging.callAPI(urls, ++page);
       }
     }).fail(function (xhr) {
-      autoflagging.notify("Failed to load data:", xhr);
+      autoflagging.notify("AIM: Failed to load MS post data:", xhr);
     });
   };
 
