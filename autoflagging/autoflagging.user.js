@@ -292,6 +292,22 @@
   autoflagging.decorate.feedback._each = function ($feedback, data) {
     // Group feedback by type
     var allFeedbacks = $feedback.data("feedbacks") || {};
+    // Don't show multiple feedbacks by the same user. New feedbacks override old feedbacks.
+    //   Unfortunately, MS only sends the user_name with WebScocket feedbacks, which makes
+    //   this incorrect if there is an actual duplicate username.
+    //   In addition, it is possible, under some conditions, for MS to have more than one
+    //   feedback from the same user, which this will hide.
+    const currentUsername = data.user_name;
+    Object.keys(allFeedbacks).forEach(function (feedbackType) {
+      if (Array.isArray(allFeedbacks[feedbackType])) {
+        allFeedbacks[feedbackType] = allFeedbacks[feedbackType].filter(function (testFeedback) {
+          return testFeedback.user_name !== currentUsername;
+        });
+        if (allFeedbacks[feedbackType].length === 0) {
+          delete allFeedbacks[feedbackType];
+        }
+      }
+    });
     allFeedbacks[data.feedback_type] = (allFeedbacks[data.feedback_type] || []).concat(data);
     $feedback.data("feedbacks", allFeedbacks);
 
