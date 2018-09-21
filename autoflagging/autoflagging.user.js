@@ -32,6 +32,7 @@
 // @match       *://chat.stackexchange.com/rooms/38932/*
 // @match       *://chat.stackexchange.com/rooms/47869/*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
+// @match       *://chat.stackexchange.com/rooms/58631/*
 // @match       *://chat.stackexchange.com/rooms/59281/*
 // @match       *://chat.stackexchange.com/rooms/61165/*
 // @match       *://chat.stackexchange.com/rooms/65945/*
