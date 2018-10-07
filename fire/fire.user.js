@@ -1175,7 +1175,7 @@
       .append(
         _('div', {
           'fire-tooltip': emojiOrImage('clipboard')
-            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\nReason weight: ${d.reason_weight}\n\n${d.why}`)
+            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${d.why}`)
             .html()
         })
         .append(_('h2', 'fire-post-title')
