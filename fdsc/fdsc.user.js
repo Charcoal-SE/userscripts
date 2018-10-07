@@ -360,21 +360,21 @@
 
                     var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
                     var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
-					
+
                     var isAnswer = $(".popup-actions").parents(".answer").length !== 0;
-					
-                    //Build status
+
+                    // Build status
                     var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: ";
                     status += "<span style='color:darkgreen'>" + tps + " tp</span>, ";
                     status += "<span style='color:red'>" + fps + " fp</span>, ";
-                    
-                    //Don't add naa if the dialog opened for a question
-                    if (!isQuestion) {
-                    	status += "<span style='color:#7c5500'>" + naa + " naa</span>, ";
+
+                    // Don't add naa if the dialog opened for a question
+                    if (isAnswer) {
+                        status += "<span style='color:#7c5500'>" + naa + " naa</span>, ";
                     }
-                    
+
                     status += fdsc.autoflagged + "</strong>";
-                                   
+
                     var writeTokenButton = false;
 
                     if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
