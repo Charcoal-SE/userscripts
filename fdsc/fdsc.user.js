@@ -370,7 +370,7 @@
 
                     // Don't add naa if the dialog opened for a question
                     if (isAnswer) {
-                        status += "<span style='color:#7c5500'>" + naa + " naa</span>, ";
+                      status += "<span style='color:#7c5500'>" + naa + " naa</span>, ";
                     }
 
                     status += fdsc.autoflagged + "</strong>";
