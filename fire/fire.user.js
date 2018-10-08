@@ -905,6 +905,19 @@
   }
 
   /**
+   * stopPropagationIfTargetBody - If the target of the event is the body, then stop propagation.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param {object} event     An event
+   */
+  function stopPropagationIfTargetBody(event) {
+    if (event.target === document.body)
+      event.stopPropagation();
+  }
+
+  /**
    * keyboardShortcuts - Handle keypress events for the popup.
    *
    * @private
@@ -1242,6 +1255,7 @@
         '.fire-popup-body pre',
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
+    document.addEventListener('keypress', stopPropagationIfTargetBody, true);
   }
 
   /**
@@ -1404,6 +1418,7 @@
       $(document)
         .off('keydown', keyboardShortcuts)
         .off('click', '.fire-popup-body pre');
+      document.removeEventListener('keypress', stopPropagationIfTargetBody, true);
 
       $('#container').removeClass('fire-blur');
 
