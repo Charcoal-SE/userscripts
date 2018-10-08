@@ -72,6 +72,7 @@ To open the reported post on it's site:
 
 |1.0    ||
 | ---   |---
+|1.0.32 |Bugfix: Escape image tags in code blocks
 |1.0.31 |Remove display of weight. Adjust probably deleted detection when flagging via MS. Keypress block (again).
 |1.0.30 |Prevent keypress from affecting chat input when the popup is open. Add chat rooms.
 |1.0.29 |Update MS API filters due to MS changes.
