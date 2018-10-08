@@ -1566,7 +1566,7 @@
               response = {message: jqXHR.responseText};
             }
 
-            if (response.message === 'Spam flag option not present') {
+            if (response.message === 'Flag option not present') {
               toastr.info('This post could not be flagged.<br />' +
                 'It is probably deleted already.');
               closePopup();
