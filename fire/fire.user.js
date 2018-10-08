@@ -1967,8 +1967,8 @@
    * @memberof module:fire
    */
   function registerOpenLastReportKey() {
-    $(document).on('keydown', ({keyCode, ctrlKey}) => {
-      if (keyCode === fire.constants.keys.space && ctrlKey) {
+    $(document).on('keydown', ({keyCode, ctrlKey, altKey, metaKey, shiftKey}) => {
+      if (keyCode === fire.constants.keys.space && ctrlKey && !altKey && !metaKey && !shiftKey) {
         const button = $('.fire-button').last(); // .content:not(.ai-deleted)
         if (button && button.length > 0)
           loadDataForReport.call(button, true);
