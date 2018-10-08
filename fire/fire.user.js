@@ -905,6 +905,19 @@
   }
 
   /**
+   * stopPropagationIfTargetBody - If the target of the event is the body, then stop propagation.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param {object} event     An event
+   */
+  function stopPropagationIfTargetBody(event) {
+    if (event.target === document.body)
+      event.stopPropagation();
+  }
+
+  /**
    * keyboardShortcuts - Handle keypress events for the popup.
    *
    * @private
@@ -1176,7 +1189,7 @@
       .append(
         _('div', {
           'fire-tooltip': emojiOrImage('clipboard')
-            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\nReason weight: ${d.reason_weight}\n\n${d.why}`)
+            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${d.why}`)
             .html()
         })
         .append(_('h2', 'fire-post-title')
@@ -1243,6 +1256,7 @@
         '.fire-popup-body pre',
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
+    document.addEventListener('keypress', stopPropagationIfTargetBody, true);
   }
 
   /**
@@ -1405,6 +1419,7 @@
       $(document)
         .off('keydown', keyboardShortcuts)
         .off('click', '.fire-popup-body pre');
+      document.removeEventListener('keypress', stopPropagationIfTargetBody, true);
 
       $('#container').removeClass('fire-blur');
 
@@ -1567,7 +1582,7 @@
               response = {message: jqXHR.responseText};
             }
 
-            if (response.message === 'Spam flag option not present') {
+            if (response.message === 'Flag option not present') {
               toastr.info('This post could not be flagged.<br />' +
                 'It is probably deleted already.');
               closePopup();
