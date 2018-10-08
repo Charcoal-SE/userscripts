@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.30
+// @version     1.0.31
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -905,6 +905,19 @@
   }
 
   /**
+   * stopPropagationIfTargetBody - If the target of the event is the body, then stop propagation.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param {object} event     An event
+   */
+  function stopPropagationIfTargetBody(event) {
+    if (event.target === document.body)
+      event.stopPropagation();
+  }
+
+  /**
    * keyboardShortcuts - Handle keypress events for the popup.
    *
    * @private
@@ -1242,6 +1255,7 @@
         '.fire-popup-body pre',
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
+    document.addEventListener('keypress', stopPropagationIfTargetBody, true);
   }
 
   /**
@@ -1404,6 +1418,7 @@
       $(document)
         .off('keydown', keyboardShortcuts)
         .off('click', '.fire-popup-body pre');
+      document.removeEventListener('keypress', stopPropagationIfTargetBody, true);
 
       $('#container').removeClass('fire-blur');
 
@@ -1566,7 +1581,7 @@
               response = {message: jqXHR.responseText};
             }
 
-            if (response.message === 'Spam flag option not present') {
+            if (response.message === 'Flag option not present') {
               toastr.info('This post could not be flagged.<br />' +
                 'It is probably deleted already.');
               closePopup();
