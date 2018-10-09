@@ -38,6 +38,15 @@
 // @match       *://chat.stackoverflow.com/rooms/126195/*
 // @match       *://chat.stackoverflow.com/rooms/167826/*
 // @match       *://chat.stackoverflow.com/rooms/170175/*
+// @match       *://chat.stackexchange.com/transcript/*
+// @match       *://chat.meta.stackexchange.com/transcript/*
+// @match       *://chat.stackoverflow.com/transcript/*
+// @match       *://chat.stackexchange.com/users/120914/*
+// @match       *://chat.stackoverflow.com/users/3735529/*
+// @match       *://chat.meta.stackexchange.com/users/266345/*
+// @include     /^https?://chat\.stackexchange\.com/search.*[?&]room=(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|59281|61165|65945)(?:\b.*$|$)/
+// @include     /^https?://chat\.meta\.stackexchange\.com/search.*[?&]room=(?:89|1037|1181)(?:\b.*$|$)/
+// @include     /^https?://chat\.stackoverflow\.com/search.*[?&]room=(?:41570|90230|111347|126195|167826|170175)(?:\b.*$|$)/
 // @grant       none
 // ==/UserScript==
 
@@ -136,7 +145,8 @@
     showFireOnExistingMessages();
     registerAnchorHover();
     registerOpenLastReportKey();
-    CHAT.addEventHandlerHook(chatListener);
+    if (CHAT && CHAT.addEventHandlerHook)
+      CHAT.addEventHandlerHook(chatListener);
 
     checkHashForWriteToken();
   })(window);
@@ -234,7 +244,7 @@
    */
   function listHasCurrentUser(flags) {
     return flags && Array.isArray(flags.users) &&
-      flags.users.some(({username}) => username === fire.chatUser.name);
+      fire.chatUser && flags.users.some(({username}) => username === fire.chatUser.name);
   }
 
   /**
@@ -2075,7 +2085,7 @@
    * @param {number} timeout The time to wait before trying to decorate the messages.
    */
   function decorateExistingMessages(timeout) {
-    const chat = $('#chat');
+    const chat = $(/^\/(?:search|users)/.test(window.location.pathname) ? '#content' : '#chat,#transcript');
 
     chat.one('DOMSubtreeModified', () => {
       // We need another timeout here, because the first modification occurs before
@@ -2095,6 +2105,7 @@
         }
       }, timeout);
     });
+    $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
   }
 
   /**
@@ -2179,6 +2190,7 @@
     registerForLocalStorage(fire, 'userData', 'fire-user-data');
     registerForLocalStorage(fire, 'userSites', 'fire-user-sites');
     registerForLocalStorage(fire, 'sites', 'fire-sites');
+    registerForLocalStorage(fire, 'savedChatUser', 'fire-saved-chat-user');
 
     if (fire.userData === null)
       fire.userData = defaultStorage;
@@ -2230,17 +2242,34 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param {number}  count          The number of attempts alreay made. Initial calls to this function usually do not provide this parameter.
    */
-  function getCurrentChatUser() {
-    setTimeout(() => { // This code was too fast for FireFox
+  function getCurrentChatUser(count) {
+    // This will loop until it succesfully gets the user from CHAT.
+    //   It's tried immediately, then the next nine attempts are at intervals defined by fire.constants.loadUserDelay.
+    //   All attempts after that are at 10 times that delay. Currently, that's 9 at 500ms, then 5s intervals.
+    count = count ? count + 1 : 1;
+    const multiplier = count > fire.constants.loadUserDelayApplyMultiplierCount ? fire.constants.loadUserDelayMultiplier : 1;
+    if (CHAT && CHAT.RoomUsers && typeof CHAT.RoomUsers.get === 'function' && CHAT.CURRENT_USER_ID) {
+      // Under some conditions, this code is too fast to run immediately (e.g. the page is slow, SE is slow, browser is slow).
       CHAT.RoomUsers
         .get(CHAT.CURRENT_USER_ID)
         .done(user => {
           fire.chatUser = user;
-
+          fire.savedChatUser = user;
           fire.log('Current user found.');
+        })
+        .always(() => {
+          if (!fire.chatUser)
+            setTimeout(getCurrentChatUser, multiplier * fire.constants.loadUserDelay, count);
         });
-    }, fire.constants.loadUserDelay); // Maybe this is enough?
+      return;
+    } else if ((multiplier > 1 || (count > 1 && CHAT && CHAT.RoomUsers)) && fire.savedChatUser && fire.savedChatUser.name) { // eslint-disable-line no-extra-parens
+      fire.chatUser = Object.assign({}, fire.savedChatUser);
+      return;
+    }
+    setTimeout(getCurrentChatUser, multiplier * fire.constants.loadUserDelay, count);
   }
 
   /**
@@ -2276,6 +2305,8 @@
       buttonFade: 100,
       loadAllMessagesDelay: 500,
       loadUserDelay: 500,
+      loadUserDelayMultiplier: 5,
+      loadUserDelayApplyMultiplierCount: 11,
       tooltipOffset: 20,
       tooltipOffsetSmall: 5,
       halfPopupWidth: 300,
