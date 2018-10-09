@@ -3,6 +3,7 @@
 // @namespace   https://github.com/Charcoal-SE/
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
+// @contributor Makyen
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
 // @version     1.0.32
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
