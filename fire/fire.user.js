@@ -29,6 +29,7 @@
 // @match       *://chat.stackexchange.com/rooms/38932/*
 // @match       *://chat.stackexchange.com/rooms/47869/*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
+// @match       *://chat.stackexchange.com/rooms/58631/*
 // @match       *://chat.stackexchange.com/rooms/59281/*
 // @match       *://chat.stackexchange.com/rooms/61165/*
 // @match       *://chat.stackexchange.com/rooms/65945/*
@@ -44,7 +45,7 @@
 // @match       *://chat.stackexchange.com/users/120914/*
 // @match       *://chat.stackoverflow.com/users/3735529/*
 // @match       *://chat.meta.stackexchange.com/users/266345/*
-// @include     /^https?://chat\.stackexchange\.com/search.*[?&]room=(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|59281|61165|65945)(?:\b.*$|$)/
+// @include     /^https?://chat\.stackexchange\.com/search.*[?&]room=(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|58631|59281|61165|65945)(?:\b.*$|$)/
 // @include     /^https?://chat\.meta\.stackexchange\.com/search.*[?&]room=(?:89|1037|1181)(?:\b.*$|$)/
 // @include     /^https?://chat\.stackoverflow\.com/search.*[?&]room=(?:41570|90230|111347|126195|167826|170175)(?:\b.*$|$)/
 // @grant       none
