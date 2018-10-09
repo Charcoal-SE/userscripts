@@ -1458,6 +1458,23 @@
   }
 
   /**
+   * getJqXHRmessage - Gets the response message from two locations in a jqXHR Object from a request to MS.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}    jqXHR     The jqXHR Object from a MS or SE AJAX call.
+   * @returns {object}              Data from jqXHR.responseText
+   */
+  function getJqXHRmessage(jqXHR) {
+    try {
+      return JSON.parse(jqXHR.responseText);
+    } catch (err) {
+      return {message: (jqXHR || {responseText: ''}).responseText};
+    }
+  }
+
+  /**
    * postMetaSmokeFeedback - Submit metasmoke feedback.
    *
    * @private
@@ -1587,19 +1604,22 @@
           fire.error('Not write-authenticated on MS', data, jqXHR);
         } else {
           if (jqXHR.responseText) {
-            let response;
-            try {
-              response = JSON.parse(jqXHR.responseText);
-            } catch (err) {
-              response = {message: jqXHR.responseText};
-            }
-
+            const response = getJqXHRmessage(jqXHR);
             if (response.message === 'Flag option not present') {
-              toastr.info('This post could not be flagged.<br />' +
-                'It is probably deleted already.');
+              toastr.info('This post could not be flagged.<br/>It\'s probably already deleted.');
               closePopup();
               return;
-            }
+            } // else
+            if (response.message === 'No account on this site.') {
+              toastr.info('This post could not be flagged.<br/>You don\'t have an account on that site.');
+              closePopup();
+              return;
+            } // else
+            if (response.message === 'You have already flagged this post for moderator attention') {
+              toastr.info('This post could not be flagged.<br/>You have already flagged this post for moderator attention.');
+              closePopup();
+              return;
+            } // else
           }
 
           // Will give you a 500 with status: 'failed' and a message if the spam flag fails;
