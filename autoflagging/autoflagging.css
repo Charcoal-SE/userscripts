@@ -2,12 +2,12 @@
   position: absolute;
   right: 4px;
   bottom: 0;
-  /* This 'inherit' and the next one make sure the autoflagging information
+  /* This 'inherit' makes sure the autoflagging information
   is readable *over* the chat message itself, but uses the default background
-  of the chatroom messages. */
-  background: inherit;
-}
-div.message {
+  of the chatroom messages. There used to be a background: inherit for
+  .messages, but it did not appear to have a beneficial effect and it caused
+  the theme in dark-transparent rooms (The Restaurant at the End of the Universe)
+  to be messed up.*/
   background: inherit;
 }
 .reply-parent .ai-information:not(.inline) {
