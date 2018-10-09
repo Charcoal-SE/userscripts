@@ -96,7 +96,7 @@
        */
       api: {
         ms: {
-          key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
+          key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's metasmoke API key
           url: 'https://metasmoke.erwaysoftware.com/api/v2.0/',
           urlV1: 'https://metasmoke.erwaysoftware.com/api/'
         },
@@ -201,7 +201,7 @@
   }
 
   /**
-   * getDataForUrl - Loads MetaSmoke data for a specified post url.
+   * getDataForUrl - Loads metasmoke data for a specified post url.
    *
    * @private
    * @memberof module:fire
@@ -309,7 +309,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object}  data          A MetaSmoke report
+   * @param {object}  data          A metasmoke report
    * @param {boolean} openAfterLoad Open the report popup after load?
    * @param {object}  $this         The clicked FIRE report button
    * @param {boolean} skipLoadPost  skip loading additional data fot the post?
@@ -408,7 +408,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The MetaSmoke report.
+   * @param {object} report The metasmoke report.
    */
   function loadPost(report) {
     const parameters = {site: report.site};
@@ -430,7 +430,7 @@
           if (typeof autoflagging !== 'undefined') { // eslint-disable-line no-undef
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
 
-            // The post is deleted, but MetaSmoke doesn't know it yet.
+            // The post is deleted, but metasmoke doesn't know it yet.
             if (fire.userData.metasmokeWriteToken)
               metapi.deletedPost(report.id, fire.api.ms.key, fire.userData.metasmokeWriteToken, $.noop);
           }
@@ -449,7 +449,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The MetaSmoke report.
+   * @param {object} report The metasmoke report.
    */
   function loadPostRevisions(report) {
     const parameters = {site: report.site};
@@ -512,7 +512,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The MetaSmoke report.
+   * @param {object} report The metasmoke report.
    */
   function loadPostFlagStatus(report) {
     const parameters = {
@@ -686,7 +686,7 @@
   }
 
   /**
-   * getWriteToken - Gets a MetaSmoke write token.
+   * getWriteToken - Gets a metasmoke write token.
    *
    * @private
    * @memberof module:fire
@@ -705,7 +705,7 @@
         })
         .done(({token}) => {
           setValue('metasmokeWriteToken', token);
-          toastr.success('Successfully obtained MetaSmoke write token!');
+          toastr.success('Successfully obtained metasmoke write token!');
           closePopup();
 
           if (afterGetToken)
@@ -1010,7 +1010,7 @@
    */
   const clickHandlers = {
     /**
-     * Open the "Request authorization" MetaSmoke page.
+     * Open the "Request authorization" metasmoke page.
      *
      * @private
      */
@@ -1018,12 +1018,12 @@
       window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank');
     },
     /**
-     * Request a token from the MetaSmoke code.
+     * Request a token from the metasmoke code.
      *
      * @private
      *
      * @param {object} input      The input DOM node that contains the code.
-     * @param {function} callback The callback that receives the MetaSmoke code.
+     * @param {function} callback The callback that receives the metasmoke code.
      */
     saveToken: (input, callback) => {
       const value = input.val();
@@ -1068,9 +1068,9 @@
       .append(
         _('div', 'fire-popup-header')
           .append(_('p', {
-            html: 'FIRE requires a MetaSmoke write token to submit feedback.<br />' +
-                  'This requires that your MetaSmoke account has the "Reviewer" role. <br />' +
-                  'Once you\'ve authenticated FIRE with MetaSmoke, you\'ll be given a code.<br />'
+            html: 'FIRE requires a metasmoke write token to submit feedback.<br />' +
+                  'This requires that your metasmoke account has the "Reviewer" role. <br />' +
+                  'Once you\'ve authenticated FIRE with metasmoke, you\'ll be given a code.<br />'
           }))
           .append(button('Request Token', clickHandlers.requestToken))
           .append(input)
@@ -1139,7 +1139,7 @@
       href: `http://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
       target: '_blank',
       'fire-key': fire.openOnMSCodes,
-      'fire-tooltip': 'Open on MetaSmoke'
+      'fire-tooltip': 'Open on metasmoke'
     });
 
     const top = _('p', 'fire-popup-header')
@@ -1458,7 +1458,7 @@
   }
 
   /**
-   * postMetaSmokeFeedback - Submit MetaSmoke feedback.
+   * postMetaSmokeFeedback - Submit metasmoke feedback.
    *
    * @private
    * @memberof module:fire
@@ -1474,7 +1474,7 @@
       const {ms} = fire.api;
       const token = fire.userData.metasmokeWriteToken;
       if (data.has_sent_feedback) {
-        const message = span('You have already sent feedback to MetaSmoke for this report.');
+        const message = span('You have already sent feedback to metasmoke for this report.');
         if (verdict === 'tpu-') {
           postMetaSmokeSpamFlag(data, ms, token, message.after('<br /><br />'));
         } else {
@@ -1533,7 +1533,7 @@
    * @param   {object} api             API configuration object, containing:
    * @param   {string} api.url         The API url.
    * @param   {string} api.key         The API key.
-   * @param   {string} token           The MetaSmoke write token.
+   * @param   {string} token           The metasmoke write token.
    * @param   {object} feedbackSuccess A jQuery DOM node containing the feedback success message.
    * @returns {undefined}              returns undefined to break out of the function.
    */
@@ -1579,12 +1579,12 @@
           // https://metasmoke.erwaysoftware.com/authentication/status
           // Will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
           toastr.error(
-            'FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
-            'Your MetaSmoke account doesn\'t appear to be write-authenticated.<br />' +
+            'FIRE requires your metasmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
+            'Your metasmoke account doesn\'t appear to be write-authenticated.<br />' +
             'Please open <em><a href="https://metasmoke.erwaysoftware.com/authentication/status" target="_blank">this page</a></em> to authenticate with Stack Exchange.',
             null,
             {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
-          fire.error('Not write-authenticated', data, jqXHR);
+          fire.error('Not write-authenticated on MS', data, jqXHR);
         } else {
           if (jqXHR.responseText) {
             let response;
@@ -1657,7 +1657,7 @@
    * @param   {object}                data     the report data.
    * @param   {(number|string|array)} keyCodes The keyCodes to use for this button.
    * @param   {string}                text     The text to display for this button.
-   * @param   {string}                verdict  This button's MetaSmoke verdict
+   * @param   {string}                verdict  This button's metasmoke verdict
    * @param   {string}                tooltip  The tooltip to display for this button.
    * @returns {object}                         The constructed feedback button.
    */
