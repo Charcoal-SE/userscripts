@@ -404,6 +404,9 @@
    */
   autoflagging.callAPI = function (urls, page) {
     debug("Call API");
+    if (!urls) {
+      return;
+    }
     if (page == null) {
       page = 1;
     }
