@@ -2336,10 +2336,3 @@
     };
   }
 })();
-
-/**
- * This is a callback that is passed a single report's data.
- *
- * @callback singleReportCallback
- * @param {object} reportData The data for the loaded report.
- */
