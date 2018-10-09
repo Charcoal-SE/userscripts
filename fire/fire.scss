@@ -110,13 +110,13 @@ img.fire-emoji-large {
       margin: 0;
 
       &.fire-metasmoke-button {
-        margin-right: 55px;
+        margin-right: 10px;
       }
 
       &.fire-close-button,
       &.fire-metasmoke-button {
         float: right;
-        margin-bottom: -23px;
+        margin-bottom: 0;
       }
 
       &.fire-feedback-button {
@@ -155,7 +155,7 @@ img.fire-emoji-large {
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
-      max-width: 460px;
+      max-width: 440px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -163,7 +163,7 @@ img.fire-emoji-large {
 
   // Body
   .fire-popup-body {
-    max-height: 390px;
+    max-height: 380px;
     overflow-y: scroll;
     border: 1px solid #ccc;
     padding: 10px;
@@ -209,6 +209,17 @@ img.fire-emoji-large {
         box-shadow: 0 0 10px -2px $shadow-color;
         display: inline-block;
       }
+
+      blockquote {
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #FFF8DC;
+        border-left: 2px solid #ffeb8e;
+      }
+
+      li {
+        margin-left: 10px;
+      }
     }
 
     a {
@@ -251,6 +262,13 @@ img.fire-emoji-large {
         max-height: none;
         white-space: pre-wrap;
       }
+    }
+
+    code {
+      font-family: Fira Code,Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+      font-size: 13px;
+      background-color: #eff0f1;
+      padding: 1px 5px;
     }
   } // End body
 
