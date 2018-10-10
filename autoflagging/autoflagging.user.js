@@ -74,6 +74,71 @@
     $.ajaxSetup({cache: false});
   }
 
+  let doWhenReady = $(document).ready;
+  if (window.location.pathname.indexOf('/transcript') !== 0 && CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === 'function' && !CHAT.Hub.roomReady.fired()) {
+    doWhenReady = CHAT.Hub.roomReady.add;
+  }
+  doWhenReady(() => {
+    function getEffectiveBackgroundColor(element, defaultColor) {
+      defaultColor = defaultColor ? defaultColor : 'rgb(255,255,255)';
+      let testEl = element.first();
+      const colors = [];
+      do {
+        try {
+          const current = testEl.css('background-color').replace(/\s+/g, '').toLowerCase();
+          if (current && current !== 'transparent' && current !== 'rgba(0,0,0,0)') {
+            colors.push(current);
+          }
+          if (current.indexOf('rgb(') === 0) {
+            // There's a color without transparency.
+            break;
+          }
+        } catch (e) {
+          // This should always get pushed if we make it up to the document element.
+          colors.push(defaultColor);
+        }
+        testEl = testEl.parent();
+      } while (testEl.length);
+      return 'rgb(' + colors.reduceRight((sum, color) => {
+        color = color.replace(/rgba?\((.*)\)/, '$1').split(/,/g);
+        if (color.length < 4) {
+          //rgb, not rgba
+          return color;
+        }
+        if (color.length !== 4 || sum.length !== 3) {
+          throw new Error('Something went wrong getting the effective color');
+        }
+        for (let index = 0; index < 3; index++) {
+          const start = +sum[index];
+          const end = +color[index];
+          const distance = +color[3];
+          sum[index] = start + (end - start) * distance;
+        }
+        return sum;
+      }, []).join(', ') + ')';
+    }
+    const backgroundColor = getEffectiveBackgroundColor($('.monologue:not(.mine) .messages'));
+    const rgbAverage = backgroundColor.replace(/rgba?\((.*)\)/, '$1').split(/,/g).reduce((sum, value) => (+value + sum), 0) / 3;
+    $(document.head).append(`
+      <style type="text/css">
+        .monologue:not(.mine) .message:not(.reply-parent):not(.reply-child):not(.highlight) .ai-information {
+          background-color: ${backgroundColor};
+        }
+        ${(rgbAverage > 128 ? '' : `
+        .ai-feedback-info-tpu {
+          color: #82f883;
+        }
+        .ai-feedback-info-fp {
+          color: #ff4442;
+        }
+        .ai-feedback-info-naa {
+          color: #ba8b6d;
+        }
+        `)}
+      </style>
+    `);
+  });
+
   // Constants
   var hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
   window.autoflagging = {};
