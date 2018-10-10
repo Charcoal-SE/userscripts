@@ -1140,7 +1140,7 @@
 
     const openOnMSButton = _('a', 'button fire-metasmoke-button', {
       text: 'MS',
-      href: `http://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
+      href: `https://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
       target: '_blank',
       'fire-key': fire.openOnMSCodes,
       'fire-tooltip': 'Open on metasmoke'
@@ -1287,7 +1287,7 @@
           img.attr('src', img.data('src'));
           e.preventDefault();
         });
-        element.src = 'http://placehold.it/550x100//ffffff?text=Click+to+show+image.';
+        element.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
       });
     }
   }
