@@ -151,6 +151,7 @@
           }
         })
         .fail(function (xhr) {
+          autoflagging.notify("AIM: Failed to load MS reason data (1):", xhr);
           debug("Failed to load reasons:", xhr);
         });
     }
