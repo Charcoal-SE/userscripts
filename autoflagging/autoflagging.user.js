@@ -47,7 +47,7 @@
 // @grant       none
 // ==/UserScript==
 
-/* global autoflagging, ReconnectingWebSocket, unsafeWindow */
+/* global autoflagging, ReconnectingWebSocket, unsafeWindow, CHAT, $, Notifier */
 
 // To enable/disable trace information, type autoflagging.trace(true) or
 // autoflagging.trace(false), respectively, in your browser's console.
