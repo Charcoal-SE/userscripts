@@ -2268,7 +2268,7 @@
    * @param {number}  count          The number of attempts alreay made. Initial calls to this function usually do not provide this parameter.
    */
   function getCurrentChatUser(count) {
-    // This will loop until it succesfully gets the user from CHAT.
+    // This will loop until it succesfully gets the user from CHAT, unless it's not available, then a stored version is used.
     //   It's tried immediately, then the next nine attempts are at intervals defined by fire.constants.loadUserDelay.
     //   All attempts after that are at 10 times that delay. Currently, that's 9 at 500ms, then 5s intervals.
     count = count ? count + 1 : 1;
@@ -2303,9 +2303,6 @@
    * @returns {object} FIRE's constants
    */
   function getFireConstants() {
-    /**
-     * @memberof module:fire
-     */
     return {
       keys: {
         enter: 13,
