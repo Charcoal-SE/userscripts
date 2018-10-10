@@ -1105,7 +1105,11 @@
     const that = this;
 
     if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
-      getWriteToken(() => openReportPopup.call(that)); // Open the popup later
+      getWriteToken(() => {
+        // Open the popup for the FIRE button clicked after getting the token.
+        closePopup(); // Call this a second time.
+        setTimeout(() => openReportPopup.call(that), fire.constants.loadAllMessagesDelay);
+      });
       return;
     }
 
@@ -1422,6 +1426,8 @@
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
 
+      if (!fire.isOpen)
+        $('#container').removeClass('fire-blur');
       delete fire.settingsAreOpen;
     } else {
       const selector = '.fire-popup, .fire-popup-modal';
