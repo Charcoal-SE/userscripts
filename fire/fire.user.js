@@ -3,8 +3,9 @@
 // @namespace   https://github.com/Charcoal-SE/
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus
+// @contributor Makyen
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.0.31
+// @version     1.1.0
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -29,6 +30,7 @@
 // @match       *://chat.stackexchange.com/rooms/38932/*
 // @match       *://chat.stackexchange.com/rooms/47869/*
 // @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
+// @match       *://chat.stackexchange.com/rooms/58631/*
 // @match       *://chat.stackexchange.com/rooms/59281/*
 // @match       *://chat.stackexchange.com/rooms/61165/*
 // @match       *://chat.stackexchange.com/rooms/65945/*
@@ -38,6 +40,15 @@
 // @match       *://chat.stackoverflow.com/rooms/126195/*
 // @match       *://chat.stackoverflow.com/rooms/167826/*
 // @match       *://chat.stackoverflow.com/rooms/170175/*
+// @match       *://chat.stackexchange.com/transcript/*
+// @match       *://chat.meta.stackexchange.com/transcript/*
+// @match       *://chat.stackoverflow.com/transcript/*
+// @match       *://chat.stackexchange.com/users/120914/*
+// @match       *://chat.stackoverflow.com/users/3735529/*
+// @match       *://chat.meta.stackexchange.com/users/266345/*
+// @include     /^https?://chat\.stackexchange\.com/search.*[?&]room=(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|58631|59281|61165|65945)(?:\b.*$|$)/
+// @include     /^https?://chat\.meta\.stackexchange\.com/search.*[?&]room=(?:89|1037|1181)(?:\b.*$|$)/
+// @include     /^https?://chat\.stackoverflow\.com/search.*[?&]room=(?:41570|90230|111347|126195|167826|170175)(?:\b.*$|$)/
 // @grant       none
 // ==/UserScript==
 
@@ -85,7 +96,7 @@
        */
       api: {
         ms: {
-          key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's MetaSmoke API key
+          key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's metasmoke API key
           url: 'https://metasmoke.erwaysoftware.com/api/v2.0/',
           urlV1: 'https://metasmoke.erwaysoftware.com/api/'
         },
@@ -136,7 +147,8 @@
     showFireOnExistingMessages();
     registerAnchorHover();
     registerOpenLastReportKey();
-    CHAT.addEventHandlerHook(chatListener);
+    if (CHAT && CHAT.addEventHandlerHook)
+      CHAT.addEventHandlerHook(chatListener);
 
     checkHashForWriteToken();
   })(window);
@@ -189,7 +201,7 @@
   }
 
   /**
-   * getDataForUrl - Loads MetaSmoke data for a specified post url.
+   * getDataForUrl - Loads metasmoke data for a specified post url.
    *
    * @private
    * @memberof module:fire
@@ -234,7 +246,7 @@
    */
   function listHasCurrentUser(flags) {
     return flags && Array.isArray(flags.users) &&
-      flags.users.some(({username}) => username === fire.chatUser.name);
+      fire.chatUser && flags.users.some(({username}) => username === fire.chatUser.name);
   }
 
   /**
@@ -297,7 +309,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object}  data          A MetaSmoke report
+   * @param {object}  data          A metasmoke report
    * @param {boolean} openAfterLoad Open the report popup after load?
    * @param {object}  $this         The clicked FIRE report button
    * @param {boolean} skipLoadPost  skip loading additional data fot the post?
@@ -396,7 +408,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The MetaSmoke report.
+   * @param {object} report The metasmoke report.
    */
   function loadPost(report) {
     const parameters = {site: report.site};
@@ -418,7 +430,7 @@
           if (typeof autoflagging !== 'undefined') { // eslint-disable-line no-undef
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
 
-            // The post is deleted, but MetaSmoke doesn't know it yet.
+            // The post is deleted, but metasmoke doesn't know it yet.
             if (fire.userData.metasmokeWriteToken)
               metapi.deletedPost(report.id, fire.api.ms.key, fire.userData.metasmokeWriteToken, $.noop);
           }
@@ -437,7 +449,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The MetaSmoke report.
+   * @param {object} report The metasmoke report.
    */
   function loadPostRevisions(report) {
     const parameters = {site: report.site};
@@ -500,7 +512,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The MetaSmoke report.
+   * @param {object} report The metasmoke report.
    */
   function loadPostFlagStatus(report) {
     const parameters = {
@@ -674,7 +686,7 @@
   }
 
   /**
-   * getWriteToken - Gets a MetaSmoke write token.
+   * getWriteToken - Gets a metasmoke write token.
    *
    * @private
    * @memberof module:fire
@@ -693,7 +705,7 @@
         })
         .done(({token}) => {
           setValue('metasmokeWriteToken', token);
-          toastr.success('Successfully obtained MetaSmoke write token!');
+          toastr.success('Successfully obtained metasmoke write token!');
           closePopup();
 
           if (afterGetToken)
@@ -998,7 +1010,7 @@
    */
   const clickHandlers = {
     /**
-     * Open the "Request authorization" MetaSmoke page.
+     * Open the "Request authorization" metasmoke page.
      *
      * @private
      */
@@ -1006,12 +1018,12 @@
       window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank');
     },
     /**
-     * Request a token from the MetaSmoke code.
+     * Request a token from the metasmoke code.
      *
      * @private
      *
      * @param {object} input      The input DOM node that contains the code.
-     * @param {function} callback The callback that receives the MetaSmoke code.
+     * @param {function} callback The callback that receives the metasmoke code.
      */
     saveToken: (input, callback) => {
       const value = input.val();
@@ -1056,9 +1068,9 @@
       .append(
         _('div', 'fire-popup-header')
           .append(_('p', {
-            html: 'FIRE requires a MetaSmoke write token to submit feedback.<br />' +
-                  'This requires that your MetaSmoke account has the "Reviewer" role. <br />' +
-                  'Once you\'ve authenticated FIRE with MetaSmoke, you\'ll be given a code.<br />'
+            html: 'FIRE requires a metasmoke write token to submit feedback.<br />' +
+                  'This requires that your metasmoke account has the "Reviewer" role. <br />' +
+                  'Once you\'ve authenticated FIRE with metasmoke, you\'ll be given a code.<br />'
           }))
           .append(button('Request Token', clickHandlers.requestToken))
           .append(input)
@@ -1093,7 +1105,11 @@
     const that = this;
 
     if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
-      getWriteToken(() => openReportPopup.call(that)); // Open the popup later
+      getWriteToken(() => {
+        // Open the popup for the FIRE button clicked after getting the token.
+        closePopup(); // Call this a second time.
+        setTimeout(() => openReportPopup.call(that), fire.constants.loadAllMessagesDelay);
+      });
       return;
     }
 
@@ -1124,10 +1140,10 @@
 
     const openOnMSButton = _('a', 'button fire-metasmoke-button', {
       text: 'MS',
-      href: `http://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
+      href: `https://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
       target: '_blank',
       'fire-key': fire.openOnMSCodes,
-      'fire-tooltip': 'Open on MetaSmoke'
+      'fire-tooltip': 'Open on metasmoke'
     });
 
     const top = _('p', 'fire-popup-header')
@@ -1180,7 +1196,8 @@
       .html()       // Get the escaped HTML, unescape whitelisted tags.
       .replace(/&lt;(\/?([abpsu]|[hb]r|[uo]l|li|h\d|code|pre|strong|em|img).*?)&gt;/gi, '<$1>')
       .replace(/<(\/ ?)?(script|style|link)/gi, '&lt;$1$2')
-      .replace(/(script|style|link)>/gi, '$1&gt;');
+      .replace(/(script|style|link)>/gi, '$1&gt;')
+      .replace(/(<code>[\s\S]*?)<(img.*?)>([\s\S]*?<\/code>)/, '$1&lt;$2&gt;$3'); // Escape image tags in code tags
 
     const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
@@ -1270,7 +1287,7 @@
           img.attr('src', img.data('src'));
           e.preventDefault();
         });
-        element.src = 'http://placehold.it/550x100//ffffff?text=Click+to+show+image.';
+        element.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
       });
     }
   }
@@ -1409,6 +1426,8 @@
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
 
+      if (!fire.isOpen)
+        $('#container').removeClass('fire-blur');
       delete fire.settingsAreOpen;
     } else {
       const selector = '.fire-popup, .fire-popup-modal';
@@ -1445,7 +1464,24 @@
   }
 
   /**
-   * postMetaSmokeFeedback - Submit MetaSmoke feedback.
+   * getJqXHRmessage - Gets the response message from two locations in a jqXHR Object from a request to MS.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}    jqXHR     The jqXHR Object from a MS or SE AJAX call.
+   * @returns {object}              Data from jqXHR.responseText
+   */
+  function getJqXHRmessage(jqXHR) {
+    try {
+      return JSON.parse(jqXHR.responseText);
+    } catch (err) {
+      return {message: (jqXHR || {responseText: ''}).responseText};
+    }
+  }
+
+  /**
+   * postMetaSmokeFeedback - Submit metasmoke feedback.
    *
    * @private
    * @memberof module:fire
@@ -1461,7 +1497,7 @@
       const {ms} = fire.api;
       const token = fire.userData.metasmokeWriteToken;
       if (data.has_sent_feedback) {
-        const message = span('You have already sent feedback to MetaSmoke for this report.');
+        const message = span('You have already sent feedback to metasmoke for this report.');
         if (verdict === 'tpu-') {
           postMetaSmokeSpamFlag(data, ms, token, message.after('<br /><br />'));
         } else {
@@ -1520,7 +1556,7 @@
    * @param   {object} api             API configuration object, containing:
    * @param   {string} api.url         The API url.
    * @param   {string} api.key         The API key.
-   * @param   {string} token           The MetaSmoke write token.
+   * @param   {string} token           The metasmoke write token.
    * @param   {object} feedbackSuccess A jQuery DOM node containing the feedback success message.
    * @returns {undefined}              returns undefined to break out of the function.
    */
@@ -1566,27 +1602,30 @@
           // https://metasmoke.erwaysoftware.com/authentication/status
           // Will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
           toastr.error(
-            'FIRE requires your MetaSmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
-            'Your MetaSmoke account doesn\'t appear to be write-authenticated.<br />' +
+            'FIRE requires your metasmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
+            'Your metasmoke account doesn\'t appear to be write-authenticated.<br />' +
             'Please open <em><a href="https://metasmoke.erwaysoftware.com/authentication/status" target="_blank">this page</a></em> to authenticate with Stack Exchange.',
             null,
             {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
-          fire.error('Not write-authenticated', data, jqXHR);
+          fire.error('Not write-authenticated on MS', data, jqXHR);
         } else {
           if (jqXHR.responseText) {
-            let response;
-            try {
-              response = JSON.parse(jqXHR.responseText);
-            } catch (err) {
-              response = {message: jqXHR.responseText};
-            }
-
+            const response = getJqXHRmessage(jqXHR);
             if (response.message === 'Flag option not present') {
-              toastr.info('This post could not be flagged.<br />' +
-                'It is probably deleted already.');
+              toastr.info('This post could not be flagged.<br/>It\'s probably already deleted.');
               closePopup();
               return;
-            }
+            } // else
+            if (response.message === 'No account on this site.') {
+              toastr.info('This post could not be flagged.<br/>You don\'t have an account on that site.');
+              closePopup();
+              return;
+            } // else
+            if (response.message === 'You have already flagged this post for moderator attention') {
+              toastr.info('This post could not be flagged.<br/>You have already flagged this post for moderator attention.');
+              closePopup();
+              return;
+            } // else
           }
 
           // Will give you a 500 with status: 'failed' and a message if the spam flag fails;
@@ -1644,7 +1683,7 @@
    * @param   {object}                data     the report data.
    * @param   {(number|string|array)} keyCodes The keyCodes to use for this button.
    * @param   {string}                text     The text to display for this button.
-   * @param   {string}                verdict  This button's MetaSmoke verdict
+   * @param   {string}                verdict  This button's metasmoke verdict
    * @param   {string}                tooltip  The tooltip to display for this button.
    * @returns {object}                         The constructed feedback button.
    */
@@ -1966,8 +2005,8 @@
    * @memberof module:fire
    */
   function registerOpenLastReportKey() {
-    $(document).on('keydown', ({keyCode, ctrlKey}) => {
-      if (keyCode === fire.constants.keys.space && ctrlKey) {
+    $(document).on('keydown', ({keyCode, ctrlKey, altKey, metaKey, shiftKey}) => {
+      if (keyCode === fire.constants.keys.space && ctrlKey && !altKey && !metaKey && !shiftKey) {
         const button = $('.fire-button').last(); // .content:not(.ai-deleted)
         if (button && button.length > 0)
           loadDataForReport.call(button, true);
@@ -2074,7 +2113,7 @@
    * @param {number} timeout The time to wait before trying to decorate the messages.
    */
   function decorateExistingMessages(timeout) {
-    const chat = $('#chat');
+    const chat = $(/^\/(?:search|users)/.test(window.location.pathname) ? '#content' : '#chat,#transcript');
 
     chat.one('DOMSubtreeModified', () => {
       // We need another timeout here, because the first modification occurs before
@@ -2094,6 +2133,7 @@
         }
       }, timeout);
     });
+    $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
   }
 
   /**
@@ -2178,6 +2218,7 @@
     registerForLocalStorage(fire, 'userData', 'fire-user-data');
     registerForLocalStorage(fire, 'userSites', 'fire-user-sites');
     registerForLocalStorage(fire, 'sites', 'fire-sites');
+    registerForLocalStorage(fire, 'savedChatUser', 'fire-saved-chat-user');
 
     if (fire.userData === null)
       fire.userData = defaultStorage;
@@ -2229,17 +2270,34 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param {number}  count          The number of attempts alreay made. Initial calls to this function usually do not provide this parameter.
    */
-  function getCurrentChatUser() {
-    setTimeout(() => { // This code was too fast for FireFox
+  function getCurrentChatUser(count) {
+    // This will loop until it succesfully gets the user from CHAT, unless it's not available, then a stored version is used.
+    //   It's tried immediately, then the next nine attempts are at intervals defined by fire.constants.loadUserDelay.
+    //   All attempts after that are at 10 times that delay. Currently, that's 9 at 500ms, then 5s intervals.
+    count = count ? count + 1 : 1;
+    const multiplier = count > fire.constants.loadUserDelayApplyMultiplierCount ? fire.constants.loadUserDelayMultiplier : 1;
+    if (CHAT && CHAT.RoomUsers && typeof CHAT.RoomUsers.get === 'function' && CHAT.CURRENT_USER_ID) {
+      // Under some conditions, this code is too fast to run immediately (e.g. the page is slow, SE is slow, browser is slow).
       CHAT.RoomUsers
         .get(CHAT.CURRENT_USER_ID)
         .done(user => {
           fire.chatUser = user;
-
+          fire.savedChatUser = user;
           fire.log('Current user found.');
+        })
+        .always(() => {
+          if (!fire.chatUser)
+            setTimeout(getCurrentChatUser, multiplier * fire.constants.loadUserDelay, count);
         });
-    }, fire.constants.loadUserDelay); // Maybe this is enough?
+      return;
+    } else if ((multiplier > 1 || (count > 1 && CHAT && CHAT.RoomUsers)) && fire.savedChatUser && fire.savedChatUser.name) { // eslint-disable-line no-extra-parens
+      fire.chatUser = Object.assign({}, fire.savedChatUser);
+      return;
+    }
+    setTimeout(getCurrentChatUser, multiplier * fire.constants.loadUserDelay, count);
   }
 
   /**
@@ -2251,9 +2309,6 @@
    * @returns {object} FIRE's constants
    */
   function getFireConstants() {
-    /**
-     * @memberof module:fire
-     */
     return {
       keys: {
         enter: 13,
@@ -2266,7 +2321,18 @@
         notFound: 404,
         conflict: 409
       },
-      emoji: {fire: '🔥', user: '👤', gear: '⚙️', pencil: '✏️️', smile: '😄', clipboard: '📋', flag: '🏳️', autoflag: '🏴'},
+      emoji: {
+        /* eslint-disable no-magic-numbers */
+        fire: String.fromCodePoint(0x1F525),
+        user: String.fromCodePoint(0x1F464),
+        gear: String.fromCodePoint(0x2699) + String.fromCodePoint(0xFE0F),
+        pencil: String.fromCodePoint(0x270F) + String.fromCodePoint(0xFE0F), // This produces the expected multi-color version.
+        smile: String.fromCodePoint(0x1F604),
+        clipboard: String.fromCodePoint(0x1F4CB),
+        flag: String.fromCodePoint(0x1F3F3) + String.fromCodePoint(0xFE0F),
+        autoflag: String.fromCodePoint(0x1F3F4)
+        /* eslint-enable no-magic-numbers */
+      },
       emojiSize: 16,
       siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,
@@ -2275,6 +2341,8 @@
       buttonFade: 100,
       loadAllMessagesDelay: 500,
       loadUserDelay: 500,
+      loadUserDelayMultiplier: 5,
+      loadUserDelayApplyMultiplierCount: 11,
       tooltipOffset: 20,
       tooltipOffsetSmall: 5,
       halfPopupWidth: 300,
@@ -2282,10 +2350,3 @@
     };
   }
 })();
-
-/**
- * This is a callback that is passed a single report's data.
- *
- * @callback singleReportCallback
- * @param {object} reportData The data for the loaded report.
- */
