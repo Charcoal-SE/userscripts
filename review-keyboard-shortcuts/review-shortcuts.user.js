@@ -2,7 +2,7 @@
 // @name        MS Review Keyboard Shortcuts
 // @description Adds keyboard shortcuts to the review queues on metasmoke.
 // @author      ArtOfCode
-// @version     0.1.1
+// @version     0.2.1
 // @namespace   charcoal-se.org
 // @match       https://metasmoke.erwaysoftware.com/review/*
 // @updateURL   https://github.com/Charcoal-SE/userscripts/raw/master/review-keyboard-shortcuts/review-shortcuts.user.js
@@ -14,6 +14,16 @@ $(document).ready(() => {
     'untagged-domains': {
       t: () => {
         $('select').first().selectpicker('toggle');
+      }
+    },
+    
+    'posts': {
+      k: () => {
+        $('.review-submit-link[data-response="tp"]').click();
+      },
+      
+      v: () => {
+        $('.review-submit-link[data-response="tp"]').click();
       }
     }
   };
@@ -50,8 +60,9 @@ $(document).ready(() => {
       return;
     }
 
-    if (queueSpecificActions[key]) {
-      queueSpecificActions[key](ev);
+    const queue = /\/review\/([^\/]+)/.exec(location.pathname)[1];
+    if (queueSpecificActions[queue] && queueSpecificActions[queue][key]) {
+      queueSpecificActions[queue][key](ev);
       return;
     }
   });
