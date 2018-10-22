@@ -1,0 +1,35 @@
+{
+  "name": "review-keyboard-shortcuts",
+  "version": "0.1.1",
+  "description": "Add keyboard shortcuts to MS review to get reviews done quicker.",
+  "scripts": {
+    "test": "xo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Charcoal-SE/userscripts.git"
+  },
+  "author": "Charcoal",
+  "license": "(MIT OR Apache-2.0)",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/Charcoal-SE/userscripts/issues"
+  },
+  "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
+  "devDependencies": {
+    "xo": "^0.17.1"
+  },
+
+  "xo": {
+    "space": true,
+    "envs": [
+      "browser",
+      "es6",
+      "jquery",
+      "greasemonkey"
+    ],
+    "rules": {
+      "quotes": ["error", "single", {"avoidEscape": true}]
+    }
+  }
+}
