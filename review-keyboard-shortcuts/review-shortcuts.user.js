@@ -5,6 +5,8 @@
 // @version     0.1.1
 // @namespace   charcoal-se.org
 // @match       https://metasmoke.erwaysoftware.com/review/*
+// @updateURL   https://github.com/Charcoal-SE/userscripts/raw/master/review-keyboard-shortcuts/review-shortcuts.user.js
+// @downloadURL https://github.com/Charcoal-SE/userscripts/raw/master/review-keyboard-shortcuts/review-shortcuts.user.js
 // ==/UserScript==
 
 $(document).ready(() => {
