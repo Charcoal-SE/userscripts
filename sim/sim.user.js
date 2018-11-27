@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.3.1
+// @version      0.4.1
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @match       *://*.stackexchange.com/*
@@ -23,27 +23,6 @@
 
 (() => {
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
-
-  const addCSS = () => {
-    const css = document.createElement('style');
-    document.head.appendChild(css);
-    css.sheet.insertRule(`.sim-popup {
-          min-width: 50em;
-          margin: 1em;
-        }`, 0);
-    css.sheet.insertRule(`.sim-popup > div:first-of-type {
-          float: left;
-          width: 45%;
-          border-top: 1px solid #ddd;
-          padding-top: 0.5em;
-        }`, 0);
-    css.sheet.insertRule(`.sim-popup > div:last-of-type {
-          float: right;
-          width: 45%;
-          border-top: 1px solid #ddd;
-          padding-top: 0.5em;
-        }`, 0);
-  };
 
   const getCurrentSiteAPIParam = () => {
     const regex = /((?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
@@ -77,45 +56,51 @@
     });
   };
 
-  const displayDialog = postData => {
-    const container = $(`<div class="popup sim-popup"></div>`);
-    container.append(`<h2>This post was <strong>${postData.caught ? '' : 'not '}caught</strong> by SmokeDetector</h2>`);
-    if (postData.caught) {
-      container.append(`<p><a href="${postData.metasmokeURI}">metasmoke record</a></p>`);
-      container.append(`<p>It was classified as <strong>${postData.feedback}</strong> by Charcoal volunteers.</p>`);
+  const stacksModal = $(`<aside class="js-modal-overlay js-modal-close" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="s-modal--dialog js-modal-dialog w80 wmx8" role="document">
+    <h2 class="s-modal--header sim--modal-header"></h2>
+    <div class="s-modal--body sim--modal-content"></div>
+    <a class="s-modal--close s-btn s-btn__muted js-modal-close" href="#" aria-label="Close">&times;</a>
+  </div>
+</aside>`);
 
-      const autoflags = $(`<div></div>`);
-      autoflags.append(`<h2>Autoflags</h2>`);
+  const displayDialog = postData => {
+    const modal = stacksModal.clone();
+    const contentSpace = modal.find('.sim--modal-content');
+    contentSpace.append(`<div class="grid grid__fl1"><div class="grid--cell5 sim--left-content"></div><div class="grid--cell7 sim--right-content"></div></div>`);
+
+    const header = modal.find('.sim--modal-header');
+    header.text(postData.caught ? postData.feedback : 'Not Caught');
+
+    if (postData.caught) {
+      contentSpace.prepend(`<p><a class="s-link" href="${postData.metasmokeURI}">View this post on metasmoke</a></p>`);
+
+      const autoflags = contentSpace.find('.sim--left-content');
+      autoflags.append(`<h3>Autoflags</h3>`);
       autoflags.append(`<p>This post was <strong>${postData.autoflagged ? '' : 'not '} autoflagged</strong>.</p>`);
       if (postData.autoflagged) {
         autoflags.append(`<p>Flags from the following users were used:</p>`);
         const users = $(`<ul></ul>`);
         postData.autoflaggers.forEach(af => {
-          users.append(`<li><a href="https://chat.stackexchange.com/users/${af.stackexchange_chat_id}">${af.username}</a></li>`);
+          users.append(`<li><a class="s-link" href="https://chat.stackexchange.com/users/${af.stackexchange_chat_id}">${af.username}</a></li>`);
         });
         autoflags.append(users);
       }
-      container.append(autoflags);
 
-      const manuals = $(`<div></div>`);
-      manuals.append(`<h2>Manual Flags</h2>`);
+      const manuals = contentSpace.find('.sim--right-content');
+      manuals.append(`<h3>Manual Flags</h3>`);
       manuals.append(`<p>There were ${postData.manual_flags.length} additional flags cast manually on this post through Charcoal systems.</p>`);
       if (postData.manual_flags.length > 0) {
         manuals.append(`<p>The following users cast manual flags:</p>`);
         const users = $(`<ul></ul>`);
         postData.manual_flags.forEach(af => {
-          users.append(`<li><a href="https://chat.stackexchange.com/users/${af.stackexchange_chat_id}">${af.username}</a></li>`);
+          users.append(`<li><a class="s-link" href="https://chat.stackexchange.com/users/${af.stackexchange_chat_id}">${af.username}</a></li>`);
         });
         manuals.append(users);
       }
-      container.append(manuals);
     }
 
-    $('body').loadPopup({
-      lightbox: false,
-      target: $('body'),
-      html: container.outerHTML()
-    });
+    StackExchange.helpers.showModal(modal);
   };
 
   const getInfo = async ev => {
@@ -176,7 +161,6 @@
   };
 
   $(document).ready(() => {
-    addCSS();
     attachToPosts();
     $('.sim-get-info').on('click', getInfo);
   });
