@@ -21,6 +21,8 @@
 // @downloadURL  https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // ==/UserScript==
 
+/* globals StackExchange */
+
 (() => {
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
 
@@ -100,7 +102,7 @@
       }
     }
 
-    StackExchange.helpers.showModal(modal); // eslint-disable-line no-undef
+    StackExchange.helpers.showModal(modal);
   };
 
   const getInfo = async ev => {
