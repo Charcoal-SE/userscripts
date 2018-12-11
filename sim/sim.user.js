@@ -100,7 +100,7 @@
       }
     }
 
-    StackExchange.helpers.showModal(modal);
+    StackExchange.helpers.showModal(modal); // eslint-disable-line no-undef 
   };
 
   const getInfo = async ev => {
