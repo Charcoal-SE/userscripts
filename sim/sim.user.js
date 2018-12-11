@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.4.1
+// @version      0.4.2
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @match       *://*.stackexchange.com/*
@@ -20,6 +20,8 @@
 // @updateURL    https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // @downloadURL  https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // ==/UserScript==
+
+/* globals StackExchange */
 
 (() => {
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
