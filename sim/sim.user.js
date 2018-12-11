@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.4.1
+// @version      0.4.2
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @match       *://*.stackexchange.com/*
@@ -100,7 +100,7 @@
       }
     }
 
-    StackExchange.helpers.showModal(modal); // eslint-disable-line no-undef 
+    StackExchange.helpers.showModal(modal); // eslint-disable-line no-undef
   };
 
   const getInfo = async ev => {
