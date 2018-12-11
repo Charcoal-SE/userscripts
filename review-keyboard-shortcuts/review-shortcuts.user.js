@@ -16,12 +16,12 @@ $(document).ready(() => {
         $('select').first().selectpicker('toggle');
       }
     },
-    
-    'posts': {
+
+    'posts': { // eslint-disable-line quote-props
       k: () => {
         $('.review-submit-link[data-response="tp"]').click();
       },
-      
+
       v: () => {
         $('.review-submit-link[data-response="tp"]').click();
       }
@@ -60,7 +60,7 @@ $(document).ready(() => {
       return;
     }
 
-    const queue = /\/review\/([^\/]+)/.exec(location.pathname)[1];
+    const queue = /\/review\/([^\/]+)/.exec(location.pathname)[1]; // eslint-disable-line no-useless-escape
     if (queueSpecificActions[queue] && queueSpecificActions[queue][key]) {
       queueSpecificActions[queue][key](ev);
       return;
