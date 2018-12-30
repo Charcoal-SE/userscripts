@@ -22,13 +22,17 @@
 // @include     /^https?://chat\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|58631|59281|61165|65945|84778)(?:[&/].*$|$)/
 // @include     /^https?://chat\.meta\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:89|1037|1181)(?:[&/].*$|$)/
 // @include     /^https?://chat\.stackoverflow\.com/(?:rooms/|search.*[?&]room=)(?:41570|90230|111347|126195|167826|170175)(?:[&/].*$|$)/
+// @require     https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js
+// @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
 // ==/UserScript==
+/* globals ReconnectingWebSocket */
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
  */
 (() => {
+  'use strict';
   let fire;
 
   /**
@@ -85,6 +89,7 @@
       openOnSiteCodes: keyCodesToArray(['7', 'o', numpad('7', constants)]),
       openOnMSCodes: keyCodesToArray(['8', 'm', numpad('8', constants)]),
       buttonKeyCodes: [],
+      webSocket: null,
       reportCache: {},
       openReportPopupForMessage,
       decorateMessage
@@ -1916,8 +1921,11 @@
     injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
 
     // Toastr is a JavaScript library for non-blocking notifications.
-    injectScript(typeof toastr, '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', loadToastrCss, initializeToastr);
-    injectScript(typeof metapi, '//charcoal-se.org/userscripts/metapi/metapi.js', registerWebSocket);
+    injectScript(typeof toastr === 'undefined', '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', null, () => {
+      loadToastrCss();
+      initializeToastr();
+    });
+    injectScript(typeof ReconnectingWebSocket === 'undefined', '//cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js', null, registerWebSocket);
 
     fire.log('Injected scripts and stylesheets.');
   }
@@ -1943,13 +1951,13 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string}   name       The global name to check against before injecting the script. Example: (`typeof myInjectedGlobal`)
-   * @param {string}   path       The script's path.
-   * @param {function} [callback] An optional "success" callback.
-   * @param {function} [always]   An optional "always" callback.
+   * @param {falsy/truthy}   load       If truthy, this function loads the script. Falsy indicates it's already loaded.
+   * @param {string}         path       The script's path.
+   * @param {function}       [callback] An optional "success" callback.
+   * @param {function}       [always]   An optional "always" callback.
    */
-  function injectScript(name, path, callback, always) {
-    if (name === 'undefined') {
+  function injectScript(load, path, callback, always) {
+    if (load) {
       $.ajaxSetup({cache: true});
       $.getScript(`${path}?fire=${fire.metaData.version}`)
         .done(callback || $.noop)
@@ -1957,6 +1965,8 @@
         .fail(() => fire.error('Script failed to load: ', path))
         .always(always || $.noop)
         .always(() => $.ajaxSetup({cache: false}));
+    } else if (typeof always === 'function') {
+      always();
     }
   }
 
@@ -2056,8 +2066,26 @@
    * @memberof module:fire
    */
   function registerWebSocket() {
-    metapi.watchSocket(fire.api.ms.key, socketOnMessage);
-    fire.log('WebSocket initialized.');
+    if (fire.webSocket) {
+      // Close any existing WebSocket.
+      fire.webSocket.close();
+    }
+    fire.webSocket = new ReconnectingWebSocket('wss://metasmoke.erwaysoftware.com/cable', null, {automaticOpen: false});
+    fire.webSocket.addEventListener('message', socketOnMessage);
+    fire.webSocket.addEventListener('open', () => {
+      fire.webSocket.send(JSON.stringify({
+        identifier: JSON.stringify({
+          channel: 'ApiChannel',
+          key: fire.api.ms.key
+        }),
+        command: 'subscribe'
+      }));
+    });
+    // Wait 3s to open the WebSocket, due to potential disruption while the page loads.
+    setTimeout(() => {
+      fire.webSocket.open();
+      fire.log('WebSocket initialized.');
+    }, fire.constants.webSocketInitialOpenDelay);
   }
 
   /**
@@ -2350,7 +2378,8 @@
       tooltipOffset: 20,
       tooltipOffsetSmall: 5,
       halfPopupWidth: 300,
-      minPopupLeft: 10
+      minPopupLeft: 10,
+      webSocketInitialOpenDelay: 3000
     };
   }
 })();
