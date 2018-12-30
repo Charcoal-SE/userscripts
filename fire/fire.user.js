@@ -89,7 +89,7 @@
        */
       metaData: GM_info.script || GM_info['Feedback Instantly, Rapidly, Effortlessly'],
       /**
-       * The userscript's api urls and keys
+       * The userscript's API URLs and keys
        *
        * @public
        * @memberof module:fire
@@ -290,7 +290,7 @@
         const itemsById = {};
         for (const item of response.items)
           itemsById[item.id] = item;
-        // May need to handle the posibility that there will be multiple pages
+        // May need to handle the possibility that there will be multiple pages
         const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF`;
         $.get(feedbacksUrl).done(feedbacks => {
           // Add the feedbacks to each main item.
@@ -312,7 +312,7 @@
    * @param {object}  data          A metasmoke report
    * @param {boolean} openAfterLoad Open the report popup after load?
    * @param {object}  $this         The clicked FIRE report button
-   * @param {boolean} skipLoadPost  skip loading additional data fot the post?
+   * @param {boolean} skipLoadPost  skip loading additional data for the post?
    */
   function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
@@ -379,7 +379,7 @@
       delete localStorage['fire-user-sites'];
     }
 
-    if (!sites.storedAt) { // If the site data is empy
+    if (!sites.storedAt) { // If the site data is empty
       const parameters = {
         filter: '!Fn4IB7S7Yq2UJF5Bh48LrjSpTc',
         pagesize: 10000
@@ -566,7 +566,7 @@
    * @memberof module:fire
    *
    * @param {object} response the Stack Exchange `user` response.
-   * @param {number} page     The page that's been loaed.
+   * @param {number} page     The page that's been loaded.
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
@@ -647,7 +647,7 @@
    * @param   {string}   method         The Stack Exchange api method.
    * @param   {object}   parameters     The parameters to be passed to the Stack Exchange api.
    * @param   {object}   config         The AJAX call configuration object, containing:
-   * @param   {function} config.call    The jquery AJAX call to use.
+   * @param   {function} config.call    The jQuery AJAX call to use.
    * @param   {function} config.success The `success` callback.
    * @param   {function} config.error   The `error` callback.
    * @param   {function} config.always  The `always` callback.
@@ -1050,7 +1050,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {function} callback The action to perform after getting a write token / chosing read-only mode.
+   * @param {function} callback The action to perform after getting a write token / choosing read-only mode.
    */
   function writeTokenPopup(callback) {
     const input = _('input', 'fire-popup-input', {
@@ -1946,7 +1946,7 @@
   function injectExternalScripts() {
     injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
 
-    // Toastr is a Javascript library for non-blocking notifications.
+    // Toastr is a JavaScript library for non-blocking notifications.
     injectScript(typeof toastr, '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', loadToastrCss, initializeToastr);
     injectScript(typeof metapi, '//charcoal-se.org/userscripts/metapi/metapi.js', registerWebSocket);
 
@@ -1974,7 +1974,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string}   name       The global name to check against before injecting the script. Exapme: (`typeof myInjectedGlobal`)
+   * @param {string}   name       The global name to check against before injecting the script. Example: (`typeof myInjectedGlobal`)
    * @param {string}   path       The script's path.
    * @param {function} [callback] An optional "success" callback.
    * @param {function} [always]   An optional "always" callback.
@@ -2081,14 +2081,14 @@
   }
 
   /**
-   * registerWebSocket - Register a websocket listener.
+   * registerWebSocket - Register a WebSocket listener.
    *
    * @private
    * @memberof module:fire
    */
   function registerWebSocket() {
     metapi.watchSocket(fire.api.ms.key, socketOnMessage);
-    fire.log('Websocket initialized.');
+    fire.log('WebSocket initialized.');
   }
 
   /**
@@ -2306,10 +2306,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param {number}  count          The number of attempts alreay made. Initial calls to this function usually do not provide this parameter.
+   * @param {number}  count          The number of attempts already made. Initial calls to this function usually do not provide this parameter.
    */
   function getCurrentChatUser(count) {
-    // This will loop until it succesfully gets the user from CHAT, unless it's not available, then a stored version is used.
+    // This will loop until it successfully gets the user from CHAT, unless it's not available, then a stored version is used.
     //   It's tried immediately, then the next nine attempts are at intervals defined by fire.constants.loadUserDelay.
     //   All attempts after that are at 10 times that delay. Currently, that's 9 at 500ms, then 5s intervals.
     count = count ? count + 1 : 1;
