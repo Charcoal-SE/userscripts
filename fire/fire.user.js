@@ -402,10 +402,6 @@
 
           if (typeof autoflagging !== 'undefined') { // eslint-disable-line no-undef
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
-
-            // The post is deleted, but metasmoke doesn't know it yet.
-            if (fire.userData.metasmokeWriteToken)
-              metapi.deletedPost(report.id, fire.api.ms.key, fire.userData.metasmokeWriteToken, $.noop);
           }
 
           if (report.has_sent_feedback)
