@@ -1364,7 +1364,7 @@
           ))
           .append(br())
           .append(createSettingsCheckBox('flag', fire.userData.flag, flagOptionClickHandler,
-            'Also submit "Spam" flag with "tpu-" feedback.',
+            'Also submit "spam" and "rude" flags with those buttons.',
             'Flag on feedback:')
           )
           .append(br())
