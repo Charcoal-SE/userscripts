@@ -5,57 +5,34 @@
 // @author      Cerbrus
 // @contributor Makyen
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.1.0
+// @version     1.2.0
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
-// @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*
-// @match       *://chat.meta.stackexchange.com/rooms/1037/*
-// @match       *://chat.meta.stackexchange.com/rooms/1181/the-fire-department*
-// @match       *://chat.stackexchange.com/rooms/11/*
-// @match       *://chat.stackexchange.com/rooms/95/*
-// @match       *://chat.stackexchange.com/rooms/201/*
-// @match       *://chat.stackexchange.com/rooms/388/*
-// @match       *://chat.stackexchange.com/rooms/468/*
-// @match       *://chat.stackexchange.com/rooms/511/*
-// @match       *://chat.stackexchange.com/rooms/2165/*
-// @match       *://chat.stackexchange.com/rooms/3877/*
-// @match       *://chat.stackexchange.com/rooms/8089/*
-// @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
-// @match       *://chat.stackexchange.com/rooms/22462/*
-// @match       *://chat.stackexchange.com/rooms/24938/*
-// @match       *://chat.stackexchange.com/rooms/34620/*
-// @match       *://chat.stackexchange.com/rooms/35068/*
-// @match       *://chat.stackexchange.com/rooms/38932/*
-// @match       *://chat.stackexchange.com/rooms/47869/*
-// @match       *://chat.stackexchange.com/rooms/56223/the-spam-blot*
-// @match       *://chat.stackexchange.com/rooms/58631/*
-// @match       *://chat.stackexchange.com/rooms/59281/*
-// @match       *://chat.stackexchange.com/rooms/61165/*
-// @match       *://chat.stackexchange.com/rooms/65945/*
-// @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
-// @match       *://chat.stackoverflow.com/rooms/90230/*
-// @match       *://chat.stackoverflow.com/rooms/111347/sobotics*
-// @match       *://chat.stackoverflow.com/rooms/126195/*
-// @match       *://chat.stackoverflow.com/rooms/167826/*
-// @match       *://chat.stackoverflow.com/rooms/170175/*
 // @match       *://chat.stackexchange.com/transcript/*
 // @match       *://chat.meta.stackexchange.com/transcript/*
 // @match       *://chat.stackoverflow.com/transcript/*
 // @match       *://chat.stackexchange.com/users/120914/*
+// @match       *://chat.stackexchange.com/users/120914?*
 // @match       *://chat.stackoverflow.com/users/3735529/*
+// @match       *://chat.stackoverflow.com/users/3735529?*
 // @match       *://chat.meta.stackexchange.com/users/266345/*
-// @include     /^https?://chat\.stackexchange\.com/search.*[?&]room=(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|58631|59281|61165|65945)(?:\b.*$|$)/
-// @include     /^https?://chat\.meta\.stackexchange\.com/search.*[?&]room=(?:89|1037|1181)(?:\b.*$|$)/
-// @include     /^https?://chat\.stackoverflow\.com/search.*[?&]room=(?:41570|90230|111347|126195|167826|170175)(?:\b.*$|$)/
+// @match       *://chat.meta.stackexchange.com/users/266345?*
+// @include     /^https?://chat\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|58631|59281|61165|65945|84778)(?:[&/].*$|$)/
+// @include     /^https?://chat\.meta\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:89|1037|1181)(?:[&/].*$|$)/
+// @include     /^https?://chat\.stackoverflow\.com/(?:rooms/|search.*[?&]room=)(?:41570|90230|111347|126195|167826|170175)(?:[&/].*$|$)/
+// @require     https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js
+// @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
 // ==/UserScript==
+/* globals ReconnectingWebSocket */
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
  */
 (() => {
+  'use strict';
   let fire;
 
   /**
@@ -89,7 +66,7 @@
        */
       metaData: GM_info.script || GM_info['Feedback Instantly, Rapidly, Effortlessly'],
       /**
-       * The userscript's api urls and keys
+       * The userscript's API URLs and keys
        *
        * @public
        * @memberof module:fire
@@ -109,9 +86,10 @@
       constants,
       smokeDetectorId,
       SDMessageSelector: `.user-${smokeDetectorId} .message `,
-      openOnSiteCodes: keyCodesToArray(['6', 'o', numpad('6', constants)]),
-      openOnMSCodes: keyCodesToArray(['7', 'm', numpad('7', constants)]),
+      openOnSiteCodes: keyCodesToArray(['7', 'o', numpad('7', constants)]),
+      openOnMSCodes: keyCodesToArray(['8', 'm', numpad('8', constants)]),
       buttonKeyCodes: [],
+      webSocket: null,
       reportCache: {},
       openReportPopupForMessage,
       decorateMessage
@@ -290,7 +268,7 @@
         const itemsById = {};
         for (const item of response.items)
           itemsById[item.id] = item;
-        // May need to handle the posibility that there will be multiple pages
+        // May need to handle the possibility that there will be multiple pages
         const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF`;
         $.get(feedbacksUrl).done(feedbacks => {
           // Add the feedbacks to each main item.
@@ -312,7 +290,7 @@
    * @param {object}  data          A metasmoke report
    * @param {boolean} openAfterLoad Open the report popup after load?
    * @param {object}  $this         The clicked FIRE report button
-   * @param {boolean} skipLoadPost  skip loading additional data fot the post?
+   * @param {boolean} skipLoadPost  skip loading additional data for the post?
    */
   function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
@@ -379,7 +357,7 @@
       delete localStorage['fire-user-sites'];
     }
 
-    if (!sites.storedAt) { // If the site data is empy
+    if (!sites.storedAt) { // If the site data is empty
       const parameters = {
         filter: '!Fn4IB7S7Yq2UJF5Bh48LrjSpTc',
         pagesize: 10000
@@ -429,10 +407,6 @@
 
           if (typeof autoflagging !== 'undefined') { // eslint-disable-line no-undef
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
-
-            // The post is deleted, but metasmoke doesn't know it yet.
-            if (fire.userData.metasmokeWriteToken)
-              metapi.deletedPost(report.id, fire.api.ms.key, fire.userData.metasmokeWriteToken, $.noop);
           }
 
           if (report.has_sent_feedback)
@@ -566,7 +540,7 @@
    * @memberof module:fire
    *
    * @param {object} response the Stack Exchange `user` response.
-   * @param {number} page     The page that's been loaed.
+   * @param {number} page     The page that's been loaded.
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
@@ -647,7 +621,7 @@
    * @param   {string}   method         The Stack Exchange api method.
    * @param   {object}   parameters     The parameters to be passed to the Stack Exchange api.
    * @param   {object}   config         The AJAX call configuration object, containing:
-   * @param   {function} config.call    The jquery AJAX call to use.
+   * @param   {function} config.call    The jQuery AJAX call to use.
    * @param   {function} config.success The `success` callback.
    * @param   {function} config.error   The `error` callback.
    * @param   {function} config.always  The `always` callback.
@@ -1050,7 +1024,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {function} callback The action to perform after getting a write token / chosing read-only mode.
+   * @param {function} callback The action to perform after getting a write token / choosing read-only mode.
    */
   function writeTokenPopup(callback) {
     const input = _('input', 'fire-popup-input', {
@@ -1153,13 +1127,23 @@
       .append(br());
 
     if (!fire.userData.readOnly) {
-      top
-        .append(createFeedbackButton(d, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'True positive'))
-        .append(createFeedbackButton(d, ['2', 'r', numpad('2')], 'rude', 'rude', 'Rude / Abusive'))
-        .append(createFeedbackButton(d, ['3', 'v', numpad('3')], 'tp-', 'tp-', 'Vandalism'))
-        .append(createFeedbackButton(d, ['4', 'n', numpad('4')], 'naa-', 'naa-', 'Not an Answer / VLQ'))
-        .append(createFeedbackButton(d, ['5', 'f', numpad('5')], 'fp-', 'fp-', 'False Positive'))
-        .append(br());
+      const buttonContainer = _('div', 'fire-popup-feedbackButtonContainer').css({
+        display: 'inline-block',
+        'vertical-align': 'middle'
+      });
+      top.append(buttonContainer);
+      /* eslint-disable no-multi-spaces */
+      buttonContainer
+        // Buttons that raise a flag and send feedback.
+        .append(createFeedbackButton(d, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'spam', 'True positive, blacklist user & spam flag (add user to blacklist)'))
+        .append(createFeedbackButton(d, ['2', 'r', numpad('2')], 'rude', 'tpu-', 'rude', 'Rude / Abusive, blacklist user & rude flag'))
+        // Buttons that only send feedback.
+        .append('<span style="float:left;padding:4px 5px 0px 15px;" title="The following don\'t raise a flag, they only submit feedback to metasmoke.">No flag:</span>')
+        .append(createFeedbackButton(d, ['3', 'T', numpad('3')], 'tpu-', 'tpu-', '',     'True positive & blacklist user; Don\'t raise a flag.'))
+        .append(createFeedbackButton(d, ['4', 'v', numpad('4')], 'tp-',  'tp-',  '',     'tp- (e.g. Vandalism; single case of undisclosed affiliation); Don\'t add user to blacklist. Don\'t raise a flag.'))
+        .append(createFeedbackButton(d, ['5', 'n', numpad('5')], 'naa-', 'naa-', '',     'Not an Answer / VLQ; Don\'t raise a flag.'))
+        .append(createFeedbackButton(d, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'));
+      /* eslint-enable no-multi-spaces */
     }
 
     let postType;
@@ -1380,7 +1364,7 @@
           ))
           .append(br())
           .append(createSettingsCheckBox('flag', fire.userData.flag, flagOptionClickHandler,
-            'Also submit "Spam" flag with "tpu-" feedback.',
+            'Also submit "spam" and "rude" flags with those buttons.',
             'Flag on feedback:')
           )
           .append(br())
@@ -1481,48 +1465,41 @@
   }
 
   /**
-   * postMetaSmokeFeedback - Submit metasmoke feedback.
+   * postMetaSmokeFeedbackAndFlag - Submit metasmoke feedback and flag, if appropriate.
    *
    * @private
    * @memberof module:fire
    *
-   * @param {object} data    The report data.
-   * @param {string} verdict The chosen verdict.
-   * @param {object} button  The clicked button.
+   * @param {object} data     The report data.
+   * @param {string} verdict  The chosen verdict.
+   * @param {string} flagType The chosen flag type.
    */
-  function postMetaSmokeFeedback(data, verdict, button) {
-    if (!fire.sendingFeedback && !$(button).attr('disabled')) {
+  function postMetaSmokeFeedbackAndFlag(data, verdict, flagType) {
+    if (!fire.sendingFeedback) {
       fire.sendingFeedback = true;
 
       const {ms} = fire.api;
       const token = fire.userData.metasmokeWriteToken;
       if (data.has_sent_feedback) {
-        const message = span('You have already sent feedback to metasmoke for this report.');
-        if (verdict === 'tpu-') {
-          postMetaSmokeSpamFlag(data, ms, token, message.after('<br /><br />'));
+        const info = span('You have already sent feedback to metasmoke for this report.');
+        if (fire.userData.flag && flagType) {
+          postMetaSmokeFlag(data, flagType, {info});
         } else {
-          toastr.info(message);
+          toastr.info(info);
           closePopup();
         }
       } else {
-        let msVerdict = verdict;
-        if (verdict === 'rude') {
-          msVerdict = 'tpu-';
-          toastr.info('"Rude / Abusive" flagging isn\'t implemented yet.<br />' +
-            'If you wish to flag this as well, please select "tpu-"');
-        }
-
         $.ajax({
           type: 'POST',
           url: `${ms.urlV1}w/post/${data.id}/feedback`, // V2.0 appears broken at this time. Using V1.
-          data: {type: msVerdict, key: ms.key, token}
+          data: {type: verdict, key: ms.key, token}
         })
         .done(() => {
-          const message = span(`Sent feedback "<em>${verdict}"</em> to metasmoke.`);
-          if (verdict === 'tpu-' && fire.userData.flag) {
-            postMetaSmokeSpamFlag(data, ms, token, message.after('<br /><br />'));
+          const success = span(`Sent feedback "<em>${verdict}</em>" to metasmoke.`);
+          if (fire.userData.flag && flagType) {
+            postMetaSmokeFlag(data, flagType, {success});
           } else {
-            toastr.success(message);
+            toastr.success(success);
             closePopup();
           }
         })
@@ -1535,7 +1512,13 @@
 
             getWriteToken(() => openReportPopup.call(previous)); // Open the popup later
           } else {
-            toastr.error('An error occurred sending post feedback to metasmoke.');
+            const error = span(`An error occurred sending post feedback "<em>${verdict}</em>" to metasmoke.`);
+            if (fire.userData.flag && flagType) {
+              // Even if we got a non-auth-needed error for the feedback, we still try to flag.
+              postMetaSmokeFlag(data, flagType, {error});
+            } else {
+              toastr.error(error);
+            }
             fire.error('An error occurred sending post feedback to metasmoke.', jqXHR);
           }
         })
@@ -1547,20 +1530,36 @@
   }
 
   /**
-   * postMetaSmokeSpamFlag - Flag the post as spam.
+   * toastrFeedbackResult - Display a toastr message from the feedback result.
    *
    * @private
    * @memberof module:fire
    *
-   * @param   {object} data            The report data.
-   * @param   {object} api             API configuration object, containing:
-   * @param   {string} api.url         The API url.
-   * @param   {string} api.key         The API key.
-   * @param   {string} token           The metasmoke write token.
-   * @param   {object} feedbackSuccess A jQuery DOM node containing the feedback success message.
-   * @returns {undefined}              returns undefined to break out of the function.
+   * @param   {object} feedbackResult   An Object with 'success', 'info', 'warning', or 'error' properties that can be sent to the toastr method of that name.
    */
-  function postMetaSmokeSpamFlag(data, {url, key}, token, feedbackSuccess) {
+  function toastrFeedbackResult(feedbackResult) {
+    Object.entries(feedbackResult).forEach(([key, value]) => {
+      if (value && typeof value === 'object' && value.length > 0) toastr[key](value);
+    });
+  }
+
+  /**
+   * postMetaSmokeFlag - Flag the post as spam.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object} data             The report data.
+   * @param   {string} flagType         The chosen type of flag ('spam' || 'rude' || 'abusive'). 'spam' is default.
+   * @param   {object} feedbackResult   An Object with 'success', 'info', 'warning', or 'error' properties that can be sent to the toastr method of that name.
+   * @returns {undefined}               returns undefined to break out of the function.
+   */
+  function postMetaSmokeFlag(data, flagType, feedbackResult) {
+    const {url, key} = fire.api.ms;
+    const token = fire.userData.metasmokeWriteToken;
+    flagType = flagType ? flagType : 'spam'; // Default
+    const normalizedFlagType = flagType === 'rude' ? 'abusive' : flagType; // rude is a synonym for abusive, which is what MS understands.
+    const permittedFlagTypes = ['spam', 'abusive'];
     /* TODO: fix this
     let site = fire.sites[data.site];
     if (!site.account) {
@@ -1571,21 +1570,24 @@
       toastr.info(feedbackSuccess.after(span("You don't have enough reputation on this site to cast a spam flag.")));
     } else */
     if (data.has_auto_flagged) {
-      toastr.info(feedbackSuccess.after(span('You already autoflagged this post as spam.')));
+      toastr.info(span('You already autoflagged this post as spam.'));
     } else if (data.has_manual_flagged) {
-      toastr.info(feedbackSuccess.after(span('You already flagged this post as spam.')));
+      toastr.info(span('You already manually flagged this post.'));
     } else if (data.is_deleted) {
-      toastr.info(feedbackSuccess.after(span('The reported post can\'t be flagged: It is already deleted.')));
+      toastr.info(span('The reported post can\'t be flagged: It is already deleted.'));
+    } else if (permittedFlagTypes.indexOf(normalizedFlagType) === -1) {
+      toastr.error(span('MS does not support that flag type.'));
     } else {
       $.ajax({
         type: 'POST',
         url: `${url}posts/${data.id}/flag`,
-        data: {key, token}
+        data: {
+          key,
+          token,
+          flag_type: normalizedFlagType
+        }
       })
       .done(response => {
-        toastr.success(feedbackSuccess.after(span('Successfully flagged the post as "spam".')));
-        closePopup();
-
         if (response.backoff) {
           // We've got a backoff. Deal with it...
           // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
@@ -1594,10 +1596,11 @@
           toastr.info('Backoff received');
           fire.info('Backoff received', data, response);
         }
+        toastr.success(span(`Successfully flagged the post as "${flagType}".`));
+        toastrFeedbackResult(feedbackResult);
+        closePopup();
       })
       .error(jqXHR => {
-        toastr.success('Sent feedback <em>"tpu-"</em> to metasmoke.'); // We came from a "feedback" success handler.
-
         if (jqXHR.status === fire.constants.http.conflict) {
           // https://metasmoke.erwaysoftware.com/authentication/status
           // Will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
@@ -1611,31 +1614,31 @@
         } else {
           if (jqXHR.responseText) {
             const response = getJqXHRmessage(jqXHR);
-            if (response.message === 'Flag option not present') {
-              toastr.info('This post could not be flagged.<br/>It\'s probably already deleted.');
+            const knownResponses = {
+              'Flag option not present': 'This post could not be flagged.<br/>It\'s probably already deleted.',
+              'No account on this site.': 'This post could not be flagged.<br/>You don\'t have an account on that site.',
+              'You have already flagged this post for moderator attention': 'This post could not be flagged.<br/>You have already flagged this post for moderator attention.'
+            };
+            const flagInfo = knownResponses[response];
+            if (flagInfo) {
+              toastr.info(flagInfo);
+              toastrFeedbackResult(feedbackResult);
               closePopup();
               return;
-            } // else
-            if (response.message === 'No account on this site.') {
-              toastr.info('This post could not be flagged.<br/>You don\'t have an account on that site.');
-              closePopup();
-              return;
-            } // else
-            if (response.message === 'You have already flagged this post for moderator attention') {
-              toastr.info('This post could not be flagged.<br/>You have already flagged this post for moderator attention.');
-              closePopup();
-              return;
-            } // else
+            }
           }
 
           // Will give you a 500 with status: 'failed' and a message if the spam flag fails;
-          toastr.error('Something went wrong while attempting to submit a spam flag');
-          fire.error('Something went wrong while attempting to submit a spam flag', data, jqXHR);
+          toastr.error(`Something went wrong while attempting to submit a ${flagType} flag`);
+          fire.error(`Something went wrong while attempting to submit a ${flagType} flag`, data, jqXHR);
+          toastrFeedbackResult(feedbackResult);
           fire.sendingFeedback = false;
+          // This path does not close the popup.
         }
       });
-      return;
+      return; // The last else does not fall through.
     }
+    toastrFeedbackResult(feedbackResult);
     closePopup();
   }
 
@@ -1684,10 +1687,11 @@
    * @param   {(number|string|array)} keyCodes The keyCodes to use for this button.
    * @param   {string}                text     The text to display for this button.
    * @param   {string}                verdict  This button's metasmoke verdict
+   * @param   {string}                flagType This button's flag type
    * @param   {string}                tooltip  The tooltip to display for this button.
    * @returns {object}                         The constructed feedback button.
    */
-  function createFeedbackButton(data, keyCodes, text, verdict, tooltip) {
+  function createFeedbackButton(data, keyCodes, text, verdict, flagType, tooltip) { // eslint-disable-line max-params
     let count;
     let hasSubmittedFeedback;
     let disabled = false;
@@ -1710,10 +1714,15 @@
     return _('a', `button fire-feedback-button fire-${verdict}${cssClass}`, {
       text: text + suffix,
       click: ({currentTarget}) => {
+        const $currentTarget = $(currentTarget);
+        if ($currentTarget.attr('disabled')) {
+          // Do nothing.
+          return;
+        }
         if (!data.has_sent_feedback ||
           (fire.userData.flag && !(data.has_flagged || data.is_deleted)) // eslint-disable-line no-extra-parens
         ) {
-          postMetaSmokeFeedback(data, verdict, currentTarget);
+          postMetaSmokeFeedbackAndFlag(data, verdict, flagType);
         } else {
           let performedAction;
           if (data.has_flagged)
@@ -1911,9 +1920,12 @@
   function injectExternalScripts() {
     injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
 
-    // Toastr is a Javascript library for non-blocking notifications.
-    injectScript(typeof toastr, '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', loadToastrCss, initializeToastr);
-    injectScript(typeof metapi, '//charcoal-se.org/userscripts/metapi/metapi.js', registerWebSocket);
+    // Toastr is a JavaScript library for non-blocking notifications.
+    injectScript(typeof toastr === 'undefined', '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', null, () => {
+      loadToastrCss();
+      initializeToastr();
+    });
+    injectScript(typeof ReconnectingWebSocket === 'undefined', '//cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js', null, registerWebSocket);
 
     fire.log('Injected scripts and stylesheets.');
   }
@@ -1939,13 +1951,13 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string}   name       The global name to check against before injecting the script. Exapme: (`typeof myInjectedGlobal`)
-   * @param {string}   path       The script's path.
-   * @param {function} [callback] An optional "success" callback.
-   * @param {function} [always]   An optional "always" callback.
+   * @param {falsy/truthy}   load       If truthy, this function loads the script. Falsy indicates it's already loaded.
+   * @param {string}         path       The script's path.
+   * @param {function}       [callback] An optional "success" callback.
+   * @param {function}       [always]   An optional "always" callback.
    */
-  function injectScript(name, path, callback, always) {
-    if (name === 'undefined') {
+  function injectScript(load, path, callback, always) {
+    if (load) {
       $.ajaxSetup({cache: true});
       $.getScript(`${path}?fire=${fire.metaData.version}`)
         .done(callback || $.noop)
@@ -1953,6 +1965,8 @@
         .fail(() => fire.error('Script failed to load: ', path))
         .always(always || $.noop)
         .always(() => $.ajaxSetup({cache: false}));
+    } else if (typeof always === 'function') {
+      always();
     }
   }
 
@@ -2046,14 +2060,32 @@
   }
 
   /**
-   * registerWebSocket - Register a websocket listener.
+   * registerWebSocket - Register a WebSocket listener.
    *
    * @private
    * @memberof module:fire
    */
   function registerWebSocket() {
-    metapi.watchSocket(fire.api.ms.key, socketOnMessage);
-    fire.log('Websocket initialized.');
+    if (fire.webSocket) {
+      // Close any existing WebSocket.
+      fire.webSocket.close();
+    }
+    fire.webSocket = new ReconnectingWebSocket('wss://metasmoke.erwaysoftware.com/cable', null, {automaticOpen: false});
+    fire.webSocket.addEventListener('message', socketOnMessage);
+    fire.webSocket.addEventListener('open', () => {
+      fire.webSocket.send(JSON.stringify({
+        identifier: JSON.stringify({
+          channel: 'ApiChannel',
+          key: fire.api.ms.key
+        }),
+        command: 'subscribe'
+      }));
+    });
+    // Wait 3s to open the WebSocket, due to potential disruption while the page loads.
+    setTimeout(() => {
+      fire.webSocket.open();
+      fire.log('WebSocket initialized.');
+    }, fire.constants.webSocketInitialOpenDelay);
   }
 
   /**
@@ -2271,10 +2303,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param {number}  count          The number of attempts alreay made. Initial calls to this function usually do not provide this parameter.
+   * @param {number}  count          The number of attempts already made. Initial calls to this function usually do not provide this parameter.
    */
   function getCurrentChatUser(count) {
-    // This will loop until it succesfully gets the user from CHAT, unless it's not available, then a stored version is used.
+    // This will loop until it successfully gets the user from CHAT, unless it's not available, then a stored version is used.
     //   It's tried immediately, then the next nine attempts are at intervals defined by fire.constants.loadUserDelay.
     //   All attempts after that are at 10 times that delay. Currently, that's 9 at 500ms, then 5s intervals.
     count = count ? count + 1 : 1;
@@ -2346,7 +2378,8 @@
       tooltipOffset: 20,
       tooltipOffsetSmall: 5,
       halfPopupWidth: 300,
-      minPopupLeft: 10
+      minPopupLeft: 10,
+      webSocketInitialOpenDelay: 3000
     };
   }
 })();

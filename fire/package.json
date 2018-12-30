@@ -1,6 +1,6 @@
 {
   "name": "fire",
-  "version": "0.9.22",
+  "version": "1.2.0",
   "description": "FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.",
   "scripts": {
     "test": "xo"
@@ -42,7 +42,7 @@
       "no-else-return": "error",
       "no-empty-function": "error",
       "no-magic-numbers": ["error", {
-        "ignore": [0, 1, 2],
+        "ignore": [-1, 0, 1, 2],
         "ignoreArrayIndexes": true
       }],
       "vars-on-top": "error",

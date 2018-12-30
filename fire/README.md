@@ -15,19 +15,19 @@ As of this moment, the userscript posts flags _and_ MS feedback.
   ![Fire icon on report](fire.png)
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
 - The popup will contain:
-  - The reported post's contents.
-    - All links in a post will show their target url when you hover your mouse over them.
-    - Code blocks in the post can be expanded by clicking on them.
-  - 5 feedback buttons.
-    - `[spam]`, `[rude]`, `[tp-]`, `[naa-]`, `[fp-]`, for spam, rude/abusive, vandalism, NAA/VLQ, false postitive.
-    - These can be selected with <kbd>1</kbd>-<kbd>5</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
-    - The buttons can contain a number in parentheses. This indicates how many users have sent that type of feedback.
   - A header for the post's site
     - Clicking this header or pressing <kbd>6</kbd> will open the reported post on the site.
   - A "Close" button.
-- When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network (configurable setting).
-  - Provided you [have authorized MetaSmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account.
-- `rude` feedbacks "tpu-", just like `spam`, but without casting any flags. The number of both kinds of feedback will be displayed in `spam`, as they're equal to MetaSmoke.
+  - 5 feedback buttons.
+    - `[spam]`, `[rude]`, `[tpu-]`, `[tp-]`, `[naa-]`, `[fp-]`, for spam (with flag), rude/abusive (with flag), tpu- feedback without flag, vandalism, NAA/VLQ, false positive.
+    - These can be selected with <kbd>1</kbd>-<kbd>6</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
+    - The buttons can contain a number in parentheses. This indicates how many users have sent that type of feedback. All of `[spam]`, `[rude]`, and `[tpu-]` are the same feedback and will show the same number. They differ in what flag was raised, if any, but flag counts are not displayed. 
+  - The reported post's contents.
+    - All links in a post will show their target URL when you hover your mouse over them.
+    - Code blocks in the post can be expanded by clicking on them.
+- Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account:
+  - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network (configurable setting).
+  - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network (configurable setting).
 - The popup modal's blur can be toggled with <kbd>B</kbd>
 - The popup be closed by pressing <kbd>Esc</kbd> or by clicking outside of the popup.
 
@@ -35,7 +35,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 
 When SmokeDetector reports a post, these steps can be taken:
 
-To flag it as spam / send _"True positive"_ feedback:
+To flag it as spam and send _"True positive"_ feedback (_tpu-_):
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>1</kbd> - Select _"True positive"_,
@@ -44,20 +44,20 @@ To flag it as spam / send _"True positive"_ feedback:
 To send _"False positive"_ feedback:
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
-2. <kbd>5</kbd> - Select _"False positive"_,
+2. <kbd>6</kbd> - Select _"False positive"_,
 3. <kbd>Space</kbd> or <kbd>Enter</kbd> - Submit.
 
 To open the reported post on it's site:
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
-2. <kbd>6</kbd> - Open the post.
+2. <kbd>7</kbd> - Open the post.
 
 # Authorize FIRE with Stack Exchange
 
 1. Open the settings window.
 2. Click "Authorize" button.
 3. A new window opens where you "accept"
-4. That window redirects to this chat with an access token in the url hash.
+4. That window redirects to this chat with an access token in the URL hash.
 5. Fire sees the hash, saves your token, then closes the new window.
 6. You go back to the old window, it detects a token, and shows you a "success" message.
 
@@ -69,6 +69,10 @@ To open the reported post on it's site:
  - Flagging will fail if you are not registered on the particular site.
 
 # Version History
+
+|1.2    ||
+| ---   |---
+|1.2.0  |Add rude/abusive flagging. @require script dependencies. Adding R/A flagging changes keyboard shortcuts.
 
 |1.1    ||
 | ---   |---
