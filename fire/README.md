@@ -16,20 +16,30 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
 - The popup will contain:
   - A header for the post's site
-    - Clicking this header or pressing <kbd>6</kbd> will open the reported post on the site.
+    - Clicking this header or pressing <kbd>7</kbd> will open the reported post on the site.
   - A "Close" button.
-  - 5 feedback buttons.
+  - 6 feedback buttons.
     - `[spam]`, `[rude]`, `[tpu-]`, `[tp-]`, `[naa-]`, `[fp-]`, for spam (with flag), rude/abusive (with flag), tpu- feedback without flag, vandalism, NAA/VLQ, false positive.
-    - These can be selected with <kbd>1</kbd>-<kbd>6</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>
-    - The buttons can contain a number in parentheses. This indicates how many users have sent that type of feedback. All of `[spam]`, `[rude]`, and `[tpu-]` are the same feedback and will show the same number. They differ in what flag was raised, if any, but flag counts are not displayed. 
+    - These can be selected with <kbd>1</kbd> through <kbd>6</kbd>, then "clicked" by pressing <kbd>Space</kbd> or <kbd>Enter</kbd>.
+    - The buttons can contain a number in parentheses. This indicates how many users have sent that type of feedback. All of `[spam]`, `[rude]`, and `[tpu-]` are the same feedback and will show the same number. They differ in what flag was raised, if any, but flag counts are not displayed.
+  - The title for the reported question, or the title of the question on which the reported answer was placed.
+    - Hovering over the title will display why the post was reported.
+    - To the left of the title:
+      - A ✏️ is displayed if the post has more than one revision (i.e. it has been edited, but not including edits made during the edit grace period).
+<!--      - A 🏳️ is displayed if you have manually flagged the post.-->
+<!--      - A 🏴 is displayed if you have auto-flagged the post.-->
+  - The username of the post author and their reputation on that site.
   - The reported post's contents.
-    - All links in a post will show their target URL when you hover your mouse over them.
+    - All links in a post will show a tooltip with their target URL when you hover your mouse over them. This is in addition to the browser's default display of hovered URLs.
     - Code blocks in the post can be expanded by clicking on them.
-- Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account:
-  - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network (configurable setting).
-  - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network (configurable setting).
+    - If selected (configurable setting), the post's images are hidden behind a placeholder image that can be clicked to show the image included in the post. If this option is set, then the post's images are not downloaded from their source until you click on the placeholder. This is to prevent potentially NSFW images from being downloaded to your machine.
+  - At the bottom right of the popup, is a ⚙️, which opens the settings popup when clicked.
+- Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account _and_ the configuration setting for flagging is enabled:
+  - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network.
+  - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network.
+  - Those buttons will still work for providing feedback when the configureation setting for flagging is disabled.
 - The popup modal's blur can be toggled with <kbd>B</kbd>
-- The popup be closed by pressing <kbd>Esc</kbd> or by clicking outside of the popup.
+- The popup can be closed by pressing <kbd>Esc</kbd>, clicking outside of the popup, or clicking the `[Close]` button at the top-right of the popup.
 
 ## Examples
 
@@ -38,16 +48,16 @@ When SmokeDetector reports a post, these steps can be taken:
 To flag it as spam and send _"True positive"_ feedback (_tpu-_):
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
-2. <kbd>1</kbd> - Select _"True positive"_,
+2. <kbd>1</kbd> - Select _"spam"_,
 3. <kbd>Space</kbd> or <kbd>Enter</kbd> - Submit.
 
 To send _"False positive"_ feedback:
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
-2. <kbd>6</kbd> - Select _"False positive"_,
+2. <kbd>6</kbd> - Select _"fp-"_ (False positive),
 3. <kbd>Space</kbd> or <kbd>Enter</kbd> - Submit.
 
-To open the reported post on it's site:
+To open the reported post on its site:
 
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>7</kbd> - Open the post.
@@ -65,14 +75,14 @@ To open the reported post on it's site:
 
  - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
  - Forgetting to authorize FIRE. See the previous section.
- - FIRE will not submit flags on any site where you are a diamond moderator (♦) as a security precaution. However, it will still work on all other sites.
+ - FIRE will not submit flags on any site where you are a diamond moderator (♦), as a security precaution. However, it will still flag on all other sites. Your feedback will still be submitted on sites you are a moderator. The restriction of not raising flags on sites where you are a moderator is a general flagging-through-metasmoke restriction.  
  - Flagging will fail if you are not registered on the particular site.
 
 # Version History
 
 |1.2    ||
 | ---   |---
-|1.2.0  |Add rude/abusive flagging. @require script dependencies. Adding R/A flagging changes keyboard shortcuts.
+|1.2.0  |Add rude/abusive flagging. `@require` script dependencies. Adding R/A flagging changes keyboard shortcuts. Fix flagging toastr messages, which were often not displayed. A toastr message will now be displayed for each of feedback and flagging. The toastr for feedback will be on top.
 
 |1.1    ||
 | ---   |---
