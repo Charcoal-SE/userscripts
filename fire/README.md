@@ -1,4 +1,4 @@
-# 🔥 FIRE!
+# 🔥 FIRE!&nbsp;&nbsp;&nbsp;&nbsp;<sub><sup>([Code](https://github.com/Charcoal-SE/userscripts/blob/master/fire/fire.user.js)) &nbsp;([Install](https://github.com/Charcoal-SE/userscripts/raw/master/fire/fire.user.js))</sup></sub>
 
 Feedback Instantly, Effortlessly, and Rapidly (FIRE)
 is a userscript which allows you to react to SmokeDetector spam reports in chat
