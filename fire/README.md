@@ -34,6 +34,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
     - Code blocks in the post can be expanded by clicking on them.
     - If selected (configurable setting), the post's images are hidden behind a placeholder image that can be clicked to show the image included in the post. If this option is set, then the post's images are not downloaded from their source until you click on the placeholder. This is to prevent potentially NSFW images from being downloaded to your machine.
   - At the bottom right of the popup, is a ⚙️, which opens the settings popup when clicked.
+  - Just to the left of the ⚙️ is the currently running version number of FIRE. It's a link to download the most recent released version from GitHub.
 - Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account _and_ the configuration setting for flagging is enabled:
   - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network.
   - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network.
