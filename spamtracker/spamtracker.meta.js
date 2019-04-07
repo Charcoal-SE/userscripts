@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Spamtracker
-// @version      1.0.1
+// @version      1.1.0
 // @description  Rewrite of the spamtracker project, this userscript will notify you using sound and a notification if a new spam post has been posted in any smoke detector supported rooms
 // @author       Ferrybig
 // @match        *://chat.meta.stackexchange.com/*

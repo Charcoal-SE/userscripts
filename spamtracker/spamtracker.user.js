@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Spamtracker
-// @version      1.0.1
+// @version      1.1.0
 // @description  Rewrite of the spamtracker project, this userscript will notify you using sound and a notification if a new spam post has been posted in any smoke detector supported rooms
 // @author       Ferrybig
 // @match        *://chat.meta.stackexchange.com/*
@@ -558,7 +558,7 @@ unsafeWindow.Spamtracker = (function (target, siterooms, window, originalWindow)
     if (!message || !message.children[1]) {
       return false;
     }
-    const smoke = /\/\/(goo.gl\/eLDYqh|Charcoal-SE\/SmokeDetector)/i;
+    const smoke = /\/\/(git.io\/vyDZv|Charcoal-SE\/SmokeDetector)/i;
     const sePostRegex = /\/\/[a-z]*.stackexchange.com|stackoverflow.com|superuser.com|serverfault.com|askubuntu.com|stackapps.com|mathoverflow.net/i;
     const content = message.children[1].innerHTML;
     const textContent = message.children[1].textContent;
