@@ -29,6 +29,7 @@
       "greasemonkey"
     ],
     "rules": {
+      "linebreak-style": "off",
       "quotes": ["error", "single", {"avoidEscape": true}]
     }
   }
