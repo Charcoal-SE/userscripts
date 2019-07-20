@@ -26,6 +26,14 @@
       "browser",
       "jquery"
     ],
+    "ignores": [
+      "fire/*",
+      "metapi/*",
+      "metapi/*/*",
+      "ms-dark-theme/*",
+      "review-keyboard-shortcuts/*",
+      "sim/*"
+    ],
     "rules": {
       "quotes": [
         "error",
