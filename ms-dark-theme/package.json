@@ -16,7 +16,13 @@
       "jquery"
     ],
     "rules": {
-      "quotes": ["warn", "double", {"avoidEscape": true}],
+      "quotes": [
+        "warn",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ],
       "camelcase": 1,
       "brace-style": 0,
       "no-prototype-builtins": 0,
@@ -24,7 +30,10 @@
       "linebreak-style": "off",
       "comma-dangle": "off",
       "no-eq-null": "off",
-      "eqeqeq": ["error", "smart"],
+      "eqeqeq": [
+        "error",
+        "smart"
+      ],
       "unicorn/filename-case": "off"
     },
     "globals": [

@@ -31,42 +31,112 @@
       "greasemonkey"
     ],
     "rules": {
-      "arrow-parens": ["error", "always"],
-      "comma-dangle": ["error", "always-multiline"],
-      "new-cap": ["error", { "capIsNewExceptions": ["jQuery.Deferred"] }],
-      "unicorn/catch-error-name": ["error", { "name": "error" }],
-      "quotes": ["error", "single", {"avoidEscape": true}],
+      "arrow-parens": [
+        "error",
+        "always"
+      ],
+      "comma-dangle": [
+        "error",
+        "always-multiline"
+      ],
+      "new-cap": [
+        "error",
+        {
+          "capIsNewExceptions": [
+            "jQuery.Deferred"
+          ]
+        }
+      ],
+      "unicorn/catch-error-name": [
+        "error",
+        {
+          "name": "error"
+        }
+      ],
+      "quotes": [
+        "error",
+        "single",
+        {
+          "avoidEscape": true
+        }
+      ],
       "camelcase": "off",
-      "max-params": ["warn", 5],
+      "max-params": [
+        "warn",
+        5
+      ],
       "linebreak-style": "off",
-      "curly": ["error"],
+      "curly": [
+        "error",
+        "multi-or-nest",
+        "consistent"
+      ],
       "no-console": "error",
       "no-extra-parens": "off",
       "no-prototype-builtins": "error",
-      "complexity": ["error", 20],
+      "complexity": [
+        "error",
+        20
+      ],
       "consistent-return": "error",
       "no-else-return": "error",
       "no-empty-function": "error",
-      "no-magic-numbers": ["error", {
-        "ignore": [-1, 0, 1, 2],
-        "ignoreArrayIndexes": true
-      }],
+      "no-magic-numbers": [
+        "error",
+        {
+          "ignore": [
+            -1,
+            0,
+            1,
+            2
+          ],
+          "ignoreArrayIndexes": true
+        }
+      ],
       "vars-on-top": "error",
-      "consistent-this": ["error", "that"],
-      "func-style": ["error", "declaration"],
-      "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
+      "consistent-this": [
+        "error",
+        "that"
+      ],
+      "func-style": [
+        "error",
+        "declaration"
+      ],
+      "newline-per-chained-call": [
+        "error",
+        {
+          "ignoreChainWithDepth": 2
+        }
+      ],
       "no-underscore-dangle": "error",
       "no-unneeded-ternary": "error",
-      "object-curly-newline": ["error", { "multiline": true }],
-      "template-curly-spacing": ["error", "never"],
+      "object-curly-newline": [
+        "error",
+        {
+          "multiline": true
+        }
+      ],
+      "template-curly-spacing": [
+        "error",
+        "never"
+      ],
       "prefer-template": "error",
-      "prefer-destructuring": ["error", {"object": true}, {"enforceForRenamedProperties": false}],
+      "prefer-destructuring": [
+        "error",
+        {
+          "object": true
+        },
+        {
+          "enforceForRenamedProperties": false
+        }
+      ],
       "no-var": "error",
       "prefer-const": "error",
       "prefer-arrow-callback": "error",
       "object-shorthand": "error",
       "capitalized-comments": "off",
-      "valid-jsdoc": ["error",
+      "valid-jsdoc": [
+        "error",
         {
           "prefer": {
             "return": "returns"
@@ -94,7 +164,16 @@
           "matchDescription": "[A-Z].+\\."
         }
       ],
-      "require-jsdoc": ["error", {"require": {"FunctionDeclaration": true, "MethodDefinition": true, "ClassDeclaration": true}}]
+      "require-jsdoc": [
+        "error",
+        {
+          "require": {
+            "FunctionDeclaration": true,
+            "MethodDefinition": true,
+            "ClassDeclaration": true
+          }
+        }
+      ]
     },
     "globals": [
       "fire",

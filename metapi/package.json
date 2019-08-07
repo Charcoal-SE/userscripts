@@ -62,7 +62,10 @@
         "smart"
       ],
       "unicorn/filename-case": "off",
-      "max-params": [1, 5],
+      "max-params": [
+        1,
+        5
+      ],
       "unicorn/no-array-instanceof": 0,
       "object-shorthand": 0,
       "prefer-arrow-callback": 0,
