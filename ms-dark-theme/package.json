@@ -6,8 +6,8 @@
     "test": "xo"
   },
   "devDependencies": {
-    "eslint": "^4.18.2",
-    "xo": "^0.17.1"
+    "eslint": "^6.1.0",
+    "xo": "^0.24.0"
   },
   "xo": {
     "space": true,
@@ -34,7 +34,10 @@
         "error",
         "smart"
       ],
-      "unicorn/filename-case": "off"
+      "unicorn/filename-case": "off",
+      "no-var": 0,
+      "object-shorthand": 0,
+      "unicorn/prefer-node-append": 0
     },
     "globals": [
       "CHAT",

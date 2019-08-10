@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^4.18.2",
-    "xo": "^0.17.1"
+    "eslint": "^6.1.0",
+    "xo": "^0.24.0"
   },
   "//": "FIRE overrides",
   "xo": {
@@ -173,7 +173,20 @@
             "ClassDeclaration": true
           }
         }
-      ]
+      ],
+      "eslint-comments/no-unused-disable": "off",
+      "indent": [
+        "error",
+        2,
+        {
+          "MemberExpression": 1,
+          "SwitchCase": 1
+        }
+      ],
+      "no-multi-spaces": "off",
+      "padding-line-between-statements": "off",
+      "unicorn/catch-error-name": "off",
+      "unicorn/prefer-node-append": "off"
     },
     "globals": [
       "fire",

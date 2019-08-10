@@ -17,9 +17,9 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^4.18.2",
+    "eslint": "^6.1.0",
     "jquery": "^3.5.0",
-    "xo": "^0.17.1"
+    "xo": "^0.24.0"
   },
   "xo": {
     "space": true,
@@ -65,7 +65,9 @@
       "unicorn/no-array-instanceof": 0,
       "object-shorthand": 0,
       "prefer-arrow-callback": 0,
-      "no-var": 0
+      "no-var": 0,
+      "no-else-return": 0,
+      "padding-line-between-statements": 0
     }
   }
 }

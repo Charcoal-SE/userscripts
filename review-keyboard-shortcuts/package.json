@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^4.18.2",
-    "xo": "^0.17.1"
+    "eslint": "^6.1.0",
+    "xo": "^0.24.0"
   },
   "xo": {
     "space": true,
@@ -36,7 +36,15 @@
         {
           "avoidEscape": true
         }
-      ]
+      ],
+      "indent": [
+        "error",
+        2,
+        {
+          "MemberExpression": "off"
+        }
+      ],
+      "no-useless-return": 0
     }
   }
 }
