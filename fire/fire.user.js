@@ -690,20 +690,20 @@
           url: `https://metasmoke.erwaysoftware.com/oauth/token?key=${fire.api.ms.key}&code=${metaSmokeCode}`,
           method: 'GET'
         })
-        .done(({token}) => {
-          setValue('metasmokeWriteToken', token);
-          toastr.success('Successfully obtained metasmoke write token!');
-          closePopup();
+          .done(({token}) => {
+            setValue('metasmokeWriteToken', token);
+            toastr.success('Successfully obtained metasmoke write token!');
+            closePopup();
 
-          if (afterGetToken)
-            afterGetToken();
-        })
-        .error(({status}) => {
-          if (status === fire.constants.http.notFound)
-            toastr.error('Metasmoke could not find a write token - did you authorize the app?');
-          else
-            toastr.error('An unknown error occurred during OAuth with metasmoke.');
-        });
+            if (afterGetToken)
+              afterGetToken();
+          })
+          .error(({status}) => {
+            if (status === fire.constants.http.notFound)
+              toastr.error('Metasmoke could not find a write token - did you authorize the app?');
+            else
+              toastr.error('An unknown error occurred during OAuth with metasmoke.');
+          });
       } else {
         setValue('readOnly', true);
         toastr.info('FIRE is now in read-only mode.');
@@ -780,7 +780,7 @@
           html: emojiOrImage('fire'),
           click: openReportPopup
         })
-        .data('url', reportedUrl);
+          .data('url', reportedUrl);
 
         reportLink
           .after(fireButton)
@@ -1205,18 +1205,18 @@
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${d.why}`)
             .html()
         })
-        .append(_('h2', 'fire-post-title')
-          .append(_('em', {html: title}))
-        )
-        .append(_('hr'))
-        .append(
-          _('div', 'fire-report-info')
-          .append(_('h3', 'fire-type', {text: `${postType}:`}))
-          .append(
-            _('span', 'fire-username', {html: userName, title: 'Username'})
-              .append(emojiOrImage('user'))
+          .append(_('h2', 'fire-post-title')
+            .append(_('em', {html: title}))
           )
-        )
+          .append(_('hr'))
+          .append(
+            _('div', 'fire-report-info')
+              .append(_('h3', 'fire-type', {text: `${postType}:`}))
+              .append(
+                _('span', 'fire-username', {html: userName, title: 'Username'})
+                  .append(emojiOrImage('user'))
+              )
+          )
       )
       .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
         .append(reportBody)
@@ -1366,7 +1366,7 @@
         _('span', {text: 'Notification popup position:'})
           .append(br())
           .append(positionSelect)
-        );
+      );
 
     const container = _('div')
       .append(
@@ -1507,37 +1507,37 @@
           url: `${ms.urlV1}w/post/${data.id}/feedback`, // V2.0 appears broken at this time. Using V1.
           data: {type: verdict, key: ms.key, token}
         })
-        .done(() => {
-          const success = span(`Sent feedback "<em>${verdict}</em>" to metasmoke.`);
-          if (fire.userData.flag && flagType) {
-            postMetaSmokeFlag(data, flagType, {success});
-          } else {
-            toastr.success(success);
-            closePopup();
-          }
-        })
-        .error(jqXHR => {
-          if (jqXHR.status === fire.constants.http.unauthorized) {
-            toastr.error('Can\'t send feedback to metasmoke - not authenticated.');
-
-            clearValue('metasmokeWriteToken');
-            const previous = closePopup();
-
-            getWriteToken(() => openReportPopup.call(previous)); // Open the popup later
-          } else {
-            const error = span(`An error occurred sending post feedback "<em>${verdict}</em>" to metasmoke.`);
+          .done(() => {
+            const success = span(`Sent feedback "<em>${verdict}</em>" to metasmoke.`);
             if (fire.userData.flag && flagType) {
-              // Even if we got a non-auth-needed error for the feedback, we still try to flag.
-              postMetaSmokeFlag(data, flagType, {error});
+              postMetaSmokeFlag(data, flagType, {success});
             } else {
-              toastr.error(error);
+              toastr.success(success);
+              closePopup();
             }
-            fire.error('An error occurred sending post feedback to metasmoke.', jqXHR);
-          }
-        })
-        .always(() => {
-          fire.sendingFeedback = false;
-        });
+          })
+          .error(jqXHR => {
+            if (jqXHR.status === fire.constants.http.unauthorized) {
+              toastr.error('Can\'t send feedback to metasmoke - not authenticated.');
+
+              clearValue('metasmokeWriteToken');
+              const previous = closePopup();
+
+              getWriteToken(() => openReportPopup.call(previous)); // Open the popup later
+            } else {
+              const error = span(`An error occurred sending post feedback "<em>${verdict}</em>" to metasmoke.`);
+              if (fire.userData.flag && flagType) {
+              // Even if we got a non-auth-needed error for the feedback, we still try to flag.
+                postMetaSmokeFlag(data, flagType, {error});
+              } else {
+                toastr.error(error);
+              }
+              fire.error('An error occurred sending post feedback to metasmoke.', jqXHR);
+            }
+          })
+          .always(() => {
+            fire.sendingFeedback = false;
+          });
       }
     }
   }
@@ -1600,55 +1600,55 @@
           flag_type: normalizedFlagType
         }
       })
-      .done(response => {
-        if (response.backoff) {
+        .done(response => {
+          if (response.backoff) {
           // We've got a backoff. Deal with it...
           // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
           // Re-execute any pending requests that were submitted during that time, afterwards.
-          debugger; // eslint-disable-line no-debugger
-          toastr.info('Backoff received');
-          fire.info('Backoff received', data, response);
-        }
-        toastr.success(span(`Successfully flagged the post as "${flagType}".`));
-        toastrFeedbackResult(feedbackResult);
-        closePopup();
-      })
-      .error(jqXHR => {
-        if (jqXHR.status === fire.constants.http.conflict) {
+            debugger; // eslint-disable-line no-debugger
+            toastr.info('Backoff received');
+            fire.info('Backoff received', data, response);
+          }
+          toastr.success(span(`Successfully flagged the post as "${flagType}".`));
+          toastrFeedbackResult(feedbackResult);
+          closePopup();
+        })
+        .error(jqXHR => {
+          if (jqXHR.status === fire.constants.http.conflict) {
           // https://metasmoke.erwaysoftware.com/authentication/status
           // Will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
-          toastr.error(
-            'FIRE requires your metasmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
+            toastr.error(
+              'FIRE requires your metasmoke account to be write-authenticated with Stack Exchange in order to submit spam flags.<br />' +
             'Your metasmoke account doesn\'t appear to be write-authenticated.<br />' +
             'Please open <em><a href="https://metasmoke.erwaysoftware.com/authentication/status" target="_blank">this page</a></em> to authenticate with Stack Exchange.',
-            null,
-            {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
-          fire.error('Not write-authenticated on MS', data, jqXHR);
-        } else {
-          if (jqXHR.responseText) {
-            const response = getJqXHRmessage(jqXHR);
-            const knownResponses = {
-              'Flag option not present': 'This post could not be flagged.<br/>It\'s probably already deleted.',
-              'No account on this site.': 'This post could not be flagged.<br/>You don\'t have an account on that site.',
-              'You have already flagged this post for moderator attention': 'This post could not be flagged.<br/>You have already flagged this post for moderator attention.'
-            };
-            const flagInfo = knownResponses[response];
-            if (flagInfo) {
-              toastr.info(flagInfo);
-              toastrFeedbackResult(feedbackResult);
-              closePopup();
-              return;
+              null,
+              {timeOut: 0, extendedTimeOut: 1000, progressBar: true});
+            fire.error('Not write-authenticated on MS', data, jqXHR);
+          } else {
+            if (jqXHR.responseText) {
+              const response = getJqXHRmessage(jqXHR);
+              const knownResponses = {
+                'Flag option not present': 'This post could not be flagged.<br/>It\'s probably already deleted.',
+                'No account on this site.': 'This post could not be flagged.<br/>You don\'t have an account on that site.',
+                'You have already flagged this post for moderator attention': 'This post could not be flagged.<br/>You have already flagged this post for moderator attention.'
+              };
+              const flagInfo = knownResponses[response];
+              if (flagInfo) {
+                toastr.info(flagInfo);
+                toastrFeedbackResult(feedbackResult);
+                closePopup();
+                return;
+              }
             }
-          }
 
-          // Will give you a 500 with status: 'failed' and a message if the spam flag fails;
-          toastr.error(`Something went wrong while attempting to submit a ${flagType} flag`);
-          fire.error(`Something went wrong while attempting to submit a ${flagType} flag`, data, jqXHR);
-          toastrFeedbackResult(feedbackResult);
-          fire.sendingFeedback = false;
+            // Will give you a 500 with status: 'failed' and a message if the spam flag fails;
+            toastr.error(`Something went wrong while attempting to submit a ${flagType} flag`);
+            fire.error(`Something went wrong while attempting to submit a ${flagType} flag`, data, jqXHR);
+            toastrFeedbackResult(feedbackResult);
+            fire.sendingFeedback = false;
           // This path does not close the popup.
-        }
-      });
+          }
+        });
       return; // The last else does not fall through.
     }
     toastrFeedbackResult(feedbackResult);
