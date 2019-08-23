@@ -1573,7 +1573,8 @@
     flagType = flagType ? flagType : 'spam'; // Default
     const normalizedFlagType = flagType === 'rude' ? 'abusive' : flagType; // rude is a synonym for abusive, which is what MS understands.
     const permittedFlagTypes = ['spam', 'abusive'];
-    /* TODO: fix this
+    /* eslint-disable no-warning-comments */
+    /* TODO: fix this // eslint-disable-line no-warning-comments
     let site = fire.sites[data.site];
     if (!site.account) {
       toastr.info(feedbackSuccess.after(span("You don't have an account on this site, so you can't cast a spam flag.")));
@@ -1582,6 +1583,7 @@
     } else if (site.account.reputation < 15) {
       toastr.info(feedbackSuccess.after(span("You don't have enough reputation on this site to cast a spam flag.")));
     } else */
+    /* eslint-enable no-warning-comments */
     if (data.has_auto_flagged) {
       toastr.info(span('You already autoflagged this post as spam.'));
     } else if (data.has_manual_flagged) {
@@ -2171,10 +2173,12 @@
 
           fire.log('Decorated existing messages.');
 
+          /* eslint-disable no-warning-comments */
           /*
           TODO: Load Stack Exchange data for each report
           updateReportCache();
           */
+          /* eslint-enable no-warning-comments */
         }
       }, timeout);
     });
