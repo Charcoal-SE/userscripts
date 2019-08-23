@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
     "eslint": "^6.1.0",
+    "eslint-utils": "^1.4.2",
     "xo": "^0.24.0"
   },
   "xo": {
