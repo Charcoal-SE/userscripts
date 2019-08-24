@@ -32,7 +32,7 @@
 // @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
 // ==/UserScript==
-/* globals ReconnectingWebSocket */
+/* globals CHAT, GM_info, toastr, $, ReconnectingWebSocket, autoflagging */
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
@@ -418,9 +418,8 @@
           report.is_deleted = true;
           $('.fire-reported-post').addClass('fire-deleted');
 
-          if (typeof autoflagging !== 'undefined') { // eslint-disable-line no-undef
+          if (typeof autoflagging !== 'undefined')
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
-          }
 
           if (report.has_sent_feedback)
             $('a.fire-feedback-button:not([disabled])').attr('disabled', true);
