@@ -25,6 +25,10 @@
 /* globals StackExchange, $ */
 
 (() => {
+  if (window.location.pathname.indexOf('/c/') === 0) {
+    // Don't run on Teams
+    return;
+  }
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
 
   const isNato = location.pathname === '/tools/new-answers-old-questions';
