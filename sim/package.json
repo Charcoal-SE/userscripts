@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^6.1.0",
-    "eslint-utils": "^1.4.2",
+    "eslint": "^6.6.0",
+    "eslint-utils": "^1.4.3",
     "jquery": "^3.5.0",
     "xo": "^0.24.0"
   },
