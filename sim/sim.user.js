@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.4.2
+// @version      0.5.1
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
+// @contributor  Makyen
 // @match       *://*.stackexchange.com/*
 // @match       *://*.stackoverflow.com/*
 // @match       *://*.superuser.com/*
@@ -21,10 +22,16 @@
 // @downloadURL  https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // ==/UserScript==
 
-/* globals StackExchange */
+/* globals StackExchange, $ */
 
 (() => {
+  if (window.location.pathname.indexOf('/c/') === 0) {
+    // Don't run on Teams
+    return;
+  }
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
+
+  const isNato = location.pathname === '/tools/new-answers-old-questions';
 
   const getCurrentSiteAPIParam = () => {
     const regex = /((?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
@@ -48,23 +55,94 @@
     return null;
   };
 
-  const attachToPosts = () => {
-    $('.question, .answer').each((i, e) => {
-      const id = $(e).data(`${$(e).hasClass('question') ? 'question' : 'answer'}id`);
-      const apiParam = getCurrentSiteAPIParam();
-      const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
-
-      $(e).find('.post-menu').append(`<span class="lsep">|</span><a href="#" class="sim-get-info" data-request="${msUri}">smokey</a>`);
+  const getPostMenu = $e => {
+    return $e.find('.post-menu:not(.preview-options)').map(function () {
+      // SE has used a .post-menu-container within the .post-menu. It was there for a while and then removed.
+      //   It's not clear if it will come back. This is just playing it safe in case SE puts it back in.
+      const container = $(this).children('.post-menu-container');
+      if (container.length > 0) {
+        return container;
+      }
+      return this;
     });
   };
 
-  const stacksModal = $(`<aside class="js-modal-overlay js-modal-close" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="s-modal--dialog js-modal-dialog w80 wmx8" role="document">
-    <h2 class="s-modal--header sim--modal-header"></h2>
-    <div class="s-modal--body sim--modal-content"></div>
-    <a class="s-modal--close s-btn s-btn__muted js-modal-close" href="#" aria-label="Close">&times;</a>
-  </div>
-</aside>`);
+  const getPostId = e => {
+    const $e = $(e);
+    let post = $e;
+    if (!post.is('.question, .answer')) {
+      post = $e.closest('.answer, .question');
+    }
+    let id = post.data('questionid') || post.data('answerid');
+    if (!id) {
+      // If we are passed a .post-menu, then get the child that is the js-share-link, as it's definitely associated with the post.
+      let link = $e.children('.js-share-link');
+      if (link.length === 0) {
+        link = post.find('.answer-hyperlink, .question-hyperlink');
+      }
+      if (link.length === 0) {
+        link = $e.find('.js-share-link');
+      }
+      if (link.length === 0) {
+        return null;
+      }
+      const href = link.attr('href');
+      const endNumberMatch = href.match(/#(\d+)$/);
+      if (endNumberMatch) {
+        id = endNumberMatch[1];
+      } else {
+        const firstNumberMatch = href.match(/(\d+)/);
+        id = firstNumberMatch && firstNumberMatch[1];
+      }
+    }
+    return id;
+  };
+
+  const attachToPosts = () => {
+    let posts = $('.question, .answer');
+    if (posts.length === 0 && isNato) {
+      $('body.tools-page #mainbar > table.default-view-post-table > tbody > tr').addClass('answer');
+      posts = $('.question, .answer');
+    }
+    posts.each((i, e) => {
+      const $e = $(e);
+
+      // Get the element which contains the menu
+      let postMenu = getPostMenu($e);
+      if (postMenu.length === 0 && isNato) {
+        $e.find('> td:last-of-type').append($('<div class="post-menu simFakePostMenu"></div>'));
+        postMenu = getPostMenu($e);
+      }
+      postMenu.filter(function () {
+        // Don't re-add the smokey button if it's already there.
+        return !$(this).find('.sim-get-info').length;
+      // Add the smokey button to the remaining post menus.
+      }).each(function () {
+        // We construct the msUri in here, because there are some cases where there can be a .question within a .question.
+        const id = getPostId(this);
+        if (!id) {
+          return;
+        }
+        const apiParam = getCurrentSiteAPIParam();
+        const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
+        const $this = $(this);
+        $this.append(`<span class="lsep">|</span><a href="#" class="sim-get-info" data-request="${msUri}">smokey</a>`);
+        if (isNato) {
+          // Clean up if we are in NATO Enhancements
+          $this.closest('body.tools-page #mainbar > table.default-view-post-table > tbody > tr.answer .question').closest('tr.answer').removeClass('answer');
+        }
+      });
+    });
+  };
+
+  const stacksModal = $(`
+    <aside class="js-modal-overlay js-modal-close" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="s-modal--dialog js-modal-dialog w80 wmx8" role="document">
+        <h2 class="s-modal--header sim--modal-header"></h2>
+        <div class="s-modal--body sim--modal-content"></div>
+        <a class="s-modal--close s-btn s-btn__muted js-modal-close" href="#" aria-label="Close">&times;</a>
+      </div>
+    </aside>`);
 
   const displayDialog = postData => {
     const modal = stacksModal.clone();
@@ -136,7 +214,10 @@
       const feedbacks = feedbacksJson.items;
       const uniques = [...(new Set(feedbacks.map(f => f.feedback_type.charAt(0))))];
       let fbType;
-      if (uniques.length === 1) {
+      if (uniques.length === 0) {
+        fbType = 'No Feedback';
+      }
+      else if (uniques.length === 1) {
         fbType = feedbacks[0].feedback_type;
       }
       else {
@@ -162,8 +243,22 @@
     displayDialog(postData);
   };
 
+  attachToPosts();
   $(document).ready(() => {
     attachToPosts();
-    $('.sim-get-info').on('click', getInfo);
+    $(document)
+      .on('click', '.sim-get-info', getInfo)
+      // Most, but not all, cases where the button needs to be re-added happen after an AJAX call.
+      .ajaxComplete(() => {
+        attachToPosts();
+        // Some AJAX fetches need a delayed call.
+        setTimeout(attachToPosts, 55);
+      });
+    // There are some corner cases where adding the button needs to be done after SE is ready.
+    StackExchange.ready(() => {
+      attachToPosts();
+      // Some pages (e.g. NATO) just take a long time to be ready.
+      setTimeout(attachToPosts, 5000);
+    });
   });
 })();
