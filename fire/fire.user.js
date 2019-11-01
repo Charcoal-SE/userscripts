@@ -1079,6 +1079,107 @@
   }
 
   /**
+   * toHTMLEntitiesBetweenTags - Convert HTML tags to  &lt;tag text&gt; that are within the start and end of a specified tag.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {string}            toChange                The complete text to make changes within.
+   * @param   {string}            tagText                 The type of tag within which to make changes (e.g. "code")
+   * @param   {RegExp}            whiteListedTagsRegex    Falsey or a RegExp that is used to match tags which should be whitelisted inside the changed area.
+   *
+   * @returns {string}                                    The changed text
+   */
+  function toHTMLEntitiesBetweenTags(toChange, tagText, whiteListedTagsRegex) {
+    let codeLevel = 0;
+    const tagRegex = new RegExp(`(</?${tagText}>)`, 'g');
+    const tagSplit = (toChange || '').split(tagRegex);
+    const tagBegin = `<${tagText}>`;
+    const tagEnd = `</${tagText}>`;
+    return tagSplit.reduce((text, split) => {
+      if (split === tagBegin) {
+        codeLevel++;
+        if (codeLevel === 1) return text + split;
+      } else if (split === tagEnd) {
+        codeLevel--;
+      }
+      if (codeLevel > 0) {
+        split = split.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        if (whiteListedTagsRegex) {
+          whiteListedTagsRegex.lastIndex = 0;
+          split = split.replace(whiteListedTagsRegex, '<$1>');
+        }
+      }
+      return text + split;
+    }, '');
+  }
+
+  /**
+   * generatePostBodyDivFromText - Generate a <div> containing the HTML for a post body from HTML text.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {string}          htmlText    The text to change into HTML.
+   * @param   {falseyTruthy}    isFromSE    Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
+   *
+   * @returns {jQuery}                      <div> containing the body HTML.
+   */
+  function generatePostBodyDivFromData(htmlText, isFromSE) { // eslint-disable-line no-unused-vars
+    // isFromSE is not yet implemented.
+    // Just having the whitelisted tags active is good, but results in the possibility that we've enabled
+    //   a tag within <code>.
+    // div and pre can have class and other attributes for snippets.
+
+    // SE normally provides HTML with <code> sections having <, >, and & (???) replaced by their HTML entities. The .body we get from MS has all of those replaced
+    //   back as the characters. I assume that this is done to facilitate regex matching within <code>. It does mean that it's not, necessarily, possible to
+    //   recover back to the actual content (e.g. what happens with Markdown like `<code>`: SE would send "<code>&lt;code&gt;</code>", but that gets converted
+    //   to "<code><code></code>" by SD/MS.
+    /*
+      `<code>` foobar `</code>`
+      produces
+      <code>&lt;code&gt;</code> foobar <code>&lt;/code&gt;</code>
+      processed:
+      <code><code></code> foobar <code></code></code>
+
+      `<code></code> foobar <code></code>`
+      produces
+      <code>&lt;code&gt;&lt;/code&gt; foobar &lt;code&gt;&lt;/code&gt;</code>
+      processed:
+      <code><code></code> foobar <code></code></code>
+
+          */
+    // What we have in the MS provided body is that the <code> sections have had all of the &gt;, &lt; and ? &amp; ? changed to actual characters, rather than the
+    //   HTML entities, which is what SE provides. So, in order to display it (or compare it to what SE provides), we need to convert all of those back to the
+    //   HTML entities. If we don't, then what's displayed could be incorrect.
+    // At this point, it's reasonably consistently formatted HTML, due to being processed from Markdown by SE.
+    // On deleted posts where the MS data isn't available, d.body could be undefined.
+
+    const parser = new DOMParser();
+    const whiteListedTagsRegex = /&lt;((?:\/?(?:b|blockquote|code|del|dd|dl|dt|em|h[123]|i|kbd|li|p|s|sup|sub|strong|strike|ul|br|hr))|(?:\/(?:a|div|img|ol|pre|span))|(?:a|div|img|ol|pre|span)\b.*?)\s*\/?&gt;/gi;
+
+    const bodyOnlyWhitelist = $('<div/>')
+      .text(htmlText || '') // Escape everything. NOTE: Everything should be unescaped comming from SD/MS, but properly formatted if it's from SE.
+      .html() // Get the escaped HTML, unescape whitelisted tags.
+      .replace(whiteListedTagsRegex, '<$1>')
+      .replace(/<(\/ ?)?(script|style)/gi, '&lt;$1$2')
+      .replace(/(script|style)>/gi, '$1&gt;');
+
+    let processedBody = toHTMLEntitiesBetweenTags(bodyOnlyWhitelist, 'code');
+    // I don't recall why blockquotes are handled specially.
+    processedBody = toHTMLEntitiesBetweenTags(processedBody, 'blockquote', whiteListedTagsRegex);
+    // At this point, if we just pass the HTML to jQuery, then the images are fetched, which might look suspicious if network traffic is being monitored
+    //   (e.g. in a work environment) and the image is NSFW. Still need to avoid that.
+    const bodyAsDOM = parser.parseFromString(`<div>${processedBody}</div>`, 'text/html');
+    // Change all the image src prior to inserting into main document DOM or letting jQuery see it.
+    [].slice.call(bodyAsDOM.body.querySelectorAll('img')).forEach(image => {
+      image.dataset.src = image.src;
+      image.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
+    });
+    return $(bodyAsDOM.body.firstChild);
+  }
+
+  /**
    * openReportPopup - Build a report popup and show it.
    *
    * @private
@@ -1187,13 +1288,7 @@
       title = reportTitle; // eslint-disable-line prefer-destructuring
     }
 
-    const reportBody = $('<div/>')
-      .text(d.body) // Escape everything.
-      .html()       // Get the escaped HTML, unescape whitelisted tags.
-      .replace(/&lt;(\/?([abpsu]|[hb]r|[uo]l|li|h\d|code|pre|strong|em|img).*?)&gt;/gi, '<$1>')
-      .replace(/<(\/ ?)?(script|style|link)/gi, '&lt;$1$2')
-      .replace(/(script|style|link)>/gi, '$1&gt;')
-      .replace(/(<code>[\s\S]*?)<(img.*?)>([\s\S]*?<\/code>)/, '$1&lt;$2&gt;$3'); // Escape image tags in code tags
+    const reportBody = generatePostBodyDivFromData(d.body, false);
 
     const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
