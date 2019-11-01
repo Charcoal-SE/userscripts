@@ -136,7 +136,10 @@
       const feedbacks = feedbacksJson.items;
       const uniques = [...(new Set(feedbacks.map(f => f.feedback_type.charAt(0))))];
       let fbType;
-      if (uniques.length === 1) {
+      if (uniques.length === 0) {
+        fbType = 'No Feedback';
+      }
+      else if (uniques.length === 1) {
         fbType = feedbacks[0].feedback_type;
       }
       else {
