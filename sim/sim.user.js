@@ -58,13 +58,14 @@
     });
   };
 
-  const stacksModal = $(`<aside class="js-modal-overlay js-modal-close" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="s-modal--dialog js-modal-dialog w80 wmx8" role="document">
-    <h2 class="s-modal--header sim--modal-header"></h2>
-    <div class="s-modal--body sim--modal-content"></div>
-    <a class="s-modal--close s-btn s-btn__muted js-modal-close" href="#" aria-label="Close">&times;</a>
-  </div>
-</aside>`);
+  const stacksModal = $(`
+    <aside class="js-modal-overlay js-modal-close" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="s-modal--dialog js-modal-dialog w80 wmx8" role="document">
+        <h2 class="s-modal--header sim--modal-header"></h2>
+        <div class="s-modal--body sim--modal-content"></div>
+        <a class="s-modal--close s-btn s-btn__muted js-modal-close" href="#" aria-label="Close">&times;</a>
+      </div>
+    </aside>`);
 
   const displayDialog = postData => {
     const modal = stacksModal.clone();
