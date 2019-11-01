@@ -4,6 +4,7 @@
 // @version      0.4.2
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
+// @contributor  Makyen
 // @match       *://*.stackexchange.com/*
 // @match       *://*.stackoverflow.com/*
 // @match       *://*.superuser.com/*
