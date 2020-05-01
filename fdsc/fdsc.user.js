@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.17
+// @version     1.18
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -429,7 +429,7 @@
               $(document).off("DOMNodeInserted");
             }
 
-            $(".popup-submit").on("click", function () {
+            $(".js-popup-submit").on("click", function () {
               var selected = $("input[name=top-form]").filter(":checked");
               var feedbackType;
               if (selected.val() === "PostSpam" || selected.val() === "PostOffensive") {
@@ -460,7 +460,7 @@
               });
 
               // Likewise, remove this handler when it's finished to avoid multiple fires.
-              $(".popup-submit").off("click");
+              $(".js-popup-submit").off("click");
             });
           });
         });
