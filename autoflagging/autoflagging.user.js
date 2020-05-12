@@ -37,13 +37,13 @@
   // Inject CSS
   var css = window.document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "//charcoal-se.org/userscripts/autoflagging/autoflagging.css";
+  css.href = "//cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/autoflagging/autoflagging.css";
   document.head.appendChild(css);
 
   // Load the Emoji support script
   if (!window.emojiSupportChecker) {
     $.ajaxSetup({cache: true});
-    $.getScript("//charcoal-se.org/userscripts/emoji/emoji.js");
+    $.getScript("//cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/emoji/emoji.js");
     $.ajaxSetup({cache: false});
   }
 
