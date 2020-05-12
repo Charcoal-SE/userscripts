@@ -108,6 +108,9 @@
         .ai-feedback-info-naa {
           color: #ba8b6d;
         }
+        .ai-feedback-info-ignore {
+          color: #ff4442;
+        }
         `)}
       </style>
     `);
@@ -362,7 +365,8 @@
     var simpleFeedbacks = {
       k: {},
       f: {},
-      n: {}
+      n: {},
+      i: {}
     };
     for (var type in allFeedbacks) {
       if (hOP(allFeedbacks, type) && allFeedbacks[type] instanceof Array) {
@@ -376,6 +380,8 @@
           simpleFeedbacks.f[type] = users;
         } else if (type.indexOf("naa") !== -1) {
           simpleFeedbacks.n[type] = users;
+        } else if (type.indexOf("ignore") !== -1) {
+          simpleFeedbacks.i[type] = users;
         }
       }
     }
@@ -385,10 +391,11 @@
     autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.k, $feedback, "tpu-");
     autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.f, $feedback, "fp-");
     autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.n, $feedback, "naa-");
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.i, $feedback, "ignore-");
   };
 
   /*!
-   * Adds feedback of one type (tpu-, naa-, fp-) to a feedback DOM element.
+   * Adds feedback of one type (tpu-, naa-, fp-, ignore-) to a feedback DOM element.
    */
   autoflagging.decorate.feedback.addFeedback = function (items, $feedback, defaultKey) {
     var count = Object.keys(items)
