@@ -626,12 +626,22 @@
     function decorate(selector, data) {
       (function _deco() {
         debug.decorate("Attempting to decorate \"" + selector + "\" with", data, "message:", $(selector).parents(".message"));
-        if ($(selector).parents(".message").find(".ai-spinner, .ai-information.ai-loaded").length > 0) {
-          autoflagging.decorateMessage($(selector).parents(".message"), data);
+        const messages = $(selector).parents(".message");
+        const messagesWithAIInfo = messages.filter(function() {
+          return $(this).find(".ai-spinner, .ai-information.ai-loaded").length > 0;
+        });
+        if (messages.length && messages.length === messagesWithAIInfo.length) {
+          // All messages have AI info and there's at least one message.
+          messages.each(function() {
+            const thisMessage = $(this);
+            autoflagging.decorateMessage(thisMessage, data);
+          });
         } else {
-          // MS is faster than chat; add the decorate operation to the queue
-          debug.queue("Queueing", selector);
-          autoflagging.msgQueue.push(_deco);
+            // MS is faster than chat; add the decorate operation to the queue
+            debug.queue("Queueing", selector);
+            //This could result in data from an earlier run overwriting later data, if later run is also in the queue
+            //  and the apprporiate SD message appears between this run and that next run.
+            autoflagging.msgQueue.push(_deco);
         }
       })();
     }
