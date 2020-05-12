@@ -32,7 +32,7 @@
 // @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
 // ==/UserScript==
-/* globals CHAT, GM_info, toastr, $, ReconnectingWebSocket, autoflagging */
+/* globals CHAT, GM_info, toastr, $, ReconnectingWebSocket, autoflagging */ // eslint-disable-line no-redeclare
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
@@ -309,7 +309,7 @@
     data.is_answer = data.link.includes('/a/');
     data.site = parseSiteUrl(data.link);
     data.is_deleted = data.deleted_at !== null;
-    data.message_id = parseInt($this.closest('.message')[0].id.split('-')[1], 10);
+    data.message_id = Number.parseInt($this.closest('.message')[0].id.split('-')[1], 10);
 
     data.has_auto_flagged = listHasCurrentUser(data.autoflagged) && data.autoflagged.flagged;
     data.has_manual_flagged = listHasCurrentUser(data.manual_flags);
@@ -921,36 +921,36 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} e the jQuery keyboard event
+   * @param {object} event the jQuery keyboard event
    */
-  function keyboardShortcuts(e) {
+  function keyboardShortcuts(event) {
     const c = fire.constants;
-    if (e.altKey || e.ctrlKey || e.metaKey)
+    if (event.altKey || event.ctrlKey || event.metaKey)
       // Do nothing if any of the Alt, Ctrl, or Meta keys are pressed (opening the popup with Ctrl-Space is handled elsewhere).
       // This prevents conflicts with browser-based shortcuts (e.g. Ctrl-F being used as FP).
       return;
-    if (e.keyCode === c.keys.enter || e.keyCode === c.keys.space) {
-      e.preventDefault();
+    if (event.keyCode === c.keys.enter || event.keyCode === c.keys.space) {
+      event.preventDefault();
 
       const selector = '.fire-popup-header a.button.focus';
       $(selector)
         .fadeOut(c.buttonFade)           // Flash to indicate which button was selected.
         .fadeIn(c.buttonFade, () => $(selector).click());
     } else {
-      if (!fire.settingsAreOpen && e.keyCode < c.keys.F1) // Allow interaction with settings popup.
-        e.preventDefault(); // Prevent keys from entering the chat input while the popup is open
-      if (fire.buttonKeyCodes.includes(e.keyCode) && !fire.settingsAreOpen) {
+      if (!fire.settingsAreOpen && event.keyCode < c.keys.F1) // Allow interaction with settings popup.
+        event.preventDefault(); // Prevent keys from entering the chat input while the popup is open
+      if (fire.buttonKeyCodes.includes(event.keyCode) && !fire.settingsAreOpen) {
         $('.fire-popup-header a.button')
           .removeClass('focus')
           .trigger('mouseleave');
 
-        const $button = $(`.fire-popup-header a[fire-key~=${e.keyCode}]:not([disabled])`);
+        const $button = $(`.fire-popup-header a[fire-key~=${event.keyCode}]:not([disabled])`);
         const button = $button[0]; // eslint-disable-line prefer-destructuring
 
         if (button) {
-          if (e.keyCode === c.keys.esc) { // [Esc] key
+          if (event.keyCode === c.keys.esc) { // [Esc] key
             $button.click();
-          } else if (fire.openOnSiteCodes.includes(e.keyCode) || fire.openOnMSCodes.includes(e.keyCode)) { // Open the report on the site
+          } else if (fire.openOnSiteCodes.includes(event.keyCode) || fire.openOnMSCodes.includes(event.keyCode)) { // Open the report on the site
             window.open(button.href);
           } else {                // [1-5] keys for feedback buttons
             const pos = button.getBoundingClientRect();
@@ -963,11 +963,11 @@
               }));
           }
         } else {
-          const $button = $(`a[fire-key~=${e.keyCode}]:not([disabled])`);
+          const $button = $(`a[fire-key~=${event.keyCode}]:not([disabled])`);
           if ($button[0])
             $button.click();
         }
-      } else if (fire.settingsAreOpen && e.keyCode === c.keys.esc) {
+      } else if (fire.settingsAreOpen && event.keyCode === c.keys.esc) {
         closePopup();
       }
     }
@@ -1371,9 +1371,9 @@
       $('.fire-reported-post img').each((i, element) => {
         const img = $(element);
         img.data('src', element.src);
-        img.one('click', e => {
+        img.one('click', event => {
           img.attr('src', img.data('src'));
-          e.preventDefault();
+          event.preventDefault();
         });
         element.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
       });
@@ -1420,12 +1420,12 @@
     const selected = fire.userData.toastrPosition;
     const positionSelect = _('select', 'fire-position-select', {change: toastrPositionChangeHandler});
 
-    for (const val of toastrClasses) {
+    for (const value of toastrClasses) {
       positionSelect.append(
         _('option', {
-          value: val,
-          text: val.replace(/-/g, ' '),
-          selected: val === selected
+          value,
+          text: value.replace(/-/g, ' '),
+          selected: value === selected
         })
       );
     }
@@ -1563,7 +1563,7 @@
   function getJqXHRmessage(jqXHR) {
     try {
       return JSON.parse(jqXHR.responseText);
-    } catch (err) {
+    } catch (error) { // eslint-disable-line no-unused-vars, unicorn/catch-error-name
       return {message: (jqXHR || {responseText: ''}).responseText};
     }
   }
@@ -1774,13 +1774,13 @@
   /**
    * numpad - Get the numpad keyCode for the passed number.
    *
-   * @param {number|string} num The value to get the keyCode for.
-   * @param {object} constants An optional reference to FIRE's constants, for when `fire` is not yet declared.
+   * @param {number|string}   numberKey   The value to get the keyCode for.
+   * @param {object}          constants   An optional reference to FIRE's constants, for when `fire` is not yet declared.
    *
    * @returns {number} the keypad keyCode for the passed number.
    */
-  function numpad(num, constants) {
-    return String(num).charCodeAt(0) + (constants || fire.constants).numpadOffset;
+  function numpad(numberKey, constants) {
+    return String(numberKey).charCodeAt(0) + (constants || fire.constants).numpadOffset;
   }
 
   /**
@@ -2207,7 +2207,9 @@
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
       get: () => JSON.parse(localStorage.getItem(localStorageKey)),
-      set: value => localStorage.setItem(localStorageKey, JSON.stringify(value))
+      set: value => {
+        localStorage.setItem(localStorageKey, JSON.stringify(value));
+      }
     });
   }
 
