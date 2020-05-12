@@ -610,28 +610,13 @@
   });
 
   // Add autoflagging information to older messages as they are loaded
-  $("#getmore, #getmore-mine").click(function () {
-    $(this).one("DOMSubtreeModified", function () {
-      // We need another timeout here, because the first modification occurs before
-      // the new (old) chat messages are loaded.
-      setTimeout(function () {
-        var urls = "";
-        $(autoflagging.selector).filter(function () {
-          return !$(this).find(".ai-information").length;
-        }).each(function () {
-          var url = autoflagging.getPostURL(this);
-          if (url !== null) {
-            if (urls !== "") {
-              urls += ",";
-            }
-            autoflagging.addSpinnerToMessage($(this));
-            urls += url;
-          }
-        });
-        // MS API call
-        autoflagging.callAPI(urls);
-      }, 500);
-    });
+  $(document).ajaxComplete(function (event, jqXHR, ajaxSettings) {
+    //By the time this gets called, the messages are in the DOM.
+    if (/chats\/\d+\/events/i.test(ajaxSettings.url)) {
+      // The URL for fetching more messages is:
+      //  /chats/11540/events?before=[previous oldest message]&mode=Messages&msgCount=100
+      autoflagging.markupAllReportsInChat();
+    }
   });
 
   // Listen to MS events
