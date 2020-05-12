@@ -53,6 +53,7 @@
   }
   doWhenReady(() => {
     function getEffectiveBackgroundColor(element, defaultColor) {
+      element = element instanceof jQuery ? element : $(element);
       defaultColor = defaultColor ? defaultColor : "rgb(255,255,255)";
       let testEl = element.first();
       const colors = [];
