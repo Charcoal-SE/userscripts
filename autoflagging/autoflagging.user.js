@@ -126,7 +126,14 @@
   autoflagging.apiURL = "https://metasmoke.erwaysoftware.com/api/v2.0";
   autoflagging.baseURL = autoflagging.apiURL + "/posts/urls?filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&key=" + autoflagging.key;
   autoflagging.selector = ".user-" + autoflagging.smokeyID + " .message ";
-  autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)? [^\]]+?] ([^:]+):(?: post \d+ out of \d+\) \(\d+\):)? <a href="([^"]+)">(.+?)<\/a>.* by (?:<a href="[^"]+\/u(sers)?\/(\d+)">(.+?)<\/a>|a deleted user) on <code>([^<]+)<\/code>/;
+  // autoflagging.messageRegex is used both to detect the HTML of SD messages which are to be decorated and parse the SE URL out of the SD report.
+  // https://regex101.com/r/tnUyUI/1
+  // Group 1: URL for SE post (This is the only group that is currently used.)
+  // Group 2: SE post title
+  // Group 3: SE user's user ID
+  // Group 4: SE username
+  // Group 5: SE site
+  autoflagging.messageRegex = /\[ <a[^>]+>SmokeDetector<\/a>(?: \| <a[^>]+>MS<\/a>)?.*?<a href="([^"]+)">(.+?)<\/a>.* by (?:<a href="[^"]+\/u(?:sers)?\/(\d+)(?:\/[^"]*)?">(.+?)<\/a>|a deleted user) on <code>([^<]+)/;
   autoflagging.hasMoreRegex = /\+\d+ more \(\d+\)/;
   autoflagging.hasNotificationRegex = /^ \(@.*\)$/;
 
@@ -525,7 +532,7 @@
    */
   autoflagging.getPostURL = function (selector) {
     var matches = autoflagging.messageRegex.exec($(selector).html());
-    return matches && matches[2];
+    return matches && matches[1];
   };
 
   // Wait for the chat messages to be loaded.
