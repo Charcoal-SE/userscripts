@@ -20,7 +20,7 @@
 // @grant       none
 // ==/UserScript==
 
-/* global autoflagging, ReconnectingWebSocket, unsafeWindow, CHAT, $, Notifier */
+/* global autoflagging, ReconnectingWebSocket, unsafeWindow, CHAT, $, Notifier, jQuery */ //eslint-disable-line no-redeclare
 
 // To enable/disable trace information, type autoflagging.trace(true) or
 // autoflagging.trace(false), respectively, in your browser's console.
