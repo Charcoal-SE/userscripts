@@ -642,6 +642,7 @@
       case "confirm_subscription":
       case "ping":
       case "welcome":
+      case "statistic":
         break;
       default: {
         // Analyze socket message
@@ -650,24 +651,24 @@
         var deletionLog = jsonData.message.deletion_log;
         var feedback = jsonData.message.feedback;
         var notFlagged = jsonData.message.not_flagged;
-        if (typeof flagLog != "undefined") {
+        if (typeof flagLog !== "undefined") {
           // Autoflagging information
           debug.ws(flagLog.user, "autoflagged", flagLog.post);
           let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
           decorate(selector, flagLog.post);
-        } else if (typeof deletionLog != "undefined") {
+        } else if (typeof deletionLog !== "undefined") {
           // Deletion log
           debug.ws("deleted:", deletionLog);
           let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
           $(selector).parents(".content").addClass("ai-deleted");
-        } else if (typeof feedback != "undefined") {
+        } else if (typeof feedback !== "undefined") {
           // Feedback
           debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // feedback_type
           let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
           decorate(selector, {
             feedbacks: [feedback]
           });
-        } else if (typeof notFlagged != "undefined") {
+        } else if (typeof notFlagged !== "undefined") {
           // Not flagged
           debug.ws(notFlagged.post, "not flagged");
           let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
