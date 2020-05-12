@@ -454,10 +454,42 @@
 
   /*!
    * Calls the API to get information about multiple posts at once, considering the paging system of the API.
+   * If there are more than 100 URLs requested, then the list of URLs is broken into chunks of 100 max and
+   * the API is called on each chunk.
    * It will use the results to decorate the Smokey reports which are already on the page.
    */
-  autoflagging.callAPI = function (urls, page) {
+  autoflagging.callAPI = function (urls) {
     debug("Call API");
+    if (!Array.isArray(urls)) {
+      return;
+    }
+    //chunkArray is from SOCVR's Archiver; copied by Makyen
+    function chunkArray(array, chunkSize) {
+      //Chop a single array into an array of arrays. Each new array contains chunkSize number of
+      //  elements, except the last one.
+      var chunkedArray = [];
+      var startIndex = 0;
+      while (array.length > startIndex) {
+        chunkedArray.push(array.slice(startIndex, startIndex + chunkSize));
+        startIndex += chunkSize;
+      }
+      return chunkedArray;
+    }
+    //Split the array into chunks that are a max of 100 URLs each and call the API.
+    //There isn't a specified number that is a maximum for the API, but there appear to be
+    //  problems when requesting a large number of URLs.
+    const chunkedArray = chunkArray(urls, 100);
+    chunkedArray.forEach((chunk) => {
+      autoflagging.callAPIChunk(chunk.join(','))
+    });
+  }
+
+  /*!
+   * Calls the API to get information about multiple posts at once, considering the paging system of the API.
+   * It will use the results to decorate the Smokey reports which are already on the page.
+   */
+  autoflagging.callAPIChunk = function (urls, page) {
+    debug("Call APIChunk");
     if (!urls) {
       return;
     }
@@ -465,14 +497,21 @@
       page = 1;
     }
     var autoflagData = {};
-    // With a large value of per_page this can timeout the request. 20 appeared to work here, but 30 got timeouts.
-    //  IMO, it's better to leave this as the default 10, rather than risk timeouts.
-    var url = autoflagging.baseURL + "&page=" + page + "&urls=" + urls;
+    // After changes to MS, requesting max 100 URLs appears to be working well.
+    var url = autoflagging.baseURL + "&page=" + page + "&per_page=100&urls=" + urls;
     debug("URL:", url);
     $.get(url, function (data) {
       // Group information by link
       for (var i = 0; i < data.items.length; i++) {
-        autoflagData[data.items[i].link] = data.items[i];
+        const link = data.items[i].link;
+        if (autoflagData[link] && autoflagData[link].id > data.items[i].id) {
+          //If there's more than one MS post for this URL, then we want to use the
+          //  most recent one. This is a stopgap rather than re-writing this to
+          //  use the MS post info which is closest in time to the SD report.
+          //Normally, the most recent MS post is listed first.
+          continue;
+        }
+        autoflagData[link] = data.items[i];
       }
 
       // Loop over all Smokey reports and decorate them
@@ -527,7 +566,7 @@
 
       if (data.has_more) {
         // There are more items on the next 'page'
-        autoflagging.callAPI(urls, ++page);
+        autoflagging.callAPIChunk(urls, ++page);
       }
     }).fail(function (xhr) {
       autoflagging.notify("AIM: Failed to load MS post data:", xhr);
