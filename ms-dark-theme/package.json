@@ -6,9 +6,10 @@
     "test": "xo"
   },
   "devDependencies": {
-    "eslint": "^6.6.0",
+    "eslint": "^6.8.0",
     "eslint-utils": "^1.4.3",
-    "xo": "^0.24.0"
+    "webpack": "^4.43.0",
+    "xo": "^0.30.0"
   },
   "xo": {
     "space": true,
@@ -38,7 +39,9 @@
       "unicorn/filename-case": "off",
       "no-var": 0,
       "object-shorthand": 0,
-      "unicorn/prefer-node-append": 0
+      "unicorn/prefer-node-append": 0,
+      "unicorn/no-for-loop": 0,
+      "unicorn/prevent-abbreviations": 0
     },
     "globals": [
       "CHAT",
