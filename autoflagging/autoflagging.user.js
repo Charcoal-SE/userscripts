@@ -27,6 +27,23 @@
 
 (function () {
   "use strict";
+  const isChat = window.location.pathname.indexOf('/rooms/') === 0;
+
+  function doWhenRoomReadyIfMainChat(toCall) {
+    //This should probably change to looking at window.location.
+    if (!isChat) {
+      return;
+    }
+    if (CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === 'function') {
+      if (CHAT.Hub.roomReady.fired()) {
+        //The room is ready now.
+        toCall();
+      } else {
+        CHAT.Hub.roomReady.add(toCall);
+      }
+    }
+  }
+
   const createDebug = typeof unsafeWindow === "undefined" ? window.debug : unsafeWindow.debug || window.debug;
   const debug = createDebug("aim");
   debug.decorate = createDebug("aim:decorate");
@@ -583,22 +600,45 @@
 
   // Wait for the chat messages to be loaded.
   var chat = $("#chat");
-  chat.on("DOMSubtreeModified", function () {
+
+  /*!
+   * Handle the chat room being ready when on a main chat page.
+   */
+  autoflagging.handleChatRoomReady = function () {
     if (chat.html().length !== 0) {
       // Chat messages loaded
-      chat.off("DOMSubtreeModified");
+      autoflagging.markupAllReportsInChat();
+    }
+  };
 
+  /*!
+   * Add AIM markup to all messages in the DOM.
+   */
+  autoflagging.markupAllReportsInChat = function () {
       // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
-      var urls = "";
-      $(autoflagging.selector).each(function () {
-        var url = autoflagging.getPostURL(this);
-        // Show spinner
-        if (url !== null) {
-          if (urls !== "") {
-            urls += ",";
-          }
+      var urls = [];
+      $(autoflagging.selector).filter(function () {
+        const eachSelected = $(this);
+        //Clean out any empty AI infos
+        eachSelected.find(".ai-information").each(function() {
+            const eachAiInfo = $(this);
+            if (!eachAiInfo.children().length) {
+                //There's no content in the AI info. Something went wrong elsewhere, so we just remove it.
+                eachAiInfo.remove();
+            }
+        });
+        //Clean out AI Info from any messages without exactly 2 AI Infos: Something is wrong, and we should redo adding AI Info.
+        const aiInfo = eachSelected.find(".ai-information");
+        if (aiInfo.length !== 2) {
+            aiInfo.remove();
+            return true;
+        } //else
+        return false;
+      }).each(function () {
+        const url = autoflagging.getPostURL(this);
+        if (typeof url === 'string' && url) {
           autoflagging.addSpinnerToMessage($(this));
-          urls += url;
+          urls.push(url);
         }
       });
 
@@ -606,8 +646,11 @@
       autoflagging.callAPI(urls);
 
       $(".message:has(.ai-information)").addClass("ai-message");
-    }
-  });
+  };
+
+  if (chat.length) {
+    doWhenRoomReadyIfMainChat(autoflagging.handleChatRoomReady);
+  }
 
   // Add autoflagging information to older messages as they are loaded
   $(document).ajaxComplete(function (event, jqXHR, ajaxSettings) {
@@ -637,11 +680,13 @@
             autoflagging.decorateMessage(thisMessage, data);
           });
         } else {
-            // MS is faster than chat; add the decorate operation to the queue
-            debug.queue("Queueing", selector);
-            //This could result in data from an earlier run overwriting later data, if later run is also in the queue
-            //  and the apprporiate SD message appears between this run and that next run.
-            autoflagging.msgQueue.push(_deco);
+            if (isChat) {
+              // MS is faster than chat; add the decorate operation to the queue
+              debug.queue("Queueing", selector);
+              //This could result in data from an earlier run overwriting later data, if later run is also in the queue
+              //  and the apprporiate SD message appears between this run and that next run.
+              autoflagging.msgQueue.push(_deco);
+            }
         }
       })();
     }
