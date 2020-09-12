@@ -80,6 +80,10 @@ To open the reported post on its site:
 
 # Version History
 
+|1.3    ||
+| ---   |---
+|1.3.0  |Add recognition of the new user, "metasmoke", posting "feedback received" messages. Update list of rooms in which FIRE runs.
+
 |1.2    ||
 | ---   |---
 |1.2.0  |Add rude/abusive flagging. `@require` script dependencies. Adding R/A flagging changes keyboard shortcuts. Fix flagging toastr messages, which were often not displayed. A toastr message will now be displayed for each of feedback and flagging. The toastr for feedback will be on top.
