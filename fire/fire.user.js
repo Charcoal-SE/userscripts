@@ -55,7 +55,7 @@
       'chat.meta.stackexchange.com': 266345
     }[location.host];       // From which, we need the current host's ID
 
-    const metasmokeId = {   // Same as above, but for the metasmoke account
+    const metasmokeId = { // Same as above, but for the metasmoke account
       'chat.stackexchange.com': 478536,
       'chat.stackoverflow.com': 14262788,
       'chat.meta.stackexchange.com': 848503
