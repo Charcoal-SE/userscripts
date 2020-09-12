@@ -5,7 +5,7 @@
 // @author      Cerbrus
 // @contributor Makyen
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.2.0
+// @version     1.3.0
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -19,9 +19,15 @@
 // @match       *://chat.stackoverflow.com/users/3735529?*
 // @match       *://chat.meta.stackexchange.com/users/266345/*
 // @match       *://chat.meta.stackexchange.com/users/266345?*
-// @include     /^https?://chat\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:11|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|47869|56223|58631|59281|61165|65945|84778)(?:[&/].*$|$)/
+// @match       *://chat.stackexchange.com/users/478536/*
+// @match       *://chat.stackexchange.com/users/478536?*
+// @match       *://chat.stackoverflow.com/users/14262788/*
+// @match       *://chat.stackoverflow.com/users/14262788?*
+// @match       *://chat.meta.stackexchange.com/users/848503/*
+// @match       *://chat.meta.stackexchange.com/users/848503?*
+// @include     /^https?://chat\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:11|27|95|201|388|468|511|2165|3877|8089|11540|22462|24938|34620|35068|38932|46061|47869|56223|58631|59281|61165|65945|84778|96491|106445|109836|109841)(?:[&/].*$|$)/
 // @include     /^https?://chat\.meta\.stackexchange\.com/(?:rooms/|search.*[?&]room=)(?:89|1037|1181)(?:[&/].*$|$)/
-// @include     /^https?://chat\.stackoverflow\.com/(?:rooms/|search.*[?&]room=)(?:41570|90230|111347|126195|167826|170175)(?:[&/].*$|$)/
+// @include     /^https?://chat\.stackoverflow\.com/(?:rooms/|search.*[?&]room=)(?:41570|90230|111347|126195|167826|170175|202954)(?:[&/].*$|$)/
 // @require     https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js
 // @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
@@ -48,6 +54,12 @@
       'chat.stackoverflow.com': 3735529,
       'chat.meta.stackexchange.com': 266345
     }[location.host];       // From which, we need the current host's ID
+
+    const metasmokeId = { // Same as above, but for the metasmoke account
+      'chat.stackexchange.com': 478536,
+      'chat.stackoverflow.com': 14262788,
+      'chat.meta.stackexchange.com': 848503
+    }[location.host];
 
     const constants = getFireConstants();
 
@@ -85,7 +97,8 @@
       },
       constants,
       smokeDetectorId,
-      SDMessageSelector: `.user-${smokeDetectorId} .message `,
+      metasmokeId,
+      SDMessageSelector: `.user-${smokeDetectorId} .message, .user-${metasmokeId} .message `,
       openOnSiteCodes: keyCodesToArray(['7', 'o', numpad('7', constants)]),
       openOnMSCodes: keyCodesToArray(['8', 'm', numpad('8', constants)]),
       buttonKeyCodes: [],
@@ -715,7 +728,7 @@
    * @param {number} message.message_id The message ID
    */
   function chatListener({event_type, user_id, message_id}) {
-    if (event_type === 1 && user_id === fire.smokeDetectorId) {
+    if (event_type === 1 && (user_id === fire.smokeDetectorId || user_id === fire.metasmokeId)) {
       setTimeout(() => {
         const message = $(`#message-${message_id}`);
         decorateMessage(message);
