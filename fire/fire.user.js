@@ -48,6 +48,12 @@
       'chat.stackoverflow.com': 3735529,
       'chat.meta.stackexchange.com': 266345
     }[location.host];       // From which, we need the current host's ID
+    
+    const metasmokeId = {   // Same as above, but for the metasmoke account
+      'chat.stackexchange.com': 478536,
+      'chat.stackoverflow.com': 14262788,
+      'chat.meta.stackexchange.com': 848503
+    }[location.host];
 
     const constants = getFireConstants();
 
@@ -85,7 +91,8 @@
       },
       constants,
       smokeDetectorId,
-      SDMessageSelector: `.user-${smokeDetectorId} .message `,
+      metasmokeId,
+      SDMessageSelector: `.user-${smokeDetectorId} .message, .user-${metasmokeId} .message `,
       openOnSiteCodes: keyCodesToArray(['7', 'o', numpad('7', constants)]),
       openOnMSCodes: keyCodesToArray(['8', 'm', numpad('8', constants)]),
       buttonKeyCodes: [],
@@ -715,7 +722,7 @@
    * @param {number} message.message_id The message ID
    */
   function chatListener({event_type, user_id, message_id}) {
-    if (event_type === 1 && user_id === fire.smokeDetectorId) {
+    if (event_type === 1 && (user_id === fire.smokeDetectorId || user_id === fire.metasmokeId)) {
       setTimeout(() => {
         const message = $(`#message-${message_id}`);
         decorateMessage(message);
