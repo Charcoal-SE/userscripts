@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.18
+// @version     1.19
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -291,7 +291,7 @@
           debug("write token", data.value);
         });
 
-        $(".flag-post-link").on("click", function (clickEvent) {
+        $(".js-flag-post-link").on("click", function (clickEvent) {
           $(document).on("DOMNodeInserted", function (nodeEvent) {
             var container;
             if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") === "popup-flag-post") {
