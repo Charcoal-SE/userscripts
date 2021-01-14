@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.6.1
+// @version      0.6.2
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @contributor  Makyen
@@ -57,15 +57,7 @@
   };
 
   const getPostMenu = $e => {
-    return $e.find('.post-menu:not(.preview-options)').map(function () {
-      // SE has used a .post-menu-container within the .post-menu. It was there for a while and then removed.
-      //   It's not clear if it will come back. This is just playing it safe in case SE puts it back in.
-      const container = $(this).children('.post-menu-container');
-      if (container.length > 0) {
-        return container;
-      }
-      return this;
-    });
+    return $e.find('.js-post-menu:not(.preview-options) .s-anchors');
   };
 
   const getPostId = e => {
@@ -76,7 +68,7 @@
     }
     let id = post.data('questionid') || post.data('answerid');
     if (!id) {
-      // If we are passed a .post-menu, then get the child that is the js-share-link, as it's definitely associated with the post.
+      // If we are passed a .js-post-menu, then get the child that is the js-share-link, as it's definitely associated with the post.
       let link = $e.children('.js-share-link');
       if (link.length === 0) {
         link = post.find('.answer-hyperlink, .question-hyperlink');
@@ -111,7 +103,7 @@
       // Get the element which contains the menu
       let postMenu = getPostMenu($e);
       if (postMenu.length === 0 && isNato) {
-        $e.find('> td:last-of-type').append($('<div class="post-menu simFakePostMenu"></div>'));
+        $e.find('> td:last-of-type').append($('<div class="js-post-menu simFakePostMenu"></div>'));
         postMenu = getPostMenu($e);
       }
       postMenu.filter(function () {
@@ -127,7 +119,7 @@
         const apiParam = getCurrentSiteAPIParam();
         const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
         const $this = $(this);
-        $this.append(`<span class="lsep">|</span><a href="#" class="sim-get-info" data-request="${msUri}">smokey</a>`);
+        $this.append(`<div class="grid--cell"><a href="#" class="sim-get-info" data-request="${msUri}">smokey</a></div>`);
         if (isNato) {
           // Clean up if we are in NATO Enhancements
           $this.closest('body.tools-page #mainbar > table.default-view-post-table > tbody > tr.answer .question').closest('tr.answer').removeClass('answer');
