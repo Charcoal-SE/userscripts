@@ -515,21 +515,21 @@
    */
   autoflagging.decorate.feedback.addFeedback = function (items, $feedback, defaultKey) {
     var count = Object.keys(items)
-                      .map(function (key) {
-                        return items[key].length;
-                      })
-                      .reduce(function (a, b) {
-                        return a + b;
-                      }, 0);
+      .map(function (key) {
+        return items[key].length;
+      })
+      .reduce(function (a, b) {
+        return a + b;
+      }, 0);
     if (count) {
       var title = (items[defaultKey] || []).join(", ");
       var titles = Object.keys(items)
-                         .map(function (key) {
-                           if (key.replace(/-$/, "") === defaultKey.replace(/-$/, "")) {
-                             return undefined;
-                           }
-                           return key + ": " + items[key].join(", ");
-                         });
+        .map(function (key) {
+          if (key.replace(/-$/, "") === defaultKey.replace(/-$/, "")) {
+            return undefined;
+          }
+          return key + ": " + items[key].join(", ");
+        });
       titles.unshift(title);
       titles = titles.filter(function (x) {
         return x;
