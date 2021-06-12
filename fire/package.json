@@ -18,10 +18,9 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-utils": "^1.4.3",
-    "webpack": "^4.43.0",
-    "xo": "^0.30.0"
+    "eslint": "^7.28.0",
+    "webpack": "^5.38.1",
+    "xo": "^0.40.2"
   },
   "//": "FIRE overrides",
   "xo": {
@@ -194,7 +193,19 @@
       "padding-line-between-statements": "off",
       "unicorn/catch-error-name": "off",
       "unicorn/prefer-node-append": "off",
-      "unicorn/prefer-includes": "off"
+      "unicorn/prefer-includes": "off",
+      "unicorn/no-array-for-each": 0,
+      "unicorn/no-array-reduce": 0,
+      "unicorn/no-instanceof-array": 0,
+      "unicorn/no-this-assignment": 0,
+      "unicorn/numeric-separators-style": 0,
+      "unicorn/prefer-date-now": 0,
+      "unicorn/prefer-dom-node-append": 0,
+      "unicorn/prefer-dom-node-remove": 0,
+      "unicorn/prefer-module": 0,
+      "unicorn/prefer-optional-catch-binding": 0,
+      "unicorn/prefer-ternary": 0,
+      "unicorn/prevent-abbreviations": 0
     },
     "globals": [
       "fire",

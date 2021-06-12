@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
-    "test": "xo --ignore fire.meta.js --ignore fire.user.js --ignore set-minimal-fire-sites-and-fire-user-sites.js --ignore stylelint.config.js --ignore ms_dark_theme_meta.js --ignore object-equality.js --ignore ms_dark_theme.user.js --ignore ms_dark_theme.meta.js --ignore metapi.js --ignore sim.user.js --ignore test/tests.js --ignore test/object-equality.js --ignore test/object-equality-tests.js",
+    "test": "xo --ignore fire.meta.js --ignore fire.user.js --ignore set-minimal-fire-sites-and-fire-user-sites.js --ignore stylelint.config.js --ignore ms_dark_theme_meta.js --ignore object-equality.js --ignore ms_dark_theme.user.js --ignore ms_dark_theme.meta.js --ignore metapi.js --ignore sim.user.js --ignore test/tests.js --ignore test/object-equality.js --ignore test/object-equality-tests.js --ignore review-keyboard-shortcuts/review-shortcuts.user.js",
     "get-meta": "bash ./extractScriptMetadata.sh"
   },
   "repository": {
@@ -18,10 +18,9 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-utils": "^1.4.3",
-    "webpack": "^4.43.0",
-    "xo": "0.30.0"
+    "eslint": "^7.28.0",
+    "webpack": "^5.38.1",
+    "xo": "^0.40.2"
   },
   "xo": {
     "space": true,
@@ -94,12 +93,24 @@
       "unicorn/string-content": 0,
       "unicorn/better-regex": 0,
       "unicorn/no-fn-reference-in-iterator": 0,
-      "unicorn/prefer-number-properties": 0
+      "unicorn/prefer-number-properties": 0,
+      "unicorn/no-array-for-each": 0,
+      "unicorn/no-array-reduce": 0,
+      "unicorn/no-instanceof-array": 0,
+      "unicorn/no-this-assignment": 0,
+      "unicorn/numeric-separators-style": 0,
+      "unicorn/prefer-date-now": 0,
+      "unicorn/prefer-dom-node-append": 0,
+      "unicorn/prefer-dom-node-remove": 0,
+      "unicorn/prefer-module": 0,
+      "unicorn/prefer-optional-catch-binding": 0,
+      "unicorn/prefer-ternary": 0
     },
     "globals": [
       "CHAT",
       "Notifier",
       "StackExchange"
     ]
-  }
+  },
+  "dependencies": {}
 }
