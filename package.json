@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
-    "test": "xo",
+    "test": "xo --ignore fire.meta.js --ignore fire.user.js --ignore set-minimal-fire-sites-and-fire-user-sites.js --ignore stylelint.config.js --ignore ms_dark_theme_meta.js --ignore object-equality.js --ignore ms_dark_theme.user.js --ignore ms_dark_theme.meta.js --ignore metapi.js --ignore sim.user.js --ignore test/tests.js --ignore test/object-equality.js --ignore test/object-equality-tests.js",
     "get-meta": "bash ./extractScriptMetadata.sh"
   },
   "repository": {
