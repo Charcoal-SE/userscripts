@@ -20,23 +20,23 @@
 // @grant       none
 // ==/UserScript==
 
-/* global autoflagging, ReconnectingWebSocket, unsafeWindow, CHAT, $, Notifier, jQuery */ //eslint-disable-line no-redeclare
+/* global autoflagging, ReconnectingWebSocket, unsafeWindow, CHAT, $, Notifier, jQuery */ // eslint-disable-line no-redeclare
 
 // To enable/disable trace information, type autoflagging.trace(true) or
 // autoflagging.trace(false), respectively, in your browser's console.
 
 (function () {
   "use strict";
-  const isChat = window.location.pathname.indexOf('/rooms/') === 0;
+  const isChat = window.location.pathname.indexOf("/rooms/") === 0;
 
   function doWhenRoomReadyIfMainChat(toCall) {
-    //This should probably change to looking at window.location.
+    // This should probably change to looking at window.location.
     if (!isChat) {
       return;
     }
-    if (CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === 'function') {
+    if (CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function") {
       if (CHAT.Hub.roomReady.fired()) {
-        //The room is ready now.
+        // The room is ready now.
         toCall();
       } else {
         CHAT.Hub.roomReady.add(toCall);
@@ -480,10 +480,10 @@
     if (!Array.isArray(urls)) {
       return;
     }
-    //chunkArray is from SOCVR's Archiver; copied by Makyen
+    // chunkArray is from SOCVR's Archiver; copied by Makyen
     function chunkArray(array, chunkSize) {
-      //Chop a single array into an array of arrays. Each new array contains chunkSize number of
-      //  elements, except the last one.
+      // Chop a single array into an array of arrays. Each new array contains chunkSize number of
+      //   elements, except the last one.
       var chunkedArray = [];
       var startIndex = 0;
       while (array.length > startIndex) {
@@ -492,26 +492,21 @@
       }
       return chunkedArray;
     }
-    //Split the array into chunks that are a max of 100 URLs each and call the API.
-    //There isn't a specified number that is a maximum for the API, but there appear to be
-    //  problems when requesting a large number of URLs.
+    // Split the array into chunks that are a max of 100 URLs each and call the API.
+    // There isn't a specified number that is a maximum for the API, but there appear to be
+    //   problems when requesting a large number of URLs.
     const chunkedArray = chunkArray(urls, 100);
-    chunkedArray.forEach((chunk) => {
-      autoflagging.callAPIChunk(chunk.join(','))
-    });
-  }
+    chunkedArray.forEach(chunk => autoflagging.callAPIChunk(chunk.join(",")));
+  };
 
   /*!
    * Calls the API to get information about multiple posts at once, considering the paging system of the API.
    * It will use the results to decorate the Smokey reports which are already on the page.
    */
-  autoflagging.callAPIChunk = function (urls, page) {
+  autoflagging.callAPIChunk = function (urls, page = 1) {
     debug("Call APIChunk");
     if (!urls) {
       return;
-    }
-    if (page == null) {
-      page = 1;
     }
     var autoflagData = {};
     // After changes to MS, requesting max 100 URLs appears to be working well.
@@ -522,10 +517,10 @@
       for (var i = 0; i < data.items.length; i++) {
         const link = data.items[i].link;
         if (autoflagData[link] && autoflagData[link].id > data.items[i].id) {
-          //If there's more than one MS post for this URL, then we want to use the
-          //  most recent one. This is a stopgap rather than re-writing this to
-          //  use the MS post info which is closest in time to the SD report.
-          //Normally, the most recent MS post is listed first.
+          // If there's more than one MS post for this URL, then we want to use the
+          //   most recent one. This is a stopgap rather than re-writing this to
+          //   use the MS post info which is closest in time to the SD report.
+          // Normally, the most recent MS post is listed first.
           continue;
         }
         autoflagData[link] = data.items[i];
@@ -536,7 +531,7 @@
         var $element = $(this);
         var postURL = autoflagging.getPostURL(this);
         var postData = autoflagData[postURL];
-        if (typeof postData == "undefined") {
+        if (typeof postData === "undefined") {
           return;
         }
         // Post deleted?
@@ -615,46 +610,46 @@
    * Add AIM markup to all messages in the DOM.
    */
   autoflagging.markupAllReportsInChat = function () {
-      // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
-      var urls = [];
-      $(autoflagging.selector).filter(function () {
-        const eachSelected = $(this);
-        //Clean out any empty AI infos
-        eachSelected.find(".ai-information").each(function() {
-            const eachAiInfo = $(this);
-            if (!eachAiInfo.children().length) {
-                //There's no content in the AI info. Something went wrong elsewhere, so we just remove it.
-                eachAiInfo.remove();
-            }
-        });
-        //Clean out AI Info from any messages without exactly 2 AI Infos: Something is wrong, and we should redo adding AI Info.
-        const aiInfo = eachSelected.find(".ai-information");
-        if (aiInfo.length !== 2) {
-            aiInfo.remove();
-            return true;
-        } //else
-        return false;
-      }).each(function () {
-        const url = autoflagging.getPostURL(this);
-        if (typeof url === 'string' && url) {
-          autoflagging.addSpinnerToMessage($(this));
-          urls.push(url);
+    // Find all Smokey reports (they are characterized by having an MS link) and extract the post URLs from them
+    var urls = [];
+    $(autoflagging.selector).filter(function () {
+      const eachSelected = $(this);
+      // Clean out any empty AI infos
+      eachSelected.find(".ai-information").each(function () {
+        const eachAiInfo = $(this);
+        if (eachAiInfo.children().length === 0) {
+          // There's no content in the AI info. Something went wrong elsewhere, so we just remove it.
+          eachAiInfo.remove();
         }
       });
+      // Clean out AI Info from any messages without exactly 2 AI Infos: Something is wrong, and we should redo adding AI Info.
+      const aiInfo = eachSelected.find(".ai-information");
+      if (aiInfo.length !== 2) {
+        aiInfo.remove();
+        return true;
+      } // else
+      return false;
+    }).each(function () {
+      const url = autoflagging.getPostURL(this);
+      if (typeof url === "string" && url) {
+        autoflagging.addSpinnerToMessage($(this));
+        urls.push(url);
+      }
+    });
 
-      // MS API call
-      autoflagging.callAPI(urls);
+    // MS API call
+    autoflagging.callAPI(urls);
 
-      $(".message:has(.ai-information)").addClass("ai-message");
+    $(".message:has(.ai-information)").addClass("ai-message");
   };
 
-  if (chat.length) {
+  if (chat.length > 0) {
     doWhenRoomReadyIfMainChat(autoflagging.handleChatRoomReady);
   }
 
   // Add autoflagging information to older messages as they are loaded
   $(document).ajaxComplete(function (event, jqXHR, ajaxSettings) {
-    //By the time this gets called, the messages are in the DOM.
+    // By the time this gets called, the messages are in the DOM.
     if (/chats\/\d+\/events/i.test(ajaxSettings.url)) {
       // The URL for fetching more messages is:
       //  /chats/11540/events?before=[previous oldest message]&mode=Messages&msgCount=100
@@ -670,23 +665,21 @@
       (function _deco() {
         debug.decorate("Attempting to decorate \"" + selector + "\" with", data, "message:", $(selector).parents(".message"));
         const messages = $(selector).parents(".message");
-        const messagesWithAIInfo = messages.filter(function() {
+        const messagesWithAIInfo = messages.filter(function () {
           return $(this).find(".ai-spinner, .ai-information.ai-loaded").length > 0;
         });
-        if (messages.length && messages.length === messagesWithAIInfo.length) {
+        if (messages.length > 0 && messages.length === messagesWithAIInfo.length) {
           // All messages have AI info and there's at least one message.
-          messages.each(function() {
+          messages.each(function () {
             const thisMessage = $(this);
             autoflagging.decorateMessage(thisMessage, data);
           });
-        } else {
-            if (isChat) {
-              // MS is faster than chat; add the decorate operation to the queue
-              debug.queue("Queueing", selector);
-              //This could result in data from an earlier run overwriting later data, if later run is also in the queue
-              //  and the apprporiate SD message appears between this run and that next run.
-              autoflagging.msgQueue.push(_deco);
-            }
+        } else if (isChat) {
+          // MS is faster than chat; add the decorate operation to the queue
+          debug.queue("Queueing", selector);
+          // This could result in data from an earlier run overwriting later data, if later run is also in the queue
+          //   and the apprporiate SD message appears between this run and that next run.
+          autoflagging.msgQueue.push(_deco);
         }
       })();
     }
