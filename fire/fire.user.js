@@ -32,7 +32,7 @@
 // @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
 // ==/UserScript==
-/* globals CHAT, GM_info, toastr, $, ReconnectingWebSocket, autoflagging */ // eslint-disable-line no-redeclare
+/* globals CHAT, GM_info, toastr, $, jQuery, ReconnectingWebSocket, autoflagging */ // eslint-disable-line no-redeclare
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
@@ -1114,27 +1114,252 @@
     }, '');
   }
 
+  // Many of the attributes permitted here are not permitted in Markdown for SE, but are delivered by SE in the HTML for the post body.
+  //   SE adds the additional attributes.
+  // For <a>, 'rel' is not permitted in Markdown, but is in SE's HTML.
+  const whitelistedTags = {
+    withAttributes: {
+      blockquote: ['class'], // 'data-spoiler'], // data-spoiler is used on SE sites, but isn't in the HTML delevered by SE.
+      div: ['class', 'data-lang', 'data-hide', 'data-console', 'data-babel'],
+      ol: ['start'],
+      pre: ['class'],
+      span: ['class', 'dir'],
+    },
+    specialCases: {
+      a: {
+        general: ['title', 'rel', 'alt'],
+        specificValues: {
+          class: ['post-tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
+          // rel probably has a limited set of values, but that really hasn't been explored, yet.
+          // rel: ['tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
+        },
+        // href must be relative, protocol-relative, http, or https.
+        // For <a>, SE only permits a limited subset of "href" values, so we can be more specific on these.
+        regexText: {href: '(?:https?:)?//?[^" ]*'},
+      },
+      img: {
+        ordered: ['src', 'width', 'height', 'alt', 'title'],
+        isOptionallySelfClosing: true,
+      },
+      table: {specificValues: {class: ['s-table']}}, // example post with table: https://chat.stackoverflow.com/transcript/41570?m=51575339#51575339
+      td: {specificValues: {style: ['text-align: right;', 'text-align: left;', 'text-align: center;']}}, // example post with td: https://chat.stackoverflow.com/transcript/41570?m=51575339#51575339
+      th: {specificValues: {style: ['text-align: right;', 'text-align: left;', 'text-align: center;']}}, // example post with th: https://chat.stackoverflow.com/transcript/41570?m=51575339#51575339
+    },
+    optionallySelfClosingTagsWithNoAttributes: {
+      br: [],
+      hr: [],
+    },
+    withNoAttributes: {
+      b: [],
+      code: [],
+      dd: [],
+      del: [],
+      dl: [],
+      dt: [],
+      em: [],
+      h1: [],
+      h2: [],
+      h3: [],
+      i: [],
+      kbd: [],
+      li: [],
+      p: [],
+      s: [],
+      strike: [],
+      strong: [],
+      sub: [],
+      sup: [],
+      tbody: [],
+      thead: [],
+      tr: [],
+      ul: [],
+    },
+  };
+  const whitelistedAttributesByTagType = Object.assign({},
+    whitelistedTags.optionallySelfClosingTagsWithNoAttributes,
+    whitelistedTags.withNoAttributes,
+    whitelistedTags.withAttributes,
+    whitelistedTags.specialCases);
+
+  /*
+    sortJqueryByDepth is modified from an answer to "jQuery traversing order - depth first" : https://stackoverflow.com/a/5756066
+    Copytight 2011-04-22 16:27:08Z by alexl: https://stackoverflow.com/users/72562/alexl
+    licenesed under CC BY-SA 3.0
+  */
+
+  /**
+   * sortJqueryByDepth - Sort the elements in a jQuery Object by depth, deepest first.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery}          input   The elements to sort
+   *
+   * @returns {jQuery}                  New jQuery Object with the deepest elements first.
+   */
+  function sortJqueryByDepth(input) {
+    const allElements = input.map(function () {
+      return {length: $(this).parents().length, element: this};
+    }).get();
+    allElements.sort((a, b) => a.length - b.length);
+    return $(allElements.map(({element}) => element));
+  }
+
+  /**
+   * convertChildElementsWithNonWhitelistedAttributesToText - In place, convert to text all decendents of a container which have non-whitelisted attributes.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery}          container   The elements and their decendants to check.
+   *
+   */
+  function convertChildElementsWithNonWhitelistedAttributesToText(container) {
+    // Get all elements within a <div>
+    // Given that we might change some of the elements into text, this will allow us to get them again, if that occurs.
+    // This no longer assumes that the current location in the DOM of the elements in the input does not need to be maintained (i.e. they will be moved).
+    container = container instanceof jQuery ? container : $(container);
+
+    /**
+     * convertElements - In place, one pass of converting to text the decendents of a container which have non-whitelisted attributes.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {jQuery}          elementsIn   The elements and their decendants to check.
+     *
+     * @returns {boolean}                      Flag indicating if any changes were made.
+     */
+    function convertElements(elementsIn) {
+      let didChange = false;
+      elementsIn.each(function () {
+        const attrList = [...this.attributes].map((attrNode) => attrNode.name.toLowerCase());
+        const nodeType = this.nodeName.toLowerCase();
+        const nodeTypeAttrList = whitelistedAttributesByTagType[nodeType];
+        let shouldReplaceThis = false;
+        if (!Array.isArray(nodeTypeAttrList) && typeof nodeTypeAttrList === 'object' && nodeTypeAttrList !== null) {
+          // This is a special case tag.
+          // Remove attributes which can have general values.
+          const nonGeneralAttrs = attrList.filter((attr) => !Array.isArray(nodeTypeAttrList.general) || !nodeTypeAttrList.general.includes(attr));
+          // Remove any which are specific values, where the value matches one which is permitted.
+          const nonSpecificAttrs = nonGeneralAttrs.filter((attr) => !nodeTypeAttrList.specificValues || !Array.isArray(nodeTypeAttrList.specificValues[attr]) || !nodeTypeAttrList.specificValues[attr].includes(this.attributes[attr].nodeValue));
+          const remainingAttrs = nonSpecificAttrs.filter((attr) => !nodeTypeAttrList.regexText || typeof nodeTypeAttrList.regexText[attr] !== 'string' || !(new RegExp(`^${nodeTypeAttrList.regexText[attr]}$`)).test(this.attributes[attr].nodeValue));
+          const remainingUnorderedAttrs = remainingAttrs.filter((attr) => !Array.isArray(nodeTypeAttrList.ordered) || !nodeTypeAttrList.ordered.includes(attr));
+          const remainingOrderedAttrs = remainingAttrs.filter((attr) => Array.isArray(nodeTypeAttrList.ordered) && nodeTypeAttrList.ordered.includes(attr));
+          let foundIndex = -1;
+          const areOrderedAttrsInOrder = remainingOrderedAttrs.every((attr) => {
+            const newFoundIndex = nodeTypeAttrList.ordered.indexOf(attr);
+            const newFoundIndexIsHigher = foundIndex < newFoundIndex;
+            foundIndex = newFoundIndex;
+            return newFoundIndexIsHigher;
+          });
+          shouldReplaceThis = Boolean(remainingUnorderedAttrs.length) || !areOrderedAttrsInOrder;
+        } else if (!Array.isArray(nodeTypeAttrList) || !attrList.every((attr) => nodeTypeAttrList.includes(attr))) {
+          // This isn't a valid tag
+          shouldReplaceThis = true;
+        }
+        if (shouldReplaceThis) {
+          const newOuterHTML = this.outerHTML.replace('<', '&lt;').replace(/<(\/[a-z\d]+>)$/, '&lt;$1');
+          this.outerHTML = newOuterHTML;
+          didChange = true;
+        }
+      });
+      return didChange;
+    }
+    let allChildren;
+    // Repeatedly do the conversion, until nothing is changed.
+    // This can still end up with the HTML parsed incorrectly, but shouldn't have any elements which are
+    // not whitelisted, or which are whitelisted element that have attributes which are not whitelisted.
+    do {
+      // Get all the elements again, and re-run the conversion.
+      allChildren = sortJqueryByDepth(container.find('*'));
+    } while (convertElements(allChildren));
+  }
+
+  const whiteListedSETagsRegex = (function () {
+    // https://regex101.com/r/90UJ2K/1
+    // https://regex101.com/r/9I7r9O/1
+    /* eslint-disable no-useless-escape */
+    const selfClosingBasicTagsRegexText = `(?:${Object.keys(whitelistedTags.optionallySelfClosingTagsWithNoAttributes).join('|')})\\s*/?`;
+    const basicTagsRegexText = `\/?(?:${Object.keys(whitelistedTags.withNoAttributes).join('|')})\\s*`;
+    const complexTagsClosingRegexText = `\/(?:${Object.keys(whitelistedTags.withAttributes).join('|')})\\s*`;
+    const complexTagsRegexText = `(?:${Object.entries(whitelistedTags.withAttributes)
+      .map(([tag, attrs]) => `(?:${tag}\\b(?: +(?:${attrs.join('|')})="[^"<>]*")*)`) // syntax highlihting fodder: "
+      .join('|')})\\s*`;
+    const specialCaseTagsClosingRegexText = `\/(?:${Object.keys(whitelistedTags.specialCases).join('|')})\\s*`;
+    /* eslint-enable no-useless-escape */
+    const specialCaseTagsRegexText = `(?:${Object.entries(whitelistedTags.specialCases).map(([tag, obj]) => {
+      const unordered = [];
+      if (Array.isArray(obj.general)) {
+        unordered.push(`(?:${(obj.general || []).join('|')})="[^"<>]*"`); // syntax highlihting fodder: "
+      }
+      if (obj.specificValues) {
+        unordered.push(Object.entries(obj.specificValues)
+          .map(([specificValueAttr, values]) => `${specificValueAttr}="(?:${values.join('|')})"`)
+          .join('|'));
+      }
+      if (obj.regexText) {
+        unordered.push(Object.entries(obj.regexText)
+          .map(([regexTextAttr, regexText]) => `${regexTextAttr}="${regexText}"`)
+          .join('|'));
+      }
+      let unorderedRegexText = '';
+      if (unordered.length > 0) {
+        unorderedRegexText = `(?:(?: +(?:${unordered.join('|')}))*)`;
+      }
+      let allAttrs = unorderedRegexText;
+      let orderedRegexText = '';
+      if (obj.ordered) {
+        orderedRegexText = `(?:(?: +${obj.ordered.join(`="[^"<>]*")?${unorderedRegexText}(?: +`)}="[^"<>]*")?)`;
+        allAttrs = unorderedRegexText + orderedRegexText + unorderedRegexText;
+      }
+      const attrRegexText = `(?:${tag}\\b${allAttrs}\\s*${obj.isOptionallySelfClosing ? '/?' : ''})`;
+      return attrRegexText;
+    })
+      .join('|')})`;
+    const fullRegexText = `&lt;(${[
+      selfClosingBasicTagsRegexText,
+      basicTagsRegexText,
+      complexTagsClosingRegexText,
+      complexTagsRegexText,
+      specialCaseTagsClosingRegexText,
+      specialCaseTagsRegexText,
+    ].join('|')})&gt;`;
+    return new RegExp(fullRegexText, 'gi');
+  })();
+  /* The whitelisted RegExp is currently:
+    Brief test: https://regex101.com/r/csDeBt/1/
+    RegExp:
+    &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|h1|h2|h3|i|kbd|li|p|s|strike|strong|sub|sup|ul)\s*|\/(?:blockquote|div|ol|pre|span)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*))\s*|\/(?:a)\s*|(?:(?:a\b(?: +(?:(?:(?:href|title|rel|alt)="[^"<>]*")|class="(?:post-tag)"))*))\s*|(?:(?:img\b(?: +(?:src|width|height|alt|title)="[^"<>]*")*)\s*\/?))&gt;
+    2021-02-10:
+      &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|h1|h2|h3|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*))\s*|\/(?:a|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt)="[^"<>]*"|class="(?:post-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
+  */
+
   /**
    * generatePostBodyDivFromText - Generate a <div> containing the HTML for a post body from HTML text.
    *
    * @private
    * @memberof module:fire
    *
-   * @param   {string}          htmlText    The text to change into HTML.
-   * @param   {falseyTruthy}    isFromSE    Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
+   * @param   {string}          htmlText         The text to change into HTML.
+   * @param   {falseyTruthy}    isTrusted        Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
    *
-   * @returns {jQuery}                      <div> containing the body HTML.
+   * @returns {jQuery}                           <div> containing the body HTML.
    */
-  function generatePostBodyDivFromData(htmlText, isFromSE) { // eslint-disable-line no-unused-vars
-    // isFromSE is not yet implemented.
+  function generatePostBodyDivFromHtmlText(htmlText, isTrusted) {
     // Just having the whitelisted tags active is good, but results in the possibility that we've enabled
     //   a tag within <code>.
     // div and pre can have class and other attributes for snippets.
 
-    // SE normally provides HTML with <code> sections having <, >, and & (???) replaced by their HTML entities. The .body we get from MS has all of those replaced
-    //   back as the characters. I assume that this is done to facilitate regex matching within <code>. It does mean that it's not, necessarily, possible to
+    // SE normally provides HTML with <code> sections having <, >, and & (???) replaced by their HTML entities. The .body we get from MS has all HTML entities
+    //   throughout the text (not just in <code> and <blockquotes>) replaced with their Unicode characters
+    //   This is done to facilitate regex matching within the post, particularly within <code>.
+    //   With what SD has done to the text it's not, necessarily, possible to
     //   recover back to the actual content (e.g. what happens with Markdown like `<code>`: SE would send "<code>&lt;code&gt;</code>", but that gets converted
-    //   to "<code><code></code>" by SD/MS.
+    //   to "<code><code></code>" by SD/MS. In addition, it's possible there were originally other pieces of text which were HTML entities that are now
+    //   Unicode characters which are incorrectly enterpreted as valid HTML tags, etc.
+    //   So, ultimately, the conversion from the body stored on MS to HTML text which we do here is, at best, an approximation. However, it's considerably
+    //   better than not trying to perform that conversion at all.
     /*
       `<code>` foobar `</code>`
       produces
@@ -1156,23 +1381,34 @@
     // On deleted posts where the MS data isn't available, d.body could be undefined.
 
     const parser = new DOMParser();
-    const whiteListedTagsRegex = /&lt;((?:\/?(?:b|blockquote|code|del|dd|dl|dt|em|h[123]|i|kbd|li|p|s|sup|sub|strong|strike|ul|br|hr))|(?:\/(?:a|div|img|ol|pre|span))|(?:a|div|img|ol|pre|span)\b.*?)\s*\/?&gt;/gi;
-
-    const bodyOnlyWhitelist = $('<div/>')
-      .text(htmlText || '') // Escape everything. NOTE: Everything should be unescaped comming from SD/MS, but properly formatted if it's from SE.
-      .html() // Get the escaped HTML, unescape whitelisted tags.
-      .replace(whiteListedTagsRegex, '<$1>')
-      .replace(/<(\/ ?)?(script|style)/gi, '&lt;$1$2')
-      .replace(/(script|style)>/gi, '$1&gt;');
-
-    let processedBody = toHTMLEntitiesBetweenTags(bodyOnlyWhitelist, 'code');
-    // I don't recall why blockquotes are handled specially.
-    processedBody = toHTMLEntitiesBetweenTags(processedBody, 'blockquote', whiteListedTagsRegex);
+    let processedBody = htmlText;
+    if (!isTrusted) {
+      // If we are converting HTML text received from SE, then we don't need to handle the HTML
+      //   entities having been converted to Unicode characters. We can just use the HTML text directly.
+      whiteListedSETagsRegex.lastIndex = 0;
+      const bodyOnlyWhitelist = $('<div/>')
+        .text(htmlText || '') // Escape everything. NOTE: Everything should be unescaped comming from SD/MS, but properly formatted if it's from SE.
+        .html() // Get the escaped HTML, unescape whitelisted tags.
+        .replace(whiteListedSETagsRegex, '<$1>');
+      processedBody = toHTMLEntitiesBetweenTags(bodyOnlyWhitelist, 'code');
+      processedBody = toHTMLEntitiesBetweenTags(processedBody, 'blockquote', whiteListedSETagsRegex);
+    }
     // At this point, if we just pass the HTML to jQuery, then the images are fetched, which might look suspicious if network traffic is being monitored
     //   (e.g. in a work environment) and the image is NSFW. Still need to avoid that.
-    const bodyAsDOM = parser.parseFromString(`<div>${processedBody}</div>`, 'text/html');
+    // ProcessedBody may be malformed, so we don't wrap it in a div in HTML text.
+    const bodyAsDOM = parser.parseFromString(processedBody, 'text/html');
+    // The body here will often have multiple child nodes. We want everything wrapped in a div, so:
+    const newDiv = bodyAsDOM.createElement('div');
+    newDiv.append(...bodyAsDOM.body.childNodes);
+    bodyAsDOM.body.append(newDiv);
+    if (!isTrusted) {
+      convertChildElementsWithNonWhitelistedAttributesToText(bodyAsDOM.body.firstChild);
+    }
     // Change all the image src prior to inserting into main document DOM or letting jQuery see it.
-    [].slice.call(bodyAsDOM.body.querySelectorAll('img')).forEach(image => {
+    // Not doing that here would result in the browser making fetches for each image's URL, which
+    // could be bad for NSFW images in some situations (e.g. someone using this from work).
+    // We could do this in the HTML text, but we want a DOM anyway, and it's easier to do it as DOM.
+    bodyAsDOM.body.querySelectorAll('img').forEach((image) => {
       image.dataset.src = image.src;
       image.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
     });
@@ -1285,7 +1521,7 @@
       title = reportTitle; // eslint-disable-line prefer-destructuring
     }
 
-    const reportBody = generatePostBodyDivFromData(d.body, false);
+    const reportBody = generatePostBodyDivFromHtmlText(d.body, false);
 
     const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
@@ -1341,7 +1577,7 @@
       .appendTo('body')
       .fadeIn('fast');
 
-    hideReportImages();
+    handleReportImages();
 
     if (d.revision_count > 1)
       showEditedIcon();
@@ -1364,18 +1600,25 @@
   }
 
   /**
-   * hideReportImages - Hides images in a report.
+   * handleReportImages - Handle images in a report. Either show them immediately, or add a click listener to show them.
+   *
+   * @private
+   * @memberof module:fire
+   *
    */
-  function hideReportImages() {
+  function handleReportImages() {
     if (fire.userData.hideImages) {
       $('.fire-reported-post img').each((i, element) => {
         const img = $(element);
-        img.data('src', element.src);
-        img.one('click', event => {
+        img.one('click', (event) => {
           img.attr('src', img.data('src'));
           event.preventDefault();
         });
-        element.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
+      });
+    } else {
+      // Restore the original image src attribute.
+      $('.fire-reported-post img').each((i, element) => {
+        element.src = $(element).data('src');
       });
     }
   }
