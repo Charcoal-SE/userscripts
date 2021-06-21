@@ -3,7 +3,8 @@
   "version": "1.3.0",
   "description": "FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.",
   "scripts": {
-    "test": "xo"
+    "test": "xo",
+    "compile-scss": "sed -e '/^---/d' fire.scss | node-sass > fire.css"
   },
   "repository": {
     "type": "git",
