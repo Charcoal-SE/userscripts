@@ -33,6 +33,8 @@
 // @grant       none
 // ==/UserScript==
 /* globals CHAT, GM_info, toastr, $, jQuery, ReconnectingWebSocket, autoflagging */ // eslint-disable-line no-redeclare
+/* eslint "curly": ["error", "multi-or-nest", "consistent"] */
+/* eslint-disable no-multi-spaces */
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
