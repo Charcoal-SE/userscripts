@@ -570,3 +570,11 @@ body.theme-dark,
     --black-100: #4a4e51;
     --red-075: #72373880;
 }
+
+/*The CSS for Search pages results in a different font-family, margin, padding, and line-height for h2. */
+body.outside .fire-popup h2 {
+  font-family: inherit;
+  margin: 0 0 10px 0;
+  padding: 0;
+  line-height: inherit;
+}
