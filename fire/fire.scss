@@ -198,6 +198,7 @@ img.fire-emoji-large {
     .fire-reported-post { // This is the div inside which the post is displayed.
       padding: 10px;
       margin: 0 -10px -10px -10px;
+      overflow-wrap: break-word;
       --s-prose-spacing: 1.1em;
 
       &.fire-deleted {
@@ -273,6 +274,7 @@ img.fire-emoji-large {
         -webkit-transition: max-height $transitionTime;
         -moz-transition: max-height $transitionTime;
         transition: max-height $transitionTime;
+        overflow-wrap: normal;
 
         &.fire-expanded {
           max-height: 400px;
