@@ -1556,7 +1556,13 @@
         $(this).addClass('is-visible');
       });
 
-    const userName = `${d.username}<span class="fire-user-reputation"></span>`;
+    // The username from SD could be unsafe, so we make sure it enters the DOM as text, not HTML.
+    const $userName = $('<div><a class="fire-user-name"></a><span class="fire-user-reputation"></span></div>');
+    $userName
+      .find('.fire-user-name')
+      .text(d.username)
+      .attr('href', d.user_link ? d.user_link : '');
+    const userNameHtml = $userName.html();
 
     const body = newEl('div', 'fire-popup-body')
       .append(
@@ -1573,7 +1579,7 @@
             newEl('div', 'fire-report-info')
               .append(newEl('h3', 'fire-type', {text: `${postType}:`}))
               .append(
-                newEl('span', 'fire-username', {html: userName, title: 'Username'})
+                newEl('span', 'fire-username', {html: userNameHtml, title: 'Username'})
                   .append(emojiOrImage('user'))
               )
           )
