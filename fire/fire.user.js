@@ -1524,6 +1524,32 @@
     }
 
     const reportBody = generatePostBodyDivFromHtmlText(d.body, false);
+    // Convert relative URLs to point to the URL on the source site.
+    // SE uses these for tags and some site-specific functionality (e.g. circuit simulation on Electronics)
+    const [, siteHref] = (d.link || '').match(/^((?:https?:)?\/\/(?:[a-z\d-]+\.)+[a-z\d-]+\/)/i) || ['', ''];
+    // A couple of reports which had this problem:
+    //   https://chat.stackexchange.com/transcript/11540?m=55601336#55601336  (links at bottom)
+    //   https://chat.stackexchange.com/transcript/11540?m=54674140#54674140  (tags)
+    reportBody.find('a').each(function () {
+      const $this = $(this);
+      let href = $this.attr('href');
+      if (!/^(?:[a-z]+:)?\/\//.test(href)) {
+        // It's not a fully qualified or protocol-relative link.
+        if (href.startsWith('/')) {
+          // The path is absolute
+          if (siteHref.endsWith('/')) {
+            href = href.replace('/', '');
+          }
+          this.href = siteHref + href;
+        } else {
+          // It's relative to the question (really shouldn't see any of these)
+          if (!siteHref.endsWith('/')) {
+            href = `/${href}`;
+          }
+          this.href = d.link + href;
+        }
+      }
+    });
     reportBody.find('blockquote.spoiler')
       .attr('data-spoiler', 'Reveal spoiler')
       .one('click', function () {
