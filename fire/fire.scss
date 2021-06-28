@@ -198,6 +198,7 @@ img.fire-emoji-large {
     .fire-reported-post { // This is the div inside which the post is displayed.
       padding: 10px;
       margin: 0 -10px -10px -10px;
+      --s-prose-spacing: 1.1em;
 
       &.fire-deleted {
         background-color: #f4eaea;
@@ -392,34 +393,34 @@ img.fire-emoji-large {
       }
 
       .s-table-container {
-        margin-bottom: var(--s-prose-spacing)
+        margin-bottom: var(--s-prose-spacing);
         overflow-x: auto;
-        scrollbar-color: var(--scrollbar) transparent
+        scrollbar-color: var(--scrollbar) transparent;
 
         &:last-child,
         &:only-child {
-          margin-bottom: 0
+          margin-bottom: 0;
         }
 
         &::-webkit-scrollbar {
           width: 10px;
           height: 10px;
-          background-color: transparent
+          background-color: transparent;
         }
 
         &::-webkit-scrollbar-track {
           border-radius: 10px;
-          background-color: transparent
+          background-color: transparent;
         }
 
         &::-webkit-scrollbar-thumb {
           border-radius: 10px;
-          background-color: var(--scrollbar)
+          background-color: var(--scrollbar);
         }
 
         &::-webkit-scrollbar-corner {
           background-color: transparent;
-          border-color: transparent
+          border-color: transparent;
         }
       } // End .s-table-container
 
@@ -429,7 +430,7 @@ img.fire-emoji-large {
         max-width: 100%;
         border-collapse: collapse;
         border-spacing: 0;
-        font-size: 13px
+        font-size: 13px;
 
         th,
         td {
@@ -439,35 +440,32 @@ img.fire-emoji-large {
           border-right: 1px solid var(--black-100);
           vertical-align: middle;
           color: var(--fc-medium);
-          text-align: left
+          text-align: left;
         }
 
         th {
           font-weight: bold;
-          color: var(--fc-dark)
+          color: var(--fc-dark);
         }
 
         thead th {
           vertical-align: bottom;
           white-space: nowrap;
           background-color: var(--black-025);
-          line-height: 1.15384615
-        }
-
-        thead th {
+          line-height: 1.15384615;
         }
 
         tbody th {
-          font-weight: normal
+          font-weight: normal;
         }
 
         tr:last-of-type td,
         tr:last-of-type th {
-          border-bottom: 1px solid var(--black-100)
+          border-bottom: 1px solid var(--black-100);
         }
 
         tbody+tbody {
-          border-top: 2px solid var(--black-100)
+          border-top: 2px solid var(--black-100);
         }
       } // End .s-table
     } // End .fire-reported-post
@@ -545,4 +543,28 @@ img.fire-emoji-large {
 
 @keyframes spinner {
   to { transform: rotate(360deg); }
+}
+
+/* Used in table CSS; Largely copied from SE's Stacks CSS*/
+body,
+.theme-light__forced {
+    --black-025: #fafafb;
+    --black-100: #d6d9dc;
+    --red-075: #f9d3d780;
+
+}
+
+@media (prefers-color-scheme:dark) {
+    body.theme-system {
+        --black-025: #393939;
+        --black-100: #4a4e51;
+        --red-075: #72373880;
+    }
+}
+
+body.theme-dark,
+.theme-dark__forced {
+    --black-025: #393939;
+    --black-100: #4a4e51;
+    --red-075: #72373880;
 }
