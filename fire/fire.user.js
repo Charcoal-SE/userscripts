@@ -1524,6 +1524,11 @@
     }
 
     const reportBody = generatePostBodyDivFromHtmlText(d.body, false);
+    reportBody.find('blockquote.spoiler')
+      .attr('data-spoiler', 'Reveal spoiler')
+      .one('click', function () {
+        $(this).addClass('is-visible');
+      });
 
     const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
