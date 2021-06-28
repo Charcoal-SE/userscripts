@@ -523,7 +523,39 @@ img.fire-emoji-large {
     cursor: pointer;
     word-wrap: break-word;
     word-break: break-word;
-  }
+
+      .fire-detections-list {
+        margin-left: 13px;
+      }
+
+      .fire-watchlist-detection, .fire-blacklist-detection {
+        .fire-detection-text, .fire-detection-name {
+          font-weight: bold;
+        }
+        .fire-detection-data {
+          margin-left: 10px;
+          display: block;
+        }
+        .fire-detection-positions {
+          display: block;
+        }
+        .fire-detection-list-separator {
+          display: none;
+        }
+      } // End of .fire-watchlist-detection, .fire-blacklist-detection
+
+      .fire-detection-positions {
+        text-indent: -20px;
+        &::before {
+          content: "▸";
+        }
+      }
+
+      .fire-detection-item {
+        padding-left: 15px;
+        text-indent: -15px;
+      }
+  } // End .fire-tooltip
 
   &#fire-settings {
     .fire-popup-header h2 {
