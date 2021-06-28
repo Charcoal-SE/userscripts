@@ -514,6 +514,8 @@ img.fire-emoji-large {
     font-size: 12px;
     max-width: 70vw;
     cursor: pointer;
+    word-wrap: break-word;
+    word-break: break-word;
   }
 
   &#fire-settings {
