@@ -777,7 +777,7 @@
         if (!isReportedUrlValid)
           return;
 
-        const fireButton = _('span', 'fire-button', {
+        const fireButton = newEl('span', 'fire-button', {
           html: emojiOrImage('fire'),
           click: openReportPopup
         })
@@ -1041,21 +1041,21 @@
    * @param {function} callback The action to perform after getting a write token / choosing read-only mode.
    */
   function writeTokenPopup(callback) {
-    const input = _('input', 'fire-popup-input', {
+    const input = newEl('input', 'fire-popup-input', {
       type: 'text',
       maxlength: '8',
       placeholder: 'Enter code here'
     });
 
-    _('div', 'fire-popup-modal')
+    newEl('div', 'fire-popup-modal')
       .appendTo('body')
       .click(closePopup);
 
-    _('div', 'fire-popup')
+    newEl('div', 'fire-popup')
       .css({top: '5%', left: getPopupLeft()})
       .append(
-        _('div', 'fire-popup-header')
-          .append(_('p', {
+        newEl('div', 'fire-popup-header')
+          .append(newEl('p', {
             html: 'FIRE requires a metasmoke write token to submit feedback.<br />' +
                   'This requires that your metasmoke account has the "Reviewer" role. <br />' +
                   'Once you\'ve authenticated FIRE with metasmoke, you\'ll be given a code.<br />'
@@ -1065,7 +1065,7 @@
           .append(button('Save', () => clickHandlers.saveToken(input, callback)))
           .append(br())
           .append(br())
-          .append(_('p', {
+          .append(newEl('p', {
             html: 'Alternatively, if you\'re not a "Reviewer", you can run FIRE in read-only mode by disabling feedback.<br />' +
                   'You will still be able to view reports.'
           }))
@@ -1454,7 +1454,7 @@
     const site = fire.sites[d.site] || fire.sites[`${d.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
 
-    const openOnSiteButton = _('a', 'fire-site-logo', {
+    const openOnSiteButton = newEl('a', 'fire-site-logo', {
       html: site ? site.name : d.site,
       href: d.link,
       target: '_blank',
@@ -1463,7 +1463,7 @@
       'fire-tooltip': 'Show on site'
     });
 
-    const openOnMSButton = _('a', 'button fire-metasmoke-button', {
+    const openOnMSButton = newEl('a', 'button fire-metasmoke-button', {
       text: 'MS',
       href: `https://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
       target: '_blank',
@@ -1471,14 +1471,14 @@
       'fire-tooltip': 'Open on metasmoke'
     });
 
-    const top = _('p', 'fire-popup-header')
+    const top = newEl('p', 'fire-popup-header')
       .append(createCloseButton(closePopup))
       .append(openOnMSButton)
       .append(openOnSiteButton)
       .append(br());
 
     if (!fire.userData.readOnly) {
-      const buttonContainer = _('div', 'fire-popup-feedbackButtonContainer');
+      const buttonContainer = newEl('div', 'fire-popup-feedbackButtonContainer');
       top.append(buttonContainer);
       /* eslint-disable no-multi-spaces */
       buttonContainer
@@ -1558,49 +1558,49 @@
 
     const userName = `${d.username}<span class="fire-user-reputation"></span>`;
 
-    const body = _('div', 'fire-popup-body')
+    const body = newEl('div', 'fire-popup-body')
       .append(
-        _('div', {
+        newEl('div', {
           'fire-tooltip': emojiOrImage('clipboard')
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${d.why}`)
             .html()
         })
-          .append(_('h2', 'fire-post-title')
-            .append(_('em', {html: title}))
+          .append(newEl('h2', 'fire-post-title')
+            .append(newEl('em', {html: title}))
           )
-          .append(_('hr'))
+          .append(newEl('hr'))
           .append(
-            _('div', 'fire-report-info')
-              .append(_('h3', 'fire-type', {text: `${postType}:`}))
+            newEl('div', 'fire-report-info')
+              .append(newEl('h3', 'fire-type', {text: `${postType}:`}))
               .append(
-                _('span', 'fire-username', {html: userName, title: 'Username'})
+                newEl('span', 'fire-username', {html: userName, title: 'Username'})
                   .append(emojiOrImage('user'))
               )
           )
       )
-      .append(_('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
+      .append(newEl('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
         .append(reportBody)
       );
 
-    _('div', 'fire-popup-modal')
+    newEl('div', 'fire-popup-modal')
       .appendTo('body')
       .click(closePopup);
 
-    const versionLink = _('a', 'fire-version-link', {
+    const versionLink = newEl('a', 'fire-version-link', {
       text: fire.metaData.version,
       href: `${fire.metaData.downloadURL}?${new Date().getTime()}`,
       target: '_self',
       title: 'Update'
     });
 
-    const settingsButton = _('a', 'fire-settings-button', {
+    const settingsButton = newEl('a', 'fire-settings-button', {
       html: emojiOrImage('gear'),
       click: openSettingsPopup,
       'fire-key': keyCodesToArray('s'),
       'fire-tooltip': 'FIRE Configuration'
     });
 
-    _('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
+    newEl('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
       .css({top: '5%', left: getPopupLeft()})
       .append(top)
       .append(body)
@@ -1668,21 +1668,21 @@
 
     fire.settingsAreOpen = true;
 
-    const popup = _('div', 'fire-popup', {id: 'fire-settings'})
+    const popup = newEl('div', 'fire-popup', {id: 'fire-settings'})
       .css({top: '5%', left: getPopupLeft()});
 
-    const top = _('p', 'fire-popup-header')
+    const top = newEl('p', 'fire-popup-header')
       .append(
-        _('h2')
+        newEl('h2')
           .append(emojiOrImage('fire', true))
           .append(' FIRE settings.'))
       .append(createCloseButton(closePopup));
 
-    const toastDurationElements = _('div')
+    const toastDurationElements = newEl('div')
       .append(
-        _('span', {text: 'Notification popup duration:'})
+        newEl('span', {text: 'Notification popup duration:'})
           .append(br())
-          .append(_('input', {
+          .append(newEl('input', {
             id: 'toastr_duration',
             type: 'number',
             value: fire.userData.toastrDuration,
@@ -1694,11 +1694,11 @@
 
     const toastrClasses = ['top-right', 'bottom-right', 'bottom-left', 'top-left', 'top-full-width', 'bottom-full-width', 'top-center', 'bottom-center'];
     const selected = fire.userData.toastrPosition;
-    const positionSelect = _('select', 'fire-position-select', {change: toastrPositionChangeHandler});
+    const positionSelect = newEl('select', 'fire-position-select', {change: toastrPositionChangeHandler});
 
     for (const value of toastrClasses) {
       positionSelect.append(
-        _('option', {
+        newEl('option', {
           value,
           text: value.replace(/-/g, ' '),
           selected: value === selected
@@ -1716,10 +1716,10 @@
     let requestStackExchangeTokenButton = $();
 
     if (!fire.userData.stackexchangeWriteToken) {
-      requestStackExchangeTokenButton = _('p', 'fire-request-write-token')
+      requestStackExchangeTokenButton = newEl('p', 'fire-request-write-token')
         .append(br())
-        .append(_('h3', {text: 'Stack Exchange write token:'}))
-        .append(_('p', {
+        .append(newEl('h3', {text: 'Stack Exchange write token:'}))
+        .append(newEl('p', {
           html:
             'Authorize FIRE with your Stack Exchange account.<br />' +
             'This allows FIRE to load additional data for reported posts.'
@@ -1727,17 +1727,17 @@
         .append(button('Authorize FIRE with Stack Exchange', requestStackExchangeToken));
     }
 
-    const positionSelector = _('div')
+    const positionSelector = newEl('div')
       .append(br())
       .append(
-        _('span', {text: 'Notification popup position:'})
+        newEl('span', {text: 'Notification popup position:'})
           .append(br())
           .append(positionSelect)
       );
 
-    const container = _('div')
+    const container = newEl('div')
       .append(
-        _('div', 'fire-settings-section fire-settings-left')
+        newEl('div', 'fire-settings-section fire-settings-left')
           .append(createSettingsCheckBox('blur', fire.userData.blur, blurOptionClickHandler,
             'Enable blur on popup background.',
             'Popup blur:'
@@ -1760,8 +1760,8 @@
           .append(disableReadonlyButton)
       )
       .append(
-        _('div', 'fire-settings-section fire-settings-right')
-          .append(_('h3', {text: 'Notifications:'}))
+        newEl('div', 'fire-settings-section fire-settings-right')
+          .append(newEl('h3', {text: 'Notifications:'}))
           .append(toastDurationElements)
           .append(positionSelector)
           .append(requestStackExchangeTokenButton)
@@ -2093,7 +2093,7 @@
     const suffix = count ? ` (${count})` : '';
     const cssClass = hasSubmittedFeedback ? ' fire-submitted' : '';
 
-    return _('a', `button fire-feedback-button fire-${verdict}${cssClass}`, {
+    return newEl('a', `button fire-feedback-button fire-${verdict}${cssClass}`, {
       text: text + suffix,
       click: ({currentTarget}) => {
         const $currentTarget = $(currentTarget);
@@ -2135,7 +2135,7 @@
    * @returns {object}                The constructed "close" button.
    */
   function createCloseButton(clickHandler) {
-    return _('a', 'button fire-close-button', {
+    return newEl('a', 'button fire-close-button', {
       text: 'Close',
       title: 'Close this popup',
       click: clickHandler,
@@ -2158,26 +2158,26 @@
    * @returns {object}              The constructed settings checkbox.
    */
   function createSettingsCheckBox(id, value, handler, labelText, headerText) {
-    const checkBox = _('input', {
+    const checkBox = newEl('input', {
       id: `checkbox_${id}`,
       type: 'checkbox',
       checked: value,
       click: handler
     });
 
-    const label = _('label', {
+    const label = newEl('label', {
       for: `checkbox_${id}`,
       text: labelText
     });
 
-    return _('div')
-      .append(_('h3', {text: headerText}))
+    return newEl('div')
+      .append(newEl('h3', {text: headerText}))
       .append(checkBox)
       .append(label);
   }
 
   /**
-   * _ - Wrapper to create a new element with a specified class.
+   * newEl - Wrapper to create a new element with a specified class.
    *
    * @private
    * @memberof module:fire
@@ -2185,9 +2185,10 @@
    * @param   {string} tagName    The tag to create.
    * @param   {string} [cssClass] The tag's css class. Optional. If this is an object, this is assumed to be `options`.
    * @param   {object} [options]  The options to use for the created element.
+   *
    * @returns {object}            A jQuery DOM node.
    */
-  function _(tagName, cssClass, options) {
+  function newEl(tagName, cssClass, options) {
     if (typeof cssClass === 'object') {
       options = cssClass;
       cssClass = undefined;
@@ -2213,7 +2214,7 @@
    * @returns {object} A jQuery `<br />` DOM node.
    */
   function br() {
-    return _('br');
+    return newEl('br');
   }
 
   /**
@@ -2226,7 +2227,7 @@
    * @returns {object}          A jQuery `<span>` DOM node with the specified contents.
    */
   function span(contents) {
-    return _('span', {html: contents});
+    return newEl('span', {html: contents});
   }
 
   /**
@@ -2240,7 +2241,7 @@
    * @returns {object}                A jQuery `<button>` DOM node.
    */
   function button(text, clickHandler) {
-    return _('a', 'button', {
+    return newEl('a', 'button', {
       text,
       click: clickHandler
     });
@@ -2285,7 +2286,7 @@
     const url = 'https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/';
     const hex = emoji.codePointAt(0).toString(fire.constants.hex);
 
-    const emojiImage = _('img', `fire-emoji${large ? '-large' : ''}`, {
+    const emojiImage = newEl('img', `fire-emoji${large ? '-large' : ''}`, {
       src: `${url + hex}.png`,
       alt: emoji
     });
@@ -2425,7 +2426,7 @@
         $('.fire-tooltip').remove();
         const element = $(currentTarget);
         element.after(
-          _('span', 'fire-tooltip', {html: element.attr('fire-tooltip')})
+          newEl('span', 'fire-tooltip', {html: element.attr('fire-tooltip')})
         );
       })
       .on('mousemove', selector, ({clientX, clientY}) => {
