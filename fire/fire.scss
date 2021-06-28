@@ -300,6 +300,28 @@ img.fire-emoji-large {
         background-color: #eff0f1;
         padding: 1px 5px;
       }
+
+
+      // Tags: Ideally, these would be colored per-site
+      a.post-tag {
+        color: rgb(57, 115, 157);
+        background-color: rgb(225, 236, 244);
+        border-color: transparent;
+      }
+
+      a.post-tag {
+        display: inline-block;
+        padding: .4em .5em;
+        margin: 2px 2px 2px 0;
+        font-size: 11px;
+        line-height: 1;
+        white-space: nowrap;
+        text-decoration: none;
+        text-align: center;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 3px;
+      }
     } // End .fire-reported-post
   } // End body
 
