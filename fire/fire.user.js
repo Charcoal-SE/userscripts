@@ -1418,7 +1418,157 @@
   }
 
   /**
-   * openReportPopup - Build a report popup and show it.
+   * substitutePhoneNubmers - Adjust a watched or blacklisted number listing.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {string}          match    The matched <li>
+   * @param   {string}          p1       (<li class="fire-detection-item)
+   * @param   {string}          p2       ("><span class="fire-detection-name">)
+   * @param   {string}          p3       ((?:potentially bad keyword|bad phone number) in \w+<\/span>)
+   * @param   {string}          p4       ( - )
+   * @param   {string}          p5       (<span class="fire-detection-data">)
+   * @param   {string}          p6       (.*? found (?:verbatim|normalized))
+   * @param   {string}          p7       (<\/span>)
+   *
+   * @returns {string}                   The processed text to use in the why <li>
+   */
+  function substitutePhoneNubmers(match, p1, p2, p3, p4, p5, p6, p7) { // eslint-disable-line max-params
+    const start = `${p1} fire-blacklist-detection fire-blacklisted-number-detection${p2}${p3}${p4}${p5}`;
+    let numberCount = 1;
+    const positions = p6
+      .split(';')
+      .map((val) => val.trim())
+      .sort()
+      .join('; ')
+      .split(/( found (?:verbatim|normalized)(?:;|$))/g)
+      .reduce((sum, current, index, array) => {
+        if (!current || !current.trim()) {
+          return sum;
+        }
+        if (/( found (?:verbatim|normalized)(?:;|$))/.test(current)) {
+          const savedNumberCount = numberCount;
+          numberCount = 1;
+          current = current.replace(/^(.*?)(;?)$/, `$1${(savedNumberCount > 1 ? ` (${savedNumberCount} times)` : '')}$2`);
+          return `${sum}${current}</span>`;
+        }
+        if (array.length > index + 3 && array[index].trim() === array[index + 2].trim() && (array[index + 1].trim() === array[index + 3].trim() || array[index + 1].trim() === `${array[index + 3].trim()};`)) { // eslint-disable-line no-magic-numbers
+          array[index] = '';
+          array[index + 1] = ''; // Causes the next array entry to be skipped.
+          numberCount++;
+          return sum;
+        }
+        return `${sum}<span class="fire-detection-positions"><span class="fire-detection-text">${current.trim()}</span>`;
+      }, '')
+      // https://regex101.com/r/fAyKYX/1/
+      .replace(/(<span class="fire-detection-text">.*?<\/span>) (found (?:verbatim|normalized)(?: \(\d+ times\))?);?(<\/span>)/ig, '$2: $1$3');
+    return start + positions + p7;
+  }
+
+  /**
+   * generateDisplayWhyFromWhy - Adjust a watched or blacklisted number listing.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {string}          why      The why text
+   *
+   * @returns {string}                   The HTML text to display.
+   */
+  function generateDisplayWhyFromWhy(why) {
+    // Escape everything in the why.
+    const escapedWhy = $('<div/>')
+      .text(why || '')
+      .html();
+
+    const displayWhy = `<ul class="fire-detections-list">${(escapedWhy || '')
+      // https://regex101.com/r/gSvmRd/2
+      .replace(/^(\s*)(\w[\w -]+?)( - )(.*?)$/mg, '<li class="fire-detection-item"><span class="fire-detection-name">$2</span>$3<span class="fire-detection-data">$4</span>')
+      // https://regex101.com/r/qXY8ut/2
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(bad keyword in \w+<\/span>)( - )/img, '$1 fire-blacklist-detection$2$3$4')
+      // https://regex101.com/r/XekswL/2 --- Not actually represented there. The use of a function makes it not possible to actually show the substitutions
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)((?:potentially bad keyword|bad phone number) in \w+<\/span>)( - )(<span class="fire-detection-data">)(.*? found (?:verbatim|normalized))(<\/span>)$/img, substitutePhoneNubmers)
+      // https://regex101.com/r/40bCoE/2
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(potentially bad keyword in \w+<\/span>)( - )/img, '$1 fire-watchlist-detection$2$3$4')
+      // https://regex101.com/r/em5MHz/1
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(blacklisted website in \w+<\/span>)( - )/img, '$1 fire-blacklist-detection$2$3$4')
+      // https://regex101.com/r/nq9K4T/1
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(blacklisted username<\/span>)( - )/img, '$1 fire-blacklist-detection$2$3$4')
+      // https://regex101.com/r/MI8FIp/1/
+      // https://regex101.com/r/CylfFI/1 2019-10-06
+      .replace(/(Positions? )(\d+-\d+(?:, \d+-\d+)*(?:, \+\d+ more)?: )(.*?)(, )?((?=Position)|<\/span>$)/mg, '<span class="fire-detection-positions">$1<span class="fire-detection-locations">$2</span><span class="fire-detection-text">$3</span><span class="fire-detection-list-separator">$4</span></span>$5')
+      .replace(/\r?\n(<li )/g, '</li>$1')
+    }</li></ul>`;
+    // Convert the text to DOM nodes for easier processing.
+    const asDom = $(displayWhy);
+    // For some detections, there are multiple tests that are run with the same name.
+    //  For example, the "Bad keyword in {}" name includes several separate tests.
+    //  Each test with that name produces a separate entry in the `why` data. This
+    //  can be helpful when determining that it was detected by a different test,
+    //  but for general use, the information isn't that valuable.
+    //  Thus, we consolidate adjacent <li> elements with the same detection reason.
+    let child = asDom.children().first();
+    while (child.length > 0) {
+      const next = child.next();
+      if (next.length > 0) {
+        const childDetectionName = child
+          .find('.fire-detection-name')
+          .text()
+          .trim();
+        const nextDetectionName = next
+          .find('.fire-detection-name')
+          .text()
+          .trim();
+        if (childDetectionName === nextDetectionName) {
+          const childData = child.find('.fire-detection-data');
+          childData.append(next.find('.fire-detection-data .fire-detection-positions'));
+          child.addClass('fire-needs-sort');
+          next.remove();
+          continue;
+        }
+      }
+      child = next;
+    }
+    // After consolidation, we're left with the list of items detected not necessarily
+    //   in order based on their Position. So, we sort the detection locations in ascending
+    //   oder for each detection type which was consolidated, which were marked with the
+    //   "fire-needs-sort" class when consolidated above.
+    asDom
+      .find('.fire-needs-sort')
+      .each(function () {
+        const $this = $(this);
+        const detectionData = $this.find('.fire-detection-data');
+        const sorted = detectionData
+          .children()
+          .toArray()
+          .sort((a, b) => {
+            let [, posAstart, posAstop] = $(a)
+              .find('.fire-detection-locations')
+              .text()
+              .match(/\s*(\d+)-(\d+)(?:, \d+-\d+)*/) || [null, '-1', '-1'];
+            let [, posBstart, posBstop] = $(b)
+              .find('.fire-detection-locations')
+              .text()
+              .match(/\s*(\d+)-(\d+)(?:, \d+-\d+)*/) || [null, '-1', '-1'];
+            posAstart = Number(posAstart);
+            posBstart = Number(posBstart);
+            if (posAstart === posBstart) {
+              posAstop = Number(posAstop);
+              posBstop = Number(posBstop);
+              return posAstop - posBstop;
+            } // else
+            return posAstart - posBstart;
+          });
+        detectionData.append(sorted);
+      })
+      .removeClass('fire-needs-sort');
+    const consolidatedDisplayWhy = asDom[0].outerHTML;
+    return consolidatedDisplayWhy;
+  }
+
+  /**
+   * openReportPopup - Build a report popup and show it. This is the click handler for FIRE buttons.
    *
    * @private
    * @memberof module:fire
@@ -1564,11 +1714,13 @@
       .attr('href', d.user_link ? d.user_link : '');
     const userNameHtml = $userName.html();
 
+    const displayWhy = generateDisplayWhyFromWhy(d.why);
+
     const body = newEl('div', 'fire-popup-body')
       .append(
         newEl('div', {
           'fire-tooltip': emojiOrImage('clipboard')
-            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${d.why}`)
+            .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${displayWhy}`)
             .html()
         })
           .append(newEl('h2', 'fire-post-title')
