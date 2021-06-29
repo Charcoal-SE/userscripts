@@ -38,7 +38,7 @@
       "linebreak-style": "off",
       "curly": ["error"],
       "no-console": "error",
-      "no-extra-parens": "error",
+      "no-extra-parens": "off",
       "no-prototype-builtins": "error",
       "complexity": ["error", 20],
       "consistent-return": "error",
