@@ -52,13 +52,13 @@
     const smokeDetectorId = { // This is Smokey's user ID for each supported domain
       'chat.stackexchange.com': 120914,
       'chat.stackoverflow.com': 3735529,
-      'chat.meta.stackexchange.com': 266345
+      'chat.meta.stackexchange.com': 266345,
     }[location.host];       // From which, we need the current host's ID
 
     const metasmokeId = { // Same as above, but for the metasmoke account
       'chat.stackexchange.com': 478536,
       'chat.stackoverflow.com': 14262788,
-      'chat.meta.stackexchange.com': 848503
+      'chat.meta.stackexchange.com': 848503,
     }[location.host];
 
     const constants = getFireConstants();
@@ -87,13 +87,13 @@
         ms: {
           key: '55c3b1f85a2db5922700c36b49583ce1a047aabc4cf5f06ba5ba5eff217faca6', // This script's metasmoke API key
           url: 'https://metasmoke.erwaysoftware.com/api/v2.0/',
-          urlV1: 'https://metasmoke.erwaysoftware.com/api/'
+          urlV1: 'https://metasmoke.erwaysoftware.com/api/',
         },
         se: {
           key: 'NDllMffmzoX8A6RPHEPVXQ((', // This script's Stack Exchange API key
           url: 'https://api.stackexchange.com/2.2/',
-          clientId: 9136
-        }
+          clientId: 9136,
+        },
       },
       constants,
       smokeDetectorId,
@@ -105,7 +105,7 @@
       webSocket: null,
       reportCache: {},
       openReportPopupForMessage,
-      decorateMessage
+      decorateMessage,
     };
 
     /**
@@ -127,7 +127,7 @@
       toastrPosition: 'top-right',
       toastrDuration: 2500,
       readOnly: false,
-      version: fire.metaData.version
+      version: fire.metaData.version,
     };
 
     registerLoggingFunctions();
@@ -383,7 +383,7 @@
     if (!sites.storedAt) { // If the site data is empty
       const parameters = {
         filter: '!Fn4IB7S7Yq2UJF5Bh48LrjSpTc',
-        pagesize: 10000
+        pagesize: 10000,
       };
 
       getSE(
@@ -519,7 +519,7 @@
     const parameters = {
       site: report.site,
       filter: '!-.Lt3GZC8aYs',
-      auth: true
+      auth: true,
     };
 
     const type = report.is_answer ? 'answers' : 'questions';
@@ -550,7 +550,7 @@
       page,
       pagesize: 100,
       filter: '!-rT(axL(',
-      auth: true
+      auth: true,
     };
 
     getSE(
@@ -614,7 +614,7 @@
       call: $.get,
       success,
       error,
-      always
+      always,
     });
   }
 
@@ -707,7 +707,7 @@
       if (metaSmokeCode && metaSmokeCode.length === fire.constants.metaSmokeCodeLength) {
         $.ajax({
           url: `https://metasmoke.erwaysoftware.com/oauth/token?key=${fire.api.ms.key}&code=${metaSmokeCode}`,
-          method: 'GET'
+          method: 'GET',
         })
           .done(({token}) => {
             setValue('metasmokeWriteToken', token);
@@ -801,7 +801,7 @@
 
         const fireButton = newEl('span', 'fire-button', {
           html: emojiOrImage('fire'),
-          click: openReportPopup
+          click: openReportPopup,
         })
           .data('url', reportedUrl);
 
@@ -987,7 +987,7 @@
               .trigger('mouseenter')
               .trigger($.Event('mousemove', { // eslint-disable-line new-cap
                 clientX: pos.right - (button.offsetWidth + c.tooltipOffset),
-                clientY: pos.top + c.tooltipOffset
+                clientY: pos.top + c.tooltipOffset,
               }));
           }
         } else {
@@ -1057,7 +1057,7 @@
       closePopup();
       closePopup();
       getWriteToken();
-    }
+    },
   };
 
   /**
@@ -1072,7 +1072,7 @@
     const input = newEl('input', 'fire-popup-input', {
       type: 'text',
       maxlength: '8',
-      placeholder: 'Enter code here'
+      placeholder: 'Enter code here',
     });
 
     newEl('div', 'fire-popup-modal')
@@ -1086,7 +1086,7 @@
           .append(newEl('p', {
             html: 'FIRE requires a metasmoke write token to submit feedback.<br />' +
                   'This requires that your metasmoke account has the "Reviewer" role. <br />' +
-                  'Once you\'ve authenticated FIRE with metasmoke, you\'ll be given a code.<br />'
+                  'Once you\'ve authenticated FIRE with metasmoke, you\'ll be given a code.<br />',
           }))
           .append(button('Request Token', clickHandlers.requestToken))
           .append(input)
@@ -1095,7 +1095,7 @@
           .append(br())
           .append(newEl('p', {
             html: 'Alternatively, if you\'re not a "Reviewer", you can run FIRE in read-only mode by disabling feedback.<br />' +
-                  'You will still be able to view reports.'
+                  'You will still be able to view reports.',
           }))
           .append(button('Disable feedback', callback))
       )
@@ -1642,7 +1642,7 @@
       target: '_blank',
       css: {'background-image': `url(${siteIcon})`},
       'fire-key': fire.openOnSiteCodes,
-      'fire-tooltip': 'Show on site'
+      'fire-tooltip': 'Show on site',
     });
 
     const openOnMSButton = newEl('a', 'button fire-metasmoke-button', {
@@ -1650,7 +1650,7 @@
       href: `https://m.erwaysoftware.com/posts/by-url?url=${postData.link}`,
       target: '_blank',
       'fire-key': fire.openOnMSCodes,
-      'fire-tooltip': 'Open on metasmoke'
+      'fire-tooltip': 'Open on metasmoke',
     });
 
     const top = newEl('p', 'fire-popup-header')
@@ -1753,7 +1753,7 @@
         newEl('div', {
           'fire-tooltip': emojiOrImage('clipboard')
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${displayWhy}`)
-            .html()
+            .html(),
         })
           .append(newEl('h2', 'fire-post-title')
             .append(newEl('em', {html: title}))
@@ -1780,14 +1780,14 @@
       text: fire.metaData.version,
       href: `${fire.metaData.downloadURL}?${new Date().getTime()}`,
       target: '_self',
-      title: 'Update'
+      title: 'Update',
     });
 
     const settingsButton = newEl('a', 'fire-settings-button', {
       html: emojiOrImage('gear'),
       click: openSettingsPopup,
       'fire-key': keyCodesToArray('s'),
-      'fire-tooltip': 'FIRE Configuration'
+      'fire-tooltip': 'FIRE Configuration',
     });
 
     newEl('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
@@ -1881,7 +1881,7 @@
             type: 'number',
             value: fire.userData.toastrDuration,
             change: toastrDurationHandler,
-            blur: () => toastr.info('Notification duration updated')
+            blur: () => toastr.info('Notification duration updated'),
           }))
           .append(' ms')
       );
@@ -1895,7 +1895,7 @@
         newEl('option', {
           value,
           text: value.replace(/-/g, ' '),
-          selected: value === selected
+          selected: value === selected,
         })
       );
     }
@@ -1916,7 +1916,7 @@
         .append(newEl('p', {
           html:
             'Authorize FIRE with your Stack Exchange account.<br />' +
-            'This allows FIRE to load additional data for reported posts.'
+            'This allows FIRE to load additional data for reported posts.',
         }))
         .append(button('Authorize FIRE with Stack Exchange', requestStackExchangeToken));
     }
@@ -2067,7 +2067,7 @@
         $.ajax({
           type: 'POST',
           url: `${ms.urlV1}w/post/${data.id}/feedback`, // V2.0 appears broken at this time. Using V1.
-          data: {type: verdict, key: ms.key, token}
+          data: {type: verdict, key: ms.key, token},
         })
           .done(() => {
             const success = span(`Sent feedback "<em>${verdict}</em>" to metasmoke.`);
@@ -2163,8 +2163,8 @@
         data: {
           key,
           token,
-          flag_type: normalizedFlagType
-        }
+          flag_type: normalizedFlagType,
+        },
       })
         .done((response) => {
           if (response.backoff) {
@@ -2196,7 +2196,7 @@
               const knownResponses = {
                 'Flag option not present': 'This post could not be flagged.<br/>It\'s probably already deleted.',
                 'No account on this site.': 'This post could not be flagged.<br/>You don\'t have an account on that site.',
-                'You have already flagged this post for moderator attention': 'This post could not be flagged.<br/>You have already flagged this post for moderator attention.'
+                'You have already flagged this post for moderator attention': 'This post could not be flagged.<br/>You have already flagged this post for moderator attention.',
               };
               const flagInfo = knownResponses[response];
               if (flagInfo) {
@@ -2321,7 +2321,7 @@
       },
       disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)), // eslint-disable-line no-extra-parens
       'fire-key': keyCodesToArray(keyCodes),
-      'fire-tooltip': tooltip + suffix
+      'fire-tooltip': tooltip + suffix,
     });
   }
 
@@ -2340,7 +2340,7 @@
       title: 'Close this popup',
       click: clickHandler,
       'fire-tooltip': 'Close popup',
-      'fire-key': keyCodesToArray(fire.constants.keys.esc) // Escape key code,
+      'fire-key': keyCodesToArray(fire.constants.keys.esc), // Escape key code,
     });
   }
 
@@ -2362,12 +2362,12 @@
       id: `checkbox_${id}`,
       type: 'checkbox',
       checked: value,
-      click: handler
+      click: handler,
     });
 
     const label = newEl('label', {
       for: `checkbox_${id}`,
-      text: labelText
+      text: labelText,
     });
 
     return newEl('div')
@@ -2443,7 +2443,7 @@
   function button(text, clickHandler) {
     return newEl('a', 'button', {
       text,
-      click: clickHandler
+      click: clickHandler,
     });
   }
 
@@ -2489,7 +2489,7 @@
 
     const emojiImage = newEl('img', `fire-emoji${large ? '-large' : ''}`, {
       src: `${url + hex}.png`,
-      alt: emoji
+      alt: emoji,
     });
 
     return span(emojiImage);
@@ -2578,7 +2578,7 @@
       preventDuplicates: false, // If we send feedback twice, show 2 notifications, even if they're duplicates.
       timeOut: fire.userData.toastrDuration,
       hideDuration: 250,
-      extendedTimeOut: 500
+      extendedTimeOut: 500,
     };
 
     fire.log('Toastr included, notification options set.');
@@ -2587,7 +2587,7 @@
       info: 'info',
       success: 'log',
       warning: 'warn',
-      error: 'error'
+      error: 'error',
     };
 
     toastr.subscribe((toast) => {
@@ -2635,7 +2635,7 @@
       .on('mousemove', selector, ({clientX, clientY}) => {
         $('.fire-tooltip').css({
           left: clientX + fire.constants.tooltipOffset,
-          top: clientY + fire.constants.tooltipOffsetSmall
+          top: clientY + fire.constants.tooltipOffsetSmall,
         });
       })
       .on('mouseleave', selector,
@@ -2662,9 +2662,9 @@
       fire.webSocket.send(JSON.stringify({
         identifier: JSON.stringify({
           channel: 'ApiChannel',
-          key: fire.api.ms.key
+          key: fire.api.ms.key,
         }),
-        command: 'subscribe'
+        command: 'subscribe',
       }));
     });
     // Wait 3s to open the WebSocket, due to potential disruption while the page loads.
@@ -2689,7 +2689,7 @@
       get: () => JSON.parse(localStorage.getItem(localStorageKey)),
       set: (value) => {
         localStorage.setItem(localStorageKey, JSON.stringify(value));
-      }
+      },
     });
   }
 
@@ -2941,12 +2941,12 @@
         enter: 13,
         esc: 27,
         space: 32,
-        F1: 112
+        F1: 112,
       },
       http: {
         unauthorized: 401,
         notFound: 404,
-        conflict: 409
+        conflict: 409,
       },
       emoji: {
         /* eslint-disable no-magic-numbers */
@@ -2957,7 +2957,7 @@
         smile: String.fromCodePoint(0x1F604),
         clipboard: String.fromCodePoint(0x1F4CB),
         flag: String.fromCodePoint(0x1F3F3) + String.fromCodePoint(0xFE0F),
-        autoflag: String.fromCodePoint(0x1F3F4)
+        autoflag: String.fromCodePoint(0x1F3F4),
         /* eslint-enable no-magic-numbers */
       },
       emojiSize: 16,
@@ -2974,7 +2974,7 @@
       tooltipOffsetSmall: 5,
       halfPopupWidth: 300,
       minPopupLeft: 10,
-      webSocketInitialOpenDelay: 3000
+      webSocketInitialOpenDelay: 3000,
     };
   }
 })();
