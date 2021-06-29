@@ -33,8 +33,6 @@
 // @grant       none
 // ==/UserScript==
 /* globals CHAT, GM_info, toastr, $, jQuery, ReconnectingWebSocket, autoflagging */ // eslint-disable-line no-redeclare
-/* eslint "curly": ["error", "multi-or-nest", "consistent"] */
-/* eslint-disable no-multi-spaces */
 
 /**
  * anonymous function - IIFE to prevent accidental pollution of the global scope..
@@ -113,8 +111,9 @@
     /**
      * Add fire to the global scope, but don't override it if it already exists.
      */
-    if (!hOP(scope, 'fire'))
+    if (!hOP(scope, 'fire')) {
       scope.fire = fire;
+    }
     scope.fireNoConflict = fire;
 
     /**
@@ -140,8 +139,9 @@
     showFireOnExistingMessages();
     registerAnchorHover();
     registerOpenLastReportKey();
-    if (CHAT && CHAT.addEventHandlerHook)
+    if (CHAT && CHAT.addEventHandlerHook) {
       CHAT.addEventHandlerHook(chatListener);
+    }
 
     checkHashForWriteToken();
   })(window);
@@ -254,10 +254,11 @@
     const $this = $(this);
     const url = $this.data('url');
 
-    if (!fire.reportCache[url])
+    if (!fire.reportCache[url]) {
       getDataForUrl(url, (data) => parseDataForReport(data, openAfterLoad, $this));
-    else if (openAfterLoad === true)
+    } else if (openAfterLoad === true) {
       $this.click();
+    }
   }
 
   /**
@@ -278,19 +279,23 @@
     $.get(url, (response) => {
       fire.log('Report cache updated:', response);
       if (response && response.items) {
-        if (response.items.length <= 0)
+        if (response.items.length <= 0) {
           toastr.info('No metasmoke reports found.');
+        }
         const itemsById = {};
-        for (const item of response.items)
+        for (const item of response.items) {
           itemsById[item.id] = item;
+        }
         // May need to handle the possibility that there will be multiple pages
         const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF`;
         $.get(feedbacksUrl).done((feedbacks) => {
           // Add the feedbacks to each main item.
-          for (const feedback of feedbacks.items)
+          for (const feedback of feedbacks.items) {
             itemsById[feedback.id] = feedback;
-          for (const item of response.items)
+          }
+          for (const item of response.items) {
             parseDataForReport(item, false, null, true);
+          }
         });
       }
     });
@@ -326,18 +331,21 @@
     }
 
     const match = data.link.match(/.*\/(\d+)/);
-    if (match && match[1])
+    if (match && match[1]) {
       [, data.post_id] = match;
+    }
 
     fire.reportCache[data.link] = data; // Store the data
 
     fire.log('Loaded report data', data);
 
-    if (!skipLoadPost)
+    if (!skipLoadPost) {
       loadPost(data);
+    }
 
-    if (openAfterLoad === true)
+    if (openAfterLoad === true) {
       $this.click();
+    }
   }
 
   /**
@@ -382,8 +390,9 @@
         'sites',
         parameters,
         ({items}) => {
-          for (const item of items)
+          for (const item of items) {
             sites[item.api_site_parameter] = item;
+          }
 
           sites.storedAt = now; // Set the storage timestamp
           fire.sites = sites;   // Store the site list
@@ -420,11 +429,13 @@
           report.is_deleted = true;
           $('.fire-reported-post').addClass('fire-deleted');
 
-          if (typeof autoflagging !== 'undefined')
+          if (typeof autoflagging !== 'undefined') {
             $(`#message-${report.message_id} .content`).addClass('ai-deleted');
+          }
 
-          if (report.has_sent_feedback)
+          if (report.has_sent_feedback) {
             $('a.fire-feedback-button:not([disabled])').attr('disabled', true);
+          }
         }
 
         fire.log('Loaded a post', response);
@@ -450,8 +461,9 @@
           report.se.revisions = response.items;
           report.revision_count = response.items.length;
 
-          if (report.revision_count > 1)
+          if (report.revision_count > 1) {
             showEditedIcon();
+          }
 
           fire.log('Loaded a post\'s revision status', response);
         }
@@ -490,8 +502,9 @@
 
     rep.text(` (${reputation}) `);
 
-    if (reputation !== 1)
+    if (reputation !== 1) {
       rep.addClass('fire-has-rep');
+    }
   }
 
   /**
@@ -558,8 +571,9 @@
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
-    if (page === 1)
+    if (page === 1) {
       fire.userSites = [];
+    }
 
     fire.userSites = fire.userSites.concat(response.items);
 
@@ -572,8 +586,9 @@
       accounts.forEach((site) => {
         site.apiName = parseSiteUrl(site.site_url);
 
-        if (sites[site.apiName])
+        if (sites[site.apiName]) {
           sites[site.apiName].account = site;
+        }
       });
 
       fire.userSites = accounts;
@@ -659,16 +674,19 @@
 
     const ajaxCall = call(se.url + method, parameters);
 
-    if (success)
+    if (success) {
       ajaxCall.done(success);
+    }
 
-    if (error)
+    if (error) {
       ajaxCall.fail(error);
-    else
+    } else {
       ajaxCall.fail((jqXHR) => fire.error('Error performing this AJAX call!', jqXHR));
+    }
 
-    if (always)
+    if (always) {
       ajaxCall.always(always);
+    }
 
     return ajaxCall;
   }
@@ -696,22 +714,25 @@
             toastr.success('Successfully obtained metasmoke write token!');
             closePopup();
 
-            if (afterGetToken)
+            if (afterGetToken) {
               afterGetToken();
+            }
           })
           .error(({status}) => {
-            if (status === fire.constants.http.notFound)
+            if (status === fire.constants.http.notFound) {
               toastr.error('Metasmoke could not find a write token - did you authorize the app?');
-            else
+            } else {
               toastr.error('An unknown error occurred during OAuth with metasmoke.');
+            }
           });
       } else {
         setValue('readOnly', true);
         toastr.info('FIRE is now in read-only mode.');
         closePopup();
 
-        if (afterGetToken)
+        if (afterGetToken) {
           afterGetToken();
+        }
       }
     });
   }
@@ -774,8 +795,9 @@
             reportedUrl.includes('charcoal-se.org'));
         }
 
-        if (!isReportedUrlValid)
+        if (!isReportedUrlValid) {
           return;
+        }
 
         const fireButton = newEl('span', 'fire-button', {
           html: emojiOrImage('fire'),
@@ -900,8 +922,9 @@
     toastr.info(`${message} ${value ? 'en' : 'dis'}abled.`);
     fire.userData = data;
 
-    if (callback)
+    if (callback) {
       callback();
+    }
   }
 
   /**
@@ -913,8 +936,9 @@
    * @param {object} event     An event
    */
   function stopPropagationIfTargetBody(event) {
-    if (event.target === document.body)
+    if (event.target === document.body) {
       event.stopPropagation();
+    }
   }
 
   /**
@@ -927,10 +951,11 @@
    */
   function keyboardShortcuts(event) {
     const c = fire.constants;
-    if (event.altKey || event.ctrlKey || event.metaKey)
+    if (event.altKey || event.ctrlKey || event.metaKey) {
       // Do nothing if any of the Alt, Ctrl, or Meta keys are pressed (opening the popup with Ctrl-Space is handled elsewhere).
       // This prevents conflicts with browser-based shortcuts (e.g. Ctrl-F being used as FP).
       return;
+    }
     if (event.keyCode === c.keys.enter || event.keyCode === c.keys.space) {
       event.preventDefault();
 
@@ -939,8 +964,9 @@
         .fadeOut(c.buttonFade)           // Flash to indicate which button was selected.
         .fadeIn(c.buttonFade, () => $(selector).click());
     } else {
-      if (!fire.settingsAreOpen && event.keyCode < c.keys.F1) // Allow interaction with settings popup.
-        event.preventDefault(); // Prevent keys from entering the chat input while the popup is open
+      if (!fire.settingsAreOpen && event.keyCode < c.keys.F1) { // Allow interaction with settings popup.
+        event.preventDefault();
+      } // Prevent keys from entering the chat input while the popup is open
       if (fire.buttonKeyCodes.includes(event.keyCode) && !fire.settingsAreOpen) {
         $('.fire-popup-header a.button')
           .removeClass('focus')
@@ -966,8 +992,9 @@
           }
         } else {
           const $button = $(`a[fire-key~=${event.keyCode}]:not([disabled])`);
-          if ($button[0])
+          if ($button[0]) {
             $button.click();
+          }
         }
       } else if (fire.settingsAreOpen && event.keyCode === c.keys.esc) {
         closePopup();
@@ -1015,8 +1042,9 @@
      */
     saveToken: (input, callback) => {
       const value = input.val();
-      if (value && value.length === fire.constants.metaSmokeCodeLength)
+      if (value && value.length === fire.constants.metaSmokeCodeLength) {
         callback(value);
+      }
 
       closePopup();
     },
@@ -1101,7 +1129,9 @@
     return tagSplit.reduce((text, split) => {
       if (split === tagBegin) {
         codeLevel++;
-        if (codeLevel === 1) return text + split;
+        if (codeLevel === 1) {
+          return text + split;
+        }
       } else if (split === tagEnd) {
         codeLevel--;
       }
@@ -1574,8 +1604,10 @@
    * @memberof module:fire
    */
   function openReportPopup() {
-    if (fire.isOpen && $('.fire-popup').length > 0)
-      return; // Don't open the popup twice.
+    if (fire.isOpen && $('.fire-popup').length > 0) {
+      // Don't open the popup twice.
+      return;
+    }
 
     const that = this;
 
@@ -1770,15 +1802,17 @@
 
     handleReportImages();
 
-    if (postData.revision_count > 1)
+    if (postData.revision_count > 1) {
       showEditedIcon();
+    }
 
     $('#container').toggleClass('fire-blur', fire.userData.blur);
 
     expandLinksOnHover();
 
-    if (postData.se && postData.se.post)
+    if (postData.se && postData.se.post) {
       showReputation(postData.se.post.owner.reputation);
+    }
 
     $(document)
       .keydown(keyboardShortcuts)
@@ -1821,8 +1855,10 @@
    * @memberof module:fire
    */
   function openSettingsPopup() {
-    if (fire.settingsAreOpen)
-      return; // Don't open the settings twice.
+    if (fire.settingsAreOpen) {
+      // Don't open the settings twice.
+      return;
+    }
 
     fire.settingsAreOpen = true;
 
@@ -1948,8 +1984,9 @@
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
 
-      if (!fire.isOpen)
+      if (!fire.isOpen) {
         $('#container').removeClass('fire-blur');
+      }
       delete fire.settingsAreOpen;
     } else {
       const selector = '.fire-popup, .fire-popup-modal';
@@ -2077,7 +2114,9 @@
    */
   function toastrFeedbackResult(feedbackResult) {
     Object.entries(feedbackResult).forEach(([key, value]) => {
-      if (value && typeof value === 'object' && value.length > 0) toastr[key](value);
+      if (value && typeof value === 'object' && value.length > 0) {
+        toastr[key](value);
+      }
     });
   }
 
@@ -2192,8 +2231,9 @@
    * @returns {array.number}                   An array of keyCodes mapped from the input chars / keyCodes.
    */
   function keyCodesToArray(keyCodes) {
-    if (!Array.isArray(keyCodes))
+    if (!Array.isArray(keyCodes)) {
       keyCodes = [keyCodes];
+    }
 
     keyCodes.forEach((value, i) => {
       keyCodes[i] =
@@ -2236,8 +2276,9 @@
     let hasSubmittedFeedback;
     let disabled = false;
 
-    if (!data.is_answer)
+    if (!data.is_answer) {
       disabled = verdict === 'naa-';
+    }
 
     if (data.feedbacks) { // Has feedback
       count = data.feedbacks.filter(
@@ -2265,10 +2306,11 @@
           postMetaSmokeFeedbackAndFlag(data, verdict, flagType);
         } else {
           let performedAction;
-          if (data.has_flagged)
+          if (data.has_flagged) {
             performedAction = 'flagged';
-          else if (data.is_deleted)
+          } else if (data.is_deleted) {
             performedAction = 'deleted';
+          }
 
           toastr.info(
             `You have already sent feedback for this reported post.<br />The post has already been ${performedAction}.`,
@@ -2438,8 +2480,9 @@
   function emojiOrImage(emoji, large) {
     emoji = fire.constants.emoji[emoji] || emoji;
 
-    if (fire.useEmoji)
+    if (fire.useEmoji) {
       return span(emoji);
+    }
 
     const url = 'https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/';
     const hex = emoji.codePointAt(0).toString(fire.constants.hex);
@@ -2548,8 +2591,9 @@
     };
 
     toastr.subscribe((toast) => {
-      if (toast.state === 'visible')
+      if (toast.state === 'visible') {
         (fire[map[toast.map.type]] || fire.log)(toast.map.message);
+      }
     });
   }
 
@@ -2563,8 +2607,9 @@
     $(document).on('keydown', ({keyCode, ctrlKey, altKey, metaKey, shiftKey}) => {
       if (keyCode === fire.constants.keys.space && ctrlKey && !altKey && !metaKey && !shiftKey) {
         const button = $('.fire-button').last(); // .content:not(.ai-deleted)
-        if (button && button.length > 0)
+        if (button && button.length > 0) {
           loadDataForReport.call(button, true);
+        }
       }
     });
 
@@ -2797,16 +2842,19 @@
     registerForLocalStorage(fire, 'sites', 'fire-sites');
     registerForLocalStorage(fire, 'savedChatUser', 'fire-saved-chat-user');
 
-    if (fire.userData === null)
+    if (fire.userData === null) {
       fire.userData = defaultStorage;
+    }
 
-    if (fire.userData.debug)
+    if (fire.userData.debug) {
       fire.info('Debug mode enabled.');
+    }
 
     const data = fire.userData;
     for (const key in defaultStorage) {
-      if (hOP(defaultStorage, key) && !hOP(data, key))
+      if (hOP(defaultStorage, key) && !hOP(data, key)) {
         data[key] = defaultStorage[key];
+      }
     }
     fire.userData = data;
 
@@ -2866,8 +2914,9 @@
           fire.log('Current user found.');
         })
         .always(() => {
-          if (!fire.chatUser)
+          if (!fire.chatUser) {
             setTimeout(getCurrentChatUser, multiplier * fire.constants.loadUserDelay, count);
+          }
         });
       return;
     } // else

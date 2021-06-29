@@ -35,7 +35,7 @@
       "camelcase": "off",
       "max-params": ["warn", 5],
       "linebreak-style": "off",
-      "curly": ["error", "multi-or-nest", "consistent"],
+      "curly": ["error"],
       "no-console": "error",
       "no-extra-parens": "error",
       "no-prototype-builtins": "error",
