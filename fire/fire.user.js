@@ -1592,21 +1592,21 @@
 
     const $that = $(that);
     const url = $that.data('url');
-    let d;
+    let postData;
 
     if (url && fire.reportCache[url] && !fire.reportCache[url].isExpired) {
-      d = fire.reportCache[url];
+      postData = fire.reportCache[url];
     } else {
       loadDataForReport.call(that, true); // No data, so load it.
       return;
     }
 
-    const site = fire.sites[d.site] || fire.sites[`${d.site}.net`];
-    const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${d.site}/img/apple-touch-icon.png`;
+    const site = fire.sites[postData.site] || fire.sites[`${postData.site}.net`];
+    const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${postData.site}/img/apple-touch-icon.png`;
 
     const openOnSiteButton = newEl('a', 'fire-site-logo', {
-      html: site ? site.name : d.site,
-      href: d.link,
+      html: site ? site.name : postData.site,
+      href: postData.link,
       target: '_blank',
       css: {'background-image': `url(${siteIcon})`},
       'fire-key': fire.openOnSiteCodes,
@@ -1615,7 +1615,7 @@
 
     const openOnMSButton = newEl('a', 'button fire-metasmoke-button', {
       text: 'MS',
-      href: `https://m.erwaysoftware.com/posts/by-url?url=${d.link}`,
+      href: `https://m.erwaysoftware.com/posts/by-url?url=${postData.link}`,
       target: '_blank',
       'fire-key': fire.openOnMSCodes,
       'fire-tooltip': 'Open on metasmoke'
@@ -1633,21 +1633,21 @@
       /* eslint-disable no-multi-spaces */
       buttonContainer
         // Buttons that raise a flag and send feedback.
-        .append(createFeedbackButton(d, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'spam', 'True positive, blacklist user & spam flag (add user to blacklist)'))
-        .append(createFeedbackButton(d, ['2', 'r', numpad('2')], 'rude', 'tpu-', 'rude', 'Rude / Abusive, blacklist user & rude flag'))
+        .append(createFeedbackButton(postData, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'spam', 'True positive, blacklist user & spam flag (add user to blacklist)'))
+        .append(createFeedbackButton(postData, ['2', 'r', numpad('2')], 'rude', 'tpu-', 'rude', 'Rude / Abusive, blacklist user & rude flag'))
         // Buttons that only send feedback.
         .append('<span style="float:left;padding:4px 5px 0px 15px;" title="The following don\'t raise a flag, they only submit feedback to metasmoke.">No flag:</span>')
-        .append(createFeedbackButton(d, ['3', 'T', numpad('3')], 'tpu-', 'tpu-', '',     'True positive & blacklist user; Don\'t raise a flag.'))
-        .append(createFeedbackButton(d, ['4', 'v', numpad('4')], 'tp-',  'tp-',  '',     'tp- (e.g. Vandalism; single case of undisclosed affiliation); Don\'t add user to blacklist. Don\'t raise a flag.'))
-        .append(createFeedbackButton(d, ['5', 'n', numpad('5')], 'naa-', 'naa-', '',     'Not an Answer / VLQ; Don\'t raise a flag.'))
-        .append(createFeedbackButton(d, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'));
+        .append(createFeedbackButton(postData, ['3', 'T', numpad('3')], 'tpu-', 'tpu-', '',     'True positive & blacklist user; Don\'t raise a flag.'))
+        .append(createFeedbackButton(postData, ['4', 'v', numpad('4')], 'tp-',  'tp-',  '',     'tp- (e.g. Vandalism; single case of undisclosed affiliation); Don\'t add user to blacklist. Don\'t raise a flag.'))
+        .append(createFeedbackButton(postData, ['5', 'n', numpad('5')], 'naa-', 'naa-', '',     'Not an Answer / VLQ; Don\'t raise a flag.'))
+        .append(createFeedbackButton(postData, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'));
       /* eslint-enable no-multi-spaces */
     }
 
     let postType;
     let suffix;
 
-    if (d.is_answer) {
+    if (postData.is_answer) {
       postType = 'Answer';
       suffix = 'n';
     } else {
@@ -1656,16 +1656,16 @@
     }
 
     const reportTitle = $('<div/>')
-      .text(d.title) // Escape everything.
+      .text(postData.title) // Escape everything.
       .html();       // Get the escaped HTML
 
     let title;
 
-    if (d.has_auto_flagged) {
+    if (postData.has_auto_flagged) {
       title = emojiOrImage('autoflag')
         .attr('fire-tooltip', 'You have auto-flagged this post.')
         .append(` ${reportTitle}`);
-    } else if (d.has_flagged) {
+    } else if (postData.has_flagged) {
       title = emojiOrImage('flag')
         .attr('fire-tooltip', 'You have flagged this post.')
         .append(` ${reportTitle}`);
@@ -1673,10 +1673,10 @@
       title = reportTitle; // eslint-disable-line prefer-destructuring
     }
 
-    const reportBody = generatePostBodyDivFromHtmlText(d.body, false);
+    const reportBody = generatePostBodyDivFromHtmlText(postData.body, false);
     // Convert relative URLs to point to the URL on the source site.
     // SE uses these for tags and some site-specific functionality (e.g. circuit simulation on Electronics)
-    const [, siteHref] = (d.link || '').match(/^((?:https?:)?\/\/(?:[a-z\d-]+\.)+[a-z\d-]+\/)/i) || ['', ''];
+    const [, siteHref] = (postData.link || '').match(/^((?:https?:)?\/\/(?:[a-z\d-]+\.)+[a-z\d-]+\/)/i) || ['', ''];
     // A couple of reports which had this problem:
     //   https://chat.stackexchange.com/transcript/11540?m=55601336#55601336  (links at bottom)
     //   https://chat.stackexchange.com/transcript/11540?m=54674140#54674140  (tags)
@@ -1696,7 +1696,7 @@
           if (!siteHref.endsWith('/')) {
             href = `/${href}`;
           }
-          this.href = d.link + href;
+          this.href = postData.link + href;
         }
       }
     });
@@ -1710,11 +1710,11 @@
     const $userName = $('<div><a class="fire-user-name"></a><span class="fire-user-reputation"></span></div>');
     $userName
       .find('.fire-user-name')
-      .text(d.username)
-      .attr('href', d.user_link ? d.user_link : '');
+      .text(postData.username)
+      .attr('href', postData.user_link ? postData.user_link : '');
     const userNameHtml = $userName.html();
 
-    const displayWhy = generateDisplayWhyFromWhy(d.why);
+    const displayWhy = generateDisplayWhyFromWhy(postData.why);
 
     const body = newEl('div', 'fire-popup-body')
       .append(
@@ -1736,7 +1736,7 @@
               )
           )
       )
-      .append(newEl('div', `fire-reported-post${d.is_deleted ? ' fire-deleted' : ''}`)
+      .append(newEl('div', `fire-reported-post${postData.is_deleted ? ' fire-deleted' : ''}`)
         .append(reportBody)
       );
 
@@ -1770,15 +1770,15 @@
 
     handleReportImages();
 
-    if (d.revision_count > 1)
+    if (postData.revision_count > 1)
       showEditedIcon();
 
     $('#container').toggleClass('fire-blur', fire.userData.blur);
 
     expandLinksOnHover();
 
-    if (d.se && d.se.post)
-      showReputation(d.se.post.owner.reputation);
+    if (postData.se && postData.se.post)
+      showReputation(postData.se.post.owner.reputation);
 
     $(document)
       .keydown(keyboardShortcuts)
