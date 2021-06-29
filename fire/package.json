@@ -30,6 +30,7 @@
       "greasemonkey"
     ],
     "rules": {
+      "arrow-parens": ["error", "always"],
       "quotes": ["error", "single", {"avoidEscape": true}],
       "camelcase": "off",
       "max-params": ["warn", 5],
@@ -77,7 +78,6 @@
           "matchDescription": "[A-Z].+\\."
         }
       ],
-
       "require-jsdoc": ["error", {"require": {"FunctionDeclaration": true, "MethodDefinition": true, "ClassDeclaration": true}}]
     },
     "globals": [

@@ -48,7 +48,7 @@
    *
    * @param {object} scope The scope to register FIRE on. Usually, `window`.
    */
-  (scope => { // Init
+  ((scope) => { // Init
     const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
 
     const smokeDetectorId = { // This is Smokey's user ID for each supported domain
@@ -206,14 +206,14 @@
     const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&page=1&urls=${reportedUrl}`;
     $.get(url)
-      .done(data => {
+      .done((data) => {
         if (data && data.items) {
           if (data.items.length <= 0) {
             toastr.info(`No metasmoke reports found for url:<br />${reportedUrl}`);
             return;
           }
           const feedbacksUrl = `${ms.url}feedbacks/post/${data.items[0].id}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF&page=1`;
-          $.get(feedbacksUrl).done(feedbacks => {
+          $.get(feedbacksUrl).done((feedbacks) => {
             data.items[0].feedbacks = feedbacks.items;
             callback(data.items[0]);
           });
@@ -255,7 +255,7 @@
     const url = $this.data('url');
 
     if (!fire.reportCache[url])
-      getDataForUrl(url, data => parseDataForReport(data, openAfterLoad, $this));
+      getDataForUrl(url, (data) => parseDataForReport(data, openAfterLoad, $this));
     else if (openAfterLoad === true)
       $this.click();
   }
@@ -270,12 +270,12 @@
     const urls = $('.fire-button')
       .map((index, element) => $(element).data('url'))
       .toArray()
-      .filter(url => !fire.reportCache[url]) // Only get un-cached reports
+      .filter((url) => !fire.reportCache[url]) // Only get un-cached reports
       .join(',');
 
     const {ms} = fire.api;
     const url = `${ms.url}posts/urls?key=${ms.key}&filter=HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ&page=1&urls=${urls}`;
-    $.get(url, response => {
+    $.get(url, (response) => {
       fire.log('Report cache updated:', response);
       if (response && response.items) {
         if (response.items.length <= 0)
@@ -285,7 +285,7 @@
           itemsById[item.id] = item;
         // May need to handle the possibility that there will be multiple pages
         const feedbacksUrl = `${ms.url}feedbacks/post/${Object.keys(itemsById).join(',')}?key=${ms.key}&filter=HNKJJKGNHOHLNOKINNGOOIHJNLHLOJOHIOFFLJIJJHLNNF`;
-        $.get(feedbacksUrl).done(feedbacks => {
+        $.get(feedbacksUrl).done((feedbacks) => {
           // Add the feedbacks to each main item.
           for (const feedback of feedbacks.items)
             itemsById[feedback.id] = feedback;
@@ -409,7 +409,7 @@
     getSE(
       `posts/${report.post_id}`,
       parameters,
-      response => {
+      (response) => {
         if (response.items && response.items.length > 0) {
           report.se = report.se || {};
           [report.se.post] = response.items;
@@ -445,7 +445,7 @@
     getSE(
       `posts/${report.post_id}/revisions`,
       parameters,
-      response => {
+      (response) => {
         if (response && response.items) {
           report.se.revisions = response.items;
           report.revision_count = response.items.length;
@@ -514,7 +514,7 @@
     getSE(
       `${type}/${report.post_id}/flags/options`,
       parameters,
-      response => {
+      (response) => {
         report.se.available_flags = response.items;
         report.has_flagged = response.items && response.items.some(
           ({has_flagged, title}) => has_flagged && title === 'spam'
@@ -543,7 +543,7 @@
     getSE(
       'me/associated',
       parameters,
-      response => parseUserResponse(response, page)
+      (response) => parseUserResponse(response, page)
     );
   }
 
@@ -569,7 +569,7 @@
       const accounts = fire.userSites;
       const {sites} = fire;
 
-      accounts.forEach(site => {
+      accounts.forEach((site) => {
         site.apiName = parseSiteUrl(site.site_url);
 
         if (sites[site.apiName])
@@ -665,7 +665,7 @@
     if (error)
       ajaxCall.fail(error);
     else
-      ajaxCall.fail(jqXHR => fire.error('Error performing this AJAX call!', jqXHR));
+      ajaxCall.fail((jqXHR) => fire.error('Error performing this AJAX call!', jqXHR));
 
     if (always)
       ajaxCall.always(always);
@@ -685,7 +685,7 @@
     setValue('readOnly', false);
     const afterGetToken = callback;
 
-    writeTokenPopup(metaSmokeCode => {
+    writeTokenPopup((metaSmokeCode) => {
       if (metaSmokeCode && metaSmokeCode.length === fire.constants.metaSmokeCodeLength) {
         $.ajax({
           url: `https://metasmoke.erwaysoftware.com/oauth/token?key=${fire.api.ms.key}&code=${metaSmokeCode}`,
@@ -2041,7 +2041,7 @@
               closePopup();
             }
           })
-          .error(jqXHR => {
+          .error((jqXHR) => {
             if (jqXHR.status === fire.constants.http.unauthorized) {
               toastr.error('Can\'t send feedback to metasmoke - not authenticated.');
 
@@ -2127,7 +2127,7 @@
           flag_type: normalizedFlagType
         }
       })
-        .done(response => {
+        .done((response) => {
           if (response.backoff) {
           // We've got a backoff. Deal with it...
           // Yea, this isn't implemented yet. probably gonna set a timer for the backoff and
@@ -2140,7 +2140,7 @@
           toastrFeedbackResult(feedbackResult);
           closePopup();
         })
-        .error(jqXHR => {
+        .error((jqXHR) => {
           if (jqXHR.status === fire.constants.http.conflict) {
           // https://metasmoke.erwaysoftware.com/authentication/status
           // Will give you a 409 response with error_name, error_code and error_message parameters if the user isn't write-authenticated;
@@ -2547,7 +2547,7 @@
       error: 'error'
     };
 
-    toastr.subscribe(toast => {
+    toastr.subscribe((toast) => {
       if (toast.state === 'visible')
         (fire[map[toast.map.type]] || fire.log)(toast.map.message);
     });
@@ -2642,7 +2642,7 @@
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
       get: () => JSON.parse(localStorage.getItem(localStorageKey)),
-      set: value => {
+      set: (value) => {
         localStorage.setItem(localStorageKey, JSON.stringify(value));
       }
     });
@@ -2860,7 +2860,7 @@
       // Under some conditions, this code is too fast to run immediately (e.g. the page is slow, SE is slow, browser is slow).
       CHAT.RoomUsers
         .get(CHAT.CURRENT_USER_ID)
-        .done(user => {
+        .done((user) => {
           fire.chatUser = user;
           fire.savedChatUser = user;
           fire.log('Current user found.');
