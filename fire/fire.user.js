@@ -93,6 +93,13 @@
           key: 'NDllMffmzoX8A6RPHEPVXQ((', // This script's Stack Exchange API key
           url: 'https://api.stackexchange.com/2.2/',
           clientId: 9136,
+          // The backoff Object contains one entry per endpoint. The value of that property is a jQuery.Deferred which
+          // is always resolved after the response is received from the previous call to the endpoint. It's resolved
+          // either immediately, or after any `backoff` which the SE aPI specifies. It's also delayed by
+          // seAPIErrorDelay in the case of an error.
+          // Overall, this means we only have one request in flight at a time per endpoint. This limitation is
+          // assumed to result in us not making too many requests to the SE API per second (SE API hard limit is 30 requests/s).
+          backoffs: {},
         },
       },
       constants,
@@ -383,10 +390,11 @@
     if (!sites.storedAt) { // If the site data is empty
       const parameters = {
         filter: '!Fn4IB7S7Yq2UJF5Bh48LrjSpTc',
-        pagesize: 10000,
+        pagesize: 10000, //"sites" endpoint has a special dispensation that it can be any pagesize.
       };
 
       getSE(
+        'sites',
         'sites',
         parameters,
         ({items}) => {
@@ -395,7 +403,7 @@
           }
 
           sites.storedAt = now; // Set the storage timestamp
-          fire.sites = sites;   // Store the site list
+          fire.sites = sites; // Store the site list
 
           loadCurrentSEUser();
 
@@ -405,7 +413,7 @@
   }
 
   /**
-   * loadPost - Loads additional information for a post, from the Stack exchange API.
+   * loadPost - Loads additional information for a post from the Stack exchange API.
    *
    * @private
    * @memberof module:fire
@@ -416,6 +424,7 @@
     const parameters = {site: report.site};
 
     getSE(
+      'posts/{}',
       `posts/${report.post_id}`,
       parameters,
       (response) => {
@@ -454,6 +463,7 @@
     const parameters = {site: report.site};
 
     getSE(
+      'posts/{}/revisions',
       `posts/${report.post_id}/revisions`,
       parameters,
       (response) => {
@@ -525,6 +535,7 @@
     const type = report.is_answer ? 'answers' : 'questions';
 
     getSE(
+      `${type}/{}/flags/options`,
       `${type}/${report.post_id}/flags/options`,
       parameters,
       (response) => {
@@ -538,12 +549,12 @@
   }
 
   /**
-   * loadPostFlagStatus - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
+   * loadCurrentSEUser - Loads the current Stack Exchange user and what sites they're registered at from the Stack Exchange API.
    *
    * @private
    * @memberof module:fire
    *
-   * @param {number} [page=1] the page to load.
+   * @param {number}     [page=1]     The page to load.
    */
   function loadCurrentSEUser(page = 1) {
     const parameters = {
@@ -554,6 +565,7 @@
     };
 
     getSE(
+      'me/associated',
       'me/associated',
       parameters,
       (response) => parseUserResponse(response, page)
@@ -566,8 +578,8 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} response the Stack Exchange `user` response.
-   * @param {number} page     The page that's been loaded.
+   * @param {object}    response    The Stack Exchange `user` response.
+   * @param {number}    page        The page that's been loaed.
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
@@ -603,14 +615,17 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string}   method     The Stack Exchange api method.
-   * @param {object}   parameters The parameters to be passed to the Stack Exchange api.
-   * @param {function} success    The `success` callback.
-   * @param {function} error      The `error` callback.
-   * @param {function} always     The `always` callback.
+   * @param {string}   endpoint          The Stack Exchange API endpoint.
+   * @param {string}   method            The Stack Exchange API method (i.e. the endpoint part of the URL path).
+   * @param {object}   parameters        The parameters to be passed to the Stack Exchange API.
+   * @param {function} success           The `success` callback.
+   * @param {function} error             The `error` callback.
+   * @param {function} always            The `always` callback.
+   *
+   * @returns {Deferred}                 Deferred Object representing the request for SE data. Resolves when the request is complete.
    */
-  function getSE(method, parameters, success, error, always) {
-    stackExchangeAjaxCall(method, parameters, {
+  function getSE(endpoint, method, parameters, success, error, always) { // eslint-disable-line max-params
+    return stackExchangeAjaxCall(`GET-${endpoint}`, method, parameters, {
       call: $.get,
       success,
       error,
@@ -619,25 +634,28 @@
   }
 
   /**
-   * getSE - `POST` call on the Stack Exchange API.
+   * postSE - `POST` call on the Stack Exchange API.
    *
    * @private
    * @memberof module:fire
    *
-   * @param  {string}   method     The Stack Exchange api method.
-   * @param  {object}   parameters The parameters to be passed to the Stack Exchange api.
-   * @param  {function} success    The `success` callback.
-   * @param  {function} error      The `error` callback.
-   * @param  {function} always     The `always` callback.
+   * @param  {string}   endpoint         The Stack Exchange API endpoint.
+   * @param  {string}   method           The Stack Exchange API method (i.e. the endpoint part of the URL path).
+   * @param  {object}   parameters       The parameters to be passed to the Stack Exchange API.
+   * @param  {function} success          The `success` callback.
+   * @param  {function} error            The `error` callback.
+   * @param  {function} always           The `always` callback.
+   *
+   * @returns {Deferred}                 Deferred Object representing the POST request to SE. Resolves when the request is complete.
    */
   /*
-  function postSE(method, parameters, success, error, always) {
-   stackExchangeAjaxCall(method, parameters, {
-     call: $.post
-     success,
-     error,
-     always
-   });
+  function postSE(endpoint, method, parameters, success, error, always) { // eslint-disable-line max-params
+    return stackExchangeAjaxCall(`POST-${endpoint}`, method, parameters, {
+      call: $.post,
+      success,
+      error,
+      always,
+    });
   }
   */
 
@@ -647,42 +665,112 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}   method         The Stack Exchange api method.
-   * @param   {object}   parameters     The parameters to be passed to the Stack Exchange api.
+   * @param   {string}   endpoint       The Stack Exchange API endpoint.
+   * @param   {string}   method         The Stack Exchange API method (i.e. the endpoint part of the URL path).
+   * @param   {object}   parameters     The parameters to be passed to the Stack Exchange API.
    * @param   {object}   config         The AJAX call configuration object, containing:
    * @param   {function} config.call    The jQuery AJAX call to use.
    * @param   {function} config.success The `success` callback.
    * @param   {function} config.error   The `error` callback.
    * @param   {function} config.always  The `always` callback.
-   * @returns {jqXHR}                   The jqXHR Promise.
+   *
+   * @returns {Deferred}                Deferred Object representing the request for SE data. Resolves when the request is complete.
    */
-  function stackExchangeAjaxCall(method, parameters, {call, success, error, always}) {
+  function stackExchangeAjaxCall(endpoint, method, parameters, {call, success, error, always}) {
     const {se} = fire.api;
+    const {backoffs} = se;
     const type = call === $.get ? 'get' : 'post';
 
     parameters = parameters || {};
 
     parameters.key = se.key;
 
+    // For the SE API, backoffs are on a per-endpoint basis.
+    if (!backoffs[endpoint]) {
+      // Set up the initial 0 length backoff delay.
+      backoffs[endpoint] = jQuery.Deferred().resolve();
+    }
+    const oldBackoff = backoffs[endpoint];
+
     if (fire.userData.stackexchangeWriteToken) {
+      // We *always* send the write token, if it exists, so we use the SE API quota reserved for this application.
+      //   That's one of the benefits of having a token.
       parameters.access_token = fire.userData.stackexchangeWriteToken;
       delete parameters.auth;
     } else if (parameters.auth) {
       fire.warn(`Auth is required for this API call, but was not available.\n"${type}": ${method}`);
-      return null;
+      return jQuery.Deferred().reject('Auth not available.');
     }
 
-    const ajaxCall = call(se.url + method, parameters);
+    const newBackoff = jQuery.Deferred();
+    backoffs[endpoint] = newBackoff;
+
+    // Only perform the new AJAX call once the oldBackoff resolves.
+    const ajaxCall = oldBackoff.then(() => call(se.url + method, parameters));
+
+    ajaxCall.done((response) => {
+      const {backoff, quota_remaining} = response;
+      if (quota_remaining < fire.constants.seQuotaAlwaysWarnIfLower || (quota_remaining < fire.constants.seQuotaWarnPeriodicIfLower && quota_remaining % fire.constants.seQuotaWarnPeriodicOn < fire.constants.seQuotaWarnPeriodicWithin)) {
+        toastr.warning(`Remaining SE API quota = ${quota_remaining}`);
+      }
+      // The following and assigning newBackoff to backoffs[endpoint] (above) results in us having at most one request in flight at a time per endpoint.
+      //   This also results in effectively limiting the rate at which we make requests, at least on a per endpoint basis.
+      const backoffDelay = backoff ? (backoff * fire.constants.millisecondsInSecond) + fire.constants.seAPIExtraBackoffDelay : 0;
+      if (backoffDelay) {
+        setTimeout(newBackoff.resolve, backoffDelay);
+      } else {
+        // Resolve the new backoff immediately.
+        newBackoff.resolve();
+      }
+    });
 
     if (success) {
       ajaxCall.done(success);
     }
+
+    // If we get an error from the AJAX call, we still need to resolve the backoff Defered.
+    ajaxCall.fail(function (jqXHR) {
+      // We could use different delays here based on what the error is. It should be noted that it's possible
+      //   for us to get a backoff violation error, even if we never got a backof. That can happen if there are requests
+      //   made to the same endpoints by anything else in this IP address, which is actually quite likely, depending on
+      //   the endpoint.
+      const errorData = jqXHR.responseJSON;
+      if (jqXHR && jqXHR.status === fire.constants.seAPIThrottleViolationStatus && errorData && errorData.error_name === 'throttle_violation') {
+        setTimeout(newBackoff.resolve, fire.constants.seAPIThrottleViolationDelay);
+      } else if (errorData && errorData.error_message && errorData.error_message.indexOf('You cannot perform this action for another') === 0) { // SE API, Need to delay flagging.
+        const [delaySeconds] = errorData.error_message.match(/\d+/);
+        setTimeout(newBackoff.resolve, delaySeconds * fire.constants.millisecondsInSecond);
+      } else {
+        console.error('SE API AJAX fail (May contain your SE token. Don\'t share that!):', // eslint-disable-line no-console
+          '\n::  jqXHR:', jqXHR,
+          '\n::  arguments:', arguments, // eslint-disable-line prefer-rest-params
+          '\n:: responseJSON:', jqXHR.responseJSON,
+          '\n:: response text:', jqXHR.responseText
+        );
+        setTimeout(newBackoff.resolve, fire.constants.seAPIErrorDelay);
+      }
+    });
 
     if (error) {
       ajaxCall.fail(error);
     } else {
       ajaxCall.fail((jqXHR) => fire.error('Error performing this AJAX call!', jqXHR));
     }
+
+    ajaxCall.fail((jqXHR) => {
+      const response = jqXHR.responseJSON;
+      console.error('Failed SE AJAX call (May contain your SE token. Don\'t share that!): jqXHR:', jqXHR, '::  response:', response); // eslint-disable-line no-console
+      if (response) {
+        if (response.error_message === '`key` is not valid for passed `access_token`, application did not create token.' &&
+            response.error_name === 'access_denied') {
+          // Handle the SE access key being invalid. This is something that the user can't recover from otherwise. They would need to manually edit localStorage.
+          const errorReport = 'The SE access key is invalid. Deleting the key.';
+          console.error(errorReport); // eslint-disable-line no-console
+          toastr.error(errorReport);
+          setValue('stackexchangeWriteToken', '');
+        }
+      }
+    });
 
     if (always) {
       ajaxCall.always(always);
@@ -718,7 +806,7 @@
               afterGetToken();
             }
           })
-          .error(({status}) => {
+          .fail(({status}) => {
             if (status === fire.constants.http.notFound) {
               toastr.error('Metasmoke could not find a write token - did you authorize the app?');
             } else {
@@ -2974,6 +3062,15 @@
       tooltipOffsetSmall: 5,
       halfPopupWidth: 300,
       minPopupLeft: 10,
+      millisecondsInSecond: 1000,
+      seQuotaAlwaysWarnIfLower: 100,
+      seQuotaWarnPeriodicIfLower: 1005,
+      seQuotaWarnPeriodicOn: 100,
+      seQuotaWarnPeriodicWithin: 3,
+      seAPIExtraBackoffDelay: 250,
+      seAPIErrorDelay: 11000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a thottle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
+      seAPIThrottleViolationDelay: 16000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a thottle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
+      seAPIThrottleViolationStatus: 400,
       webSocketInitialOpenDelay: 3000,
     };
   }
