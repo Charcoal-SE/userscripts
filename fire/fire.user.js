@@ -2122,7 +2122,7 @@
   function getJqXHRmessage(jqXHR) {
     try {
       return JSON.parse(jqXHR.responseText);
-    } catch (error) { // eslint-disable-line no-unused-vars, unicorn/catch-error-name
+    } catch (error) { // eslint-disable-line no-unused-vars
       return {message: (jqXHR || {responseText: ''}).responseText};
     }
   }

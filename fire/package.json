@@ -33,6 +33,7 @@
       "arrow-parens": ["error", "always"],
       "comma-dangle": ["error", "always-multiline"],
       "new-cap": ["error", { "capIsNewExceptions": ["jQuery.Deferred"] }],
+      "unicorn/catch-error-name": ["error", { "name": "error" }],
       "quotes": ["error", "single", {"avoidEscape": true}],
       "camelcase": "off",
       "max-params": ["warn", 5],
