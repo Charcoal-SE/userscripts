@@ -2590,7 +2590,9 @@
    * @memberof module:fire
    */
   function injectExternalScripts() {
-    injectCSS('//charcoal-se.org/userscripts/fire/fire.css');
+    jQuery.Deferred().reject()
+      .then(null, () => injectCSS('//cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/fire/fire.css'))
+      .then(null, () => injectCSS('//charcoal-se.org/userscripts/fire/fire.css'));
 
     // Toastr is a JavaScript library for non-blocking notifications.
     injectScript(typeof toastr === 'undefined', '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js', null, () => {
@@ -2608,13 +2610,20 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string} path The path to the CSS file.
+   * @param   {string}        path       The path to the CSS file.
+   *
+   * @returns {Deferred}                 Deferred Object resolving upon success; rejecting upon error.
    */
   function injectCSS(path) {
-    const css = window.document.createElement('link');
-    css.rel = 'stylesheet';
-    css.href = `${path}?fire=${fire.metaData.version}`;
-    document.head.appendChild(css);
+    return jQuery.Deferred((deferred) => {
+      const css = window.document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = `${path}?fire=${fire.metaData.version}`;
+      $(css)
+        .on('load', (event) => deferred.resolve(event))
+        .on('error', (event) => deferred.reject(event));
+      document.head.append(css);
+    });
   }
 
   /**
