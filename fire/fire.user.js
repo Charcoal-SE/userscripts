@@ -53,7 +53,7 @@
       'chat.stackexchange.com': 120914,
       'chat.stackoverflow.com': 3735529,
       'chat.meta.stackexchange.com': 266345,
-    }[location.host];       // From which, we need the current host's ID
+    }[location.host]; // From which, we need the current host's ID
 
     const metasmokeId = { // Same as above, but for the metasmoke account
       'chat.stackexchange.com': 478536,
@@ -1049,7 +1049,7 @@
 
       const selector = '.fire-popup-header a.button.focus';
       $(selector)
-        .fadeOut(c.buttonFade)           // Flash to indicate which button was selected.
+        .fadeOut(c.buttonFade) // Flash to indicate which button was selected.
         .fadeIn(c.buttonFade, () => $(selector).click());
     } else {
       if (!fire.settingsAreOpen && event.keyCode < c.keys.F1) { // Allow interaction with settings popup.
@@ -1068,7 +1068,7 @@
             $button.click();
           } else if (fire.openOnSiteCodes.includes(event.keyCode) || fire.openOnMSCodes.includes(event.keyCode)) { // Open the report on the site
             window.open(button.href);
-          } else {                // [1-5] keys for feedback buttons
+          } else { // [1-5] keys for feedback buttons
             const pos = button.getBoundingClientRect();
             $button
               .addClass('focus')
@@ -1777,7 +1777,7 @@
 
     const reportTitle = $('<div/>')
       .text(postData.title) // Escape everything.
-      .html();       // Get the escaped HTML
+      .html(); // Get the escaped HTML
 
     let title;
 
@@ -2885,13 +2885,13 @@
         const info = data.message;
         let url;
 
-        if (info.flag_log) {            // Autoflagging information
+        if (info.flag_log) { // Autoflagging information
           url = info.flag_log.post.link;
         } else if (info.deletion_log) { // Deletion log
           url = info.deletion_log.post_link;
-        } else if (info.feedback) {     // Feedback
+        } else if (info.feedback) { // Feedback
           url = info.feedback.post_link;
-        } else if (info.not_flagged) {  // Not flagged
+        } else if (info.not_flagged) { // Not flagged
           url = info.not_flagged.post.link;
         } else {
           fire.log('Socket message: ', info);
