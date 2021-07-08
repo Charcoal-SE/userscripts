@@ -41,14 +41,17 @@ img.fire-emoji-large {
     top: -2px; }
 
 .fire-popup {
-  width: 600px;
-  max-height: 500px;
   position: fixed;
   z-index: 100;
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 20px 2px #646464; }
+  box-shadow: 0 0 20px 2px #646464;
+  width: calc(70% - 9vw);
+  max-height: 85vh;
+  left: 6vw !important;
+  top: 2vh !important;
+  box-sizing: border-box; }
   .fire-popup .fire-popup-header {
     min-height: 40px; }
     .fire-popup .fire-popup-header a.button {
@@ -138,7 +141,7 @@ img.fire-emoji-large {
       display: inline-block;
       vertical-align: middle; }
   .fire-popup .fire-popup-body {
-    max-height: 380px;
+    max-height: calc(85vh - 160px);
     overflow-y: scroll;
     border: 1px solid #ccc;
     padding: 10px;
@@ -389,16 +392,32 @@ img.fire-emoji-large {
     .fire-popup .fire-tooltip .fire-detection-item {
       padding-left: 15px;
       text-indent: -15px; }
-  .fire-popup#fire-settings .fire-popup-header h2 {
-    display: inline-block; }
-  .fire-popup#fire-settings .fire-settings-section {
-    width: 290px;
-    display: inline-block;
-    vertical-align: top;
-    padding: 5px; }
-  .fire-popup#fire-settings #toastr_duration {
-    max-width: 50px;
-    margin-top: 4px; }
+  .fire-popup#fire-settings {
+    min-height: 460px; }
+    .fire-popup#fire-settings .fire-popup-header h2 {
+      display: inline-block; }
+    .fire-popup#fire-settings .fire-settings-section {
+      width: 290px;
+      display: inline-block;
+      vertical-align: top;
+      padding: 5px; }
+    .fire-popup#fire-settings #toastr_duration {
+      max-width: 50px;
+      margin-top: 4px; }
+  @media (min-width: 0px) and (max-width: 700px) {
+    .fire-popup {
+      width: 96vw;
+      max-height: 95vh;
+      left: 2vw !important;
+      top: 2vw !important;
+      padding: 10px 10px 16px 10px; }
+      .fire-popup .fire-popup-body {
+        max-height: calc(95vh - 120px); }
+      .fire-popup .fire-popup-header .fire-site-logo {
+        font-size: 18px; }
+      .fire-popup .fire-settings-button {
+        margin: 5px 0px -10px 0;
+        line-height: 8px; } }
 
 .fire-popup.fire-readonly .fire-popup-header .fire-site-logo {
   max-width: 475px; }
