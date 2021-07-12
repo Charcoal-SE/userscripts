@@ -1280,6 +1280,9 @@
       h1: [],
       h2: [],
       h3: [],
+      h4: [],
+      h5: [],
+      h6: [],
       i: [],
       kbd: [],
       li: [],
@@ -1448,11 +1451,8 @@
     return new RegExp(fullRegexText, 'gi');
   })();
   /* The whitelisted RegExp is currently:
-    Brief test: https://regex101.com/r/csDeBt/1/
-    RegExp:
-    &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|h1|h2|h3|i|kbd|li|p|s|strike|strong|sub|sup|ul)\s*|\/(?:blockquote|div|ol|pre|span)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*))\s*|\/(?:a)\s*|(?:(?:a\b(?: +(?:(?:(?:href|title|rel|alt)="[^"<>]*")|class="(?:post-tag)"))*))\s*|(?:(?:img\b(?: +(?:src|width|height|alt|title)="[^"<>]*")*)\s*\/?))&gt;
-    2021-02-10:
-      &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|h1|h2|h3|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*))\s*|\/(?:a|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt)="[^"<>]*"|class="(?:post-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
+    2021-07-12 (https://regex101.com/r/eU8bQU/1):
+    &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|h1|h2|h3|h4|h5|h6|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*))\s*|\/(?:a|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt)="[^"<>]*"|class="(?:post-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
   */
 
   /**

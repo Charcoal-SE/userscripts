@@ -177,14 +177,83 @@ img.fire-emoji-large {
       .fire-popup .fire-popup-body .fire-reported-post li {
         margin-left: 10px; }
       .fire-popup .fire-popup-body .fire-reported-post h1 {
-        font-size: 21px; }
+        font-size: 23px; }
       .fire-popup .fire-popup-body .fire-reported-post h2 {
-        font-size: 19px; }
+        font-size: 21px; }
       .fire-popup .fire-popup-body .fire-reported-post h3 {
+        font-size: 19px; }
+      .fire-popup .fire-popup-body .fire-reported-post h4 {
         font-size: 17px; }
-      .fire-popup .fire-popup-body .fire-reported-post h1, .fire-popup .fire-popup-body .fire-reported-post h2, .fire-popup .fire-popup-body .fire-reported-post h3 {
+      .fire-popup .fire-popup-body .fire-reported-post h5 {
+        font-size: 15px; }
+      .fire-popup .fire-popup-body .fire-reported-post h6 {
+        font-size: 13px; }
+      .fire-popup .fire-popup-body .fire-reported-post h1, .fire-popup .fire-popup-body .fire-reported-post h2, .fire-popup .fire-popup-body .fire-reported-post h3, .fire-popup .fire-popup-body .fire-reported-post h4, .fire-popup .fire-popup-body .fire-reported-post h5, .fire-popup .fire-popup-body .fire-reported-post h6 {
         line-height: 1.3;
-        margin: 0 0 1em; }
+        margin: 0 0 .5em 0;
+        font-weight: bold; }
+      .fire-popup .fire-popup-body .fire-reported-post img + h1, .fire-popup .fire-popup-body .fire-reported-post img + h2, .fire-popup .fire-popup-body .fire-reported-post img + h3, .fire-popup .fire-popup-body .fire-reported-post img + h4, .fire-popup .fire-popup-body .fire-reported-post img + h5, .fire-popup .fire-popup-body .fire-reported-post img + h6,
+      .fire-popup .fire-popup-body .fire-reported-post dl + h1,
+      .fire-popup .fire-popup-body .fire-reported-post dl + h2,
+      .fire-popup .fire-popup-body .fire-reported-post dl + h3,
+      .fire-popup .fire-popup-body .fire-reported-post dl + h4,
+      .fire-popup .fire-popup-body .fire-reported-post dl + h5,
+      .fire-popup .fire-popup-body .fire-reported-post dl + h6,
+      .fire-popup .fire-popup-body .fire-reported-post p + h1,
+      .fire-popup .fire-popup-body .fire-reported-post p + h2,
+      .fire-popup .fire-popup-body .fire-reported-post p + h3,
+      .fire-popup .fire-popup-body .fire-reported-post p + h4,
+      .fire-popup .fire-popup-body .fire-reported-post p + h5,
+      .fire-popup .fire-popup-body .fire-reported-post p + h6,
+      .fire-popup .fire-popup-body .fire-reported-post pre + h1,
+      .fire-popup .fire-popup-body .fire-reported-post pre + h2,
+      .fire-popup .fire-popup-body .fire-reported-post pre + h3,
+      .fire-popup .fire-popup-body .fire-reported-post pre + h4,
+      .fire-popup .fire-popup-body .fire-reported-post pre + h5,
+      .fire-popup .fire-popup-body .fire-reported-post pre + h6,
+      .fire-popup .fire-popup-body .fire-reported-post blockquote + h1,
+      .fire-popup .fire-popup-body .fire-reported-post blockquote + h2,
+      .fire-popup .fire-popup-body .fire-reported-post blockquote + h3,
+      .fire-popup .fire-popup-body .fire-reported-post blockquote + h4,
+      .fire-popup .fire-popup-body .fire-reported-post blockquote + h5,
+      .fire-popup .fire-popup-body .fire-reported-post blockquote + h6,
+      .fire-popup .fire-popup-body .fire-reported-post table + h1,
+      .fire-popup .fire-popup-body .fire-reported-post table + h2,
+      .fire-popup .fire-popup-body .fire-reported-post table + h3,
+      .fire-popup .fire-popup-body .fire-reported-post table + h4,
+      .fire-popup .fire-popup-body .fire-reported-post table + h5,
+      .fire-popup .fire-popup-body .fire-reported-post table + h6,
+      .fire-popup .fire-popup-body .fire-reported-post .s-table-container + h1,
+      .fire-popup .fire-popup-body .fire-reported-post .s-table-container + h2,
+      .fire-popup .fire-popup-body .fire-reported-post .s-table-container + h3,
+      .fire-popup .fire-popup-body .fire-reported-post .s-table-container + h4,
+      .fire-popup .fire-popup-body .fire-reported-post .s-table-container + h5,
+      .fire-popup .fire-popup-body .fire-reported-post .s-table-container + h6,
+      .fire-popup .fire-popup-body .fire-reported-post .s-link-preview + h1,
+      .fire-popup .fire-popup-body .fire-reported-post .s-link-preview + h2,
+      .fire-popup .fire-popup-body .fire-reported-post .s-link-preview + h3,
+      .fire-popup .fire-popup-body .fire-reported-post .s-link-preview + h4,
+      .fire-popup .fire-popup-body .fire-reported-post .s-link-preview + h5,
+      .fire-popup .fire-popup-body .fire-reported-post .s-link-preview + h6,
+      .fire-popup .fire-popup-body .fire-reported-post dd + h1,
+      .fire-popup .fire-popup-body .fire-reported-post dd + h2,
+      .fire-popup .fire-popup-body .fire-reported-post dd + h3,
+      .fire-popup .fire-popup-body .fire-reported-post dd + h4,
+      .fire-popup .fire-popup-body .fire-reported-post dd + h5,
+      .fire-popup .fire-popup-body .fire-reported-post dd + h6,
+      .fire-popup .fire-popup-body .fire-reported-post ul + h1,
+      .fire-popup .fire-popup-body .fire-reported-post ul + h2,
+      .fire-popup .fire-popup-body .fire-reported-post ul + h3,
+      .fire-popup .fire-popup-body .fire-reported-post ul + h4,
+      .fire-popup .fire-popup-body .fire-reported-post ul + h5,
+      .fire-popup .fire-popup-body .fire-reported-post ul + h6,
+      .fire-popup .fire-popup-body .fire-reported-post ol + h1,
+      .fire-popup .fire-popup-body .fire-reported-post ol + h2,
+      .fire-popup .fire-popup-body .fire-reported-post ol + h3,
+      .fire-popup .fire-popup-body .fire-reported-post ol + h4,
+      .fire-popup .fire-popup-body .fire-reported-post ol + h5,
+      .fire-popup .fire-popup-body .fire-reported-post ol + h6 {
+        margin-top: 1em; }
       .fire-popup .fire-popup-body .fire-reported-post a .href {
         display: none;
         word-break: break-all; }
