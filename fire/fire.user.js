@@ -1767,7 +1767,7 @@
 
     const openOnMSButton = newEl('a', 'button fire-metasmoke-button', {
       text: 'MS',
-      href: `https://m.erwaysoftware.com/posts/by-url?url=${postData.link}`,
+      href: `https://metasmoke.erwaysoftware.com/posts/by-url?url=${postData.link}`,
       target: '_blank',
       'fire-key': fire.openOnMSCodes,
       'fire-tooltip': 'Open on metasmoke',
