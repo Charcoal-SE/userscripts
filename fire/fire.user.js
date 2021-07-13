@@ -2513,7 +2513,6 @@
   function createCloseButton(clickHandler) {
     return newEl('a', 'button fire-close-button', {
       text: 'Close',
-      title: 'Close this popup',
       click: clickHandler,
       'fire-tooltip': 'Close popup',
       'fire-key': keyCodesToArray(fire.constants.keys.esc), // Escape key code,
