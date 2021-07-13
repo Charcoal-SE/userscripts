@@ -44,7 +44,7 @@
   /**
    * anonymous function - Initialize FIRE.
    *
-   * @param {object} scope The scope to register FIRE on. Usually, `window`.
+   * @param   {object}    scope    The scope to register FIRE on. Usually, `window`.
    */
   ((scope) => { // Init
     const hOP = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
@@ -68,6 +68,7 @@
      *
      * @global
      * @module fire
+     *
      */
     fire = {
       /**
@@ -75,6 +76,7 @@
        *
        * @public
        * @memberof module:fire
+       *
        */
       metaData: GM_info.script || GM_info['Feedback Instantly, Rapidly, Effortlessly'],
       /**
@@ -82,6 +84,7 @@
        *
        * @public
        * @memberof module:fire
+       *
        */
       api: {
         ms: {
@@ -158,6 +161,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function requestStackExchangeToken() {
     const url = `https://stackexchange.com/oauth/dialog?client_id=${fire.api.se.clientId}&scope=${encodeURIComponent('no_expiry')}&redirect_uri=${encodeURIComponent(location.href)}`;
@@ -173,6 +177,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function checkHashForWriteToken() {
     if (location.hash && location.hash.length > 0) {
@@ -191,6 +196,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function checkWriteTokenSuccess() {
     if (fire.userData.stackexchangeWriteToken) {
@@ -206,8 +212,8 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string}               reportedUrl The url that's been reported.
-   * @param {singleReportCallback} callback    An action to perform after the report is loaded.
+   * @param   {string}                  reportedUrl    The url that's been reported.
+   * @param   {singleReportCallback}    callback       An action to perform after the report is loaded.
    */
   function getDataForUrl(reportedUrl, callback) {
     const {ms} = fire.api;
@@ -241,8 +247,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object} flags A report's (auto-)flags, where it's `users` array has to be checked.
-   * @returns {boolean}      `true` if the current user is found in the flag list.
+   * @param   {object}     flags    A report's (auto-)flags, where it's `users` array has to be checked.
+   *
+   * @returns {boolean}             `true` if the current user is found in the flag list.
    */
   function listHasCurrentUser(flags) {
     return flags && Array.isArray(flags.users) &&
@@ -255,7 +262,8 @@
    * @private
    * @memberof module:fire
    *
-   * @param {boolean} openAfterLoad Open the report popup after load?
+   * @param   {boolean}     openAfterLoad    Open the report popup after load?
+   * @param   {DOM_node}    this             The FIRE button which was clicked.
    */
   function loadDataForReport(openAfterLoad) {
     const $this = $(this);
@@ -273,6 +281,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function updateReportCache() { // eslint-disable-line no-unused-vars
     const urls = $('.fire-button')
@@ -314,10 +323,11 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object}  data          A metasmoke report
-   * @param {boolean} openAfterLoad Open the report popup after load?
-   * @param {object}  $this         The clicked FIRE report button
-   * @param {boolean} skipLoadPost  skip loading additional data for the post?
+   * @param   {object}      data             A metasmoke report
+   * @param   {boolean}     openAfterLoad    Open the report popup after load?
+   * @param   {object}      $this            The clicked FIRE report button
+   * @param   {boolean}     skipLoadPost     skip loading additional data for the post?
+   *
    */
   function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
@@ -361,8 +371,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string} url A report's Stack Exchange link
-   * @returns {string}     The Stack Exchange API name for the report's site.
+   * @param   {string}    url    A report's Stack Exchange link
+   *
+   * @returns {string}           The Stack Exchange API name for the report's site.
    */
   function parseSiteUrl(url) {
     return url.split(/\.com|\.net/)[0]
@@ -374,6 +385,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function loadStackExchangeSites() {
     const now = new Date().valueOf();
@@ -418,7 +430,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The metasmoke report.
+   * @param   {object}      report    The metasmoke report.
    */
   function loadPost(report) {
     const parameters = {site: report.site};
@@ -457,7 +469,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The metasmoke report.
+   * @param   {object}      report    The metasmoke report.
    */
   function loadPostRevisions(report) {
     const parameters = {site: report.site};
@@ -485,6 +497,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function showEditedIcon() {
     const title = $('.fire-post-title');
@@ -505,7 +518,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {number} reputation The user's reputation.
+   * @param   {number}    reputation    The user's reputation.
    */
   function showReputation(reputation) {
     const rep = $('.fire-user-reputation');
@@ -523,7 +536,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} report The metasmoke report.
+   * @param   {object}      report    The metasmoke report.
    */
   function loadPostFlagStatus(report) {
     const parameters = {
@@ -554,7 +567,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {number}     [page=1]     The page to load.
+   * @param   {number}    [page=1]    The page to load.
    */
   function loadCurrentSEUser(page = 1) {
     const parameters = {
@@ -578,8 +591,8 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object}    response    The Stack Exchange `user` response.
-   * @param {number}    page        The page that's been loaed.
+   * @param   {object}    response    The Stack Exchange `user` response.
+   * @param   {number}    page        The page that's been loaed.
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
@@ -615,14 +628,14 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string}   endpoint          The Stack Exchange API endpoint.
-   * @param {string}   method            The Stack Exchange API method (i.e. the endpoint part of the URL path).
-   * @param {object}   parameters        The parameters to be passed to the Stack Exchange API.
-   * @param {function} success           The `success` callback.
-   * @param {function} error             The `error` callback.
-   * @param {function} always            The `always` callback.
+   * @param   {string}      endpoint      The Stack Exchange API endpoint.
+   * @param   {string}      method        The Stack Exchange API method (i.e. the endpoint part of the URL path).
+   * @param   {object}      parameters    The parameters to be passed to the Stack Exchange API.
+   * @param   {function}    [success]     The `success` callback (optional).
+   * @param   {function}    [error]       The `error` callback (optional).
+   * @param   {function}    [always]      The `always` callback (optional).
    *
-   * @returns {Deferred}                 Deferred Object representing the request for SE data. Resolves when the request is complete.
+   * @returns {Deferred}                  Deferred Object representing the request for SE data. Resolves when the request is complete.
    */
   function getSE(endpoint, method, parameters, success, error, always) { // eslint-disable-line max-params
     return stackExchangeAjaxCall(`GET-${endpoint}`, method, parameters, {
@@ -639,14 +652,14 @@
    * @private
    * @memberof module:fire
    *
-   * @param  {string}   endpoint         The Stack Exchange API endpoint.
-   * @param  {string}   method           The Stack Exchange API method (i.e. the endpoint part of the URL path).
-   * @param  {object}   parameters       The parameters to be passed to the Stack Exchange API.
-   * @param  {function} success          The `success` callback.
-   * @param  {function} error            The `error` callback.
-   * @param  {function} always           The `always` callback.
+   * @param   {string}      endpoint      The Stack Exchange API endpoint.
+   * @param   {string}      method        The Stack Exchange API method (i.e. the endpoint part of the URL path).
+   * @param   {object}      parameters    The parameters to be passed to the Stack Exchange API.
+   * @param   {function}    [success]     The `success` callback (optional).
+   * @param   {function}    [error]       The `error` callback (optional).
+   * @param   {function}    [always]      The `always` callback (optional).
    *
-   * @returns {Deferred}                 Deferred Object representing the POST request to SE. Resolves when the request is complete.
+   * @returns {Deferred}                  Deferred Object representing the POST request to SE. Resolves when the request is complete.
    */
   /*
   function postSE(endpoint, method, parameters, success, error, always) { // eslint-disable-line max-params
@@ -665,16 +678,16 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}   endpoint       The Stack Exchange API endpoint.
-   * @param   {string}   method         The Stack Exchange API method (i.e. the endpoint part of the URL path).
-   * @param   {object}   parameters     The parameters to be passed to the Stack Exchange API.
-   * @param   {object}   config         The AJAX call configuration object, containing:
-   * @param   {function} config.call    The jQuery AJAX call to use.
-   * @param   {function} config.success The `success` callback.
-   * @param   {function} config.error   The `error` callback.
-   * @param   {function} config.always  The `always` callback.
+   * @param   {string}      endpoint            The Stack Exchange API endpoint.
+   * @param   {string}      method              The Stack Exchange API method (i.e. the endpoint part of the URL path).
+   * @param   {object}      parameters          The parameters to be passed to the Stack Exchange API.
+   * @param   {object}      config              The AJAX call configuration object, containing:
+   * @param   {function}    config.call         The jQuery AJAX call to use.
+   * @param   {function}    [config.success]    The `success` callback (optional).
+   * @param   {function}    [config.error]      The `error` callback (optional).
+   * @param   {function}    [config.always]     The `always` callback (optional).
    *
-   * @returns {Deferred}                Deferred Object representing the request for SE data. Resolves when the request is complete.
+   * @returns {Deferred}                        Deferred Object representing the request for SE data. Resolves when the request is complete.
    */
   function stackExchangeAjaxCall(endpoint, method, parameters, {call, success, error, always}) {
     const {se} = fire.api;
@@ -785,7 +798,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param  {function} [callback] A optional function to run after the write token was obtained.
+   * @param   {function}    [callback]    A optional function to run after the write token was obtained.
    */
   function getWriteToken(callback) {
     setValue('readOnly', false);
@@ -832,10 +845,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} message            The received message, containing:
-   * @param {number} message.event_type The message type
-   * @param {number} message.user_id    The message's userID
-   * @param {number} message.message_id The message ID
+   * @param   {object}    message               The received message, containing:
+   * @param   {number}    message.event_type    The message type
+   * @param   {number}    message.user_id       The message's userID
+   * @param   {number}    message.message_id    The message ID
    */
   function chatListener({event_type, user_id, message_id}) {
     if (event_type === 1 && (user_id === fire.smokeDetectorId || user_id === fire.metasmokeId)) {
@@ -852,7 +865,7 @@
    * @public
    * @memberof module:fire
    *
-   * @param {object} message The message DOM node the button should be added to.
+   * @param   {object}    message    The message DOM node the button should be added to.
    */
   function decorateMessage(message) {
     const m = $(message);
@@ -906,9 +919,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object} $object A jQuery list of DOM elements
-   * @param   {string} text    The text the element should contain.
-   * @returns {object}         The filtered list
+   * @param   {object}    $object    A jQuery list of DOM elements
+   * @param   {string}    text       The text the element should contain.
+   *
+   * @returns {object}               The filtered list
    */
   function filterOnContents($object, text) {
     return $object.filter((i, element) => $(element).text() === text);
@@ -919,6 +933,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The <select> element for toastr notification position selection.
    */
   function toastrPositionChangeHandler() {
     const value = $(this).val();
@@ -937,6 +953,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The <input type="number"> element for toastr notification duration selection.
    */
   function toastrDurationHandler() {
     const value = $(this).val();
@@ -954,6 +972,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The <input type="checkbox"> element for bluring the background.
    */
   function blurOptionClickHandler() {
     boolOptionClickHandler(this, 'Blur', 'blur', () => {
@@ -966,6 +986,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The <input type="checkbox"> element for flagging on "tpu-" feedback.
    */
   function flagOptionClickHandler() {
     boolOptionClickHandler(this, 'Flagging on "tpu-" feedback', 'flag');
@@ -976,6 +998,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The <input type="checkbox"> element for enabling debug logging.
    */
   function debugOptionClickHandler() {
     boolOptionClickHandler(this, 'Debug mode', 'debug');
@@ -986,6 +1010,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The <input type="checkbox"> element for hiding images.
    */
   function imageOptionClickHandler() {
     boolOptionClickHandler(this, 'Hiding images on reports', 'hideImages');
@@ -997,10 +1023,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object}   element    The `input[type=checkbox]`` DOM node that was clicked.
-   * @param {string}   message    The message to show.
-   * @param {string}   key        The setting key to save.
-   * @param {function} [callback] A optional callback.
+   * @param   {object}      element       The `input[type=checkbox]`` DOM node that was clicked.
+   * @param   {string}      message       The message to show.
+   * @param   {string}      key           The setting key to save.
+   * @param   {function}    [callback]    A optional callback.
    */
   function boolOptionClickHandler(element, message, key, callback) {
     const value = $(element).is(':checked');
@@ -1021,7 +1047,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} event     An event
+   * @param   {object}    event    An event
    */
   function stopPropagationIfTargetBody(event) {
     if (event.target === document.body) {
@@ -1035,7 +1061,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} event the jQuery keyboard event
+   * @param   {object}    event    The jQuery keyboard event
    */
   function keyboardShortcuts(event) {
     const c = fire.constants;
@@ -1096,7 +1122,7 @@
    * @public
    * @memberof module:fire
    *
-   * @param {object} message The message DOM node the report should be opened for.
+   * @param    {object}    message    The message DOM node the report should be opened for.
    */
   function openReportPopupForMessage(message) {
     loadDataForReport.call(
@@ -1110,12 +1136,14 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   const clickHandlers = {
     /**
      * Open the "Request authorization" metasmoke page.
      *
      * @private
+     *
      */
     requestToken: () => {
       window.open(`https://metasmoke.erwaysoftware.com/oauth/request?key=${fire.api.ms.key}`, '_blank');
@@ -1125,8 +1153,8 @@
      *
      * @private
      *
-     * @param {object} input      The input DOM node that contains the code.
-     * @param {function} callback The callback that receives the metasmoke code.
+     * @param    {object}      input       The input DOM node that contains the code.
+     * @param    {function}    callback    The callback that receives the metasmoke code.
      */
     saveToken: (input, callback) => {
       const value = input.val();
@@ -1140,6 +1168,7 @@
      * Close all popup windows and open the "Request write token" popup.
      *
      * @private
+     *
      */
     disableReadonly: () => {
       closePopup();
@@ -1154,7 +1183,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {function} callback The action to perform after getting a write token / choosing read-only mode.
+   * @param   {function}    callback    The action to perform after getting a write token / choosing read-only mode.
    */
   function writeTokenPopup(callback) {
     const input = newEl('input', 'fire-popup-input', {
@@ -1202,11 +1231,11 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}            toChange                The complete text to make changes within.
-   * @param   {string}            tagText                 The type of tag within which to make changes (e.g. "code")
-   * @param   {RegExp}            whiteListedTagsRegex    Falsey or a RegExp that is used to match tags which should be whitelisted inside the changed area.
+   * @param   {string}    toChange                The complete text to make changes within.
+   * @param   {string}    tagText                 The type of tag within which to make changes (e.g. "code")
+   * @param   {RegExp}    whiteListedTagsRegex    Falsey or a RegExp that is used to match tags which should be whitelisted inside the changed area.
    *
-   * @returns {string}                                    The changed text
+   * @returns {string}                            The changed text
    */
   function toHTMLEntitiesBetweenTags(toChange, tagText, whiteListedTagsRegex) {
     let codeLevel = 0;
@@ -1316,9 +1345,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {jQuery}          input   The elements to sort
+   * @param   {jQuery}    input    The elements to sort
    *
-   * @returns {jQuery}                  New jQuery Object with the deepest elements first.
+   * @returns {jQuery}             New jQuery Object with the deepest elements first.
    */
   function sortJqueryByDepth(input) {
     const allElements = input.map(function () {
@@ -1334,7 +1363,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {jQuery}          container   The elements and their decendants to check.
+   * @param   {jQuery}    container    The elements and their decendants to check.
    *
    */
   function convertChildElementsWithNonWhitelistedAttributesToText(container) {
@@ -1349,9 +1378,9 @@
      * @private
      * @memberof module:fire
      *
-     * @param   {jQuery}          elementsIn   The elements and their decendants to check.
+     * @param   {jQuery}     elementsIn    The elements and their decendants to check.
      *
-     * @returns {boolean}                      Flag indicating if any changes were made.
+     * @returns {boolean}                  Flag indicating if any changes were made.
      */
     function convertElements(elementsIn) {
       let didChange = false;
@@ -1461,10 +1490,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}          htmlText         The text to change into HTML.
-   * @param   {falseyTruthy}    isTrusted        Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
+   * @param   {string}          htmlText     The text to change into HTML.
+   * @param   {falseyTruthy}    isTrusted    Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
    *
-   * @returns {jQuery}                           <div> containing the body HTML.
+   * @returns {jQuery}                       <div> containing the body HTML.
    */
   function generatePostBodyDivFromHtmlText(htmlText, isTrusted) {
     // Just having the whitelisted tags active is good, but results in the possibility that we've enabled
@@ -1541,16 +1570,16 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}          match    The matched <li>
-   * @param   {string}          p1       (<li class="fire-detection-item)
-   * @param   {string}          p2       ("><span class="fire-detection-name">)
-   * @param   {string}          p3       ((?:potentially bad keyword|bad phone number) in \w+<\/span>)
-   * @param   {string}          p4       ( - )
-   * @param   {string}          p5       (<span class="fire-detection-data">)
-   * @param   {string}          p6       (.*? found (?:verbatim|normalized))
-   * @param   {string}          p7       (<\/span>)
+   * @param   {string}    match    The matched <li>
+   * @param   {string}    p1       (<li class="fire-detection-item)
+   * @param   {string}    p2       ("><span class="fire-detection-name">)
+   * @param   {string}    p3       ((?:potentially bad keyword|bad phone number) in \w+<\/span>)
+   * @param   {string}    p4       ( - )
+   * @param   {string}    p5       (<span class="fire-detection-data">)
+   * @param   {string}    p6       (.*? found (?:verbatim|normalized))
+   * @param   {string}    p7       (<\/span>)
    *
-   * @returns {string}                   The processed text to use in the why <li>
+   * @returns {string}             The processed text to use in the why <li>
    */
   function substitutePhoneNubmers(match, p1, p2, p3, p4, p5, p6, p7) { // eslint-disable-line max-params
     const start = `${p1} fire-blacklist-detection fire-blacklisted-number-detection${p2}${p3}${p4}${p5}`;
@@ -1590,9 +1619,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}          why      The why text
+   * @param   {string}    why   The why text
    *
-   * @returns {string}                   The HTML text to display.
+   * @returns {string}          The HTML text to display.
    */
   function generateDisplayWhyFromWhy(why) {
     // Escape everything in the why.
@@ -1690,6 +1719,8 @@
    *
    * @private
    * @memberof module:fire
+   *
+   * @param   {DOM_node}    this    The FIRE button which was clicked.
    */
   function openReportPopup() {
     if (fire.isOpen && $('.fire-popup').length > 0) {
@@ -1941,6 +1972,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function openSettingsPopup() {
     if (fire.settingsAreOpen) {
@@ -2063,7 +2095,7 @@
    * @private
    * @memberof module:fire
    *
-   * @returns {object} The previously closed popup's button (if any) so it can be re-opened.
+   * @returns {object}    The previously closed popup's button (if any) so it can be re-opened.
    */
   function closePopup() {
     fire.sendingFeedback = false;
@@ -2103,7 +2135,7 @@
    * @private
    * @memberof module:fire
    *
-   * @returns {number} The `left` position for the popup.
+   * @returns {number}    The `left` position for the popup.
    */
   function getPopupLeft() {
     const w = (window.innerWidth - $('#sidebar').width()) / 2;
@@ -2117,6 +2149,7 @@
    * @memberof module:fire
    *
    * @param   {object}    jqXHR     The jqXHR Object from a MS or SE AJAX call.
+   *
    * @returns {object}              Data from jqXHR.responseText
    */
   function getJqXHRmessage(jqXHR) {
@@ -2133,9 +2166,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} data     The report data.
-   * @param {string} verdict  The chosen verdict.
-   * @param {string} flagType The chosen flag type.
+   * @param   {object}    data        The report data.
+   * @param   {string}    verdict     The chosen verdict.
+   * @param   {string}    flagType    The chosen flag type.
    */
   function postMetaSmokeFeedbackAndFlag(data, verdict, flagType) {
     if (!fire.sendingFeedback) {
@@ -2198,7 +2231,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object} feedbackResult   An Object with 'success', 'info', 'warning', or 'error' properties that can be sent to the toastr method of that name.
+   * @param   {object}    feedbackResult    An Object with 'success', 'info', 'warning', or 'error' properties that can be sent to the toastr method of that name.
    */
   function toastrFeedbackResult(feedbackResult) {
     Object.entries(feedbackResult).forEach(([key, value]) => {
@@ -2214,10 +2247,11 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object} data             The report data.
-   * @param   {string} flagType         The chosen type of flag ('spam' || 'rude' || 'abusive'). 'spam' is default.
-   * @param   {object} feedbackResult   An Object with 'success', 'info', 'warning', or 'error' properties that can be sent to the toastr method of that name.
-   * @returns {undefined}               returns undefined to break out of the function.
+   * @param   {object}       data             The report data.
+   * @param   {string}       flagType         The chosen type of flag ('spam' || 'rude' || 'abusive'). 'spam' is default.
+   * @param   {object}       feedbackResult   An Object with 'success', 'info', 'warning', or 'error' properties that can be sent to the toastr method of that name.
+   *
+   * @returns {undefined}                     Returns undefined to break out of the function.
    */
   function postMetaSmokeFlag(data, flagType, feedbackResult) {
     const {url, key} = fire.api.ms;
@@ -2315,8 +2349,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {(number|string|array)} keyCodes An number, string, or array of numbers or strings containing keys or keycodes.
-   * @returns {array.number}                   An array of keyCodes mapped from the input chars / keyCodes.
+   * @param   {(number|string|array)}    keyCodes    An number, string, or array of numbers or strings containing keys or keycodes.
+   *
+   * @returns {array.number}                         An array of keyCodes mapped from the input chars / keyCodes.
    */
   function keyCodesToArray(keyCodes) {
     if (!Array.isArray(keyCodes)) {
@@ -2336,10 +2371,10 @@
   /**
    * numpad - Get the numpad keyCode for the passed number.
    *
-   * @param {number|string}   numberKey   The value to get the keyCode for.
-   * @param {object}          constants   An optional reference to FIRE's constants, for when `fire` is not yet declared.
+   * @param   {number|string}    numberKey      The value to get the keyCode for.
+   * @param   {object}           [constants]    An optional reference to FIRE's constants, for when `fire` is not yet declared.
    *
-   * @returns {number} the keypad keyCode for the passed number.
+   * @returns {number}                          The keypad keyCode for the passed number.
    */
   function numpad(numberKey, constants) {
     return String(numberKey).charCodeAt(0) + (constants || fire.constants).numpadOffset;
@@ -2351,13 +2386,14 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object}                data     the report data.
-   * @param   {(number|string|array)} keyCodes The keyCodes to use for this button.
-   * @param   {string}                text     The text to display for this button.
-   * @param   {string}                verdict  This button's metasmoke verdict
-   * @param   {string}                flagType This button's flag type
-   * @param   {string}                tooltip  The tooltip to display for this button.
-   * @returns {object}                         The constructed feedback button.
+   * @param   {object}                   data        The report data.
+   * @param   {(number|string|array)}    keyCodes    The keyCodes to use for this button.
+   * @param   {string}                   text        The text to display for this button.
+   * @param   {string}                   verdict     This button's metasmoke verdict
+   * @param   {string}                   flagType    This button's flag type
+   * @param   {string}                   tooltip     The tooltip to display for this button.
+   *
+   * @returns {object}                               The constructed feedback button.
    */
   function createFeedbackButton(data, keyCodes, text, verdict, flagType, tooltip) { // eslint-disable-line max-params
     let count;
@@ -2419,8 +2455,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {function} clickHandler The button's `click` handler.
-   * @returns {object}                The constructed "close" button.
+   * @param   {function}    clickHandler    The button's `click` handler.
+   *
+   * @returns {object}                      The constructed "close" button.
    */
   function createCloseButton(clickHandler) {
     return newEl('a', 'button fire-close-button', {
@@ -2471,11 +2508,11 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string} tagName    The tag to create.
-   * @param   {string} [cssClass] The tag's css class. Optional. If this is an object, this is assumed to be `options`.
-   * @param   {object} [options]  The options to use for the created element.
+   * @param   {string}    tagName       The tag to create.
+   * @param   {string}    [cssClass]    The tag's css class. Optional. If this is an object, this is assumed to be `options`.
+   * @param   {object}    [options]     The options to use for the created element.
    *
-   * @returns {object}            A jQuery DOM node.
+   * @returns {object}                  A jQuery DOM node.
    */
   function newEl(tagName, cssClass, options) {
     if (typeof cssClass === 'object') {
@@ -2500,7 +2537,7 @@
    * @private
    * @memberof module:fire
    *
-   * @returns {object} A jQuery `<br />` DOM node.
+   * @returns {object}    A jQuery `<br />` DOM node.
    */
   function br() {
     return newEl('br');
@@ -2512,8 +2549,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object} contents A jQuery DOM node to use insert into the span.
-   * @returns {object}          A jQuery `<span>` DOM node with the specified contents.
+   * @param   {object}    contents    A jQuery DOM node to insert into the new span.
+   *
+   * @returns {object}                A jQuery `<span>` DOM node with the specified contents.
    */
   function span(contents) {
     return newEl('span', {html: contents});
@@ -2525,9 +2563,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}   text         The button's text
-   * @param   {function} clickHandler The button's click handler.
-   * @returns {object}                A jQuery `<button>` DOM node.
+   * @param   {string}      text            The button's text
+   * @param   {function}    clickHandler    The button's click handler.
+   *
+   * @returns {object}                      A jQuery `<button>` DOM node.
    */
   function button(text, clickHandler) {
     return newEl('a', 'button', {
@@ -2541,6 +2580,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function hasEmojiSupport() {
     const canvas = document.createElement('canvas');
@@ -2562,9 +2602,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}  emoji         The emoji to render
-   * @param   {boolean} [large=false] Make it large?
-   * @returns {object}                A jQuery `<span>` DOM node with the specified emoji as string or image.
+   * @param   {string}     emoji            The emoji to render
+   * @param   {boolean}    [large=false]    Make it large?
+   *
+   * @returns {object}                      A jQuery `<span>` DOM node with the specified emoji as string or image.
    */
   function emojiOrImage(emoji, large) {
     emoji = fire.constants.emoji[emoji] || emoji;
@@ -2589,6 +2630,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function injectExternalScripts() {
     jQuery.Deferred().reject()
@@ -2611,9 +2653,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}        path       The path to the CSS file.
+   * @param   {string}      path    The path to the CSS file.
    *
-   * @returns {Deferred}                 Deferred Object resolving upon success; rejecting upon error.
+   * @returns {Deferred}            Deferred Object resolving upon success; rejecting upon error.
    */
   function injectCSS(path) {
     return jQuery.Deferred((deferred) => {
@@ -2633,10 +2675,10 @@
    * @private
    * @memberof module:fire
    *
-   * @param {falsy/truthy}   load       If truthy, this function loads the script. Falsy indicates it's already loaded.
-   * @param {string}         path       The script's path.
-   * @param {function}       [callback] An optional "success" callback.
-   * @param {function}       [always]   An optional "always" callback.
+   * @param   {falsy/truthy}    load          If truthy, this function loads the script. Falsy indicates it's already loaded.
+   * @param   {string}          path          The script's path.
+   * @param   {function}        [callback]    An optional "success" callback.
+   * @param   {function}        [always]      An optional "always" callback.
    */
   function injectScript(load, path, callback, always) {
     if (load) {
@@ -2657,6 +2699,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function loadToastrCss() {
     injectCSS('//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css');
@@ -2667,6 +2710,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function initializeToastr() {
     toastr.options = {
@@ -2700,6 +2744,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function registerOpenLastReportKey() {
     $(document).on('keydown', ({keyCode, ctrlKey, altKey, metaKey, shiftKey}) => {
@@ -2719,6 +2764,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function registerAnchorHover() {
     const selector = '[fire-tooltip]';
@@ -2748,6 +2794,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function registerWebSocket() {
     if (fire.webSocket) {
@@ -2778,9 +2825,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} object          The object to register the property on.
-   * @param {string} key             The key to use on the object.
-   * @param {string} localStorageKey The key to use in `localStorage`.
+   * @param   {object}    object             The object to register the property on.
+   * @param   {string}    key                The key to use on the object.
+   * @param   {string}    localStorageKey    The key to use in `localStorage`.
    */
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
@@ -2796,6 +2843,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function registerLoggingFunctions() {
     fire.log = getLogger('log');
@@ -2809,6 +2857,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function showFireOnExistingMessages() {
     $('#getmore, #getmore-mine')
@@ -2828,7 +2877,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {number} timeout The time to wait before trying to decorate the messages.
+   * @param   {number}    timeout    The time to wait before trying to decorate the messages.
    */
   function decorateExistingMessages(timeout) {
     const chat = $(/^\/(?:search|users)/.test(window.location.pathname) ? '#content' : '#chat,#transcript');
@@ -2862,8 +2911,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {function} fn the console function to wrap in a `debug` condition.
-   * @returns {function}    A fire-wrapped console function.
+   * @param   {function}    fn    The console function to wrap in a `debug` condition.
+   *
+   * @returns {function}          A fire-wrapped console function.
    */
   function getLogger(fn) {
     return (...args) => {
@@ -2881,7 +2931,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {object} message The socket message.
+   * @param   {object}    message    The socket message.
    */
   function socketOnMessage(message) {
     const data = JSON.parse(message.data);
@@ -2918,6 +2968,7 @@
    *
    * @private
    * @memberof module:fire
+   *
    */
   function expandLinksOnHover() {
     $('.fire-popup-body a').each((i, element) =>
@@ -2931,8 +2982,8 @@
    * @private
    * @memberof module:fire
    *
-   * @param {function} hOP            `Object.hasOwnProperty` bound securely.
-   * @param {objects}  defaultStorage localStorage's default settings.
+   * @param   {function}    hOP               `Object.hasOwnProperty` bound securely.
+   * @param   {objects}     defaultStorage    localStorage's default settings.
    */
   function initLocalStorage(hOP, defaultStorage) {
     registerForLocalStorage(fire, 'userData', 'fire-user-data');
@@ -2965,8 +3016,8 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string} key   the `localStorage` key.
-   * @param {object} value the value to set.
+   * @param   {string}    key      The `localStorage` key.
+   * @param   {object}    value    The value to set.
    */
   function setValue(key, value) {
     const data = fire.userData;
@@ -2980,7 +3031,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {string} key the `localStorage` key.
+   * @param   {string}    key    The `localStorage` key.
    */
   function clearValue(key) {
     const data = fire.userData;
@@ -2994,7 +3045,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param {number}  count          The number of attempts already made. Initial calls to this function usually do not provide this parameter.
+   * @param   {number}   count    The number of attempts already made. Initial calls to this function usually do not provide this parameter.
    */
   function getCurrentChatUser(count) {
     // This will loop until it successfully gets the user from CHAT, unless it's not available, then a stored version is used.
@@ -3031,7 +3082,7 @@
    * @private
    * @memberof module:fire
    *
-   * @returns {object} FIRE's constants
+   * @returns {object}    FIRE's constants
    */
   function getFireConstants() {
     return {

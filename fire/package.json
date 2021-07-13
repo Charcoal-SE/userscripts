@@ -67,17 +67,29 @@
       "capitalized-comments": "off",
       "valid-jsdoc": ["error",
         {
-          "prefer": {"return": "returns"},
+          "prefer": {
+            "return": "returns"
+          },
           "preferType": {
-            "String": "string", "str": "string",
-            "Number": "number", "int": "number",
-            "Boolean": "boolean", "bool": "boolean",
-            "Object": "object", "obj": "object",
-            "Array": "array", "arr": "array",
-            "Function": "function", "fn": "function", "func": "function",
+            "Array": "array",
+            "arr": "array",
+            "Boolean": "boolean",
+            "bool": "boolean",
+            "Function": "function",
+            "fn": "function",
+            "func": "function",
+            "int": "number",
+            "Number": "number",
+            "String": "string",
+            "str": "string",
+            "Object": "object",
+            "obj": "object",
             "type": "a valid type"
           },
           "requireReturn": false,
+          "requireReturnType": true,
+          "requireParamDescription": true,
+          "requireReturnDescription": true,
           "matchDescription": "[A-Z].+\\."
         }
       ],
