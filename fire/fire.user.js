@@ -2438,12 +2438,13 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {string}   id         The option's name.
-   * @param   {boolean}  value      The option's current value.
-   * @param   {function} handler    The option's click handler.
-   * @param   {string}   labelText  The text to show next to the checkbox.
-   * @param   {string}   headerText The header to show above the checkbox.
-   * @returns {object}              The constructed settings checkbox.
+   * @param   {string}      id              The option's name.
+   * @param   {boolean}     value           The option's current value.
+   * @param   {function}    handler         The option's click handler.
+   * @param   {string}      labelText       The text to show next to the checkbox.
+   * @param   {string}      [headerText]    The header to show above the checkbox (optional).
+   *
+   * @returns {object}                      The constructed settings checkbox.
    */
   function createSettingsCheckBox(id, value, handler, labelText, headerText) {
     const checkBox = newEl('input', {
@@ -2459,7 +2460,7 @@
     });
 
     return newEl('div')
-      .append(newEl('h3', {text: headerText}))
+      .append(headerText ? newEl('h3', {text: headerText}) : '')
       .append(checkBox)
       .append(label);
   }
