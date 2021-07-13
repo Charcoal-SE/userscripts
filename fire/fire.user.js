@@ -1898,7 +1898,7 @@
 
     const versionLink = newEl('a', 'fire-version-link', {
       text: fire.metaData.version,
-      href: `${fire.metaData.downloadURL}?${new Date().getTime()}`,
+      href: `${fire.metaData.downloadURL || ((GM_info.scriptMetaStr || '').match(/@downloadURL\s+(http.*)$/m) || ['', ''])[1]}?${new Date().getTime()}`,
       target: '_self',
       title: 'Update',
     });
