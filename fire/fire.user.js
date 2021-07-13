@@ -2635,7 +2635,7 @@
   function hasEmojiSupport() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const smiley = fire.constants.emoji.smile; // :smile: String.fromCharCode(55357) + String.fromCharCode(56835)
+    const smiley = fire.constants.emoji.smile; // :smile: String.fromCharCode(55357, 56835)
 
     ctx.textBaseline = 'top';
     ctx.font = '32px Arial';
@@ -3192,18 +3192,18 @@
         notFound: 404,
         conflict: 409,
       },
+      /* eslint-disable no-magic-numbers */
       emoji: {
-        /* eslint-disable no-magic-numbers */
         fire: String.fromCodePoint(0x1F525),
         user: String.fromCodePoint(0x1F464),
-        gear: String.fromCodePoint(0x2699) + String.fromCodePoint(0xFE0F),
-        pencil: String.fromCodePoint(0x270F) + String.fromCodePoint(0xFE0F), // This produces the expected multi-color version.
+        gear: String.fromCodePoint(0x2699, 0xFE0F),
+        pencil: String.fromCodePoint(0x270F, 0xFE0F), // This produces the expected multi-color version.
         smile: String.fromCodePoint(0x1F604),
         clipboard: String.fromCodePoint(0x1F4CB),
-        flag: String.fromCodePoint(0x1F3F3) + String.fromCodePoint(0xFE0F),
+        flag: String.fromCodePoint(0x1F3F3, 0xFE0F),
         autoflag: String.fromCodePoint(0x1F3F4),
-        /* eslint-enable no-magic-numbers */
       },
+      /* eslint-enable no-magic-numbers */
       emojiSize: 16,
       siteDataCacheTime: 604800000, // 604800000 ms is 7 days (7 * 24 * 60 * 60 * 1000)
       hex: 16,
