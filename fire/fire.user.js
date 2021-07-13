@@ -331,7 +331,7 @@
    */
   function parseDataForReport(data, openAfterLoad, $this, skipLoadPost) {
     data.is_answer = data.link.includes('/a/');
-    data.site = parseSiteUrl(data.link);
+    data.site = getSEApiParamFromUrl(data.link);
     data.is_deleted = data.deleted_at !== null;
     data.message_id = Number.parseInt($this.closest('.message')[0].id.split('-')[1], 10);
 
@@ -366,7 +366,7 @@
   }
 
   /**
-   * parseSiteUrl - Parse a site url into a api parameter.
+   * getSEApiParamFromUrl - Parse a site url into a API parameter.
    *
    * @private
    * @memberof module:fire
@@ -375,9 +375,10 @@
    *
    * @returns {string}           The Stack Exchange API name for the report's site.
    */
-  function parseSiteUrl(url) {
-    return url.split(/\.com|\.net/)[0]
-      .replace(/\.stackexchange|(https?:)?\/+/g, '');
+  function getSEApiParamFromUrl(url) {
+    return url.replace(/(https?:)?\/+/, '')
+      .split(/\.com|\//)[0]
+      .replace(/\.stackexchange/g, '');
   }
 
   /**
@@ -609,7 +610,7 @@
       const {sites} = fire;
 
       accounts.forEach((site) => {
-        site.apiName = parseSiteUrl(site.site_url);
+        site.apiName = getSEApiParamFromUrl(site.site_url);
 
         if (sites[site.apiName]) {
           sites[site.apiName].account = site;
