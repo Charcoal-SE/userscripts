@@ -1730,6 +1730,8 @@
     }
 
     const that = this;
+    const $that = $(that);
+    sendFireEvent($that, 'popup-opening');
 
     if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
       getWriteToken(() => {
@@ -1742,7 +1744,6 @@
 
     fire.isOpen = that;
 
-    const $that = $(that);
     const url = $that.data('url');
     let postData;
 
@@ -1753,6 +1754,7 @@
       return;
     }
 
+    sendFireEventWithPopupPostData(postData, $that, 'popup-opening-have-data');
     const site = fire.sites[postData.site] || fire.sites[`${postData.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${postData.site}/img/apple-touch-icon.png`;
 
@@ -1942,6 +1944,7 @@
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
     document.addEventListener('keypress', stopPropagationIfTargetBody, true);
+    sendFireEventWithPopupPostData(postData, $that, 'popup-open');
   }
 
   /**
@@ -1981,6 +1984,7 @@
       return;
     }
 
+    sendFireEvent(fire.isOpen, 'settings-opening');
     fire.settingsAreOpen = true;
 
     const popup = newEl('div', 'fire-popup', {id: 'fire-settings'})
@@ -2088,6 +2092,47 @@
       .hide()
       .appendTo('body')
       .fadeIn('fast');
+
+    sendFireEvent(fire.isOpen, 'settings-open');
+  }
+
+  /**
+   * sendFireEventWithPopupPostData - Trigger a custom DOM event for FIRE and include the current popup's post data.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}                 data                    The post record data.
+   * @param   {element|jQuery}         element                 The element on which to fire the event.
+   * @param   {string}                 baseEventName           The base name of the event, which will be prepended with "fire-".
+   * @param   {JSON_encodable_data}    additionalDetail        Additional JSON-ifiable data to be sent with the event.
+   * @param   {object}                 additionalProperties    Additional properties for the event.
+   */
+  function sendFireEventWithPopupPostData(data, element, baseEventName, additionalDetail = {}, additionalProperties) {
+    const postData = getMSDataCopy(data);
+    if (postData && postData.se) {
+      delete postData.se.available_flags; // Remove private data
+    }
+    delete postData.fire_button; // Non-JSONifiable
+    sendFireEvent(element, baseEventName, Object.assign({postData}, additionalDetail), additionalProperties);
+  }
+
+  /**
+   * sendFireEvent - Trigger a custom DOM event for FIRE.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {element|jQuery}         element                 The element on which to fire the event.
+   * @param   {string}                 baseEventName           The base name of the event, which will be prepended with "fire-".
+   * @param   {JSON_encodable_data}    detail                  Additional JSON-ifiable data to be sent with the event.
+   * @param   {object}                 additionalProperties    Additional properties for the event.
+   */
+  function sendFireEvent(element, baseEventName, detail = {}, additionalProperties = {bubbles: true, cancelable: true}) {
+    element = $(element);
+    element.each(function () {
+      this.dispatchEvent(new CustomEvent(`fire-${baseEventName}`, Object.assign({detail: JSON.stringify(detail)}, additionalProperties)));
+    });
   }
 
   /**
@@ -2100,7 +2145,9 @@
    */
   function closePopup() {
     fire.sendingFeedback = false;
+    const fireButton = fire.isOpen;
     if (fire.settingsAreOpen) {
+      sendFireEvent(fireButton, 'settings-closing');
       const selector = '.fire-popup#fire-settings';
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
@@ -2109,7 +2156,9 @@
         $('#container').removeClass('fire-blur');
       }
       delete fire.settingsAreOpen;
+      sendFireEvent(fireButton, 'settings-closed');
     } else {
+      sendFireEvent(fireButton, 'popup-closing');
       const selector = '.fire-popup, .fire-popup-modal';
       $(selector)
         .fadeOut('fast', () => $(selector).remove());
@@ -2123,6 +2172,7 @@
 
       const previous = fire.isOpen;
       delete fire.isOpen;
+      sendFireEvent(fireButton, 'popup-closed');
 
       return previous;
     }
@@ -2758,6 +2808,51 @@
     });
 
     fire.log('Registered "Open last report" key.');
+  }
+
+  /**
+   * jsonCopy - Copy an Object using JSON.parse(JSON.stringify()).
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}    data    The Object to copy
+   *
+   * @returns {object}            A copy of the Object
+   */
+  function jsonCopy(data) {
+    if (typeof data === 'undefined') {
+      return data;
+    }
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  /**
+   * getMSDataCopy - Create a copy of the MS report data using JSON, but keep a reference to non-JSON-ifiable data.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}    data    The MS report data.
+   *
+   * @returns {object}            A copy of the MS report data.
+   */
+  function getMSDataCopy(data) {
+    if (!data) {
+      return data;
+    }
+    const nonJSONProps = ['fire_button'];
+    const originals = {};
+    nonJSONProps.forEach((key) => {
+      originals[key] = data[key];
+      delete data[key];
+    });
+    const copy = jsonCopy(data);
+    nonJSONProps.forEach((key) => {
+      data[key] = originals[key];
+      copy[key] = originals[key];
+    });
+    return copy;
   }
 
   /**
