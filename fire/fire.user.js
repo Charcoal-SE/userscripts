@@ -1904,6 +1904,7 @@
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${displayWhy}`)
             .html(),
         })
+          .attr('data-fire-tooltip-can-lock-open', 'true')
           .append(newEl('h2', 'fire-post-title')
             .append(newEl('em', {html: title}))
           )
@@ -2890,24 +2891,108 @@
    */
   function registerAnchorHover() {
     const selector = '[fire-tooltip]';
-    $('body')
-      .on('mouseenter', selector, ({currentTarget}) => {
-        $('.fire-tooltip').remove();
-        const element = $(currentTarget);
-        element.after(
-          newEl('span', 'fire-tooltip', {html: element.attr('fire-tooltip')})
-        );
-      })
-      .on('mousemove', selector, ({clientX, clientY}) => {
-        $('.fire-tooltip').css({
-          left: clientX + fire.constants.tooltipOffset,
-          top: clientY + fire.constants.tooltipOffsetSmall,
-        });
-      })
-      .on('mouseleave', selector,
-        () => $('.fire-tooltip').remove()
-      );
+    const $body = $(document.body);
+    const {tooltipOffset} = fire.constants;
+    const {tooltipOffsetSmall} = fire.constants;
+    let $tooltip = $();
+    let ignoreEvents = false;
+    let currentTooltipsElement = $();
 
+    /**
+     * tooltipMousemove - Move the tooltip when the mouse is moved.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {event}    {clientX, clientY}    The X and Y position of the mouse from the event
+     */
+    function tooltipMousemove({clientX, clientY}) {
+      if (ignoreEvents) {
+        return;
+      }
+      if ($tooltip.length === 0) {
+        // Only do a DOM walk if the tooltip isn't already defined.
+        $tooltip = $('.fire-tooltip').first();
+      }
+      $tooltip.css({
+        left: clientX + tooltipOffset,
+        top: clientY + tooltipOffsetSmall,
+      });
+    }
+
+    /**
+     * tooltipsElementClick - Toggle locking the tooltip upon clicking the tooltip's element.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {event}      {clientX, clientY}    The X and Y position of the mouse from the event
+     *
+     * @returns {false}                            Returns false to prevent event propagation.
+     */
+    function tooltipsElementClick() {
+      ignoreEvents = !ignoreEvents;
+      const currentTooltip = $(this)
+        .closest(selector)
+        .parent()
+        .children('.fire-tooltip');
+      if (currentTooltip.length > 0) {
+        $tooltip = currentTooltip;
+        if (ignoreEvents) {
+          $tooltip.css('pointer-events', 'unset');
+        } else {
+          $tooltip.css('pointer-events', '');
+        }
+      }
+      return false;
+    }
+
+    /**
+     * stopShowingTooltip - Stop showing the tooltip.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     */
+    function stopShowingTooltip() {
+      $('.fire-tooltip').remove();
+      $body.off('mousemove', selector, tooltipMousemove);
+      currentTooltipsElement.off('click', tooltipsElementClick);
+      $tooltip = $();
+      currentTooltipsElement = $();
+      ignoreEvents = false;
+    }
+
+    $body
+      .on('mouseenter', selector, ({currentTarget, clientX, clientY}) => {
+        if (ignoreEvents) {
+          return;
+        }
+        stopShowingTooltip();
+        currentTooltipsElement = $(currentTarget);
+        currentTooltipsElement
+          .after(
+            newEl('span', 'fire-tooltip', {html: currentTooltipsElement.attr('fire-tooltip')})
+          );
+        $body.on('mousemove', selector, tooltipMousemove);
+        // Move the tooltip to the current position.
+        tooltipMousemove({clientX, clientY});
+        if (currentTooltipsElement.attr('data-fire-tooltip-can-lock-open')) {
+          currentTooltipsElement.on('click', tooltipsElementClick);
+        }
+      })
+      .on('mouseleave', selector, () => {
+        if (!ignoreEvents) {
+          stopShowingTooltip();
+        }
+      })
+      .on('fire-settings-closed fire-popup-closed', stopShowingTooltip)
+      .on('click', (event) => {
+        const $target = $(event.target);
+        if (!$target.is(selector) && $target.closest('.fire-tooltip').length === 0) {
+          stopShowingTooltip();
+        }
+      });
     fire.log('Registered anchor hover tooltip.');
   }
 
