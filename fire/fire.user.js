@@ -1716,6 +1716,44 @@
   }
 
   /**
+   * pointRelativeURLsToSourceSESite - In place, change relative link URLs to point to the source SE site.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery}    reportBody    jQuery Object containing the post body wrapped in a <div>.
+   * @param   {object}    postData      The data for the post.
+   */
+  function pointRelativeURLsToSourceSESite(reportBody, postData) {
+    // Convert relative URLs to point to the URL on the source site.
+    // SE uses these for tags and some site-specific functionality (e.g. circuit simulation on Electronics)
+    const [, siteHref] = (postData.link || '').match(/^((?:https?:)?\/\/(?:[a-z\d-]+\.)+[a-z\d-]+\/)/i) || ['', ''];
+    // A couple of reports which had this problem:
+    //   https://chat.stackexchange.com/transcript/11540?m=55601336#55601336  (links at bottom)
+    //   https://chat.stackexchange.com/transcript/11540?m=54674140#54674140  (tags)
+    reportBody.find('a').each(function () {
+      const $this = $(this);
+      let href = $this.attr('href');
+      if (!/^(?:[a-z]+:)?\/\//.test(href)) {
+        // It's not a fully qualified or protocol-relative link.
+        if (href.startsWith('/')) {
+          // The path is absolute
+          if (siteHref.endsWith('/')) {
+            href = href.replace('/', '');
+          }
+          this.href = siteHref + href;
+        } else {
+          // It's relative to the question (really shouldn't see any of these)
+          if (!siteHref.endsWith('/')) {
+            href = `/${href}`;
+          }
+          this.href = postData.link + href;
+        }
+      }
+    });
+  }
+
+  /**
    * openReportPopup - Build a report popup and show it. This is the click handler for FIRE buttons.
    *
    * @private
@@ -1830,30 +1868,8 @@
     const reportBody = generatePostBodyDivFromHtmlText(postData.body, false);
     // Convert relative URLs to point to the URL on the source site.
     // SE uses these for tags and some site-specific functionality (e.g. circuit simulation on Electronics)
-    const [, siteHref] = (postData.link || '').match(/^((?:https?:)?\/\/(?:[a-z\d-]+\.)+[a-z\d-]+\/)/i) || ['', ''];
-    // A couple of reports which had this problem:
-    //   https://chat.stackexchange.com/transcript/11540?m=55601336#55601336  (links at bottom)
-    //   https://chat.stackexchange.com/transcript/11540?m=54674140#54674140  (tags)
-    reportBody.find('a').each(function () {
-      const $this = $(this);
-      let href = $this.attr('href');
-      if (!/^(?:[a-z]+:)?\/\//.test(href)) {
-        // It's not a fully qualified or protocol-relative link.
-        if (href.startsWith('/')) {
-          // The path is absolute
-          if (siteHref.endsWith('/')) {
-            href = href.replace('/', '');
-          }
-          this.href = siteHref + href;
-        } else {
-          // It's relative to the question (really shouldn't see any of these)
-          if (!siteHref.endsWith('/')) {
-            href = `/${href}`;
-          }
-          this.href = postData.link + href;
-        }
-      }
-    });
+    pointRelativeURLsToSourceSESite(reportBody, postData);
+    // Activate spolers and add click event handlers.
     reportBody.find('blockquote.spoiler')
       .attr('data-spoiler', 'Reveal spoiler')
       .one('click', function () {
