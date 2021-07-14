@@ -903,7 +903,7 @@
 
         const fireButton = newEl('span', 'fire-button', {
           html: emojiOrImage('fire'),
-          click: openReportPopup,
+          click: fireButtonClickHandler,
         })
           .data('url', reportedUrl);
 
@@ -1754,20 +1754,31 @@
   }
 
   /**
-   * openReportPopup - Build a report popup and show it. This is the click handler for FIRE buttons.
+   * fireButtonClickHandler - Handle a click on a FIRE button: trigger the opening of a report popup.
    *
    * @private
    * @memberof module:fire
    *
    * @param   {DOM_node}    this    The FIRE button which was clicked.
    */
-  function openReportPopup() {
+  function fireButtonClickHandler() {
+    openReportPopup(this);
+  }
+
+  /**
+   * openReportPopup - Build a report popup and show it. This is the click handler for FIRE buttons.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {DOM_node}    fireButton    The FIRE button which was clicked.
+   */
+  function openReportPopup(fireButton) {
     if (fire.isOpen && $('.fire-popup').length > 0) {
       // Don't open the popup twice.
       return;
     }
 
-    const fireButton = this;
     const $fireButton = $(fireButton);
     sendFireEvent($fireButton, 'popup-opening');
 
@@ -1775,7 +1786,7 @@
       getWriteToken(() => {
         // Open the popup for the FIRE button clicked after getting the token.
         closePopup(); // Call this a second time.
-        setTimeout(() => openReportPopup.call(fireButton), fire.constants.loadAllMessagesDelay);
+        setTimeout(() => openReportPopup(fireButton), fire.constants.loadAllMessagesDelay);
       });
       return;
     }
@@ -2273,7 +2284,7 @@
               clearValue('metasmokeWriteToken');
               const previous = closePopup();
 
-              getWriteToken(() => openReportPopup.call(previous)); // Open the popup later
+              getWriteToken(() => openReportPopup(previous)); // Open the popup later
             } else {
               const error = span(`An error occurred sending post feedback "<em>${verdict}</em>" to metasmoke.`);
               if (fire.userData.flag && flagType) {
