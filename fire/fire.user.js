@@ -3038,7 +3038,16 @@
    */
   function registerForLocalStorage(object, key, localStorageKey) {
     Object.defineProperty(object, key, {
-      get: () => JSON.parse(localStorage.getItem(localStorageKey)),
+      get: () => {
+        const storage = localStorage.getItem(localStorageKey);
+        try {
+          return JSON.parse(storage);
+        } catch (error) {
+          console.error(error); // eslint-disable-line no-console
+          console.error('localStorageKey:', localStorageKey, '=', storage); // eslint-disable-line no-console
+          return {};
+        }
+      },
       set: (value) => {
         localStorage.setItem(localStorageKey, JSON.stringify(value));
       },
