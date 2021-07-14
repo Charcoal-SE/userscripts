@@ -558,37 +558,37 @@ img.fire-emoji-large {
     word-break: break-word;
     cursor: auto;
 
-      .fire-detections-list {
-        margin-left: 13px;
+    .fire-detections-list {
+      margin-left: 13px;
+    }
+
+    .fire-watchlist-detection, .fire-blacklist-detection {
+      .fire-detection-text, .fire-detection-name {
+        font-weight: bold;
       }
-
-      .fire-watchlist-detection, .fire-blacklist-detection {
-        .fire-detection-text, .fire-detection-name {
-          font-weight: bold;
-        }
-        .fire-detection-data {
-          margin-left: 10px;
-          display: block;
-        }
-        .fire-detection-positions {
-          display: block;
-        }
-        .fire-detection-list-separator {
-          display: none;
-        }
-      } // End of .fire-watchlist-detection, .fire-blacklist-detection
-
+      .fire-detection-data {
+        margin-left: 10px;
+        display: block;
+      }
       .fire-detection-positions {
-        text-indent: -20px;
-        &::before {
-          content: "▸";
-        }
+        display: block;
       }
+      .fire-detection-list-separator {
+        display: none;
+      }
+    } // End of .fire-watchlist-detection, .fire-blacklist-detection
 
-      .fire-detection-item {
-        padding-left: 15px;
-        text-indent: -15px;
+    .fire-detection-positions {
+      text-indent: -20px;
+      &::before {
+        content: "▸";
       }
+    }
+
+    .fire-detection-item {
+      padding-left: 15px;
+      text-indent: -15px;
+    }
   } // End .fire-tooltip
 
   &#fire-settings {
