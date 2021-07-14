@@ -1729,32 +1729,32 @@
       return;
     }
 
-    const that = this;
-    const $that = $(that);
-    sendFireEvent($that, 'popup-opening');
+    const fireButton = this;
+    const $fireButton = $(fireButton);
+    sendFireEvent($fireButton, 'popup-opening');
 
     if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
       getWriteToken(() => {
         // Open the popup for the FIRE button clicked after getting the token.
         closePopup(); // Call this a second time.
-        setTimeout(() => openReportPopup.call(that), fire.constants.loadAllMessagesDelay);
+        setTimeout(() => openReportPopup.call(fireButton), fire.constants.loadAllMessagesDelay);
       });
       return;
     }
 
-    fire.isOpen = that;
+    fire.isOpen = fireButton;
 
-    const url = $that.data('url');
+    const url = $fireButton.data('url');
     let postData;
 
     if (url && fire.reportCache[url] && !fire.reportCache[url].isExpired) {
       postData = fire.reportCache[url];
     } else {
-      loadDataForReport.call(that, true); // No data, so load it.
+      loadDataForReport.call(fireButton, true); // No data, so load it.
       return;
     }
 
-    sendFireEventWithPopupPostData(postData, $that, 'popup-opening-have-data');
+    sendFireEventWithPopupPostData(postData, $fireButton, 'popup-opening-have-data');
     const site = fire.sites[postData.site] || fire.sites[`${postData.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${postData.site}/img/apple-touch-icon.png`;
 
@@ -1944,7 +1944,7 @@
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
     document.addEventListener('keypress', stopPropagationIfTargetBody, true);
-    sendFireEventWithPopupPostData(postData, $that, 'popup-open');
+    sendFireEventWithPopupPostData(postData, $fireButton, 'popup-open');
   }
 
   /**
