@@ -442,7 +442,8 @@ img.fire-emoji-large {
     max-width: 70vw;
     cursor: pointer;
     word-wrap: break-word;
-    word-break: break-word; }
+    word-break: break-word;
+    cursor: auto; }
     .fire-popup .fire-tooltip .fire-detections-list {
       margin-left: 13px; }
     .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-text, .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-name, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-text, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-name {
@@ -520,3 +521,6 @@ body.outside .fire-popup h2 {
   margin: 0 0 10px 0;
   padding: 0;
   line-height: inherit; }
+
+[data-fire-tooltip-can-lock-open] {
+  cursor: pointer; }
