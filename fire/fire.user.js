@@ -1711,6 +1711,12 @@
         detectionData.append(sorted);
       })
       .removeClass('fire-needs-sort');
+    // Link the URLs in "Blacklisted user" detection.
+    asDom
+      .find('.fire-detection-name:contains("Blacklisted user")')
+      .closest('.fire-detection-item')
+      .find('.fire-detection-data')
+      .html((index, html) => html.replace(/((?:https:)?\/\/[/\w.=?]*)/g, '<a href="$1" target="_blank">$1</a>'));
     const consolidatedDisplayWhy = asDom[0].outerHTML;
     return consolidatedDisplayWhy;
   }
