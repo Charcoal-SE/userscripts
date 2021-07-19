@@ -1839,17 +1839,25 @@
     if (!fire.userData.readOnly) {
       const buttonContainer = newEl('div', 'fire-popup-feedbackButtonContainer');
       top.append(buttonContainer);
-      /* eslint-disable no-multi-spaces */
+      const buttonGroup1 = newEl('span', 'fire-popup-feedbackButtonGroup');
+      const buttonGroup2 = buttonGroup1.clone();
       buttonContainer
+        .append(buttonGroup1)
+        .append(buttonGroup2);
+      /* eslint-disable no-multi-spaces */
+      buttonGroup1
         // Buttons that raise a flag and send feedback.
         .append(createFeedbackButton(postData, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'spam', 'True positive, blacklist user & spam flag (add user to blacklist)'))
         .append(createFeedbackButton(postData, ['2', 'r', numpad('2')], 'rude', 'tpu-', 'rude', 'Rude / Abusive, blacklist user & rude flag'))
+      ; // eslint-disable-line semi-style
+      buttonGroup2
         // Buttons that only send feedback.
         .append('<span style="float:left;padding:4px 5px 0px 15px;" title="The following don\'t raise a flag, they only submit feedback to metasmoke.">No flag:</span>')
         .append(createFeedbackButton(postData, ['3', 'T', numpad('3')], 'tpu-', 'tpu-', '',     'True positive & blacklist user; Don\'t raise a flag.'))
         .append(createFeedbackButton(postData, ['4', 'v', numpad('4')], 'tp-',  'tp-',  '',     'tp- (e.g. Vandalism; single case of undisclosed affiliation); Don\'t add user to blacklist. Don\'t raise a flag.'))
         .append(createFeedbackButton(postData, ['5', 'n', numpad('5')], 'naa-', 'naa-', '',     'Not an Answer / VLQ; Don\'t raise a flag.'))
-        .append(createFeedbackButton(postData, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'));
+        .append(createFeedbackButton(postData, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'))
+      ; // eslint-disable-line semi-style
       /* eslint-enable no-multi-spaces */
     }
 
@@ -1905,7 +1913,7 @@
 
     const body = newEl('div', 'fire-popup-body')
       .append(
-        newEl('div', {
+        newEl('div', 'fire-post-title-container', {
           'fire-tooltip': emojiOrImage('clipboard')
             .append(` - The reported post is a${suffix} ${postType.toLowerCase()}.\n\n${displayWhy}`)
             .html(),
@@ -1948,8 +1956,9 @@
 
     newEl('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
       .css({top: '5%', left: getPopupLeft()})
-      .append(top)
-      .append(body)
+      .append(newEl('div', 'fire-popup-inner')
+        .append(top)
+        .append(body))
       .append(settingsButton)
       .append(versionLink)
       .hide()

@@ -105,10 +105,16 @@ img.fire-emoji-large {
   top: 2vh !important;
   box-sizing: border-box;
 
+  .fire-popup-inner {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(85vh - 40px);
+  }
 
   // Header
   .fire-popup-header {
     min-height: 40px;
+    flex: none;
 
     a.button {
       margin: 0;
@@ -184,6 +190,7 @@ img.fire-emoji-large {
     border-radius: 5px;
     box-shadow: inset 0 0 10px -3px $shadow-color;
     position: relative;
+    flex: auto;
 
     .fire-report-info .fire-username {
       float: right;
