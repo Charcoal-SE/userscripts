@@ -257,22 +257,40 @@
   }
 
   /**
-   * loadDataForReport - Loads a report's data when you hover over the FIRE button.
+   * loadDataForButtonUponEvent - Wraps loadDataForButton so that it can be called by a jQuery event handler.
    *
    * @private
    * @memberof module:fire
    *
-   * @param   {boolean}     openAfterLoad    Open the report popup after load?
-   * @param   {DOM_node}    this             The FIRE button which was clicked.
+   * @param   {DOM_node}    this    The FIRE button where the event happened.
    */
-  function loadDataForReport(openAfterLoad) {
-    const $this = $(this);
-    const url = $this.data('url');
+  function loadDataForButtonUponEvent() {
+    loadDataForButton(this);
+  }
+
+  /**
+   * loadDataForButton - Loads the report and the report's data associated with a FIRE button.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {DOM_node|jQuery}    fireButton              The FIRE button
+   * @param   {boolean}            openAfterLoadOrEvent    Open the report popup after load?
+   *
+   */
+  function loadDataForButton(fireButton, openAfterLoadOrEvent) {
+    const $fireButton = $(fireButton);
+    const openAfterLoad = openAfterLoadOrEvent === true;
+    const url = $fireButton.data('url');
+
+    if (openAfterLoad) {
+      $fireButton.addClass('fire-data-loading');
+    }
 
     if (!fire.reportCache[url]) {
-      getDataForUrl(url, (data) => parseDataForReport(data, openAfterLoad, $this));
+      getDataForUrl(url, (data) => parseDataForReport(data, openAfterLoad, $fireButton));
     } else if (openAfterLoad === true) {
-      $this.click();
+      $fireButton.click();
     }
   }
 
@@ -901,15 +919,18 @@
           return;
         }
 
-        const fireButton = newEl('span', 'fire-button', {
-          html: emojiOrImage('fire'),
-          click: fireButtonClickHandler,
-        })
-          .data('url', reportedUrl);
-
+        const fireButton = newEl('span', 'fire-button', {click: fireButtonClickHandler})
+          .data('url', reportedUrl)
+          .append(newEl('span', 'fire-button-inner', {html: `${emojiOrImage('fire').html()}`}));
+        // Remove the leading space from the next text node
+        const textElAfterReportLink = reportLink[0].nextSibling;
+        if (textElAfterReportLink.nodeName === '#text') {
+          textElAfterReportLink.textContent = textElAfterReportLink.textContent.replace(/^ /, '');
+        }
+        // Add the FIRE button
         reportLink
           .after(fireButton)
-          .after(' | ');
+          .after(' |');
       }
     }
   }
@@ -1126,10 +1147,7 @@
    * @param    {object}    message    The message DOM node the report should be opened for.
    */
   function openReportPopupForMessage(message) {
-    loadDataForReport.call(
-      $(message).find('.fire-button'),
-      true
-    );
+    loadDataForButton($(message).find('.fire-button'), true);
   }
 
   /**
@@ -1722,6 +1740,20 @@
   }
 
   /**
+   * clearFireButtonLoading - Clear the loading state indication for a FIRE button.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {DOM_node|jQuery}    fireButton    The FIRE button
+   */
+  function clearFireButtonLoading(fireButton) {
+    const $fireButton = fireButton instanceof jQuery ? fireButton : $(fireButton);
+    $fireButton.removeClass('fire-data-loading');
+    clearTimeout(fire.popupLoadingTimeout);
+  }
+
+  /**
    * pointRelativeURLsToSourceSESite - In place, change relative link URLs to point to the source SE site.
    *
    * @private
@@ -1787,6 +1819,12 @@
 
     const $fireButton = $(fireButton);
     sendFireEvent($fireButton, 'popup-opening');
+    $fireButton.addClass('fire-data-loading');
+    clearTimeout(fire.popupLoadingTimeout);
+    fire.popupLoadingTimeout = setTimeout(() => {
+      toastr.error('Opening the popup timed out. You may want to check the console for errors.');
+      clearFireButtonLoading($fireButton);
+    }, fire.constants.popupOpeningTimeoutDelay);
 
     if (!fire.userData.metasmokeWriteToken && !fire.userData.readOnly) {
       getWriteToken(() => {
@@ -1805,7 +1843,7 @@
     if (url && fire.reportCache[url] && !fire.reportCache[url].isExpired) {
       postData = fire.reportCache[url];
     } else {
-      loadDataForReport.call(fireButton, true); // No data, so load it.
+      loadDataForButton(fireButton, true); // No data, so load it.
       return;
     }
 
@@ -1987,6 +2025,8 @@
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
     document.addEventListener('keypress', stopPropagationIfTargetBody, true);
+    $fireButton.removeClass('fire-data-loading');
+    clearTimeout(fire.popupLoadingTimeout);
     sendFireEventWithPopupPostData(postData, $fireButton, 'popup-open');
   }
 
@@ -2212,6 +2252,8 @@
       document.removeEventListener('keypress', stopPropagationIfTargetBody, true);
 
       $('#container').removeClass('fire-blur');
+
+      clearFireButtonLoading(fire.isOpen);
 
       const previous = fire.isOpen;
       delete fire.isOpen;
@@ -2844,7 +2886,7 @@
       if (keyCode === fire.constants.keys.space && ctrlKey && !altKey && !metaKey && !shiftKey) {
         const button = $('.fire-button').last(); // .content:not(.ai-deleted)
         if (button && button.length > 0) {
-          loadDataForReport.call(button, true);
+          loadDataForButton(button, true);
         }
       }
     });
@@ -3097,9 +3139,9 @@
     decorateExistingMessages(0);
 
     // Load report data on fire button hover
-    $('body').on('mouseenter', '.fire-button', loadDataForReport);
+    $('body').on('mouseenter', '.fire-button', loadDataForButtonUponEvent);
 
-    fire.log('Registered `loadDataForReport` and `decorateExistingMessages`');
+    fire.log('Registered `loadDataForButtonUponEvent` and `decorateExistingMessages`');
   }
 
   /**
@@ -3363,6 +3405,7 @@
       seAPIErrorDelay: 11000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a thottle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
       seAPIThrottleViolationDelay: 16000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a thottle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
       seAPIThrottleViolationStatus: 400,
+      popupOpeningTimeoutDelay: 90000,
       webSocketInitialOpenDelay: 3000,
     };
   }

@@ -32,13 +32,23 @@ img.fire-emoji-large {
   z-index: 100; }
 
 .fire-button {
-  cursor: pointer; }
+  cursor: pointer;
+  display: inline-block;
+  width: 20px;
+  position: relative;
+  padding-left: 4px;
+  box-sizing: border-box; }
   .fire-button.fire-done {
     filter: grayscale(100%);
     opacity: 0.5; }
   .fire-button .fire-emoji {
     position: relative;
     top: -2px; }
+  .fire-button .fire-button-inner {
+    display: inline-block; }
+  .fire-button.fire-data-loading .fire-button-inner {
+    animation: spinner 0.6s linear infinite;
+    cursor: wait; }
 
 .fire-popup {
   position: fixed;
@@ -530,3 +540,10 @@ body.outside .fire-popup h2 {
 
 [data-fire-tooltip-can-lock-open] {
   cursor: pointer; }
+
+.fire-spinner {
+  animation: spinner 0.6s linear infinite; }
+
+.fire-wait {
+  cursor: wait;
+  pointer-events: none; }
