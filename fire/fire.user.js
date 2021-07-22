@@ -1578,7 +1578,7 @@
     // We could do this in the HTML text, but we want a DOM anyway, and it's easier to do it as DOM.
     bodyAsDOM.body.querySelectorAll('img').forEach((image) => {
       image.dataset.src = image.src;
-      image.src = 'https://placehold.it/550x100//ffffff?text=Click+to+show+image.';
+      image.src = 'https://via.placeholder.com/550x100//ffffff?text=Click+to+show+image.';
     });
     return $(bodyAsDOM.body.firstChild);
   }
