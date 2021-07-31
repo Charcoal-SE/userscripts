@@ -115,8 +115,8 @@ img.fire-emoji-large {
   box-shadow: 0 0 20px 2px $shadow-color;
   width: calc(70% - 9vw);
   max-height: 85vh;
-  left: 6vw !important;
-  top: 2vh !important;
+  left: 6vw;
+  top: 2vh;
   box-sizing: border-box;
 
   .fire-popup-inner {
@@ -612,7 +612,7 @@ img.fire-emoji-large {
     }
   } // End .fire-tooltip
 
-  &#fire-settings {
+  &.fire-settings-popup {
     min-height: 460px;
 
     .fire-popup-header h2 {
@@ -635,8 +635,8 @@ img.fire-emoji-large {
   @media (min-width: 0px) and (max-width: 700px) {
     width: 96vw;
     max-height: 95vh;
-    left: 2vw !important;
-    top: 2vw !important;
+    left: 2vw;
+    top: 2vw;
     padding: 10px 10px 16px 10px;
 
     .fire-popup-body {
