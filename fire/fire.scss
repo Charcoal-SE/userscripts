@@ -629,6 +629,7 @@ img.fire-emoji-large {
   word-wrap: break-word;
   word-break: break-word;
   cursor: auto;
+  z-index: 1000;
 
   .fire-detections-list {
     margin-left: 13px;
