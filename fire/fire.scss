@@ -125,6 +125,12 @@ img.fire-emoji-large {
     max-height: calc(85vh - 40px);
   }
 
+  &.fire-readonly {
+    .fire-popup-header .fire-site-logo {
+      max-width: 475px;
+    }
+  }
+
   // Header
   .fire-popup-header {
     min-height: 40px;
@@ -604,12 +610,6 @@ img.fire-emoji-large {
   }
 
 } // End Popup container
-
-.fire-popup.fire-readonly {
-  .fire-popup-header .fire-site-logo {
-    max-width: 475px;
-  }
-}
 
 .fire-tooltip {
   position: fixed;
