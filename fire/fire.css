@@ -59,13 +59,15 @@ img.fire-emoji-large {
   box-shadow: 0 0 20px 2px #646464;
   width: calc(70% - 9vw);
   max-height: 85vh;
-  left: 6vw !important;
-  top: 2vh !important;
+  left: 6vw;
+  top: 2vh;
   box-sizing: border-box; }
   .fire-popup .fire-popup-inner {
     display: flex;
     flex-direction: column;
     max-height: calc(85vh - 40px); }
+  .fire-popup.fire-readonly .fire-popup-header .fire-site-logo {
+    max-width: 475px; }
   .fire-popup .fire-popup-header {
     min-height: 40px;
     flex: none; }
@@ -442,60 +444,24 @@ img.fire-emoji-large {
     margin: 0 4px; }
   .fire-popup .fire-position-select {
     text-transform: capitalize; }
-  .fire-popup .fire-tooltip {
-    position: fixed;
-    background: #eee;
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 0 10px 0 #888;
-    border: 1px solid #bbb;
-    pointer-events: none;
-    z-index: 100;
-    white-space: pre-line;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 12px;
-    max-width: 70vw;
-    cursor: pointer;
-    word-wrap: break-word;
-    word-break: break-word;
-    cursor: auto; }
-    .fire-popup .fire-tooltip .fire-detections-list {
-      margin-left: 13px; }
-    .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-text, .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-name, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-text, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-name {
-      font-weight: bold; }
-    .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-data, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-data {
-      margin-left: 10px;
-      display: block; }
-    .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-positions, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-positions {
-      display: block; }
-    .fire-popup .fire-tooltip .fire-watchlist-detection .fire-detection-list-separator, .fire-popup .fire-tooltip .fire-blacklist-detection .fire-detection-list-separator {
-      display: none; }
-    .fire-popup .fire-tooltip .fire-detection-positions {
-      text-indent: -20px; }
-      .fire-popup .fire-tooltip .fire-detection-positions::before {
-        content: "▸"; }
-    .fire-popup .fire-tooltip .fire-detection-item {
-      padding-left: 15px;
-      text-indent: -15px; }
-  .fire-popup#fire-settings {
+  .fire-popup.fire-settings-popup {
     min-height: 460px; }
-    .fire-popup#fire-settings .fire-popup-header h2 {
+    .fire-popup.fire-settings-popup .fire-popup-header h2 {
       display: inline-block; }
-    .fire-popup#fire-settings .fire-settings-section {
+    .fire-popup.fire-settings-popup .fire-settings-section {
       width: 290px;
       display: inline-block;
       vertical-align: top;
       padding: 5px; }
-    .fire-popup#fire-settings #toastr_duration {
+    .fire-popup.fire-settings-popup #toastr_duration {
       max-width: 50px;
       margin-top: 4px; }
   @media (min-width: 0px) and (max-width: 700px) {
     .fire-popup {
       width: 96vw;
       max-height: 95vh;
-      left: 2vw !important;
-      top: 2vw !important;
+      left: 2vw;
+      top: 2vw;
       padding: 10px 10px 16px 10px; }
       .fire-popup .fire-popup-body {
         max-height: calc(95vh - 120px); }
@@ -505,8 +471,42 @@ img.fire-emoji-large {
         margin: 5px 0px -10px 0;
         line-height: 8px; } }
 
-.fire-popup.fire-readonly .fire-popup-header .fire-site-logo {
-  max-width: 475px; }
+.fire-tooltip {
+  position: fixed;
+  background: #eee;
+  padding: 5px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px 0 #888;
+  border: 1px solid #bbb;
+  pointer-events: none;
+  z-index: 100;
+  white-space: pre-line;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 12px;
+  max-width: 70vw;
+  cursor: pointer;
+  word-wrap: break-word;
+  word-break: break-word;
+  cursor: auto; }
+  .fire-tooltip .fire-detections-list {
+    margin-left: 13px; }
+  .fire-tooltip .fire-watchlist-detection .fire-detection-text, .fire-tooltip .fire-watchlist-detection .fire-detection-name, .fire-tooltip .fire-blacklist-detection .fire-detection-text, .fire-tooltip .fire-blacklist-detection .fire-detection-name {
+    font-weight: bold; }
+  .fire-tooltip .fire-watchlist-detection .fire-detection-data, .fire-tooltip .fire-blacklist-detection .fire-detection-data {
+    margin-left: 10px;
+    display: block; }
+  .fire-tooltip .fire-watchlist-detection .fire-detection-positions, .fire-tooltip .fire-blacklist-detection .fire-detection-positions {
+    display: block; }
+  .fire-tooltip .fire-watchlist-detection .fire-detection-list-separator, .fire-tooltip .fire-blacklist-detection .fire-detection-list-separator {
+    display: none; }
+  .fire-tooltip .fire-detection-positions {
+    text-indent: -20px; }
+    .fire-tooltip .fire-detection-positions::before {
+      content: "▸"; }
+  .fire-tooltip .fire-detection-item {
+    padding-left: 15px;
+    text-indent: -15px; }
 
 @keyframes spinner {
   to {
