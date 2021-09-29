@@ -67,7 +67,7 @@ $(document).ready(() => {
     }
   });
 
-  $(document).on('keydown', 'input', ev => {
+  $(document).on('keydown', 'input, textarea', ev => {
     ev.stopPropagation();
   });
 });
