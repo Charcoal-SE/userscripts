@@ -1509,6 +1509,32 @@
   */
 
   /**
+   * getHtmlAsDOMWrappedInDiv - Generate a <div> containing the provided HTML text.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {string}          htmlText     The text to change into DOM nodes.
+   *
+   * @returns {DOM_node}                     <div> containing the DOM node representation of the HTML text.
+   */
+  function getHtmlAsDOMWrappedInDiv(htmlText) {
+    // If we just use jQuery to convert the HTML text to DOM, then the images are fetched, which might look suspicious if network traffic
+    //   is being monitored (e.g. in a work environment) and the image is NSFW. This avoids that happening until such time as the elements
+    //   are placed in the page DOM. Prior to that happening, we change the URL for images, if the user hasn't selected not to do so.
+    // This also prevents various code execution attack vectors which don't function when the new nodes are not elements created in
+    //   the page DOM. However, such code *IS* executed if the newly created nodes are just placed in the page DOM, even after this.
+    //   Thus, it's necessary for subsequent processing to remove those types of attack vectors.
+    // The htmlText may be malformed, so we wrap it in a div after conversion to DOM nodes.
+    const parser = new DOMParser();
+    const htmlAsDOM = parser.parseFromString(htmlText, 'text/html');
+    // The body here will often have multiple child nodes. We want everything wrapped in a div, so:
+    const newDiv = htmlAsDOM.createElement('div');
+    newDiv.append(...htmlAsDOM.body.childNodes);
+    return newDiv;
+  }
+
+  /**
    * generatePostBodyDivFromText - Generate a <div> containing the HTML for a post body from HTML text.
    *
    * @private
@@ -1553,7 +1579,6 @@
     // At this point, it's reasonably consistently formatted HTML, due to being processed from Markdown by SE.
     // On deleted posts where the MS data isn't available, d.body could be undefined.
 
-    const parser = new DOMParser();
     let processedBody = htmlText;
     if (!isTrusted) {
       // If we are converting HTML text received from SE, then we don't need to handle the HTML
@@ -1569,23 +1594,19 @@
     // At this point, if we just pass the HTML to jQuery, then the images are fetched, which might look suspicious if network traffic is being monitored
     //   (e.g. in a work environment) and the image is NSFW. Still need to avoid that.
     // ProcessedBody may be malformed, so we don't wrap it in a div in HTML text.
-    const bodyAsDOM = parser.parseFromString(processedBody, 'text/html');
-    // The body here will often have multiple child nodes. We want everything wrapped in a div, so:
-    const newDiv = bodyAsDOM.createElement('div');
-    newDiv.append(...bodyAsDOM.body.childNodes);
-    bodyAsDOM.body.append(newDiv);
+    const containingDiv = getHtmlAsDOMWrappedInDiv(processedBody);
     if (!isTrusted) {
-      convertChildElementsWithNonWhitelistedAttributesToText(bodyAsDOM.body.firstChild);
+      convertChildElementsWithNonWhitelistedAttributesToText(containingDiv);
     }
     // Change all the image src prior to inserting into main document DOM or letting jQuery see it.
     // Not doing that here would result in the browser making fetches for each image's URL, which
     // could be bad for NSFW images in some situations (e.g. someone using this from work).
     // We could do this in the HTML text, but we want a DOM anyway, and it's easier to do it as DOM.
-    bodyAsDOM.body.querySelectorAll('img').forEach((image) => {
+    containingDiv.querySelectorAll('img').forEach((image) => {
       image.dataset.src = image.src;
       image.src = 'https://via.placeholder.com/550x100//ffffff?text=Click+to+show+image.';
     });
-    return $(bodyAsDOM.body.firstChild);
+    return $(containingDiv);
   }
 
   /**
