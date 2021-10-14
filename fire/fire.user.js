@@ -2144,17 +2144,15 @@
 
     let requestStackExchangeTokenButton = $();
 
-    if (!fire.userData.stackexchangeWriteToken) {
-      requestStackExchangeTokenButton = newEl('p', 'fire-request-write-token')
-        .append(br())
-        .append(newEl('h3', {text: 'Stack Exchange write token:'}))
-        .append(newEl('p', {
-          html:
-            'Authorize FIRE with your Stack Exchange account.<br />' +
-            'This allows FIRE to load additional data for reported posts.',
-        }))
-        .append(button('Authorize FIRE with Stack Exchange', requestStackExchangeToken));
-    }
+    requestStackExchangeTokenButton = newEl('div', 'fire-settings-section fire-request-write-token')
+      .append(newEl('h3', {text: `Stack Exchange write token${(fire.userData.stackexchangeWriteToken ? ' (Re-request)' : '')} :`}))
+      .append(newEl('p', {
+        html:
+          'Authorize FIRE with your Stack Exchange account.<br />' +
+          'This allows FIRE to load additional data for reported posts and raise non-spam flags, in addition to spam flags raised through metasmoke.<br/>' +
+          `Current token (secret; DON'T SHARE): ${fire.userData.stackexchangeWriteToken}`,
+      }))
+      .append(button(`${(fire.userData.stackexchangeWriteToken ? 'Re-a' : 'A')}uthorize FIRE with Stack Exchange`, requestStackExchangeToken));
 
     const positionSelector = newEl('div')
       .append(br())
