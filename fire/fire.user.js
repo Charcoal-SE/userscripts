@@ -151,7 +151,7 @@
     registerAnchorHover();
     registerOpenLastReportKey();
     if (CHAT && CHAT.addEventHandlerHook) {
-      CHAT.addEventHandlerHook(chatListener);
+      CHAT.addEventHandlerHook(fireChatListener);
     }
 
     checkHashForWriteToken();
@@ -859,7 +859,7 @@
   }
 
   /**
-   * chatListener - Chat message event listener.
+   * fireChatListener - Chat message event listener.
    * If SmokeDetector reports another post, decorate the message.
    *
    * @private
@@ -870,7 +870,7 @@
    * @param   {number}    message.user_id       The message's userID
    * @param   {number}    message.message_id    The message ID
    */
-  function chatListener({event_type, user_id, message_id}) {
+  function fireChatListener({event_type, user_id, message_id}) {
     if (event_type === 1 && (user_id === fire.smokeDetectorId || user_id === fire.metasmokeId)) {
       setTimeout(() => {
         const message = $(`#message-${message_id}`);
