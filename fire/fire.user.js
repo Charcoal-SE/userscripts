@@ -3919,9 +3919,9 @@ body.outside .fire-popup h2 {
         }
         stopShowingTooltip();
         currentTooltipsElement = $(currentTarget);
-        currentTooltipsElement
-          .after(
-            newEl('span', 'fire-tooltip', {html: currentTooltipsElement.attr('fire-tooltip')})
+        $(document.body)
+          .prepend(
+            newEl('div', 'fire-tooltip', {html: currentTooltipsElement.attr('fire-tooltip')})
           );
         $body.on('mousemove', selector, tooltipMousemove);
         // Move the tooltip to the current position.
