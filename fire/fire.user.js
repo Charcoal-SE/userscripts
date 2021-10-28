@@ -2118,7 +2118,7 @@
     $userName
       .find('.fire-user-name')
       .text(postData.username)
-      .attr('href', postData.user_link ? postData.user_link : '');
+      .attr('href', postData.user_link ? postData.user_link : null);
     const userNameHtml = $userName.html();
 
     const displayWhy = generateDisplayWhyFromWhy(postData.why);
