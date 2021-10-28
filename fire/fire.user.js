@@ -741,7 +741,7 @@
     const parameters = {
       page,
       pagesize: 100,
-      filter: '!-rT(axL(',
+      filter: '!6Ej2_Ci3ywSrG4RRg8Ts.6-VAB4xX-LoWFDj)DvvqcC)22L6B0zDU0GsIZe',
       auth: true,
     };
 
