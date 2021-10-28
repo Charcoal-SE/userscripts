@@ -463,7 +463,7 @@
         if (response.items && response.items.length > 0) {
           report.se = report.se || {};
           [report.se.post] = response.items;
-          showReputation(report.se.post.owner.reputation);
+          showReputation(report);
           loadPostFlagStatus(report);
           loadPostRevisions(report);
         } else {
@@ -678,15 +678,23 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {number}    reputation    The user's reputation.
+   * @param   {object}    report   The metasmoke report.
    */
-  function showReputation(reputation) {
+  function showReputation(report) {
     const rep = $('.fire-user-reputation');
+    const isThisPost = $(`.fire-reported-post.fire-postid-${report.post_id}`).length > 0;
+    const reputation = (report.se && report.se.post && report.se.post.owner) ? report.se.post.owner.reputation : (report.user_reputation ? report.user_reputation : '');
 
-    rep.text(` (${reputation}) `);
+    if (isThisPost) {
+      if (reputation) {
+        rep.text(` (${reputation}) `);
+      } else {
+        rep.text(' ');
+      }
 
-    if (reputation !== 1) {
-      rep.addClass('fire-has-rep');
+      if (reputation > 1) {
+        rep.addClass('fire-has-rep');
+      }
     }
   }
 
@@ -2185,9 +2193,7 @@
 
     expandLinksOnHover();
 
-    if (postData.se && postData.se.post) {
-      showReputation(postData.se.post.owner.reputation);
-    }
+    showReputation(postData);
 
     $(document)
       .keydown(keyboardShortcuts)
