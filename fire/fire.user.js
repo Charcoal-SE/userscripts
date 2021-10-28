@@ -1395,7 +1395,7 @@
     // Get all elements within a <div>
     // Given that we might change some of the elements into text, this will allow us to get them again, if that occurs.
     // This no longer assumes that the current location in the DOM of the elements in the input does not need to be maintained (i.e. they will be moved).
-    container = container instanceof jQuery ? container : $(container);
+    container = $(container);
 
     /**
      * convertElements - In place, one pass of converting to text the decendents of a container which have non-whitelisted attributes.
