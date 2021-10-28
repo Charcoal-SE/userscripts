@@ -532,6 +532,146 @@
     }
   }
 
+  /* linkifyTextURLs was originally highlight text via RegExp
+   * Copied by Makyen from his use of it in MagicTag2, which was copied from Makyen's
+   * answer to: Highlight a word of text on the page using .replace() at:
+   *   https://stackoverflow.com/a/40712458/3773011
+   * and substantially rewritten for SOCVR's Archiver.
+   * It was then copied by Makyen to here and modified to add the option to not shorten the link text.
+   */
+
+  /**
+   * linkifyTextURLs - Modify in place HTTP/HTTPS URLs as plain text within a DOM into <a> links.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {DOM_node}         element            The element containing the DOM structure to change.
+   * @param   {truthy/falsey}    useSpan            If true, the new link is wrapped in a <span>.
+   * @param   {truthy/falsey}    shortenLinkText    If true, the text for the link isn't shortened to what SE does for such links in SE Chat.
+   *
+   */
+  function linkifyTextURLs(element, useSpan = false, shortenLinkText = true) {
+    // This changes bare http/https/ftp URLs into links with link-text a shortened version of the URL.
+    //   If useSpan is truthy, then a span with the new elements replaces the text node.
+    //   If useSpan is falsy, then the new nodes are added as children of the same element as the text node being replaced.
+    //   The [\u200c\u200b] characters are added by SE chat to facilitate word-wrapping & should be removed from the URL.
+    const minLengthToBeURL = 8;
+    const maxLengthShortenedDisplayURL = 32;
+    const maxLengthThresholdShortenedDisplayURL = maxLengthShortenedDisplayURL - 1;
+    const endOfShortenedDisplayURLSlice = maxLengthThresholdShortenedDisplayURL - 2;
+    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+,;=\u200c\u200b-]{2,}))/g; // eslint-disable-line no-useless-escape
+    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+,;=\u200c\u200b-]{2,})/g; // eslint-disable-line no-useless-escape
+    if (!element) {
+      throw new Error('element is invalid');
+    }
+
+    /**
+     * handleTextNode - Replace any bare URL in the supplied text Node with an <a>.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {DOM_Node}    textNode                The text Node to be checked for containing a bare URL.
+     * @param   {truthy}      innerShortenLinkText    If true, shorten the length of displayed URL text to what's used in SE Chat.
+     */
+    function handleTextNode(textNode, innerShortenLinkText = true) {
+      const textNodeParent = textNode.parentNode;
+      if (textNode.nodeName !== '#text' ||
+        textNodeParent.nodeName === 'SCRIPT' ||
+        textNodeParent.nodeName === 'STYLE'
+      ) {
+        // Don't do anything except on text nodes, which are not children of <script> or <style>.
+        return;
+      }
+      const origText = textNode.textContent;
+      urlSplitRegex.lastIndex = 0;
+      const splits = origText.split(urlSplitRegex);
+      // Only change the DOM if we detected a URL in the text
+      if (splits.length > 1) {
+        // Create a span to hold the new elements.
+        const newSpan = document.createElement('span');
+        splits.forEach((split) => {
+          if (!split) {
+            return;
+          } // else
+          urlRegex.lastIndex = 0;
+          // Remove the extra characters SE chat adds to long character sequences.
+          split = split.replace(/[\u200c\u200b]/g, '');
+          const newHtml = split.replace(urlRegex, (match, p1) => {
+            // Try to match what SE uses in chat.
+            if (innerShortenLinkText && p1.length > maxLengthShortenedDisplayURL) {
+              // Reduce length & add ellipse.
+              p1 = p1.split(/\//g).reduce((sum, part, index) => {
+                if (sum[sum.length - 1] === '…' || sum.length >= maxLengthThresholdShortenedDisplayURL) {
+                  // We've found all we want.
+                  return sum;
+                }
+                if (index === 0) {
+                  if (part.length > maxLengthThresholdShortenedDisplayURL) {
+                    return `${part.slice(0, endOfShortenedDisplayURLSlice)}…`;
+                  }
+                  return part;
+                }
+                if ((sum.length + part.length) > endOfShortenedDisplayURLSlice) {
+                  return `${sum}/…`;
+                }
+                return `${sum}/${part}`;
+              }, '');
+            }
+            return innerShortenLinkText ? `<a href="${match}">${p1}</a>` : `<a href="${match}">${match}</a>`;
+          });
+          // Compare the strings, as it should be faster than a second RegExp operation and
+          //   lets us use the RegExp in only one place.
+          if (newHtml === split) {
+            // No text replacement was made; just add a text node.
+            //  These are placed as explicit text nodes because it's possible that the textContent could be valid HTML.
+            //  e.g. what if we're replacing into "You want it to look like <b>https://example.com</b>", where that's
+            //  the <b> & </b> are actual text, not elements.
+            newSpan.appendChild(document.createTextNode(split));
+          } else {
+            newSpan.insertAdjacentHTML('beforeend', newHtml);
+          }
+        });
+        // Replace the textNode with either the new span, or the new nodes.
+        if (useSpan) {
+          // Replace the textNode with the new span containing the link.
+          textNodeParent.replaceChild(newSpan, textNode);
+        } else {
+          const textNodeNextSibling = textNode.nextSibling;
+          while (newSpan.firstChild) {
+            textNodeParent.insertBefore(newSpan.firstChild, textNodeNextSibling);
+          }
+          textNode.remove();
+        }
+      }
+    }
+    const textNodes = [];
+    // Create a NodeIterator to get the text nodes in the body of the document
+    const nodeIter = document.createNodeIterator(element, NodeFilter.SHOW_TEXT);
+    let currentNode = nodeIter.nextNode();
+    // Add the text nodes found to the list of text nodes to process, if it's not a child of an <a>, <script>, or <style>.
+    while (currentNode) {
+      let parent = currentNode.parentNode;
+      while (
+        parent && parent.nodeName !== 'A' &&
+        parent.nodeName !== 'SCRIPT' &&
+        parent.nodeName !== 'STYLE' &&
+        parent.nodeName !== 'CODE'
+      ) {
+        parent = parent.parentElement;
+      }
+      if (!parent && currentNode.textContent.length >= minLengthToBeURL) {
+        textNodes.push(currentNode);
+      }
+      currentNode = nodeIter.nextNode();
+    }
+    // Process each text node
+    textNodes.forEach((el) => {
+      handleTextNode(el, shortenLinkText);
+    });
+  }
+
   /**
    * showReputation - Shows a user's reputation in the report.
    *
@@ -1762,6 +1902,11 @@
       .closest('.fire-detection-item')
       .find('.fire-detection-data')
       .html((index, html) => html.replace(/((?:https:)?\/\/[/\w.=?]*)/g, '<a href="$1" target="_blank">$1</a>'));
+    const detectionsListFirstChild = (asDom[0] || {}).firstChild || {};
+    if (detectionsListFirstChild.nodeName === '#text') {
+      // This linkifies text which was included by a user when manually reporting. It does not linkify all URLs within the why data.
+      linkifyTextURLs(detectionsListFirstChild, false, false);
+    }
     const consolidatedDisplayWhy = asDom[0].outerHTML;
     return consolidatedDisplayWhy;
   }
