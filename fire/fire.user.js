@@ -3884,10 +3884,7 @@ body.outside .fire-popup h2 {
      */
     function tooltipsElementClick() {
       ignoreEvents = !ignoreEvents;
-      const currentTooltip = $(this)
-        .closest(selector)
-        .parent()
-        .children('.fire-tooltip');
+      const currentTooltip = $('.fire-tooltip');
       if (currentTooltip.length > 0) {
         $tooltip = currentTooltip;
         if (ignoreEvents) {
