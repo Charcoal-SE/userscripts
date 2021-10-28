@@ -1110,13 +1110,11 @@
   function toastrPositionChangeHandler() {
     const value = $(this).val();
 
-    const data = fire.userData;
-    data.toastrPosition = value;
+    setValue('toastrPosition', value);
     toastr.options.positionClass = `toast-${value}`;
 
     $('#toast-container').remove();
     toastr.info('Notification position updated.');
-    fire.userData = data;
   }
 
   /**
@@ -1130,12 +1128,10 @@
   function toastrDurationHandler() {
     const value = $(this).val();
 
-    const data = fire.userData;
-    data.toastrDuration = value;
+    setValue('toastrDuration', value);
     toastr.options.timeOut = value;
 
     $('#toast-container').remove();
-    fire.userData = data;
   }
 
   /**
@@ -1202,10 +1198,8 @@
   function boolOptionClickHandler(element, message, key, callback) {
     const value = $(element).is(':checked');
 
-    const data = fire.userData;
-    data[key] = value;
+    setValue(key, value);
     toastr.info(`${message} ${value ? 'en' : 'dis'}abled.`);
-    fire.userData = data;
 
     if (callback) {
       callback();
