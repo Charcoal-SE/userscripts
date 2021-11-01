@@ -98,7 +98,7 @@
           clientId: 9136,
           // The backoff Object contains one entry per endpoint. The value of that property is a jQuery.Deferred which
           // is always resolved after the response is received from the previous call to the endpoint. It's resolved
-          // either immediately, or after any `backoff` which the SE aPI specifies. It's also delayed by
+          // either immediately, or after any `backoff` which the SE API specifies. It's also delayed by
           // seAPIErrorDelay in the case of an error.
           // Overall, this means we only have one request in flight at a time per endpoint. This limitation is
           // assumed to result in us not making too many requests to the SE API per second (SE API hard limit is 30 requests/s).
@@ -546,9 +546,9 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {DOM_node}         element            The element containing the DOM structure to change.
-   * @param   {truthy/falsey}    useSpan            If true, the new link is wrapped in a <span>.
-   * @param   {truthy/falsey}    shortenLinkText    If true, the text for the link isn't shortened to what SE does for such links in SE Chat.
+   * @param   {DOM_node}        element            The element containing the DOM structure to change.
+   * @param   {truthy/falsy}    useSpan            If true, the new link is wrapped in a <span>.
+   * @param   {truthy/falsy}    shortenLinkText    If true, the text for the link isn't shortened to what SE does for such links in SE Chat.
    *
    */
   function linkifyTextURLs(element, useSpan = false, shortenLinkText = true) {
@@ -760,7 +760,7 @@
    * @memberof module:fire
    *
    * @param   {object}    response    The Stack Exchange `user` response.
-   * @param   {number}    page        The page that's been loaed.
+   * @param   {number}    page        The page that's been loaded.
    */
   function parseUserResponse(response, page) {
     fire.log(`Loaded the current user, page ${page}:`, response);
@@ -909,10 +909,10 @@
       ajaxCall.done(success);
     }
 
-    // If we get an error from the AJAX call, we still need to resolve the backoff Defered.
+    // If we get an error from the AJAX call, we still need to resolve the backoff Deferred.
     ajaxCall.fail(function (jqXHR) {
       // We could use different delays here based on what the error is. It should be noted that it's possible
-      //   for us to get a backoff violation error, even if we never got a backof. That can happen if there are requests
+      //   for us to get a backoff violation error, even if we never got a backoff. That can happen if there are requests
       //   made to the same endpoints by anything else in this IP address, which is actually quite likely, depending on
       //   the endpoint.
       const errorData = jqXHR.responseJSON;
@@ -1140,7 +1140,7 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {DOM_node}    this    The <input type="checkbox"> element for bluring the background.
+   * @param   {DOM_node}    this    The <input type="checkbox"> element for blurring the background.
    */
   function blurOptionClickHandler() {
     boolOptionClickHandler(this, 'Blur', 'blur', () => {
@@ -1395,7 +1395,7 @@
    *
    * @param   {string}    toChange                The complete text to make changes within.
    * @param   {string}    tagText                 The type of tag within which to make changes (e.g. "code")
-   * @param   {RegExp}    whiteListedTagsRegex    Falsey or a RegExp that is used to match tags which should be whitelisted inside the changed area.
+   * @param   {RegExp}    whiteListedTagsRegex    Falsy or a RegExp that is used to match tags which should be whitelisted inside the changed area.
    *
    * @returns {string}                            The changed text
    */
@@ -1430,7 +1430,7 @@
   // For <a>, 'rel' is not permitted in Markdown, but is in SE's HTML.
   const whitelistedTags = {
     withAttributes: {
-      blockquote: ['class'], // 'data-spoiler'], // data-spoiler is used on SE sites, but isn't in the HTML delevered by SE.
+      blockquote: ['class'], // 'data-spoiler'], // data-spoiler is used on SE sites, but isn't in the HTML delivered by SE.
       div: ['class', 'data-lang', 'data-hide', 'data-console', 'data-babel'],
       ol: ['start'],
       pre: ['class'],
@@ -1502,8 +1502,8 @@
 
   /*
     sortJqueryByDepth is modified from an answer to "jQuery traversing order - depth first" : https://stackoverflow.com/a/5756066
-    Copytight 2011-04-22 16:27:08Z by alexl: https://stackoverflow.com/users/72562/alexl
-    licenesed under CC BY-SA 3.0
+    Copyright 2011-04-22 16:27:08Z by alexl: https://stackoverflow.com/users/72562/alexl
+    licensed under CC BY-SA 3.0
   */
 
   /**
@@ -1525,12 +1525,12 @@
   }
 
   /**
-   * convertChildElementsWithNonWhitelistedAttributesToText - In place, convert to text all decendents of a container which have non-whitelisted attributes.
+   * convertChildElementsWithNonWhitelistedAttributesToText - In place, convert to text all descendants of a container which have non-whitelisted attributes.
    *
    * @private
    * @memberof module:fire
    *
-   * @param   {jQuery}    container    The elements and their decendants to check.
+   * @param   {jQuery}    container    The elements and their descendants to check.
    *
    */
   function convertChildElementsWithNonWhitelistedAttributesToText(container) {
@@ -1540,12 +1540,12 @@
     container = $(container);
 
     /**
-     * convertElements - In place, one pass of converting to text the decendents of a container which have non-whitelisted attributes.
+     * convertElements - In place, one pass of converting to text the descendants of a container which have non-whitelisted attributes.
      *
      * @private
      * @memberof module:fire
      *
-     * @param   {jQuery}     elementsIn    The elements and their decendants to check.
+     * @param   {jQuery}     elementsIn    The elements and their descendants to check.
      *
      * @returns {boolean}                  Flag indicating if any changes were made.
      */
@@ -1603,14 +1603,14 @@
     const basicTagsRegexText = `\/?(?:${Object.keys(whitelistedTags.withNoAttributes).join('|')})\\s*`;
     const complexTagsClosingRegexText = `\/(?:${Object.keys(whitelistedTags.withAttributes).join('|')})\\s*`;
     const complexTagsRegexText = `(?:${Object.entries(whitelistedTags.withAttributes)
-      .map(([tag, attrs]) => `(?:${tag}\\b(?: +(?:${attrs.join('|')})="[^"<>]*")*)`) // syntax highlihting fodder: "
+      .map(([tag, attrs]) => `(?:${tag}\\b(?: +(?:${attrs.join('|')})="[^"<>]*")*)`) // syntax highlighting fodder: "
       .join('|')})\\s*`;
     const specialCaseTagsClosingRegexText = `\/(?:${Object.keys(whitelistedTags.specialCases).join('|')})\\s*`;
     /* eslint-enable no-useless-escape */
     const specialCaseTagsRegexText = `(?:${Object.entries(whitelistedTags.specialCases).map(([tag, obj]) => {
       const unordered = [];
       if (Array.isArray(obj.general)) {
-        unordered.push(`(?:${(obj.general || []).join('|')})="[^"<>]*"`); // syntax highlihting fodder: "
+        unordered.push(`(?:${(obj.general || []).join('|')})="[^"<>]*"`); // syntax highlighting fodder: "
       }
       if (obj.specificValues) {
         unordered.push(Object.entries(obj.specificValues)
@@ -1684,7 +1684,7 @@
    * @memberof module:fire
    *
    * @param   {string}          htmlText     The text to change into HTML.
-   * @param   {falseyTruthy}    isTrusted    Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
+   * @param   {truthy/falsy}    isTrusted    Truthy if the text supplied is from SE (i.e. it's trusted / not pre-processed by SD).
    *
    * @returns {jQuery}                       <div> containing the body HTML.
    */
@@ -1694,12 +1694,12 @@
     // div and pre can have class and other attributes for snippets.
 
     // SE normally provides HTML with <code> sections having <, >, and & (???) replaced by their HTML entities. The .body we get from MS has all HTML entities
-    //   throughout the text (not just in <code> and <blockquotes>) replaced with their Unicode characters
+    //   throughout the text (not just in <code> and <blockquote>) replaced with their Unicode characters
     //   This is done to facilitate regex matching within the post, particularly within <code>.
     //   With what SD has done to the text it's not, necessarily, possible to
     //   recover back to the actual content (e.g. what happens with Markdown like `<code>`: SE would send "<code>&lt;code&gt;</code>", but that gets converted
     //   to "<code><code></code>" by SD/MS. In addition, it's possible there were originally other pieces of text which were HTML entities that are now
-    //   Unicode characters which are incorrectly enterpreted as valid HTML tags, etc.
+    //   Unicode characters which are incorrectly interpreted as valid HTML tags, etc.
     //   So, ultimately, the conversion from the body stored on MS to HTML text which we do here is, at best, an approximation. However, it's considerably
     //   better than not trying to perform that conversion at all.
     /*
@@ -1728,7 +1728,7 @@
       //   entities having been converted to Unicode characters. We can just use the HTML text directly.
       whiteListedSETagsRegex.lastIndex = 0;
       const bodyOnlyWhitelist = $('<div/>')
-        .text(htmlText || '') // Escape everything. NOTE: Everything should be unescaped comming from SD/MS, but properly formatted if it's from SE.
+        .text(htmlText || '') // Escape everything. NOTE: Everything should be unescaped coming from SD/MS, but properly formatted if it's from SE.
         .html() // Get the escaped HTML, unescape whitelisted tags.
         .replace(whiteListedSETagsRegex, '<$1>');
       processedBody = toHTMLEntitiesBetweenTags(bodyOnlyWhitelist, 'code');
@@ -1867,7 +1867,7 @@
     }
     // After consolidation, we're left with the list of items detected not necessarily
     //   in order based on their Position. So, we sort the detection locations in ascending
-    //   oder for each detection type which was consolidated, which were marked with the
+    //   order for each detection type which was consolidated, which were marked with the
     //   "fire-needs-sort" class when consolidated above.
     asDom
       .find('.fire-needs-sort')
@@ -2106,7 +2106,7 @@
     // Convert relative URLs to point to the URL on the source site.
     // SE uses these for tags and some site-specific functionality (e.g. circuit simulation on Electronics)
     pointRelativeURLsToSourceSESite(reportBody, postData);
-    // Activate spolers and add click event handlers.
+    // Activate spoilers and add click event handlers.
     reportBody.find('blockquote.spoiler')
       .attr('data-spoiler', 'Reveal spoiler')
       .one('click', function () {
@@ -3705,7 +3705,7 @@ body.outside .fire-popup h2 {
    * @private
    * @memberof module:fire
    *
-   * @param   {falsy/truthy}    load          If truthy, this function loads the script. Falsy indicates it's already loaded.
+   * @param   {truthy/falsy}    load          If truthy, this function loads the script. Falsy indicates it's already loaded.
    * @param   {string}          path          The script's path.
    * @param   {function}        [callback]    An optional "success" callback.
    * @param   {function}        [always]      An optional "always" callback.
@@ -4294,8 +4294,8 @@ body.outside .fire-popup h2 {
       seQuotaWarnPeriodicOn: 100,
       seQuotaWarnPeriodicWithin: 3,
       seAPIExtraBackoffDelay: 250,
-      seAPIErrorDelay: 11000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a thottle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
-      seAPIThrottleViolationDelay: 16000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a thottle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
+      seAPIErrorDelay: 11000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a throttle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
+      seAPIThrottleViolationDelay: 16000, // The typical backoff period is 10 seconds, so this is just a bit longer. It appears this is not sufficient, although prior experience is that to get out of a throttle violation can often take a variable number of multiple attempts, which can be, or at least feel like, minutes.
       seAPIThrottleViolationStatus: 400,
       popupOpeningTimeoutDelay: 90000,
       webSocketInitialOpenDelay: 3000,
