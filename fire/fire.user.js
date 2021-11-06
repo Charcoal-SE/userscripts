@@ -1136,6 +1136,37 @@
   }
 
   /**
+   * applyBlurIfOptionSelected - Apply the "Blur" effect based on fire.userData.blur.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function applyBlurIfOptionSelected() {
+    // Just adding a filter: blur(2px) to the #container causes a re-layout which
+    // results in the input area no longer in a static location, at least in Firefox.
+    // So, we apply it to the different portions of the page separately.
+    $('#container')
+      .children()
+      .toggleClass('fire-blur', fire.userData.blur);
+    $('#main')
+      .removeClass('fire-blur')
+      .children()
+      .toggleClass('fire-blur', fire.userData.blur);
+  }
+
+  /**
+   * removeBlur - Remove the "Blur" effect.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function removeBlur() {
+    $('.fire-blur').removeClass('fire-blur');
+  }
+
+  /**
    * blurOptionClickHandler - Set the "Blur" option for the popup modal.
    *
    * @private
@@ -1145,7 +1176,7 @@
    */
   function blurOptionClickHandler() {
     boolOptionClickHandler(this, 'Blur', 'blur', () => {
-      $('#container').toggleClass('fire-blur', fire.userData.blur);
+      applyBlurIfOptionSelected();
     });
   }
 
@@ -1400,7 +1431,7 @@
       .appendTo('body')
       .fadeIn('fast');
 
-    $('#container').toggleClass('fire-blur', fire.userData.blur);
+    applyBlurIfOptionSelected();
 
     $(document).keydown(keyboardShortcuts);
   }
@@ -2354,7 +2385,7 @@
       showEditedIcon();
     }
 
-    $('#container').toggleClass('fire-blur', fire.userData.blur);
+    applyBlurIfOptionSelected();
 
     expandLinksOnHover();
 
@@ -2617,7 +2648,7 @@
           $(selector).remove();
           sendFireEvent(fireButton, 'settings-closed');
           if (!fire.isOpen) {
-            $('#container').removeClass('fire-blur');
+            removeBlur();
           }
         });
 
@@ -2632,7 +2663,7 @@
       $(selector)
         .fadeOut('fast', () => {
           $(selector).remove();
-          $('#container').removeClass('fire-blur');
+          removeBlur();
           sendFireEvent(fireButton, 'popup-closed');
         });
 
