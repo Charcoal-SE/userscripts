@@ -155,6 +155,7 @@
     }
 
     checkHashForWriteToken();
+    registerPopupMoveMouseDownListener();
   })(window);
 
   /**
@@ -288,7 +289,7 @@
       $fireButton.addClass('fire-data-loading');
     }
 
-    if (!fire.reportCache[url]) {
+    if (!fire.reportCache[url] || fire.reportCache[url].isExpired) {
       getDataForUrl(url, (data) => parseDataForReport(data, openAfterLoad, $fireButton));
     } else if (openAfterLoad === true) {
       $fireButton.click();
@@ -1207,6 +1208,24 @@
   }
 
   /**
+   * resetPopupsSizeAndLocation - Reset all popups' size and location to default.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function resetPopupsSizeAndLocation() {
+    setValue('popupLocations', {});
+    $('.fire-popup').css({
+      top: '',
+      left: '',
+      width: '',
+      height: '',
+    });
+    $('.fire-popup-inner').css({maxHeight: ''});
+  }
+
+  /**
    * stopPropagationIfTargetBody - If the target of the event is the body, then stop propagation.
    *
    * @private
@@ -1226,13 +1245,17 @@
    * @private
    * @memberof module:fire
    *
-   * @param   {object}    event    The jQuery keyboard event
+   * @param   {jQueryEvent}    event    The jQuery keyboard event
    */
   function keyboardShortcuts(event) {
     const c = fire.constants;
     if (event.altKey || event.ctrlKey || event.metaKey) {
       // Do nothing if any of the Alt, Ctrl, or Meta keys are pressed (opening the popup with Ctrl-Space is handled elsewhere).
       // This prevents conflicts with browser-based shortcuts (e.g. Ctrl-F being used as FP).
+      return;
+    }
+    const popup = $('.fire-popup');
+    if (popup.hasClass('fire-shortcuts-off')) {
       return;
     }
     if (event.keyCode === c.keys.enter || event.keyCode === c.keys.space) {
@@ -1242,42 +1265,37 @@
       $(selector)
         .fadeOut(c.buttonFade) // Flash to indicate which button was selected.
         .fadeIn(c.buttonFade, () => $(selector).click());
-    } else {
-      if (!fire.settingsAreOpen && event.keyCode < c.keys.F1) { // Allow interaction with settings popup.
-        event.preventDefault();
-      } // Prevent keys from entering the chat input while the popup is open
-      if (fire.buttonKeyCodes.includes(event.keyCode) && !fire.settingsAreOpen) {
-        $('.fire-popup-header a.button')
-          .removeClass('focus')
-          .trigger('mouseleave');
+    } else if (fire.buttonKeyCodes.includes(event.keyCode) && !fire.settingsAreOpen) {
+      $('.fire-popup-header a.button')
+        .removeClass('focus')
+        .trigger('mouseleave');
 
-        const $button = $(`.fire-popup-header a[fire-key~=${event.keyCode}]:not([disabled])`);
-        const button = $button[0]; // eslint-disable-line prefer-destructuring
+      const $button = $(`.fire-popup-header a[fire-key~=${event.keyCode}]:not([disabled])`);
+      const button = $button[0]; // eslint-disable-line prefer-destructuring
 
-        if (button) {
-          if (event.keyCode === c.keys.esc) { // [Esc] key
-            $button.click();
-          } else if (fire.openOnSiteCodes.includes(event.keyCode) || fire.openOnMSCodes.includes(event.keyCode)) { // Open the report on the site
-            window.open(button.href);
-          } else { // [1-5] keys for feedback buttons
-            const pos = button.getBoundingClientRect();
-            $button
-              .addClass('focus')
-              .trigger('mouseenter')
-              .trigger($.Event('mousemove', { // eslint-disable-line new-cap
-                clientX: pos.right - (button.offsetWidth + c.tooltipOffset),
-                clientY: pos.top + c.tooltipOffset,
-              }));
-          }
-        } else {
-          const $button = $(`a[fire-key~=${event.keyCode}]:not([disabled])`);
-          if ($button[0]) {
-            $button.click();
-          }
+      if (button) {
+        if (event.keyCode === c.keys.esc) { // [Esc] key
+          $button.click();
+        } else if (fire.openOnSiteCodes.includes(event.keyCode) || fire.openOnMSCodes.includes(event.keyCode)) { // Open the report on the site
+          window.open(button.href);
+        } else { // [1-5] keys for feedback buttons
+          const pos = button.getBoundingClientRect();
+          $button
+            .addClass('focus')
+            .trigger('mouseenter')
+            .trigger($.Event('mousemove', { // eslint-disable-line new-cap
+              clientX: pos.right - (button.offsetWidth + c.tooltipOffset),
+              clientY: pos.top + c.tooltipOffset,
+            }));
         }
-      } else if (fire.settingsAreOpen && event.keyCode === c.keys.esc) {
-        closePopup();
+      } else {
+        const $button = $(`a[fire-key~=${event.keyCode}]:not([disabled])`);
+        if ($button[0]) {
+          $button.click();
+        }
       }
+    } else if (fire.settingsAreOpen && event.keyCode === c.keys.esc) {
+      closePopup();
     }
   }
 
@@ -1358,8 +1376,8 @@
       .appendTo('body')
       .click(closePopup);
 
-    newEl('div', 'fire-popup')
-      .css({top: '5%', left: getPopupLeft()})
+    newEl('div', 'fire-popup fire-write-token-popup')
+      .css({top: '5%', left: getDefaultPopupLeft()})
       .append(
         newEl('div', 'fire-popup-header')
           .append(newEl('p', {
@@ -1928,6 +1946,102 @@
   }
 
   /**
+   * getValuesFromStyleString - Get the CSS property values contained in a string which could have been used as a "style" attribute value.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param      {string}    styleText    The string representing the styles.
+   *
+   * @returns    {object}                 An object of key/value pairs corresponding to what was in the style text.
+   */
+  function getValuesFromStyleString(styleText) {
+    try {
+      return Object.fromEntries(((styleText || '').split(';') || [])
+        .filter((value) => value)
+        .map((value) => value
+          .split(':')
+          .map((secondSplit) => secondSplit.trim())));
+    } catch (error) {
+      return {};
+    }
+  }
+
+  /**
+   * getBoxFromStyle - Get the CSS property values for attributes describing the size and position of the element from a string which could have been used as a "style" attribute value.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param      {string}    style    The string representing the styles.
+   *
+   * @returns    {object}             An object containing top, left, width, height, and maxHeight as contained in the style.
+   */
+  function getBoxFromStyle(style) {
+    const values = getValuesFromStyleString(style);
+    return {
+      top: values.top || '',
+      left: values.left || '',
+      width: values.width || '',
+      height: values.height || '',
+      maxHeight: values['max-height'] || '',
+    };
+  }
+
+  /**
+   * registerPopupMoveMouseDownListener - Add the popupMoveMouseDownListener.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function registerPopupMoveMouseDownListener() {
+    $(document).on('mousedown', '.fire-popup-move-grip', popupMoveMouseDownListener);
+  }
+
+  /**
+   * popupMoveMouseDownListener - This listens for mousedown events and moves the .fire-popup containing the element on which the event occurred.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQueryEvent}     mousedownEvent     The jQuery Event Object
+   * @param   {DOM_node}        this               The target of the event
+   */
+  function popupMoveMouseDownListener(mousedownEvent) {
+    const mouseDownTarget = $(this);
+    const popup = mouseDownTarget.closest('.fire-popup');
+    const initialPopupOffset = popup.offset();
+    const dragStartOffset = {
+      top: initialPopupOffset.top - mousedownEvent.pageY,
+      left: initialPopupOffset.left - mousedownEvent.pageX,
+    };
+
+    /**
+     * popupMoveMouseMoveListener - This listens for mousemove events and actually moves the .fire-popup which was indicated when the mousedown event happened.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {jQueryEvent}     mousemoveEvent     The jQuery Event Object for the mousemove event.
+     */
+    function popupMoveMouseMoveListener(mousemoveEvent) {
+      const newPopupOffset = {
+        top: dragStartOffset.top + mousemoveEvent.pageY,
+        left: dragStartOffset.left + mousemoveEvent.pageX,
+      };
+      popup.offset(newPopupOffset);
+    }
+    window.addEventListener('mousemove', popupMoveMouseMoveListener, true);
+    popup.addClass('fire-popup-moving');
+    $(document)
+      .one('mouseup', () => {
+        window.removeEventListener('mousemove', popupMoveMouseMoveListener, true);
+        popup.removeClass('fire-popup-moving');
+      });
+  }
+
+  /**
    * pointRelativeURLsToSourceSESite - In place, change relative link URLs to point to the source SE site.
    *
    * @private
@@ -2009,8 +2123,6 @@
       return;
     }
 
-    fire.isOpen = fireButton;
-
     const url = $fireButton.data('url');
     let postData;
 
@@ -2020,8 +2132,57 @@
       loadDataForButton(fireButton, true); // No data, so load it.
       return;
     }
+    fire.isOpen = fireButton;
+    continueOpeningReportPopup($fireButton, postData);
+  }
 
-    sendFireEventWithPopupPostData(postData, $fireButton, 'popup-opening-have-data');
+  /**
+   * addButtonsToFirePopupTop - Add the feedback buttons to the top of the FIRE popup.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery}    top         The FIRE button fireButton was pressed
+   * @param   {object}    postData    The data Object for the post
+   */
+  function addButtonsToFirePopupTop(top, postData) {
+    if (!fire.userData.readOnly) {
+      const buttonContainer = newEl('div', 'fire-popup-feedbackButtonContainer');
+      top.append(buttonContainer);
+      const buttonGroup1 = newEl('span', 'fire-popup-feedbackButtonGroup');
+      const buttonGroup2 = buttonGroup1.clone();
+      buttonContainer
+        .append(buttonGroup1)
+        .append(buttonGroup2);
+      /* eslint-disable no-multi-spaces */
+      buttonGroup1
+        // Buttons that raise a flag and send feedback.
+        .append(createFeedbackButton(postData, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'spam', 'True positive, blacklist user & spam flag (add user to blacklist)'))
+        .append(createFeedbackButton(postData, ['2', 'r', numpad('2')], 'rude', 'tpu-', 'rude', 'Rude / Abusive, blacklist user & rude flag'))
+      ; // eslint-disable-line semi-style
+      buttonGroup2
+        // Buttons that only send feedback.
+        .append('<span style="float:left;padding:4px 5px 0px 15px;" title="The following don\'t raise a flag, they only submit feedback to metasmoke.">No flag:</span>')
+        .append(createFeedbackButton(postData, ['3', 'T', numpad('3')], 'tpu-', 'tpu-', '',     'True positive & blacklist user; Don\'t raise a flag.'))
+        .append(createFeedbackButton(postData, ['4', 'v', numpad('4')], 'tp-',  'tp-',  '',     'tp- (e.g. Vandalism; single case of undisclosed affiliation); Don\'t add user to blacklist. Don\'t raise a flag.'))
+        .append(createFeedbackButton(postData, ['5', 'n', numpad('5')], 'naa-', 'naa-', '',     'Not an Answer / VLQ; Don\'t raise a flag.'))
+        .append(createFeedbackButton(postData, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'))
+      ; // eslint-disable-line semi-style
+      /* eslint-enable no-multi-spaces */
+    }
+  }
+
+  /**
+   * createTopOfFirePopup - Create the top of the FIRE popup.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}    postData    The data Object for the post
+   *
+   * @returns {jQuery}                The jQuery object for the top of the FIRE popup.
+   */
+  function createTopOfFirePopup(postData) {
     const site = fire.sites[postData.site] || fire.sites[`${postData.site}.net`];
     const siteIcon = site ? site.icon_url : `//cdn.sstatic.net/Sites/${postData.site}/img/apple-touch-icon.png`;
 
@@ -2048,34 +2209,24 @@
       .append(openOnSiteButton)
       .append(br());
 
-    if (!fire.userData.readOnly) {
-      const buttonContainer = newEl('div', 'fire-popup-feedbackButtonContainer');
-      top.append(buttonContainer);
-      const buttonGroup1 = newEl('span', 'fire-popup-feedbackButtonGroup');
-      const buttonGroup2 = buttonGroup1.clone();
-      buttonContainer
-        .append(buttonGroup1)
-        .append(buttonGroup2);
-      /* eslint-disable no-multi-spaces */
-      buttonGroup1
-        // Buttons that raise a flag and send feedback.
-        .append(createFeedbackButton(postData, ['1', 'k', numpad('1')], 'spam', 'tpu-', 'spam', 'True positive, blacklist user & spam flag (add user to blacklist)'))
-        .append(createFeedbackButton(postData, ['2', 'r', numpad('2')], 'rude', 'tpu-', 'rude', 'Rude / Abusive, blacklist user & rude flag'))
-      ; // eslint-disable-line semi-style
-      buttonGroup2
-        // Buttons that only send feedback.
-        .append('<span style="float:left;padding:4px 5px 0px 15px;" title="The following don\'t raise a flag, they only submit feedback to metasmoke.">No flag:</span>')
-        .append(createFeedbackButton(postData, ['3', 'T', numpad('3')], 'tpu-', 'tpu-', '',     'True positive & blacklist user; Don\'t raise a flag.'))
-        .append(createFeedbackButton(postData, ['4', 'v', numpad('4')], 'tp-',  'tp-',  '',     'tp- (e.g. Vandalism; single case of undisclosed affiliation); Don\'t add user to blacklist. Don\'t raise a flag.'))
-        .append(createFeedbackButton(postData, ['5', 'n', numpad('5')], 'naa-', 'naa-', '',     'Not an Answer / VLQ; Don\'t raise a flag.'))
-        .append(createFeedbackButton(postData, ['6', 'f', numpad('6')], 'fp-',  'fp-',  '',     'False Positive'))
-      ; // eslint-disable-line semi-style
-      /* eslint-enable no-multi-spaces */
-    }
+    addButtonsToFirePopupTop(top, postData);
 
+    return top;
+  }
+
+  /**
+   * createFirePopupBody - Add the feedback buttons to the top of the FIRE popup.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {object}    postData    The data Object for the post
+   *
+   * @returns {jQuery}                The jQuery object for the body of the FIRE popup.
+   */
+  function createFirePopupBody(postData) {
     let postType;
     let suffix;
-
     if (postData.is_answer) {
       postType = 'Answer';
       suffix = 'n';
@@ -2089,7 +2240,6 @@
       .html(); // Get the escaped HTML
 
     let title;
-
     if (postData.has_auto_flagged) {
       title = emojiOrImage('autoflag')
         .attr('fire-tooltip', 'You have auto-flagged this post.')
@@ -2144,13 +2294,26 @@
               )
           )
       )
-      .append(newEl('div', `fire-reported-post${postData.is_deleted ? ' fire-deleted' : ''}`)
+      .append(newEl('div', `fire-reported-post fire-postid-${postData.post_id}${postData.is_deleted ? ' fire-deleted' : ''}`)
         .append(reportBody)
       );
 
-    newEl('div', 'fire-popup-modal')
-      .appendTo('body')
-      .click(closePopup);
+    return body;
+  }
+
+  /**
+   * continueOpeningReportPopup - Actually build a report popup and show it. This is the continuation of the click handler for FIRE buttons.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery}    $fireButton    The FIRE button fireButton was pressed
+   * @param   {object}    postData       The data Object for the post
+   */
+  function continueOpeningReportPopup($fireButton, postData) {
+    sendFireEventWithPopupPostData(postData, $fireButton, 'popup-opening-have-data');
+    const top = createTopOfFirePopup(postData);
+    const body = createFirePopupBody(postData);
 
     const versionLink = newEl('a', 'fire-version-link', {
       text: fire.metaData.version,
@@ -2166,13 +2329,21 @@
       'fire-tooltip': 'FIRE Configuration',
     });
 
+    newEl('div', 'fire-popup-modal')
+      .appendTo('body')
+      .click(closePopup);
+
+    // Create the popup wrapper and put all the parts together.
     newEl('div', `fire-popup${fire.userData.readOnly ? ' fire-readonly' : ''}`)
-      .css({top: '5%', left: getPopupLeft()})
+      .css(((fire.userData.popupLocations || {}).main || {}).mainCSS || {})
+      .append(newEl('div', 'fire-popup-move-grip fire-popup-move-grip-top'))
       .append(newEl('div', 'fire-popup-inner')
+        .css(((fire.userData.popupLocations || {}).main || {}).innerCSS || {})
         .append(top)
         .append(body))
-      .append(settingsButton)
-      .append(versionLink)
+      .append(newEl('div', 'fire-bottom-edge-right-container')
+        .append(versionLink)
+        .append(settingsButton))
       .hide()
       .appendTo('body')
       .fadeIn('fast');
@@ -2242,15 +2413,22 @@
     sendFireEvent(fire.isOpen, 'settings-opening');
     fire.settingsAreOpen = true;
 
-    const popup = newEl('div', 'fire-popup', {id: 'fire-settings'})
-      .css({top: '5%', left: getPopupLeft()});
+    const popup = newEl('div', 'fire-popup fire-settings-popup')
+      .css(((fire.userData.popupLocations || {}).settings || {}).mainCSS || {})
+      .append(newEl('div', 'fire-popup-move-grip fire-popup-move-grip-top'));
+
+    const innerContainer = newEl('div', 'fire-popup-inner')
+      .css(((fire.userData.popupLocations || {}).settings || {}).innerCSS || {});
+
+    popup
+      .append(innerContainer);
 
     const top = newEl('p', 'fire-popup-header')
+      .append(createCloseButton(closePopup))
       .append(
         newEl('h2')
           .append(emojiOrImage('fire', true))
-          .append(' FIRE settings.'))
-      .append(createCloseButton(closePopup));
+          .append(' FIRE settings.'));
 
     const toastDurationElements = newEl('div')
       .append(
@@ -2307,45 +2485,35 @@
           .append(positionSelect)
       );
 
-    const container = newEl('div')
+    const settingsBodyContainer = newEl('div', 'fire-popup-body')
       .append(
-        newEl('div', 'fire-settings-section fire-settings-left')
-          .append(createSettingsCheckBox('blur', fire.userData.blur, blurOptionClickHandler,
-            'Enable blur on popup background.',
-            'Popup blur:'
-          ))
-          .append(br())
-          .append(createSettingsCheckBox('flag', fire.userData.flag, flagOptionClickHandler,
-            'Also submit "spam" and "rude" flags with those buttons.',
-            'Flag on feedback:')
-          )
-          .append(br())
-          .append(createSettingsCheckBox('debug', fire.userData.debug, debugOptionClickHandler,
-            'Enable FIRE logging in developer console.',
-            'Debug mode:')
-          )
-          .append(br())
-          .append(createSettingsCheckBox('hideImages', fire.userData.hideImages, imageOptionClickHandler,
-            'Hide images in reported messages.',
-            'Hiding images on reports:')
-          )
-          .append(disableReadonlyButton)
+        newEl('div', 'fire-settings-side fire-settings-left')
+          .append(createSettingsCheckBox('hideImages', fire.userData.hideImages, imageOptionClickHandler, 'Hide images in reported posts.', 'Popup:')
+            .append(createSettingsCheckBox('blur', fire.userData.blur, blurOptionClickHandler, 'Enable blur on popup background.'))
+            .append(button('Reset popups\' size and location', resetPopupsSizeAndLocation)))
+          .append(createSettingsCheckBox('flag', fire.userData.flag, flagOptionClickHandler, 'Also submit "spam" and "rude" flags with those buttons.', 'Flag on feedback:'))
+          .append(createSettingsCheckBox('debug', fire.userData.debug, debugOptionClickHandler, 'Enable FIRE logging in developer console.', 'Debug mode:'))
       )
       .append(
-        newEl('div', 'fire-settings-section fire-settings-right')
-          .append(newEl('h3', {text: 'Notifications:'}))
-          .append(toastDurationElements)
-          .append(positionSelector)
+        newEl('div', 'fire-settings-side fire-settings-right')
+          .append(disableReadonlyButton)
+          .append(newEl('div', 'fire-settings-section')
+            .append(newEl('h3', {text: 'Notifications:'}))
+            .append(toastDurationElements)
+            .append(positionSelector))
           .append(requestStackExchangeTokenButton)
       );
 
-    popup
+    innerContainer
       .append(top)
-      .append(container)
+      .append(settingsBodyContainer);
+
+    popup
       .hide()
       .appendTo('body')
       .fadeIn('fast');
 
+    $('.fire-popup:not(.fire-settings-popup)').css({pointerEvents: 'none'});
     sendFireEvent(fire.isOpen, 'settings-open');
   }
 
@@ -2389,6 +2557,44 @@
   }
 
   /**
+   * getCSSToRestoreFromPopup - Get the CSS key/value pairs which can be used to restore the size and position of an element.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param      {jQuery}    popup    The element for which the CSS for position and size restoral is desired, with dynamic height.
+   *
+   * @returns    {object}             An object containing top, left, width, and maxHeight which would be needed to restore with dynamic height.
+   */
+  function getCSSToRestoreFromPopup(popup) {
+    // What we need to be able to restore is:
+    //   A) the top, left, and width of the popup.
+    //   B) If the popup has been resized after being opened, as indicated by the presence of a "height" in the .fire-popup style
+    //        We use the current height of the .fire-popup-inner as the max-height for the new .fire-popup-inner
+    //   C) If the popup has NOT been resized after being opened, as indicated by the absence of a "height" in the .fire-popup style
+    //        If there is a max-height in the style for the .fire-popup-inner, then we use that as the max-height for the new .fire-popup-inner.
+    //        If there is no max-height in the style for the .fire-popup-inner, then we don't apply any height based style to the new popup.
+    const popupStyles = getBoxFromStyle(popup.attr('style'));
+    const inner = popup.find('.fire-popup-inner');
+    const innerStyles = getBoxFromStyle(inner.attr('style'));
+    const innerCSS = {maxHeight: innerStyles.maxHeight};
+    // If the popup has been resized, then there will be a valid height style on the .fire-popup, which indicates we
+    //   want to use the .fire-popup-inner's current height as its max-height the next time the popup is opened. However, if there's no valid
+    //   height or maxHeight, then we don't want to remember either.
+    if (popupStyles.height) {
+      innerCSS.maxHeight = `${inner.height()}px`;
+    }
+    const mainCSS = {};
+    ['top', 'left', 'width'].forEach((key) => {
+      mainCSS[key] = popupStyles[key];
+    });
+    return {
+      mainCSS,
+      innerCSS,
+    };
+  }
+
+  /**
    * closePopup - Close the popup.
    *
    * @private
@@ -2399,35 +2605,53 @@
   function closePopup() {
     fire.sendingFeedback = false;
     const fireButton = fire.isOpen;
+    const popupLocations = fire.userData.popupLocations || {};
     if (fire.settingsAreOpen) {
       sendFireEvent(fireButton, 'settings-closing');
-      const selector = '.fire-popup#fire-settings';
-      $(selector)
-        .fadeOut('fast', () => $(selector).remove());
+      const selector = '.fire-settings-popup';
+      const settingsPopup = $(selector);
+      popupLocations.settings = getCSSToRestoreFromPopup(settingsPopup);
+      setValue('popupLocations', popupLocations);
+      settingsPopup
+        .fadeOut('fast', () => {
+          $(selector).remove();
+          sendFireEvent(fireButton, 'settings-closed');
+          if (!fire.isOpen) {
+            $('#container').removeClass('fire-blur');
+          }
+        });
 
-      if (!fire.isOpen) {
-        $('#container').removeClass('fire-blur');
-      }
       delete fire.settingsAreOpen;
-      sendFireEvent(fireButton, 'settings-closed');
+      $('.fire-popup:not(.fire-settings-popup)').css({pointerEvents: ''});
+      $('.fire-tooltip').remove();
     } else {
       sendFireEvent(fireButton, 'popup-closing');
       const selector = '.fire-popup, .fire-popup-modal';
+      popupLocations.main = getCSSToRestoreFromPopup($('.fire-popup:not(.fire-write-token-popup):not(.fire-settings-popup)'));
+      setValue('popupLocations', popupLocations);
       $(selector)
-        .fadeOut('fast', () => $(selector).remove());
+        .fadeOut('fast', () => {
+          $(selector).remove();
+          $('#container').removeClass('fire-blur');
+          sendFireEvent(fireButton, 'popup-closed');
+        });
 
       $(document)
         .off('keydown', keyboardShortcuts)
         .off('click', '.fire-popup-body pre');
       document.removeEventListener('keypress', stopPropagationIfTargetBody, true);
 
-      $('#container').removeClass('fire-blur');
-
+      // Expire the report (force all the data to be re-fetched the next time it's needed.
+      const button = $(fire.isOpen);
+      const url = button.data('url');
+      if (fire && fire.reportCache[url]) {
+        fire.reportCache[url].isExpired = true;
+      }
       clearFireButtonLoading(fire.isOpen);
 
       const previous = fire.isOpen;
       delete fire.isOpen;
-      sendFireEvent(fireButton, 'popup-closed');
+      $('.fire-tooltip').remove();
 
       return previous;
     }
@@ -2436,16 +2660,16 @@
   }
 
   /**
-   * getPopupLeft - Gets the `left` position for the popup.
+   * getDefaultPopupLeft - Gets the default `left` position for the popup.
    *
    * @private
    * @memberof module:fire
    *
-   * @returns {number}    The `left` position for the popup.
+   * @returns {number}    The default `left` position for the popup.
    */
-  function getPopupLeft() {
-    const w = (window.innerWidth - $('#sidebar').width()) / 2;
-    return Math.max(fire.constants.minPopupLeft, w - fire.constants.halfPopupWidth);
+  function getDefaultPopupLeft() {
+    const width = (window.innerWidth - $('#sidebar').width()) / 2;
+    return Math.max(fire.constants.minPopupLeft, width - fire.constants.halfPopupWidth);
   }
 
   /**
@@ -2801,10 +3025,16 @@
       text: labelText,
     });
 
-    return newEl('div')
-      .append(headerText ? newEl('h3', {text: headerText}) : '')
-      .append(checkBox)
-      .append(label);
+    const checkboxDiv = newEl('div', 'fire-setting-checkbox-div')
+        .append(checkBox)
+        .append(label);
+
+    if (headerText) {
+      return newEl('div', 'fire-settings-section')
+        .append(newEl('h3', {text: headerText}))
+        .append(checkboxDiv);
+    } // else
+    return checkboxDiv;
   }
 
   /**
@@ -3005,21 +3235,32 @@ img.fire-emoji-large {
 
 .fire-popup {
   position: fixed;
-  z-index: 100;
   background: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 20px 2px #646464;
   width: calc(70% - 9vw);
-  max-height: 85vh;
   left: 6vw;
   top: 2vh;
   box-sizing: border-box;
+  resize: both;
+  overflow: auto;
+  z-index: 200;
+  min-height: 186px;
+  max-height: unset;
 }
   .fire-popup .fire-popup-inner {
     display: flex;
     flex-direction: column;
-    max-height: calc(85vh - 40px);
+    max-height: 100%;
+  }
+  .fire-popup:not([style*="height:"]) .fire-popup-inner {
+    max-height: 85vh;
+  }
+  .fire-popup[style*=";height:"] .fire-popup-inner,
+  .fire-popup[style*=" height:"] .fire-popup-inner {
+    max-height: unset !important;
+    height: 100%;
   }
   .fire-popup.fire-readonly .fire-popup-header .fire-site-logo {
     max-width: 475px;
@@ -3152,14 +3393,13 @@ img.fire-emoji-large {
       vertical-align: middle;
     }
   .fire-popup .fire-popup-body {
-    max-height: calc(85vh - 160px);
-    overflow-y: scroll;
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 5px;
     box-shadow: inset 0 0 10px -3px #646464;
     position: relative;
-    flex: auto;
+    max-height: unset;
+    overflow-y: auto;
   }
     .fire-popup .fire-popup-body .fire-report-info .fire-username {
       float: right;
@@ -3513,13 +3753,14 @@ img.fire-emoji-large {
       display: inline-block;
     }
     .fire-popup.fire-settings-popup .fire-settings-section {
-      width: 290px;
-      display: inline-block;
+      width: 100%;
       vertical-align: top;
       padding: 5px;
+      display: block;
+      min-width: 250px;
     }
     .fire-popup.fire-settings-popup #toastr_duration {
-      max-width: 50px;
+      max-width: 75px;
       margin-top: 4px;
     }
   @media (min-width: 0px) and (max-width: 700px) {
@@ -3645,6 +3886,69 @@ body.outside .fire-popup h2 {
   pointer-events: none;
 }
 
+/*Adjustable popup size, movable popups*/
+.fire-bottom-edge-right-container {
+  height: 17px;
+  position: absolute;
+  bottom: 2px;
+  right: 21px;
+	right: 23px;
+}
+.fire-popup .fire-bottom-edge-right-container .fire-settings-button,
+.fire-popup .fire-bottom-edge-right-container .fire-version-link {
+  float:unset;
+  margin: unset;
+  display: inline-block;
+}
+.fire-popup .fire-bottom-edge-right-container .fire-version-link {
+  margin-right:5px
+}
+.fire-popup-move-grip {
+  cursor: move;
+  position: absolute;
+}
+.fire-popup-move-grip-top {
+  width: calc(100% - 0px);
+  height: 18px;
+  left: 0px;
+  top: 0px;
+}
+.fire-popup-moving .fire-popup-move-grip {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 100vh;
+  width: 100vw;
+}
+
+/*More responsive changes*/
+.fire-settings-section .fire-setting-checkbox-div ~ a.button {
+  margin-top: 5px;
+  display: inline-block;
+}
+.fire-settings-section {
+  padding-left: 5px;
+}
+.fire-settings-section > h3 {
+  margin-left: -5px
+}
+.fire-setting-checkbox-div {
+  text-indent: -22px;
+  padding-left: 20px;
+}
+.fire-settings-side {
+	width: calc(50% - 20px);
+	display: inline-block;
+	min-width: 250px;
+	margin-right: 20px;
+	vertical-align: top;
+}
+.fire-settings-right {
+  margin-right: 10px;
+}
+.fire-settings-popup .fire-popup-body {
+  height: 100%;
+}
 
     </style>`);
   }
