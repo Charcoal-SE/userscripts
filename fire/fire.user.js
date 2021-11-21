@@ -3529,6 +3529,7 @@ img.fire-emoji-large {
         border-radius: 3px;
         box-shadow: 0 0 10px -2px #646464;
         display: inline-block;
+        word-wrap: anywhere;
       }
       .fire-popup .fire-popup-body .fire-reported-post li {
         margin-left: 10px;
