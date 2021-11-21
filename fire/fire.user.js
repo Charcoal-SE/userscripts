@@ -3842,7 +3842,6 @@ img.fire-emoji-large {
     text-transform: capitalize;
   }
   .fire-popup.fire-settings-popup {
-    min-height: 460px;
   }
     .fire-popup.fire-settings-popup .fire-popup-header h2 {
       display: inline-block;
