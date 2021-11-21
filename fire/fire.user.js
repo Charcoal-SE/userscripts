@@ -1029,6 +1029,56 @@
   }
 
   /**
+   * deleteReportCacheEntriesWithoutFireButtonInBodyForLongEnough - Deletes any fire.reportCache entry which doesn't have a matching FIRE button for long enough.
+   *
+   * @public
+   * @memberof module:fire
+   *
+   */
+  function deleteReportCacheEntriesWithoutFireButtonInBodyForLongEnough() {
+    // The goal here is to prevent the reportCache from expanding without limit.
+    // To accomplish this, we look for all entries in the cache which don't have an associated FIRE button.
+    const now = Date.now();
+    Object.keys(fire.reportCache)
+      .forEach((url) => {
+        const hasFireButton = $(`.fire-button[data-url="${url}"]`).length === 0;
+        if (hasFireButton) {
+          // There is a FIRE button, so remove any timestamp indicating that there isn't.
+          delete fire.reportCache[url].noFireButtonTimestamp;
+        } else {
+          if (typeof fire.reportCache[url].noFireButtonTimestamp !== 'number') {
+            // There's currently no existing timestamp indicating that there's no FIRE button in the DOM.
+            fire.reportCache[url].noFireButtonTimestamp = now;
+          }
+          if (now - fire.reportCache[url].noFireButtonTimestamp > fire.constants.reportCacheEntryWithNoFireButtonMinimumRetentionMilliseconds) {
+            // The entry has had no FIRE button for longer than permitted.
+            delete fire.reportCache[url];
+          }
+        }
+      });
+  }
+
+  /**
+   * cleanReportCacheIfEnoughTimePassed - Deletes any fire.reportCache entry which doesn't have a matching FIRE button, if enough time has passed.
+   *
+   * @public
+   * @memberof module:fire
+   *
+   */
+  function cleanReportCacheIfEnoughTimePassed() {
+    const now = Date.now();
+    if (!fire.lastReportCacheCleaningEpoch) {
+      fire.lastReportCacheCleaningEpoch = now;
+      return;
+    } // else
+    if (fire.lastReportCacheCleaningEpoch + fire.constants.minimumMillisecondsBetweenReportCacheCleaning >= now) {
+      // too soon
+      return;
+    } // else
+    deleteReportCacheEntriesWithoutFireButtonInBodyForLongEnough();
+  }
+
+  /**
    * decorateMessage - Adds the "FIRE" button to the passed message.
    *
    * @public
@@ -1037,51 +1087,64 @@
    * @param   {object}    message    The message DOM node the button should be added to.
    */
   function decorateMessage(message) {
-    const m = $(message);
-    if (m.find('.fire-button').length === 0) {
-      const anchors = m.find('.content a');
+    const $message = $(message);
+    if ($message.find('.fire-button').length === 0 && $message.find('a[href="https://git.io/SD-Commands"]').length === 0) {
+      decorateMessageWithoutFireButton($message);
+      cleanReportCacheIfEnoughTimePassed();
+    }
+  }
 
-      let reportLink = filterOnContents(anchors, 'MS');
-      let urlOnReportLink = true;
+  /**
+   * decorateMessageWithoutFireButton - Adds the "FIRE" button to the message in the jQuery Object passed.
+   *
+   * @public
+   * @memberof module:fire
+   *
+   * @param   {jQuery}    $message    The jQuery Object containing the message DOM node the button should be added to.
+   */
+  function decorateMessageWithoutFireButton($message) {
+    const anchors = $message.find('.content a');
 
-      if (reportLink.length === 0) {
-        reportLink = filterOnContents(anchors, 'SmokeDetector');
-        urlOnReportLink = false;
+    let reportLink = filterOnContents(anchors, 'MS');
+    let urlOnReportLink = true;
+
+    if (reportLink.length === 0) {
+      reportLink = filterOnContents(anchors, 'SmokeDetector');
+      urlOnReportLink = false;
+    }
+
+    if (reportLink.length > 0) { // This is a report
+      let reportedUrl;
+      let isReportedUrlValid = false;
+
+      if (urlOnReportLink) {
+        reportedUrl = reportLink[0].href.split('url=')[1]; // eslint-disable-line prefer-destructuring
+        isReportedUrlValid = Boolean(reportedUrl);
+      }
+      if ((!urlOnReportLink || !isReportedUrlValid) && reportLink.nextAll('a')[0]) {
+        reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
+        isReportedUrlValid = !(reportedUrl.startsWith('//github.com') ||
+          reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
+          reportedUrl.includes('/users/') ||
+          reportedUrl.includes('charcoal-se.org'));
       }
 
-      if (reportLink.length > 0) { // This is a report
-        let reportedUrl;
-        let isReportedUrlValid = false;
-
-        if (urlOnReportLink) {
-          reportedUrl = reportLink[0].href.split('url=')[1]; // eslint-disable-line prefer-destructuring
-          isReportedUrlValid = Boolean(reportedUrl);
-        }
-        if ((!urlOnReportLink || !isReportedUrlValid) && reportLink.nextAll('a')[0]) {
-          reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
-          isReportedUrlValid = !(reportedUrl.startsWith('//github.com') ||
-            reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
-            reportedUrl.includes('/users/') ||
-            reportedUrl.includes('charcoal-se.org'));
-        }
-
-        if (!isReportedUrlValid) {
-          return;
-        }
-
-        const fireButton = newEl('span', 'fire-button', {click: fireButtonClickHandler})
-          .data('url', reportedUrl)
-          .append(newEl('span', 'fire-button-inner', {html: `${emojiOrImage('fire').html()}`}));
-        // Remove the leading space from the next text node
-        const textElAfterReportLink = reportLink[0].nextSibling;
-        if (textElAfterReportLink.nodeName === '#text') {
-          textElAfterReportLink.textContent = textElAfterReportLink.textContent.replace(/^ /, '');
-        }
-        // Add the FIRE button
-        reportLink
-          .after(fireButton)
-          .after(' |');
+      if (!isReportedUrlValid) {
+        return;
       }
+
+      const fireButton = newEl('span', 'fire-button', {click: fireButtonClickHandler})
+        .data('url', reportedUrl)
+        .append(newEl('span', 'fire-button-inner', {html: `${emojiOrImage('fire').html()}`}));
+      // Remove the leading space from the next text node
+      const textElAfterReportLink = reportLink[0].nextSibling;
+      if (textElAfterReportLink.nodeName === '#text') {
+        textElAfterReportLink.textContent = textElAfterReportLink.textContent.replace(/^ /, '');
+      }
+      // Add the FIRE button
+      reportLink
+        .after(fireButton)
+        .after(' |');
     }
   }
 
@@ -4634,6 +4697,7 @@ body.outside .fire-popup h2 {
       seAPIThrottleViolationStatus: 400,
       popupOpeningTimeoutDelay: 90000,
       webSocketInitialOpenDelay: 3000,
+      reportCacheEntryWithNoFireButtonMinimumRetentionMilliseconds: 3 * 60 * 60 * 1000, // eslint-disable-line no-magic-numbers
     };
   }
 })();
