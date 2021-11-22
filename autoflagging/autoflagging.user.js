@@ -61,10 +61,108 @@
   debug("started");
 
   // Inject CSS
-  var css = window.document.createElement("link");
-  css.rel = "stylesheet";
-  css.href = "//cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/autoflagging/autoflagging.css";
-  document.head.appendChild(css);
+  $(document.head).append(`<style type="text/css" id="AIM-autoflagging-main-css">
+.ai-information:not(.inline) {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  /* This 'inherit' makes sure the autoflagging information
+  is readable *over* the chat message itself, but uses the default background
+  of the chatroom messages. There used to be a background: inherit for
+  .messages, but it did not appear to have a beneficial effect and it caused
+  the theme in dark-transparent rooms (The Restaurant at the End of the Universe)
+  to be messed up.*/
+  background: inherit;
+}
+.reply-parent .ai-information:not(.inline) {
+  background: silver;
+}
+.ai-information {
+  font-size: 11px;
+  -webkit-user-select:none;-moz-user-select:none;-ms-user-select none;user-select:none;
+  cursor: default;
+  padding-left: 0.25em;
+  padding-right: 1px;
+}
+.ai-spinner {
+  height: 1.5em;
+}
+.ai-information > * > *, .ai-feedback-info {
+  margin: 0 0.25em;
+}
+.ai-information > :last-child > :last-child {
+  margin-right: 0;
+}
+.ai-deleted, .ai-flag-count.ai-not-autoflagged {
+  transition: opacity 0.4s;
+}
+.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {
+  opacity: 0.5;
+}
+.ai-deleted {
+    max-height: 1.5em;
+    overflow: hidden;
+    transition: all 0.5s ease;
+}
+.ai-deleted:hover {
+    max-height: 3em;
+}
+.ai-flag-count {
+  color: inherit;
+  text-decoration: none !important;
+}
+.ai-flag-count::after {
+  content: " ⚑";
+}
+.ai-flag-count.ai-not-autoflagged::after {
+  content: "⚑";
+}
+
+.ai-feedback-info-tpu {
+  color: #3c763d;
+}
+.ai-feedback-info-fp {
+  color: #a94442;
+}
+.ai-feedback-info-naa {
+  color: #825325;
+}
+.ai-feedback-info-ignore {
+  color: #ff4442;
+}
+
+.ai-feedback-info-tpu::after {
+  content: " ✓";
+}
+.ai-feedback-info-fp::after {
+  content: " ✗";
+}
+.ai-feedback-info-naa::after {
+  content: " ";
+}
+.ai-feedback-info-ignore::after {
+  content: " \\1f6ab";
+}
+
+.no-emoji .ai-feedback-info-naa::after {
+  content: " " url(https://charcoal-se.org/userscripts/emoji/naa.png)
+}
+
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  .no-emoji .ai-feedback-info-naa::after {
+    content: " " url(https://charcoal-se.org/userscripts/emoji/naa-2x.png)
+  }
+}
+
+.mob #chat .monologue .message {
+  /* fix messages collapsing to the bottom of the monlogue */
+  position: relative;
+}
+
+    </style>
+  `);
 
   let doWhenReady = $(document).ready;
   if (typeof CHAT === "object" && CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function" && !CHAT.Hub.roomReady.fired()) {
@@ -112,8 +210,9 @@
     }
     const backgroundColor = getEffectiveBackgroundColor($(".monologue:not(.mine) .messages"));
     const rgbAverage = backgroundColor.replace(/rgba?\((.*)\)/, "$1").split(/,/g).reduce((sum, value) => (Number(value) + sum), 0) / 3;
+    // Add the CSS to adjust the colors used when there's a dark background.
     $(document.head).append(`
-      <style type="text/css">
+      <style type="text/css" id="AIM-autoflagging-dark-mode">
         .monologue:not(.mine) .message:not(.reply-parent):not(.reply-child):not(.highlight) .ai-information {
           background-color: ${backgroundColor};
         }
