@@ -28,14 +28,22 @@
 
 (function () {
   "use strict";
-  const isChat = window.location.pathname.indexOf("/rooms/") === 0;
+
+  const MINUTE_IN_MILLISECONDS = 60 * 1000;
+  const HOUR_IN_MILLISECONDS = 60 * MINUTE_IN_MILLISECONDS;
+  const HOURS_2_IN_MILLISECONDS = 2 * HOUR_IN_MILLISECONDS;
+  const MAX_AGE_QUEUED_SOCKET_MESSAGE_DECORATE = HOURS_2_IN_MILLISECONDS;
+  const SOCKET_MESSAGE_DECORATE_QUEUE_EXPIRE_INTERVAL = 10 * MINUTE_IN_MILLISECONDS;
+
+  const isConversation = /^\/rooms\/\d+\/conversation\/.+$/.test(window.location.pathname);
+  const isChat = !isConversation && /^\/rooms\/\d+\/[^/]*$/.test(window.location.pathname);
 
   function doWhenRoomReadyIfMainChat(toCall) {
     // This should probably change to looking at window.location.
     if (!isChat) {
       return;
     }
-    if (CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function") {
+    if (typeof CHAT === "object" && CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function") {
       if (CHAT.Hub.roomReady.fired()) {
         // The room is ready now.
         toCall();
@@ -59,7 +67,7 @@
   document.head.appendChild(css);
 
   let doWhenReady = $(document).ready;
-  if (window.location.pathname.indexOf("/transcript") !== 0 && CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function" && !CHAT.Hub.roomReady.fired()) {
+  if (typeof CHAT === "object" && CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function" && !CHAT.Hub.roomReady.fired()) {
     doWhenReady = CHAT.Hub.roomReady.add;
   }
   doWhenReady(() => {
@@ -653,114 +661,161 @@
 
   // Listen to MS events
   autoflagging.msgQueue = [];
-  autoflagging.socket = new ReconnectingWebSocket("wss://metasmoke.erwaysoftware.com/cable");
-  autoflagging.socket.onmessage = function (message) {
-    function decorate(selector, data) {
-      (function _deco() {
-        debug.decorate("Attempting to decorate \"" + selector + "\" with", data, "message:", $(selector).parents(".message"));
-        const messages = $(selector).parents(".message");
-        const messagesWithAIInfo = messages.filter(function () {
-          return $(this).find(".ai-spinner, .ai-information.ai-loaded").length > 0;
-        });
-        if (messages.length > 0 && messages.length === messagesWithAIInfo.length) {
-          // All messages have AI info and there's at least one message.
-          messages.each(function () {
-            const thisMessage = $(this);
-            autoflagging.decorateMessage(thisMessage, data);
-          });
-        } else if (isChat) {
-          // MS is faster than chat; add the decorate operation to the queue
-          debug.queue("Queueing", selector);
-          // This could result in data from an earlier run overwriting later data, if later run is also in the queue
-          //   and the apprporiate SD message appears between this run and that next run.
-          autoflagging.msgQueue.push(_deco);
-        }
-      })();
+  autoflagging.decorateOrQueueBySelector = function (selector, data, receivedTime) {
+    // If we get a jQuery 'this' value, then we are checking only a single message (i.e. no need to do a DOM walk).
+    // This is optimized such that in subsequent runs through the queue we are only looking for links in the content
+    //   part of new messages. Thus, while 'selector' can be anything the first time through, it will only be tested
+    //   against links in the new message.
+    //   We even pre-filter those links, such that we only look at links that match
+    //     .filter('a:not([href^="//git.io/"]):not([href^="//m.erwaysoftware.com/"]):not([href*="/users/"])');
+    //   That's sufficient for what we currently are looking for, but it's intensionally limited, such that
+    //   we do only a small amount of work for each queue entry.
+    receivedTime = receivedTime || Date.now();
+    debug.decorate("Attempting to decorate \"" + selector + "\" with", data, "message:", $(selector).parents(".message"));
+    let messages;
+    if (this && this.length > 0) {
+      messages = this.filter(selector).parents(".message");
+    } else {
+      // Full search of the DOM. This is only done on the first check of this.
+      messages = $(selector).parents(".message");
     }
+    const messagesWithAIInfo = messages.filter(function () {
+      return $(this).find(".ai-spinner, .ai-information.ai-loaded").length > 0;
+    });
+    if (messagesWithAIInfo.length > 0) {
+      // There's at least one message with AI info or a spinner.
+      messagesWithAIInfo.each(function () {
+        const thisMessage = $(this);
+        autoflagging.decorateMessage(thisMessage, data);
+      });
+    } else if (isChat && Date.now() < (receivedTime + MAX_AGE_QUEUED_SOCKET_MESSAGE_DECORATE)) {
+      // We only have a queue for received MS WebSocket data in main chat pages and only keep things in the queue for 2 hours, which
+      //   is about double the longest delay we've seen SD have. Note: we've significantly improved things since then, so even that's
+      //   unlikely.
+      //   If we didn't expire things, then we'd just continuously build up a deeper and deeper queue.
+      // MS is faster than chat; add the decorate operation to the queue
+      debug.queue("Queueing", selector);
+      // This could result in data from an earlier run overwriting later data, if later run is also in the queue
+      //   and the apprporiate SD message appears between this run and that next run.
+      autoflagging.msgQueue.push([selector, data, receivedTime]);
+    }
+  };
+  autoflagging.expireMSGQueue = function () {
+    const now = Date.now();
+    autoflagging.msgQueue = autoflagging.msgQueue.filter(([selector, data, receivedTime]) => now < (receivedTime + MAX_AGE_QUEUED_SOCKET_MESSAGE_DECORATE)); // eslint-disable-line no-unused-vars
+  };
 
-    // Parse message
-    var jsonData = JSON.parse(message.data);
-    switch (jsonData.type) {
-      case "confirm_subscription":
-      case "ping":
-      case "welcome":
-      case "statistic":
-        break;
-      default: {
-        // Analyze socket message
-        debug.ws("got message", jsonData.message);
-        var flagLog = jsonData.message.flag_log;
-        var deletionLog = jsonData.message.deletion_log;
-        var feedback = jsonData.message.feedback;
-        var notFlagged = jsonData.message.not_flagged;
-        if (typeof flagLog !== "undefined") {
-          // Autoflagging information
-          debug.ws(flagLog.user, "autoflagged", flagLog.post);
-          let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
-          decorate(selector, flagLog.post);
-        } else if (typeof deletionLog !== "undefined") {
-          // Deletion log
-          debug.ws("deleted:", deletionLog);
-          let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
-          $(selector).parents(".content").addClass("ai-deleted");
-        } else if (typeof feedback !== "undefined") {
-          // Feedback
-          debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // feedback_type
-          let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
-          decorate(selector, {
-            feedbacks: [feedback]
-          });
-        } else if (typeof notFlagged !== "undefined") {
-          // Not flagged
-          debug.ws(notFlagged.post, "not flagged");
-          let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
-          decorate(selector, notFlagged.post);
+  autoflagging.setupMSWebSocket = function () {
+    if (autoflagging.socket) {
+      // Don't set up the WebSocket more tha once.
+      return;
+    }
+    // Expire old queue entries every 10 minutes.
+    setInterval(autoflagging.expireMSGQueue, SOCKET_MESSAGE_DECORATE_QUEUE_EXPIRE_INTERVAL);
+
+    autoflagging.socket = new ReconnectingWebSocket("wss://metasmoke.erwaysoftware.com/cable");
+    autoflagging.socket.onmessage = function (message) {
+      // Parse message
+      var jsonData = JSON.parse(message.data);
+      switch (jsonData.type) {
+        case "confirm_subscription":
+        case "ping":
+        case "welcome":
+        case "statistic":
+          break;
+        default: {
+          // Analyze socket message
+          debug.ws("got message", jsonData.message);
+          var flagLog = jsonData.message.flag_log;
+          var deletionLog = jsonData.message.deletion_log;
+          var feedback = jsonData.message.feedback;
+          var notFlagged = jsonData.message.not_flagged;
+          if (typeof flagLog !== "undefined") {
+            // Autoflagging information
+            debug.ws(flagLog.user, "autoflagged", flagLog.post);
+            let selector = autoflagging.selector + "a[href^='" + flagLog.post.link + "']";
+            autoflagging.decorateOrQueueBySelector(selector, flagLog.post);
+          } else if (typeof deletionLog !== "undefined") {
+            // Deletion log
+            debug.ws("deleted:", deletionLog);
+            let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
+            $(selector).parents(".content").addClass("ai-deleted");
+          } else if (typeof feedback !== "undefined") {
+            // Feedback
+            debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // feedback_type
+            let selector = autoflagging.selector + "a[href^='" + feedback.post_link + "']";
+            autoflagging.decorateOrQueueBySelector(selector, {
+              feedbacks: [feedback]
+            });
+          } else if (typeof notFlagged !== "undefined") {
+            // Not flagged
+            debug.ws(notFlagged.post, "not flagged");
+            let selector = autoflagging.selector + "a[href^='" + notFlagged.post.link + "']";
+            autoflagging.decorateOrQueueBySelector(selector, notFlagged.post);
+          }
+          break;
         }
-        break;
       }
+    };
+    autoflagging.socket.onopen = function () {
+      debug.ws("WebSocket opened.");
+      // Send authentication
+      autoflagging.socket.send(JSON.stringify({
+        identifier: JSON.stringify({
+          channel: "ApiChannel",
+          key: autoflagging.key
+        }),
+        command: "subscribe"
+      }));
+    };
+    autoflagging.socket.onclose = function (close) {
+      debug.ws("WebSocket closed:", close);
+    };
+  };
+
+  autoflagging.setupMSWebSocket();
+
+  autoflagging.processSocketMessageDecorateQueue = function (newMessageSelector) {
+    // Attempt to apply each decorate from a WebSocket message.
+    // If we are passed a newMessageSelector, then we are only checking a single message for all queue entries.
+    let singleMessageContentLinks = null;
+    if (typeof newMessageSelector === "string") {
+      singleMessageContentLinks = $(newMessageSelector).find(".content a").filter("a:not([href^='//git.io/']):not([href^='//m.erwaysoftware.com/']):not([href*='/users/'])");
     }
+    const queueWhenMessagePosted = autoflagging.msgQueue;
+    autoflagging.msgQueue = [];
+    // The entire existing queue needs to be handled in one context in order to maintain consistent order.
+    setTimeout(function () {
+      const currentQueue = autoflagging.msgQueue;
+      autoflagging.msgQueue = [];
+      queueWhenMessagePosted.forEach(function (queueEntry) {
+        debug.queue("Resolving queue:", queueEntry);
+        autoflagging.decorateOrQueueBySelector.apply(singleMessageContentLinks, queueEntry);
+      });
+      // Make sure anything that's been put back on the queue is prior to anything that's been put on the queue later.
+      //   This assumes that any changes to the queue are made synchronously.
+      autoflagging.msgQueue = autoflagging.msgQueue.concat(currentQueue);
+    }, 100);
   };
 
-  autoflagging.socket.onopen = function () {
-    debug.ws("WebSocket opened.");
-    // Send authentication
-    autoflagging.socket.send(JSON.stringify({
-      identifier: JSON.stringify({
-        channel: "ApiChannel",
-        key: autoflagging.key
-      }),
-      command: "subscribe"
-    }));
-  };
-  autoflagging.socket.onclose = function (close) {
-    debug.ws("WebSocket closed:", close);
-  };
-
-  // Sometimes, autoflagging information arrives before the chat message.
-  // The code below makes sure the queued decorations are executed.
-  CHAT.addEventHandlerHook(function (e) {
-    if (e.event_type === 1 && e.user_id === autoflagging.smokeyID) {
-      var self = this;
-      setTimeout(function () {
-        var matches = autoflagging.messageRegex.exec($("#message-" + e.message_id + " .content").html());
-        if (!matches) {
-          return;
-        }
-
-        // Resolve queue
-        var q = autoflagging.msgQueue;
-        autoflagging.msgQueue = [];
-        var args = arguments;
-        q.forEach(function (f) {
-          setTimeout(function () {
-            debug.queue("Resolving queue:", f, args);
-            f.apply(self, args);
-          }, 100);
-        });
-
+  function aimChatListener(chatEvent) {
+    if (chatEvent.event_type === 1 && chatEvent.user_id === autoflagging.smokeyID) {
+      if (!autoflagging.messageRegex.test(chatEvent.content)) {
+        return;
+      }
+      // Do this after the message has been added to the DOM.
+      setTimeout(() => {
         // Show spinner
-        autoflagging.addSpinnerToMessage($("#message-" + e.message_id));
-      }, 100);
+        const newMessageSelector = `#message-${chatEvent.message_id}`;
+        autoflagging.addSpinnerToMessage($(newMessageSelector));
+        // Sometimes, autoflagging information arrives before the chat message.
+        // The code below makes sure the queued decorations are executed.
+        autoflagging.processSocketMessageDecorateQueue(newMessageSelector);
+      }, 25);
     }
-  });
+  }
+
+  if (typeof CHAT === "object" && CHAT && typeof CHAT.addEventHandlerHook === "function") {
+    CHAT.addEventHandlerHook(aimChatListener);
+  }
 })();
