@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "A selection of useful userscripts for the regulars of [Charcoal HQ](http://chat.stackexchange.com/rooms/11540/charcoal-hq).",
   "scripts": {
-    "test": "xo --ignore fire.meta.js --ignore fire.user.js --ignore set-minimal-fire-sites-and-fire-user-sites.js --ignore stylelint.config.js --ignore ms_dark_theme_meta.js --ignore object-equality.js --ignore ms_dark_theme.user.js --ignore ms_dark_theme.meta.js --ignore metapi.js --ignore sim.user.js --ignore test/tests.js --ignore test/object-equality.js --ignore test/object-equality-tests.js --ignore review-keyboard-shortcuts/review-shortcuts.user.js",
+    "test": "xo",
     "get-meta": "bash ./extractScriptMetadata.sh"
   },
   "repository": {
@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^7.32.0",
+    "eslint": "^8.3.0",
+    "eslint-plugin-promise": "^5.1.1",
     "webpack": "^5.38.1",
-    "xo": "^0.46.4",
-    "eslint-plugin-promise": "^5.1.1"
+    "xo": "^0.46.4"
   },
   "xo": {
     "space": true,
@@ -66,6 +66,10 @@
       "no-unused-vars": 0,
       "no-var": 0,
       "object-shorthand": 0,
+      "operator-linebreak": [
+        "error",
+        "after"
+      ],
       "padding-line-between-statements": 0,
       "prefer-arrow-callback": 0,
       "prefer-const": 0,
@@ -105,6 +109,7 @@
       "unicorn/prefer-dom-node-remove": 0,
       "unicorn/prefer-module": 0,
       "unicorn/prefer-optional-catch-binding": 0,
+      "unicorn/prefer-prototype-methods": 0,
       "unicorn/prefer-ternary": 0
     },
     "globals": [
