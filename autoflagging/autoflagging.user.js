@@ -423,13 +423,11 @@
 
     $autoflag.find(".ai-you-flagged").toggle(data.flagged && data.youFlagged);
     $autoflag.find(".ai-flag-count")
-             .text(data.flagged ? String(data.users.length) : "")
-             .toggleClass("ai-not-autoflagged", !data.flagged)
-             .attr("title", data.flagged ?
-               "Flagged by " + data.users.map(function (user) {
-                 return user.username || user.user_name;
-               }).join(", ") :
-               "Not Autoflagged");
+      .text(data.flagged ? String(data.users.length) : "")
+      .toggleClass("ai-not-autoflagged", !data.flagged)
+      .attr("title", data.flagged ? "Flagged by " + data.users.map(function (user) {
+        return user.username || user.user_name;
+      }).join(", ") : "Not Autoflagged");
     $autoflag.data("users", data.users);
   };
   autoflagging.decorate.autoflag.key = "autoflagged";
