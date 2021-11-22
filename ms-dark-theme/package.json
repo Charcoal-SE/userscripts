@@ -6,9 +6,10 @@
     "test": "xo"
   },
   "devDependencies": {
-    "eslint": "^7.28.0",
+    "eslint": "^7.32.0",
     "webpack": "^5.38.1",
-    "xo": "^0.40.2"
+    "xo": "^0.46.4",
+    "eslint-plugin-promise": "^5.1.1"
   },
   "xo": {
     "space": true,

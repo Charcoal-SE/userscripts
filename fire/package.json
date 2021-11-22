@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^7.28.0",
+    "eslint": "^7.32.0",
     "webpack": "^5.38.1",
-    "xo": "^0.40.2"
+    "xo": "^0.46.4",
+    "eslint-plugin-promise": "^5.1.1"
   },
   "//": "FIRE overrides",
   "xo": {
@@ -48,12 +49,7 @@
           ]
         }
       ],
-      "unicorn/catch-error-name": [
-        "error",
-        {
-          "name": "error"
-        }
-      ],
+      "unicorn/catch-error-name": "off",
       "quotes": [
         "error",
         "single",
@@ -191,7 +187,6 @@
         }
       ],
       "padding-line-between-statements": "off",
-      "unicorn/catch-error-name": "off",
       "unicorn/prefer-node-append": "off",
       "unicorn/prefer-includes": "off",
       "unicorn/no-array-for-each": 0,
