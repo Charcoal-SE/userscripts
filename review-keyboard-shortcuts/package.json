@@ -46,6 +46,7 @@
           "MemberExpression": "off"
         }
       ],
+      "comma-dangle": 0,
       "no-useless-return": 0,
       "unicorn/prevent-abbreviations": 0,
       "unicorn/better-regex": 0,
