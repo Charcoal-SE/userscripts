@@ -37,10 +37,13 @@
         "error",
         "always"
       ],
-      "comma-dangle": [
-        "error",
-        "always-multiline"
-      ],
+      "comma-dangle": ["error", {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "never",
+        "exports": "never",
+        "functions": "never"
+      }],
       "new-cap": [
         "error",
         {
@@ -65,8 +68,7 @@
       "linebreak-style": "off",
       "curly": [
         "error",
-        "multi-or-nest",
-        "consistent"
+        "all"
       ],
       "no-console": "error",
       "no-extra-parens": "off",
@@ -186,12 +188,19 @@
           "ignoreEOLComments": true
         }
       ],
+      "operator-linebreak": [
+        "error",
+        "after"
+      ],
       "padding-line-between-statements": "off",
+      "unicorn/better-regex": "off",
       "unicorn/prefer-node-append": "off",
       "unicorn/prefer-includes": "off",
       "unicorn/no-array-for-each": 0,
       "unicorn/no-array-reduce": 0,
       "unicorn/no-instanceof-array": 0,
+      "unicorn/no-lonely-if": 0,
+      "unicorn/no-object-as-default-parameter": 0,
       "unicorn/no-this-assignment": 0,
       "unicorn/numeric-separators-style": 0,
       "unicorn/prefer-date-now": 0,
