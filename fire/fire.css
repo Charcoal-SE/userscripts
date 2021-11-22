@@ -1,4 +1,10 @@
 @charset "UTF-8";
+/* This file is no longer the controlling version of CSS/SCSS used for FIRE. The CSS is now
+ * contained as text in fire.user.js and loaded from there.
+ * In the future, if you find it easier to write something as SCSS, feel free to write it that
+ * way and convert it into CSS, but you will need to manually add it to injectMainCSS()
+ * in order for it to be applied to pages in which FIRE runs.
+ */
 img.fire-emoji {
   width: 16px;
   height: 16px; }
