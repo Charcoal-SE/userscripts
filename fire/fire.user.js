@@ -423,7 +423,7 @@
     if (!sites.storedAt) { // If the site data is empty
       const parameters = {
         filter: '!Fn4IB7S7Yq2UJF5Bh48LrjSpTc',
-        pagesize: 10000, //"sites" endpoint has a special dispensation that it can be any pagesize.
+        pagesize: 10000, // "sites" endpoint has a special dispensation that it can be any pagesize.
       };
 
       getSE(
@@ -556,13 +556,13 @@
     // This changes bare http/https/ftp URLs into links with link-text a shortened version of the URL.
     //   If useSpan is truthy, then a span with the new elements replaces the text node.
     //   If useSpan is falsy, then the new nodes are added as children of the same element as the text node being replaced.
-    //   The [\u200c\u200b] characters are added by SE chat to facilitate word-wrapping & should be removed from the URL.
+    //   The [\u200C\u200B] characters are added by SE chat to facilitate word-wrapping & should be removed from the URL.
     const minLengthToBeURL = 8;
     const maxLengthShortenedDisplayURL = 32;
     const maxLengthThresholdShortenedDisplayURL = maxLengthShortenedDisplayURL - 1;
     const endOfShortenedDisplayURLSlice = maxLengthThresholdShortenedDisplayURL - 2;
-    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+,;=\u200c\u200b-]{2,}))/g; // eslint-disable-line no-useless-escape
-    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+,;=\u200c\u200b-]{2,})/g; // eslint-disable-line no-useless-escape
+    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+,;=\u200C\u200B-]{2,}))/g; // eslint-disable-line no-useless-escape
+    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+,;=\u200C\u200B-]{2,})/g; // eslint-disable-line no-useless-escape
     if (!element) {
       throw new Error('element is invalid');
     }
@@ -598,7 +598,7 @@
           } // else
           urlRegex.lastIndex = 0;
           // Remove the extra characters SE chat adds to long character sequences.
-          split = split.replace(/[\u200c\u200b]/g, '');
+          split = split.replace(/[\u200C\u200B]/g, '');
           const newHtml = split.replace(urlRegex, (match, p1) => {
             // Try to match what SE uses in chat.
             if (innerShortenLinkText && p1.length > maxLengthShortenedDisplayURL) {
@@ -637,7 +637,7 @@
         // Replace the textNode with either the new span, or the new nodes.
         if (useSpan) {
           // Replace the textNode with the new span containing the link.
-          textNodeParent.replaceChild(newSpan, textNode);
+          textNode.replaceWith(newSpan);
         } else {
           const textNodeNextSibling = textNode.nextSibling;
           while (newSpan.firstChild) {
@@ -925,7 +925,7 @@
       } else {
         console.error('SE API AJAX fail (May contain your SE token. Don\'t share that!):', // eslint-disable-line no-console
           '\n::  jqXHR:', jqXHR,
-          '\n::  arguments:', arguments, // eslint-disable-line prefer-rest-params
+          '\n::  arguments:', arguments,
           '\n:: responseJSON:', jqXHR.responseJSON,
           '\n:: response text:', jqXHR.responseText
         );
@@ -1684,7 +1684,7 @@
             foundIndex = newFoundIndex;
             return newFoundIndexIsHigher;
           });
-          shouldReplaceThis = Boolean(remainingUnorderedAttrs.length) || !areOrderedAttrsInOrder;
+          shouldReplaceThis = remainingUnorderedAttrs.length > 0 || !areOrderedAttrsInOrder;
         } else if (!Array.isArray(nodeTypeAttrList) || !attrList.every((attr) => nodeTypeAttrList.includes(attr))) {
           // This isn't a valid tag
           shouldReplaceThis = true;
@@ -2343,7 +2343,7 @@
         .attr('fire-tooltip', 'You have flagged this post.')
         .append(` ${reportTitle}`);
     } else {
-      title = reportTitle; // eslint-disable-line prefer-destructuring
+      title = reportTitle;
     }
 
     const reportBody = generatePostBodyDivFromHtmlText(postData.body, false);
@@ -2623,7 +2623,7 @@
    * @param   {JSON_encodable_data}    additionalDetail        Additional JSON-ifiable data to be sent with the event.
    * @param   {object}                 additionalProperties    Additional properties for the event.
    */
-  function sendFireEventWithPopupPostData(data, element, baseEventName, additionalDetail = {}, additionalProperties) {
+  function sendFireEventWithPopupPostData(data, element, baseEventName, additionalDetail, additionalProperties) {
     const postData = getMSDataCopy(data);
     if (postData && postData.se) {
       delete postData.se.available_flags; // Remove private data
@@ -3049,7 +3049,7 @@
           return;
         }
         if (!data.has_sent_feedback ||
-          (fire.userData.flag && !(data.has_flagged || data.is_deleted)) // eslint-disable-line no-extra-parens
+          (fire.userData.flag && !(data.has_flagged || data.is_deleted))
         ) {
           postMetaSmokeFeedbackAndFlag(data, verdict, flagType);
         } else {
@@ -3067,7 +3067,7 @@
           );
         }
       },
-      disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)), // eslint-disable-line no-extra-parens
+      disabled: disabled || (data.has_sent_feedback && (data.has_flagged || data.is_deleted || !fire.userData.flag)),
       'fire-key': keyCodesToArray(keyCodes),
       'fire-tooltip': tooltip + suffix,
     });
@@ -3120,8 +3120,8 @@
     });
 
     const checkboxDiv = newEl('div', 'fire-setting-checkbox-div')
-        .append(checkBox)
-        .append(label);
+      .append(checkBox)
+      .append(label);
 
     if (headerText) {
       return newEl('div', 'fire-settings-section')
@@ -4632,7 +4632,7 @@ body.outside .fire-popup h2 {
         });
       return;
     } // else
-    if ((multiplier > 1 || (count > 1 && CHAT && CHAT.RoomUsers)) && fire.savedChatUser && fire.savedChatUser.name) { // eslint-disable-line no-extra-parens
+    if ((multiplier > 1 || (count > 1 && CHAT && CHAT.RoomUsers)) && fire.savedChatUser && fire.savedChatUser.name) {
       fire.chatUser = Object.assign({}, fire.savedChatUser);
       return;
     }
