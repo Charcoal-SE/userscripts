@@ -17,6 +17,7 @@
 // @include     /^https?://chat\.stackoverflow\.com/(?:rooms/)(?:41570|90230|111347|126195|167826|170175|202954)(?:[&/].*$|$)/
 // @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @require     https://cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/vendor/debug.min.js
+// @require     https://cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/emoji/emoji.js
 // @grant       none
 // ==/UserScript==
 
@@ -56,13 +57,6 @@
   css.rel = "stylesheet";
   css.href = "//cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/autoflagging/autoflagging.css";
   document.head.appendChild(css);
-
-  // Load the Emoji support script
-  if (!window.emojiSupportChecker) {
-    $.ajaxSetup({cache: true});
-    $.getScript("//cdn.jsdelivr.net/gh/Charcoal-SE/userscripts/emoji/emoji.js");
-    $.ajaxSetup({cache: false});
-  }
 
   let doWhenReady = $(document).ready;
   if (window.location.pathname.indexOf("/transcript") !== 0 && CHAT && CHAT.Hub && CHAT.Hub.roomReady && typeof CHAT.Hub.roomReady.add === "function" && !CHAT.Hub.roomReady.fired()) {
