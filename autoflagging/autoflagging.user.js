@@ -800,7 +800,7 @@
   };
   autoflagging.expireMSGQueue = function () {
     const now = Date.now();
-    autoflagging.msgQueue = autoflagging.msgQueue.filter(([selector, data, receivedTime]) => now < (receivedTime + MAX_AGE_QUEUED_SOCKET_MESSAGE_DECORATE)); // eslint-disable-line no-unused-vars
+    autoflagging.msgQueue = autoflagging.msgQueue.filter(([selector, data, receivedTime]) => now < (receivedTime + MAX_AGE_QUEUED_SOCKET_MESSAGE_DECORATE));
   };
 
   autoflagging.setupMSWebSocket = function () {
