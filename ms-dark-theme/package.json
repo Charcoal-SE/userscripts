@@ -6,7 +6,10 @@
     "test": "xo"
   },
   "devDependencies": {
-    "xo": "^0.17.1"
+    "eslint": "^8.3.0",
+    "eslint-plugin-promise": "^5.1.1",
+    "webpack": "^5.38.1",
+    "xo": "^0.46.4"
   },
   "xo": {
     "space": true,
@@ -15,7 +18,13 @@
       "jquery"
     ],
     "rules": {
-      "quotes": ["warn", "double", {"avoidEscape": true}],
+      "quotes": [
+        "warn",
+        "double",
+        {
+          "avoidEscape": true
+        }
+      ],
       "camelcase": 1,
       "brace-style": 0,
       "no-prototype-builtins": 0,
@@ -23,8 +32,27 @@
       "linebreak-style": "off",
       "comma-dangle": "off",
       "no-eq-null": "off",
-      "eqeqeq": ["error", "smart"],
-      "unicorn/filename-case": "off"
+      "eqeqeq": [
+        "error",
+        "smart"
+      ],
+      "unicorn/filename-case": "off",
+      "no-var": 0,
+      "object-shorthand": 0,
+      "unicorn/prefer-node-append": 0,
+      "unicorn/no-for-loop": 0,
+      "unicorn/prevent-abbreviations": 0,
+      "unicorn/no-array-for-each": 0,
+      "unicorn/no-array-reduce": 0,
+      "unicorn/no-instanceof-array": 0,
+      "unicorn/no-this-assignment": 0,
+      "unicorn/numeric-separators-style": 0,
+      "unicorn/prefer-date-now": 0,
+      "unicorn/prefer-dom-node-append": 0,
+      "unicorn/prefer-dom-node-remove": 0,
+      "unicorn/prefer-module": 0,
+      "unicorn/prefer-optional-catch-binding": 0,
+      "unicorn/prefer-ternary": 0
     },
     "globals": [
       "CHAT",

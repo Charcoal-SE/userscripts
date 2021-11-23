@@ -1118,7 +1118,7 @@
       let isReportedUrlValid = false;
 
       if (urlOnReportLink) {
-        reportedUrl = reportLink[0].href.split('url=')[1]; // eslint-disable-line prefer-destructuring
+        reportedUrl = reportLink[0].href.split('url=')[1];
         isReportedUrlValid = Boolean(reportedUrl);
       }
       if ((!urlOnReportLink || !isReportedUrlValid) && reportLink.nextAll('a')[0]) {
@@ -1365,7 +1365,7 @@
         .trigger('mouseleave');
 
       const $button = $(`.fire-popup-header a[fire-key~=${event.keyCode}]:not([disabled])`);
-      const button = $button[0]; // eslint-disable-line prefer-destructuring
+      const button = $button[0];
 
       if (button) {
         if (event.keyCode === c.keys.esc) { // [Esc] key
@@ -2056,7 +2056,7 @@
         .map((value) => value
           .split(':')
           .map((secondSplit) => secondSplit.trim())));
-    } catch (error) {
+    } catch {
       return {};
     }
   }

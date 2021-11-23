@@ -18,10 +18,12 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "xo": "^0.17.1"
+    "eslint": "^8.3.0",
+    "eslint-plugin-promise": "^5.1.1",
+    "webpack": "^5.38.1",
+    "xo": "^0.46.4"
   },
   "xo": {
-    "space": true,
     "envs": [
       "browser",
       "jquery"
@@ -53,12 +55,114 @@
         "error",
         "smart"
       ],
-      "unicorn/filename-case": "off"
+      "unicorn/filename-case": "off",
+      "capitalized-comments": 0,
+      "eslint-comments/no-unused-disable": 0,
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1,
+          "flatTernaryExpressions": false,
+          "offsetTernaryExpressions": false,
+          "ignoreComments": false
+        }
+      ],
+      "no-else-return": 0,
+      "no-multi-spaces": 0,
+      "no-multiple-empty-lines": 0,
+      "no-unused-vars": 0,
+      "no-var": 0,
+      "object-shorthand": 0,
+      "operator-linebreak": [
+        "error",
+        "after"
+      ],
+      "padding-line-between-statements": 0,
+      "prefer-arrow-callback": 0,
+      "prefer-const": 0,
+      "prefer-destructuring": 0,
+      "prefer-rest-params": 0,
+      "unicorn/catch-error-name": 0,
+      "unicorn/explicit-length-check": 0,
+      "unicorn/no-array-instanceof": 0,
+      "unicorn/prefer-add-event-listener": 0,
+      "unicorn/prefer-node-append": 0,
+      "unicorn/prefer-query-selector": 0,
+      "valid-jsdoc": 0,
+      "no-redeclare": [
+        "error",
+        {
+          "builtinGlobals": false
+        }
+      ],
+      "unicorn/no-for-loop": 0,
+      "unicorn/no-nested-ternary": 0,
+      "unicorn/prefer-includes": 0,
+      "unicorn/prefer-string-slice": 0,
+      "unicorn/prefer-node-remove": 0,
+      "promise/prefer-await-to-then": 0,
+      "unicorn/prevent-abbreviations": 0,
+      "unicorn/string-content": 0,
+      "unicorn/better-regex": 0,
+      "unicorn/no-fn-reference-in-iterator": 0,
+      "unicorn/prefer-number-properties": 0,
+      "unicorn/no-array-for-each": 0,
+      "unicorn/no-array-reduce": 0,
+      "unicorn/no-instanceof-array": 0,
+      "unicorn/no-this-assignment": 0,
+      "unicorn/numeric-separators-style": 0,
+      "unicorn/prefer-date-now": 0,
+      "unicorn/prefer-dom-node-append": 0,
+      "unicorn/prefer-dom-node-remove": 0,
+      "unicorn/prefer-module": 0,
+      "unicorn/prefer-optional-catch-binding": 0,
+      "unicorn/prefer-prototype-methods": 0,
+      "unicorn/prefer-ternary": 0
     },
     "globals": [
       "CHAT",
       "Notifier",
       "StackExchange"
+    ],
+    "overrides": [
+      {
+        "files": "autoflagging/autoflagging.user.js",
+        "rules": {
+          "no-redeclare": [
+            "error",
+            {
+              "builtinGlobals": true
+            }
+          ],
+          "camelcase": [
+            "warn", {
+              "allow": [
+                "reason_weight"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": "spamtracker/spamtracker.user.js",
+        "rules": {
+          "indent": 0
+        }
+      },
+      {
+        "files": "spam/SmokeyPings.user.js",
+        "rules": {
+          "camelcase": [
+            "warn", {
+              "allow": [
+                "event_type",
+                "user_id"
+              ]
+            }
+          ]
+        }
+      }
     ]
   }
 }

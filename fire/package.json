@@ -18,7 +18,10 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "xo": "^0.17.1"
+    "eslint": "^8.3.0",
+    "eslint-plugin-promise": "^5.1.1",
+    "webpack": "^5.38.1",
+    "xo": "^0.46.4"
   },
   "//": "FIRE overrides",
   "xo": {
@@ -30,42 +33,109 @@
       "greasemonkey"
     ],
     "rules": {
-      "arrow-parens": ["error", "always"],
-      "comma-dangle": ["error", "always-multiline"],
-      "new-cap": ["error", { "capIsNewExceptions": ["jQuery.Deferred"] }],
-      "unicorn/catch-error-name": ["error", { "name": "error" }],
-      "quotes": ["error", "single", {"avoidEscape": true}],
+      "arrow-parens": [
+        "error",
+        "always"
+      ],
+      "comma-dangle": ["error", {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "never",
+        "exports": "never",
+        "functions": "never"
+      }],
+      "new-cap": [
+        "error",
+        {
+          "capIsNewExceptions": [
+            "jQuery.Deferred"
+          ]
+        }
+      ],
+      "unicorn/catch-error-name": "off",
+      "quotes": [
+        "error",
+        "single",
+        {
+          "avoidEscape": true
+        }
+      ],
       "camelcase": "off",
-      "max-params": ["warn", 5],
+      "max-params": [
+        "warn",
+        5
+      ],
       "linebreak-style": "off",
-      "curly": ["error"],
+      "curly": [
+        "error",
+        "all"
+      ],
       "no-console": "error",
       "no-extra-parens": "off",
       "no-prototype-builtins": "error",
-      "complexity": ["error", 20],
+      "complexity": [
+        "error",
+        20
+      ],
       "consistent-return": "error",
       "no-else-return": "error",
       "no-empty-function": "error",
-      "no-magic-numbers": ["error", {
-        "ignore": [-1, 0, 1, 2],
-        "ignoreArrayIndexes": true
-      }],
+      "no-magic-numbers": [
+        "error",
+        {
+          "ignore": [
+            -1,
+            0,
+            1,
+            2
+          ],
+          "ignoreArrayIndexes": true
+        }
+      ],
       "vars-on-top": "error",
-      "consistent-this": ["error", "that"],
-      "func-style": ["error", "declaration"],
-      "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
+      "consistent-this": [
+        "error",
+        "that"
+      ],
+      "func-style": [
+        "error",
+        "declaration"
+      ],
+      "newline-per-chained-call": [
+        "error",
+        {
+          "ignoreChainWithDepth": 2
+        }
+      ],
       "no-underscore-dangle": "error",
       "no-unneeded-ternary": "error",
-      "object-curly-newline": ["error", { "multiline": true }],
-      "template-curly-spacing": ["error", "never"],
+      "object-curly-newline": [
+        "error",
+        {
+          "multiline": true
+        }
+      ],
+      "template-curly-spacing": [
+        "error",
+        "never"
+      ],
       "prefer-template": "error",
-      "prefer-destructuring": ["error", {"object": true}, {"enforceForRenamedProperties": false}],
+      "prefer-destructuring": [
+        "error",
+        {
+          "object": true
+        },
+        {
+          "enforceForRenamedProperties": false
+        }
+      ],
       "no-var": "error",
       "prefer-const": "error",
       "prefer-arrow-callback": "error",
       "object-shorthand": "error",
       "capitalized-comments": "off",
-      "valid-jsdoc": ["error",
+      "valid-jsdoc": [
+        "error",
         {
           "prefer": {
             "return": "returns"
@@ -93,13 +163,72 @@
           "matchDescription": "[A-Z].+\\."
         }
       ],
-      "require-jsdoc": ["error", {"require": {"FunctionDeclaration": true, "MethodDefinition": true, "ClassDeclaration": true}}]
+      "require-jsdoc": [
+        "error",
+        {
+          "require": {
+            "FunctionDeclaration": true,
+            "MethodDefinition": true,
+            "ClassDeclaration": true
+          }
+        }
+      ],
+      "eslint-comments/no-unused-disable": "off",
+      "indent": [
+        "error",
+        2,
+        {
+          "MemberExpression": 1,
+          "SwitchCase": 1
+        }
+      ],
+      "no-multi-spaces": [
+        "error",
+        {
+          "ignoreEOLComments": true
+        }
+      ],
+      "operator-linebreak": [
+        "error",
+        "after"
+      ],
+      "padding-line-between-statements": "off",
+      "unicorn/better-regex": "off",
+      "unicorn/prefer-node-append": "off",
+      "unicorn/prefer-includes": "off",
+      "unicorn/no-array-for-each": 0,
+      "unicorn/no-array-reduce": 0,
+      "unicorn/no-instanceof-array": 0,
+      "unicorn/no-lonely-if": 0,
+      "unicorn/no-object-as-default-parameter": 0,
+      "unicorn/no-this-assignment": 0,
+      "unicorn/numeric-separators-style": 0,
+      "unicorn/prefer-date-now": 0,
+      "unicorn/prefer-dom-node-append": 0,
+      "unicorn/prefer-dom-node-remove": 0,
+      "unicorn/prefer-module": 0,
+      "unicorn/prefer-optional-catch-binding": 0,
+      "unicorn/prefer-ternary": 0,
+      "unicorn/prevent-abbreviations": 0
     },
     "globals": [
       "fire",
       "metapi",
       "toastr",
       "CHAT"
+    ],
+    "overrides": [
+      {
+        "files": "fire.user.js",
+        "rules": {
+          "no-unused-vars": [
+            "error",
+            {
+              "varsIgnorePattern": "[iI]gnored"
+            }
+          ]
+        }
+      }
     ]
   }
 }

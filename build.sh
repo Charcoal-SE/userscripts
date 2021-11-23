@@ -19,7 +19,7 @@ do
 done
 
 echo "Building main project..."
-npm install
+npm --no-fund install
 npm test
 ecode=$?
 if [ "$ecode" != "0" ]
@@ -33,7 +33,7 @@ for dir in ${dirs[@]} ;
 do
   echo "Building overridden: $dir"
   cd $dir
-  npm install
+  npm --no-fund install
   npm test
   ecode=$?
   if [ "$ecode" != "0" ]
