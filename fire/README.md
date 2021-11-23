@@ -34,6 +34,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
     - Code blocks in the post can be expanded by clicking on them.
     - If selected (configurable setting), the post's images are hidden behind a placeholder image that can be clicked to show the image included in the post. If this option is set, then the post's images are not downloaded from their source until you click on the placeholder. This is to prevent potentially NSFW images from being downloaded to your machine.
   - At the bottom right of the popup, is a ⚙️, which opens the settings popup when clicked.
+  - Just to the left of the ⚙️ is the currently running version number of FIRE. It's a link to download the most recent released version from GitHub.
 - Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account _and_ the configuration setting for flagging is enabled:
   - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network.
   - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network.
@@ -79,6 +80,10 @@ To open the reported post on its site:
  - Flagging will fail if you are not registered on the particular site.
 
 # Version History
+
+|1.4    ||
+| ---   |---
+|1.4.0  |<ul><li>Have links in reports wrap anywhere</li><li>Don't allow the report cache to grow without bound</li><li>Fix the blur option so it doesn't cause the chat page to relayout</li><li>Allow the main and settings popups to be moved and resized.</li><li>Linkify some URLs in the why data</li><li>Use a more identifiable name for the fireChatListener</li><li>Always allow re-authorization with SE</li><li>Add room 129590</li><li>Due to HTTPS certificate issues change to via.placeholder.com</li><li>Spin the FIRE button when loading to indicate progress</li><li>Linkify the URLs in the blacklisted user reason.</li><li>Allow some tooltips (e.g. the why data) to lock open upon click</li><li>Trigger events with post data when opening and closing, to allow better integration with add-ons.</li><li>Various internal improvements</li><li>Better responsiveness</li><li>Move the CSS into the main script, rather than an external file.</li><li>Handle backoffs from the SE API</li><li>Format the why data</li><li>Better linking of username</li><li>Handle SE site-relative URLs</li><li>Support spoilers, blockquotes, tables, snippets (somewhat), H4-H6, embedded YouTube videos in iframes</li><li>Prevent display of HTML elements which SE doesn't support.</li><li>More accurately  recover the original HTML from the SD processed report body.</li><li>Rewrite a considerable portion of generating the report body.</li><li>Adjust formatting of headers to more closely match SE presentation</li><li>xo 0.30.0 and eslint 6.8.0 changes</li><li>Formating and code style changes</li></ul>
 
 |1.3    ||
 | ---   |---

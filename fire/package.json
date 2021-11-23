@@ -1,9 +1,10 @@
 {
   "name": "fire",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.",
   "scripts": {
-    "test": "xo"
+    "test": "xo",
+    "compile-scss": "sed -e '/^---/d' fire.scss | node-sass > fire.css"
   },
   "repository": {
     "type": "git",
@@ -29,13 +30,17 @@
       "greasemonkey"
     ],
     "rules": {
+      "arrow-parens": ["error", "always"],
+      "comma-dangle": ["error", "always-multiline"],
+      "new-cap": ["error", { "capIsNewExceptions": ["jQuery.Deferred"] }],
+      "unicorn/catch-error-name": ["error", { "name": "error" }],
       "quotes": ["error", "single", {"avoidEscape": true}],
       "camelcase": "off",
       "max-params": ["warn", 5],
       "linebreak-style": "off",
-      "curly": ["error", "multi-or-nest", "consistent"],
+      "curly": ["error"],
       "no-console": "error",
-      "no-extra-parens": "error",
+      "no-extra-parens": "off",
       "no-prototype-builtins": "error",
       "complexity": ["error", 20],
       "consistent-return": "error",
@@ -62,21 +67,32 @@
       "capitalized-comments": "off",
       "valid-jsdoc": ["error",
         {
-          "prefer": {"return": "returns"},
+          "prefer": {
+            "return": "returns"
+          },
           "preferType": {
-            "String": "string", "str": "string",
-            "Number": "number", "int": "number",
-            "Boolean": "boolean", "bool": "boolean",
-            "Object": "object", "obj": "object",
-            "Array": "array", "arr": "array",
-            "Function": "function", "fn": "function", "func": "function",
+            "Array": "array",
+            "arr": "array",
+            "Boolean": "boolean",
+            "bool": "boolean",
+            "Function": "function",
+            "fn": "function",
+            "func": "function",
+            "int": "number",
+            "Number": "number",
+            "String": "string",
+            "str": "string",
+            "Object": "object",
+            "obj": "object",
             "type": "a valid type"
           },
           "requireReturn": false,
+          "requireReturnType": true,
+          "requireParamDescription": true,
+          "requireReturnDescription": true,
           "matchDescription": "[A-Z].+\\."
         }
       ],
-
       "require-jsdoc": ["error", {"require": {"FunctionDeclaration": true, "MethodDefinition": true, "ClassDeclaration": true}}]
     },
     "globals": [

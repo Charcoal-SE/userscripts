@@ -48,6 +48,7 @@
       ],
       "no-eval": 1,
       "import/no-unassigned-import": 0,
+      "import/extensions": "off",
       "camelcase": 1,
       "brace-style": 0,
       "no-prototype-builtins": 0,
