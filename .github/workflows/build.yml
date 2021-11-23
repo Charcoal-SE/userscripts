@@ -28,4 +28,6 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: build
-        run: './build.sh'
+        run: |
+          npm install --no-fund -g npm@^8.1.4
+          './build.sh'
