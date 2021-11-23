@@ -24,7 +24,6 @@
     "xo": "^0.46.4"
   },
   "xo": {
-    "space": true,
     "envs": [
       "browser",
       "jquery"
@@ -59,7 +58,16 @@
       "unicorn/filename-case": "off",
       "capitalized-comments": 0,
       "eslint-comments/no-unused-disable": 0,
-      "indent": 0,
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1,
+          "flatTernaryExpressions": false,
+          "offsetTernaryExpressions": false,
+          "ignoreComments": false
+        }
+      ],
       "no-else-return": 0,
       "no-multi-spaces": 0,
       "no-multiple-empty-lines": 0,
@@ -116,6 +124,45 @@
       "CHAT",
       "Notifier",
       "StackExchange"
+    ],
+    "overrides": [
+      {
+        "files": "autoflagging/autoflagging.user.js",
+        "rules": {
+          "no-redeclare": [
+            "error",
+            {
+              "builtinGlobals": true
+            }
+          ],
+          "camelcase": [
+            "warn", {
+              "allow": [
+                "reason_weight"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": "spamtracker/spamtracker.user.js",
+        "rules": {
+          "indent": 0
+        }
+      },
+      {
+        "files": "spam/SmokeyPings.user.js",
+        "rules": {
+          "camelcase": [
+            "warn", {
+              "allow": [
+                "event_type",
+                "user_id"
+              ]
+            }
+          ]
+        }
+      }
     ]
   }
 }

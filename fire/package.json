@@ -216,6 +216,19 @@
       "metapi",
       "toastr",
       "CHAT"
+    ],
+    "overrides": [
+      {
+        "files": "fire.user.js",
+        "rules": {
+          "no-unused-vars": [
+            "error",
+            {
+              "varsIgnorePattern": "[iI]gnored"
+            }
+          ]
+        }
+      }
     ]
   }
 }

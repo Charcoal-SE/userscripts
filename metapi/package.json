@@ -29,7 +29,6 @@
     "xo": "^0.46.4"
   },
   "xo": {
-    "space": true,
     "envs": [
       "browser",
       "jquery",

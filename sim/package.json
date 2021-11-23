@@ -47,7 +47,13 @@
       ],
       "no-eval": 1,
       "import/no-unassigned-import": 0,
-      "camelcase": 1,
+      "camelcase": [
+        "warn", {
+          "allow": [
+            "manual_flags"
+          ]
+        }
+      ],
       "brace-style": 0,
       "no-prototype-builtins": 0,
       "dot-notation": 0,
