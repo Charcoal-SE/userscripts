@@ -138,10 +138,10 @@
   content: " ✗";
 }
 .ai-feedback-info-naa::after {
-  content: " ";
+  content: " \\1F4A9";
 }
 .ai-feedback-info-ignore::after {
-  content: " \\1f6ab";
+  content: " \\1f6AB";
 }
 
 .no-emoji .ai-feedback-info-naa::after {
