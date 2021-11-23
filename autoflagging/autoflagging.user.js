@@ -504,39 +504,40 @@
 
     // Update feedback DOM element
     $feedback.empty();
-    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.k, $feedback, "tpu-");
-    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.f, $feedback, "fp-");
-    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.n, $feedback, "naa-");
-    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.i, $feedback, "ignore-");
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.k, $feedback, "tpu");
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.f, $feedback, "fp");
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.n, $feedback, "naa");
+    autoflagging.decorate.feedback.addFeedback(simpleFeedbacks.i, $feedback, "ignore");
   };
 
   /*!
    * Adds feedback of one type (tpu-, naa-, fp-, ignore-) to a feedback DOM element.
    */
-  autoflagging.decorate.feedback.addFeedback = function (items, $feedback, defaultKey) {
-    var count = Object.keys(items)
-      .map(function (key) {
-        return items[key].length;
-      })
+  autoflagging.decorate.feedback.addFeedback = function (simpleFeedbacksByType, $feedback, defaultFeedbackType) {
+    const minusDefaultKey = defaultFeedbackType + "-";
+    // We don't care about the difference between feedbacks with "-" and the same feedback without it (e.g. "tpu-" vs "tpu"), so consolidate all those.
+    Object.keys(simpleFeedbacksByType).forEach(feedbackType => {
+      const nonMinusFeedbackType = feedbackType.replace(/-$/, "");
+      if (feedbackType !== nonMinusFeedbackType) {
+        simpleFeedbacksByType[nonMinusFeedbackType] = (simpleFeedbacksByType[nonMinusFeedbackType] || []).concat(simpleFeedbacksByType[feedbackType]);
+        delete simpleFeedbacksByType[feedbackType];
+      }
+    });
+    const count = Object.keys(simpleFeedbacksByType)
+      .map(feedbackType => simpleFeedbacksByType[feedbackType].length)
       .reduce(function (a, b) {
         return a + b;
       }, 0);
     if (count) {
-      var title = (items[defaultKey] || []).join(", ");
-      var titles = Object.keys(items)
-        .map(function (key) {
-          if (key.replace(/-$/, "") === defaultKey.replace(/-$/, "")) {
-            return undefined;
-          }
-          return key + ": " + items[key].join(", ");
-        });
-      titles.unshift(title);
-      titles = titles.filter(function (x) {
-        return x;
-      });
+      // Put all the names in a list organized by feedback type, but make sure the default feedback type is first.
+      const defaultFeedbackTitle = (simpleFeedbacksByType[defaultFeedbackType] || []).join(", ");
+      const titles = Object.keys(simpleFeedbacksByType)
+        .filter(feedbackType => feedbackType !== defaultFeedbackType)
+        .map(feedbackType => feedbackType + ": " + simpleFeedbacksByType[feedbackType].join(", "));
+      titles.unshift(defaultFeedbackTitle);
       $feedback.append(
         $("<span/>").addClass("ai-feedback-info")
-          .addClass("ai-feedback-info-" + defaultKey.replace(/-$/, ""))
+          .addClass("ai-feedback-info-" + defaultFeedbackType)
           .text(count).attr("title", titles.join("; "))
       );
     }
