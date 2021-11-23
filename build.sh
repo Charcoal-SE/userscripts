@@ -5,7 +5,6 @@
 # to "ignores" in /package.json.
 
 overridden=""
-ignores="--"
 
 RED="\033[0;31m"
 NORMAL="\033[0m"
@@ -16,13 +15,12 @@ do
   then
     echo "Overridden package.json: $dir"
     overridden=$overridden";;$dir"
-    ignores=$ignores" --ignore $dir"
   fi
 done
 
 echo "Building main project..."
 npm install
-npm test $ignores
+npm test
 ecode=$?
 if [ "$ecode" != "0" ]
 then
