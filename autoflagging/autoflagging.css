@@ -63,6 +63,10 @@
 .ai-feedback-info-naa {
   color: #825325;
 }
+.ai-feedback-info-ignore {
+  color: #ff4442;
+}
+
 
 .ai-feedback-info-tpu::after {
   content: " ✓";
@@ -73,6 +77,10 @@
 .ai-feedback-info-naa::after {
   content: " 💩";
 }
+.ai-feedback-info-ignore::after {
+  content: " \1f6ab";
+}
+
 .no-emoji .ai-feedback-info-naa::after {
   content: " " url(https://charcoal-se.org/userscripts/emoji/naa.png)
 }
