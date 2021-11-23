@@ -2741,7 +2741,11 @@
       if (fire && fire.reportCache[url]) {
         fire.reportCache[url].isExpired = true;
       }
-      clearFireButtonLoading(fire.isOpen);
+
+      // We're closing all popups. Clear the loading information from all FIRE buttons.
+      $('.fire-data-loading, .fireComplete-temp-disable .fire-button').each(function () {
+        clearFireButtonLoading(this);
+      });
 
       const previous = fire.isOpen;
       delete fire.isOpen;
