@@ -3988,9 +3988,9 @@ body.outside .fire-popup h2 {
 .fire-bottom-edge-right-container {
   height: 17px;
   position: absolute;
-  bottom: 2px;
-  right: 21px;
-	right: 23px;
+  bottom: 1px;
+  right: 23px;
+  overflow: hidden;
 }
 .fire-popup .fire-bottom-edge-right-container .fire-settings-button,
 .fire-popup .fire-bottom-edge-right-container .fire-version-link {
