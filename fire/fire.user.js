@@ -5,7 +5,7 @@
 // @author      Cerbrus
 // @contributor Makyen
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.4.0
+// @version     1.4.1
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -2741,7 +2741,11 @@
       if (fire && fire.reportCache[url]) {
         fire.reportCache[url].isExpired = true;
       }
-      clearFireButtonLoading(fire.isOpen);
+
+      // We're closing all popups. Clear the loading information from all FIRE buttons.
+      $('.fire-data-loading, .fireComplete-temp-disable .fire-button').each(function () {
+        clearFireButtonLoading(this);
+      });
 
       const previous = fire.isOpen;
       delete fire.isOpen;
@@ -2779,7 +2783,7 @@
   function getJqXHRmessage(jqXHR) {
     try {
       return JSON.parse(jqXHR.responseText);
-    } catch (error) { // eslint-disable-line no-unused-vars
+    } catch (error) {
       return {message: (jqXHR || {responseText: ''}).responseText};
     }
   }
@@ -3984,9 +3988,9 @@ body.outside .fire-popup h2 {
 .fire-bottom-edge-right-container {
   height: 17px;
   position: absolute;
-  bottom: 2px;
-  right: 21px;
-	right: 23px;
+  bottom: 1px;
+  right: 23px;
+  overflow: hidden;
 }
 .fire-popup .fire-bottom-edge-right-container .fire-settings-button,
 .fire-popup .fire-bottom-edge-right-container .fire-version-link {
