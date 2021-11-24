@@ -2783,7 +2783,7 @@
   function getJqXHRmessage(jqXHR) {
     try {
       return JSON.parse(jqXHR.responseText);
-    } catch (error) { // eslint-disable-line no-unused-vars
+    } catch (error) {
       return {message: (jqXHR || {responseText: ''}).responseText};
     }
   }
