@@ -2468,9 +2468,33 @@
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
     document.addEventListener('keypress', stopPropagationIfTargetBody, true);
+    // Make short links more visible
+    $('.fire-reported-post a').each(addShortLinkClassAndWatchContainedImages);
     $fireButton.removeClass('fire-data-loading');
     clearTimeout(fire.popupLoadingTimeout);
     sendFireEventWithPopupPostData(postData, $fireButton, 'popup-open');
+  }
+
+  /**
+   * addShortLinkClassAndWatchContainedImages - If the link is small, add the "fire-short-link" class and watch any contained images for loading.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function addShortLinkClassAndWatchContainedImages() {
+    const $this = $(this);
+    const $closestA = $this.closest('a');
+    const height = $closestA.height();
+    const width = $closestA.width();
+    if (height < fire.constants.linkDisplayTooSmallHeight || width < fire.constants.linkDisplayTooSmallWidth) {
+      $closestA.addClass('fire-short-link');
+      if ($this.is('a')) {
+        $this.find('img').on('load', addShortLinkClassAndWatchContainedImages);
+      }
+    } else {
+      $closestA.removeClass('fire-short-link');
+    }
   }
 
   /**
@@ -4053,7 +4077,11 @@ body.outside .fire-popup h2 {
 .fire-settings-popup .fire-popup-body {
   height: 100%;
 }
-
+.fire-short-link:after {
+  content: "_link";
+  color: red;
+  font-style: italic;
+}
     </style>`);
   }
 
@@ -4708,6 +4736,8 @@ body.outside .fire-popup h2 {
       popupOpeningTimeoutDelay: 90000,
       webSocketInitialOpenDelay: 3000,
       reportCacheEntryWithNoFireButtonMinimumRetentionMilliseconds: 3 * 60 * 60 * 1000, // eslint-disable-line no-magic-numbers
+      linkDisplayTooSmallHeight: 10,
+      linkDisplayTooSmallWidth: 13,
     };
   }
 })();
