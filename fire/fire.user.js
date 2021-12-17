@@ -922,9 +922,15 @@
       } else if (errorData && errorData.error_message && errorData.error_message.indexOf('You cannot perform this action for another') === 0) { // SE API, Need to delay flagging.
         const [delaySeconds] = errorData.error_message.match(/\d+/);
         setTimeout(newBackoff.resolve, delaySeconds * fire.constants.millisecondsInSecond);
+      } else if (errorData && errorData.error_message && errorData.error_message === 'option_id') {
+        // SE API, Given in response to a flagging request with an invalid option_id, which can be caused by the post being deleted between when the options
+        // were obtained and when the flagging is requested.
+        // We don't set a backoff in this case.
       } else {
+        toastr.error('SE API AJAX FAIL: See console for more information');
         console.error('SE API AJAX fail (May contain your SE token. Don\'t share that!):', // eslint-disable-line no-console
           '\n::  jqXHR:', jqXHR,
+          '\n::  this:', this,
           '\n::  arguments:', arguments,
           '\n:: responseJSON:', jqXHR.responseJSON,
           '\n:: response text:', jqXHR.responseText
