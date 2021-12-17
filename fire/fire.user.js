@@ -189,7 +189,7 @@
         window.close();
       }
       // Clear hash
-      history.pushState('', document.title, window.location.pathname + window.location.search);
+      history.pushState('', document.title, window.location ? window.location.pathname + window.location.search : 'https://chat.stackexchange.com/rooms/11540/charcoal-hq');
     }
   }
 
