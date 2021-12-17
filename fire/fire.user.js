@@ -561,8 +561,8 @@
     const maxLengthShortenedDisplayURL = 32;
     const maxLengthThresholdShortenedDisplayURL = maxLengthShortenedDisplayURL - 1;
     const endOfShortenedDisplayURLSlice = maxLengthThresholdShortenedDisplayURL - 2;
-    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+,;=\u200C\u200B-]{2,}))/g; // eslint-disable-line no-useless-escape
-    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+,;=\u200C\u200B-]{2,})/g; // eslint-disable-line no-useless-escape
+    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+%,;=\u200C\u200B-]{2,}))/g; // eslint-disable-line no-useless-escape
+    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+%,;=\u200C\u200B-]{2,})/g; // eslint-disable-line no-useless-escape
     if (!element) {
       throw new Error('element is invalid');
     }
