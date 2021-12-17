@@ -1882,7 +1882,7 @@
    * @param   {string}    p3       ((?:potentially bad keyword|bad phone number) in \w+<\/span>)
    * @param   {string}    p4       ( - )
    * @param   {string}    p5       (<span class="fire-detection-data">)
-   * @param   {string}    p6       (.*? found (?:verbatim|normalized))
+   * @param   {string}    p6       (.*? found (?:verbatim|normalized|obfuscated))
    * @param   {string}    p7       (<\/span>)
    *
    * @returns {string}             The processed text to use in the why <li>
@@ -1895,12 +1895,12 @@
       .map((val) => val.trim())
       .sort()
       .join('; ')
-      .split(/( found (?:verbatim|normalized)(?:;|$))/g)
+      .split(/( found (?:verbatim|normalized|obfuscated)(?:;|$))/g)
       .reduce((sum, current, index, array) => {
         if (!current || !current.trim()) {
           return sum;
         }
-        if (/( found (?:verbatim|normalized)(?:;|$))/.test(current)) {
+        if (/( found (?:verbatim|normalized|obfuscated)(?:;|$))/.test(current)) {
           const savedNumberCount = numberCount;
           numberCount = 1;
           current = current.replace(/^(.*?)(;?)$/, `$1${(savedNumberCount > 1 ? ` (${savedNumberCount} times)` : '')}$2`);
@@ -1915,7 +1915,7 @@
         return `${sum}<span class="fire-detection-positions"><span class="fire-detection-text">${current.trim()}</span>`;
       }, '')
       // https://regex101.com/r/fAyKYX/1/
-      .replace(/(<span class="fire-detection-text">.*?<\/span>) (found (?:verbatim|normalized)(?: \(\d+ times\))?);?(<\/span>)/ig, '$2: $1$3');
+      .replace(/(<span class="fire-detection-text">.*?<\/span>) (found (?:verbatim|normalized|obfuscated)(?: \(\d+ times\))?);?(<\/span>)/ig, '$2: $1$3');
     return start + positions + p7;
   }
 
@@ -1941,7 +1941,7 @@
       // https://regex101.com/r/qXY8ut/2
       .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(bad keyword in \w+<\/span>)( - )/img, '$1 fire-blacklist-detection$2$3$4')
       // https://regex101.com/r/XekswL/2 --- Not actually represented there. The use of a function makes it not possible to actually show the substitutions
-      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)((?:potentially bad keyword|bad phone number) in \w+<\/span>)( - )(<span class="fire-detection-data">)(.*? found (?:verbatim|normalized))(<\/span>)$/img, substitutePhoneNubmers)
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)((?:potentially bad keyword|bad phone number) in \w+<\/span>)( - )(<span class="fire-detection-data">)(.*? found (?:verbatim|normalized|obfuscated))(<\/span>)$/img, substitutePhoneNubmers)
       // https://regex101.com/r/40bCoE/2
       .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(potentially bad keyword in \w+<\/span>)( - )/img, '$1 fire-watchlist-detection$2$3$4')
       // https://regex101.com/r/em5MHz/1
