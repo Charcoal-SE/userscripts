@@ -72,6 +72,17 @@ To open the reported post on its site:
 5. Fire sees the hash, saves your token, then closes the new window.
 6. You go back to the old window, it detects a token, and shows you a "success" message.
 
+You will need to do this from chat.stackexchange.com (chat.SE), commonly from [Charcoal HQ](https://chat.stackexchange.com/rooms/11540/charcoal-hq).
+Once you have chat.SE configured as you desire, you can manually transfer that configuration, including the tokens for authorizing with
+Stack Exchange and metasmoke by:
+1. In Charcoal HQ, enter the following into the browser console for the tab:
+
+       (function(){var userData = localStorage['fire-user-data']; console.log(`(function(){localStorage['fire-user-data'] = '${userData}';})()`);})()
+2. Copy the entirety of the output from that command and paste it into the browser console for a tab in chat.stackoverflow.com (chat.SO)
+(e.g. [SOCVR](https://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers)). Then reload all tabs on chat.SO that are using FIRE.
+This will overwrite the FIRE settings on chat.SO with the FIRE settings on chat.SE. If you also paste the same console output into a tab on
+chat.meta.stackexchange.com, you'll have the same FIRE settings on all three chat servers.
+
 # Common Failures
 
  - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
