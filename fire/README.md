@@ -103,6 +103,13 @@ FIRE and AIM into a chat page using a bookmarklet or just by running the followi
         });
     })();
 
+## Manually clearing FIRE's data
+
+You can use the following code in your browser's console to clear FIRE's data in order to reset FIRE's configuration to what it would be when first
+installed. In order to fully reset, you would need to run this in the browser console of tabs for each of the three chat servers.
+
+    localStorage.removeItem('fire-user-data'); localStorage.removeItem('fire-user-sites'); localStorage.removeItem('fire-sites');
+
 ## Common Failures
 
  - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
