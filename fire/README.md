@@ -112,6 +112,10 @@ FIRE and AIM into a chat page using a bookmarklet or just by running the followi
 
 ## Version History
 
+|1.5    ||
+| ---   |---
+|1.5.0  |Make short links more visible. Recognize "obfuscated" as a type of number detection. Improve detection of bare URLs in parts of `why` data.
+
 |1.4    ||
 | ---   |---
 |1.4.1  |Bugfixes: Be sure to turn off FIRE button loading indicator; UI glitch in FIRE settings button preventing click
