@@ -10,7 +10,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 
 ---
 
-# Features
+## Features
 - Open a popup for any SmokeDetector report by clicking the "Fire" or "🔥" button in the report.
   ![Fire icon on report](fire.png)
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
@@ -42,7 +42,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 - The popup modal's blur can be toggled with <kbd>B</kbd>
 - The popup can be closed by pressing <kbd>Esc</kbd>, clicking outside of the popup, or clicking the `[Close]` button at the top-right of the popup.
 
-## Examples
+### Examples
 
 When SmokeDetector reports a post, these steps can be taken:
 
@@ -63,7 +63,7 @@ To open the reported post on its site:
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>7</kbd> - Open the post.
 
-# Authorize FIRE with Stack Exchange
+## Authorize FIRE with Stack Exchange
 
 1. Open the settings window.
 2. Click "Authorize" button.
@@ -83,14 +83,7 @@ Stack Exchange and metasmoke by:
 This will overwrite the FIRE settings on chat.SO with the FIRE settings on chat.SE. If you also paste the same console output into a tab on
 chat.meta.stackexchange.com, you'll have the same FIRE settings on all three chat servers.
 
-# Common Failures
-
- - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
- - Forgetting to authorize FIRE. See the previous section.
- - FIRE will not submit flags on any site where you are a diamond moderator (♦), as a security precaution. However, it will still flag on all other sites. Your feedback will still be submitted on sites you are a moderator. The restriction of not raising flags on sites where you are a moderator is a general flagging-through-metasmoke restriction.  
- - Flagging will fail if you are not registered on the particular site.
-
-# Loading from a bookmarklet (e.g. on mobile)
+## Loading from a bookmarklet (e.g. on mobile)
 
 It is possible to load FIRE and AIM into the page using a bookmarklet. You can use the following code to load both
 FIRE and AIM into a chat page using a bookmarklet or just by running the following in the browser console:
@@ -110,8 +103,14 @@ FIRE and AIM into a chat page using a bookmarklet or just by running the followi
         });
     })();
 
+## Common Failures
 
-# Version History
+ - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
+ - Forgetting to authorize FIRE. See the previous section.
+ - FIRE will not submit flags on any site where you are a diamond moderator (♦), as a security precaution. However, it will still flag on all other sites. Your feedback will still be submitted on sites you are a moderator. The restriction of not raising flags on sites where you are a moderator is a general flagging-through-metasmoke restriction.  
+ - Flagging will fail if you are not registered on the particular site.
+
+## Version History
 
 |1.4    ||
 | ---   |---
