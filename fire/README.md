@@ -90,6 +90,27 @@ chat.meta.stackexchange.com, you'll have the same FIRE settings on all three cha
  - FIRE will not submit flags on any site where you are a diamond moderator (♦), as a security precaution. However, it will still flag on all other sites. Your feedback will still be submitted on sites you are a moderator. The restriction of not raising flags on sites where you are a moderator is a general flagging-through-metasmoke restriction.  
  - Flagging will fail if you are not registered on the particular site.
 
+# Loading from a bookmarklet (e.g. on mobile)
+
+It is possible to load FIRE and AIM into the page using a bookmarklet. You can use the following code to load both
+FIRE and AIM into a chat page using a bookmarklet or just by running the following in the browser console:
+
+    javascript:void(function(){
+      $.getScript( 'https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js' )
+        .then(() => $.getScript( 'https://charcoal-se.org/userscripts/vendor/debug.min.js' ))
+        .then(() => $.getScript( 'https://cdn.jsdelivr.net/gh/Charcoal-SE/Userscripts/autoflagging/autoflagging.user.js'))
+        .then(() => {
+          window.GM_info = {
+            script: {
+              version: '5.0.20',
+              downloadURL: 'https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js',
+            },
+          };
+          $.getScript( 'https://cdn.jsdelivr.net/gh/Charcoal-SE/Userscripts/fire/fire.user.js' );
+        });
+    })();
+
+
 # Version History
 
 |1.4    ||
