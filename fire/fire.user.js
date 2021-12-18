@@ -5,7 +5,7 @@
 // @author      Cerbrus
 // @contributor Makyen
 // @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.4.1
+// @version     1.5.0
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -189,7 +189,7 @@
         window.close();
       }
       // Clear hash
-      history.pushState('', document.title, window.location.pathname + window.location.search);
+      history.pushState('', document.title, window.location ? window.location.pathname + window.location.search : 'https://chat.stackexchange.com/rooms/11540/charcoal-hq');
     }
   }
 
@@ -561,8 +561,8 @@
     const maxLengthShortenedDisplayURL = 32;
     const maxLengthThresholdShortenedDisplayURL = maxLengthShortenedDisplayURL - 1;
     const endOfShortenedDisplayURLSlice = maxLengthThresholdShortenedDisplayURL - 2;
-    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+,;=\u200C\u200B-]{2,}))/g; // eslint-disable-line no-useless-escape
-    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+,;=\u200C\u200B-]{2,})/g; // eslint-disable-line no-useless-escape
+    const urlSplitRegex = /((?:\b(?:https?|ftp):\/\/)(?:[\w.~:\/?#[\]@!$&'()*+%,;=\u200C\u200B-]{2,}))/g; // eslint-disable-line no-useless-escape
+    const urlRegex = /(?:\b(?:https?|ftp):\/\/)([\w.~:\/?#[\]@!$&'()*+%,;=\u200C\u200B-]{2,})/g; // eslint-disable-line no-useless-escape
     if (!element) {
       throw new Error('element is invalid');
     }
@@ -922,9 +922,15 @@
       } else if (errorData && errorData.error_message && errorData.error_message.indexOf('You cannot perform this action for another') === 0) { // SE API, Need to delay flagging.
         const [delaySeconds] = errorData.error_message.match(/\d+/);
         setTimeout(newBackoff.resolve, delaySeconds * fire.constants.millisecondsInSecond);
+      } else if (errorData && errorData.error_message && errorData.error_message === 'option_id') {
+        // SE API, Given in response to a flagging request with an invalid option_id, which can be caused by the post being deleted between when the options
+        // were obtained and when the flagging is requested.
+        // We don't set a backoff in this case.
       } else {
+        toastr.error('SE API AJAX FAIL: See console for more information');
         console.error('SE API AJAX fail (May contain your SE token. Don\'t share that!):', // eslint-disable-line no-console
           '\n::  jqXHR:', jqXHR,
+          '\n::  this:', this,
           '\n::  arguments:', arguments,
           '\n:: responseJSON:', jqXHR.responseJSON,
           '\n:: response text:', jqXHR.responseText
@@ -1876,7 +1882,7 @@
    * @param   {string}    p3       ((?:potentially bad keyword|bad phone number) in \w+<\/span>)
    * @param   {string}    p4       ( - )
    * @param   {string}    p5       (<span class="fire-detection-data">)
-   * @param   {string}    p6       (.*? found (?:verbatim|normalized))
+   * @param   {string}    p6       (.*? found (?:verbatim|normalized|obfuscated))
    * @param   {string}    p7       (<\/span>)
    *
    * @returns {string}             The processed text to use in the why <li>
@@ -1889,12 +1895,12 @@
       .map((val) => val.trim())
       .sort()
       .join('; ')
-      .split(/( found (?:verbatim|normalized)(?:;|$))/g)
+      .split(/( found (?:verbatim|normalized|obfuscated)(?:;|$))/g)
       .reduce((sum, current, index, array) => {
         if (!current || !current.trim()) {
           return sum;
         }
-        if (/( found (?:verbatim|normalized)(?:;|$))/.test(current)) {
+        if (/( found (?:verbatim|normalized|obfuscated)(?:;|$))/.test(current)) {
           const savedNumberCount = numberCount;
           numberCount = 1;
           current = current.replace(/^(.*?)(;?)$/, `$1${(savedNumberCount > 1 ? ` (${savedNumberCount} times)` : '')}$2`);
@@ -1909,7 +1915,7 @@
         return `${sum}<span class="fire-detection-positions"><span class="fire-detection-text">${current.trim()}</span>`;
       }, '')
       // https://regex101.com/r/fAyKYX/1/
-      .replace(/(<span class="fire-detection-text">.*?<\/span>) (found (?:verbatim|normalized)(?: \(\d+ times\))?);?(<\/span>)/ig, '$2: $1$3');
+      .replace(/(<span class="fire-detection-text">.*?<\/span>) (found (?:verbatim|normalized|obfuscated)(?: \(\d+ times\))?);?(<\/span>)/ig, '$2: $1$3');
     return start + positions + p7;
   }
 
@@ -1935,7 +1941,7 @@
       // https://regex101.com/r/qXY8ut/2
       .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(bad keyword in \w+<\/span>)( - )/img, '$1 fire-blacklist-detection$2$3$4')
       // https://regex101.com/r/XekswL/2 --- Not actually represented there. The use of a function makes it not possible to actually show the substitutions
-      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)((?:potentially bad keyword|bad phone number) in \w+<\/span>)( - )(<span class="fire-detection-data">)(.*? found (?:verbatim|normalized))(<\/span>)$/img, substitutePhoneNubmers)
+      .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)((?:potentially bad keyword|bad phone number) in \w+<\/span>)( - )(<span class="fire-detection-data">)(.*? found (?:verbatim|normalized|obfuscated))(<\/span>)$/img, substitutePhoneNubmers)
       // https://regex101.com/r/40bCoE/2
       .replace(/(<li class="fire-detection-item)("><span class="fire-detection-name">)(potentially bad keyword in \w+<\/span>)( - )/img, '$1 fire-watchlist-detection$2$3$4')
       // https://regex101.com/r/em5MHz/1
@@ -2462,9 +2468,33 @@
         ({currentTarget}) => $(currentTarget).toggleClass('fire-expanded')
       );
     document.addEventListener('keypress', stopPropagationIfTargetBody, true);
+    // Make short links more visible
+    $('.fire-reported-post a').each(addShortLinkClassAndWatchContainedImages);
     $fireButton.removeClass('fire-data-loading');
     clearTimeout(fire.popupLoadingTimeout);
     sendFireEventWithPopupPostData(postData, $fireButton, 'popup-open');
+  }
+
+  /**
+   * addShortLinkClassAndWatchContainedImages - If the link is small, add the "fire-short-link" class and watch any contained images for loading.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function addShortLinkClassAndWatchContainedImages() {
+    const $this = $(this);
+    const $closestA = $this.closest('a');
+    const height = $closestA.height();
+    const width = $closestA.width();
+    if (height < fire.constants.linkDisplayTooSmallHeight || width < fire.constants.linkDisplayTooSmallWidth) {
+      $closestA.addClass('fire-short-link');
+      if ($this.is('a')) {
+        $this.find('img').on('load', addShortLinkClassAndWatchContainedImages);
+      }
+    } else {
+      $closestA.removeClass('fire-short-link');
+    }
   }
 
   /**
@@ -4047,7 +4077,11 @@ body.outside .fire-popup h2 {
 .fire-settings-popup .fire-popup-body {
   height: 100%;
 }
-
+.fire-short-link:after {
+  content: "_link";
+  color: red;
+  font-style: italic;
+}
     </style>`);
   }
 
@@ -4702,6 +4736,8 @@ body.outside .fire-popup h2 {
       popupOpeningTimeoutDelay: 90000,
       webSocketInitialOpenDelay: 3000,
       reportCacheEntryWithNoFireButtonMinimumRetentionMilliseconds: 3 * 60 * 60 * 1000, // eslint-disable-line no-magic-numbers
+      linkDisplayTooSmallHeight: 10,
+      linkDisplayTooSmallWidth: 13,
     };
   }
 })();

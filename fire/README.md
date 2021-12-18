@@ -10,7 +10,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 
 ---
 
-# Features
+## Features
 - Open a popup for any SmokeDetector report by clicking the "Fire" or "🔥" button in the report.
   ![Fire icon on report](fire.png)
 - SmokeDetector's _last_ report can be opened in a popup using <kbd>Ctrl</kbd>+<kbd>Space</kbd>
@@ -42,7 +42,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 - The popup modal's blur can be toggled with <kbd>B</kbd>
 - The popup can be closed by pressing <kbd>Esc</kbd>, clicking outside of the popup, or clicking the `[Close]` button at the top-right of the popup.
 
-## Examples
+### Examples
 
 When SmokeDetector reports a post, these steps can be taken:
 
@@ -63,7 +63,7 @@ To open the reported post on its site:
 1. <kbd>Ctrl</kbd>+<kbd>Space</kbd> - Open the last report,
 2. <kbd>7</kbd> - Open the post.
 
-# Authorize FIRE with Stack Exchange
+## Authorize FIRE with Stack Exchange
 
 1. Open the settings window.
 2. Click "Authorize" button.
@@ -72,14 +72,49 @@ To open the reported post on its site:
 5. Fire sees the hash, saves your token, then closes the new window.
 6. You go back to the old window, it detects a token, and shows you a "success" message.
 
-# Common Failures
+You will need to do this from chat.stackexchange.com (chat.SE), commonly from [Charcoal HQ](https://chat.stackexchange.com/rooms/11540/charcoal-hq).
+Once you have chat.SE configured as you desire, you can manually transfer that configuration, including the tokens for authorizing with
+Stack Exchange and metasmoke by:
+1. In Charcoal HQ, enter the following into the browser console for the tab:
+
+       (function(){var userData = localStorage['fire-user-data']; console.log(`(function(){localStorage['fire-user-data'] = '${userData}';})()`);})()
+2. Copy the entirety of the output from that command and paste it into the browser console for a tab in chat.stackoverflow.com (chat.SO)
+(e.g. [SOCVR](https://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers)). Then reload all tabs on chat.SO that are using FIRE.
+This will overwrite the FIRE settings on chat.SO with the FIRE settings on chat.SE. If you also paste the same console output into a tab on
+chat.meta.stackexchange.com, you'll have the same FIRE settings on all three chat servers.
+
+## Loading from a bookmarklet (e.g. on mobile)
+
+It is possible to load FIRE and AIM into the page using a bookmarklet. You can use the following code to load both
+FIRE and AIM into a chat page using a bookmarklet or just by running the following in the browser console:
+
+    javascript:void(function(){
+      $.getScript( 'https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js' )
+        .then(() => $.getScript( 'https://charcoal-se.org/userscripts/vendor/debug.min.js' ))
+        .then(() => $.getScript( 'https://cdn.jsdelivr.net/gh/Charcoal-SE/Userscripts/autoflagging/autoflagging.user.js'))
+        .then(() => {
+          window.GM_info = {
+            script: {
+              version: '5.0.20',
+              downloadURL: 'https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js',
+            },
+          };
+          $.getScript( 'https://cdn.jsdelivr.net/gh/Charcoal-SE/Userscripts/fire/fire.user.js' );
+        });
+    })();
+
+## Common Failures
 
  - When you first install FIRE, you probably have to reload the chat room before you see the clickable 🔥 FIRE decorations
  - Forgetting to authorize FIRE. See the previous section.
  - FIRE will not submit flags on any site where you are a diamond moderator (♦), as a security precaution. However, it will still flag on all other sites. Your feedback will still be submitted on sites you are a moderator. The restriction of not raising flags on sites where you are a moderator is a general flagging-through-metasmoke restriction.  
  - Flagging will fail if you are not registered on the particular site.
 
-# Version History
+## Version History
+
+|1.5    ||
+| ---   |---
+|1.5.0  |Make short links more visible. Recognize "obfuscated" as a type of number detection. Improve detection of bare URLs in parts of `why` data.
 
 |1.4    ||
 | ---   |---
