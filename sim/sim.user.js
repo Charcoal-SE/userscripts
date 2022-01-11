@@ -106,20 +106,24 @@
   };
 
   const attachToPosts = () => {
-    let posts = $('.question, .answer');
+    const posts = $('.question, .answer');
+    /* Temporarily removed due to NATOEnhancements and this needing work
     if (posts.length === 0 && isNato) {
       $('body.tools-page #mainbar > table.default-view-post-table > tbody > tr').addClass('answer');
       posts = $('.question, .answer');
     }
+    */
     posts.each((i, e) => {
       const $e = $(e);
 
       // Get the element which contains the menu
-      let postMenu = getPostMenu($e);
+      const postMenu = getPostMenu($e);
+      /* Temporarily removed due to NATOEnhancements and this needing work
       if (postMenu.length === 0 && isNato) {
         $e.find('> td:last-of-type').append($('<div class="post-menu simFakePostMenu"></div>'));
         postMenu = getPostMenu($e);
       }
+      */
       postMenu.filter(function () {
         // Don't re-add the smokey button if it's already there.
         return !$(this).find('.sim-get-info').length;
@@ -134,10 +138,12 @@
         const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
         const $this = $(this);
         $this.append(`<div class="flex--item"><button class="s-btn s-btn__link sim-get-info" data-request="${msUri}">Smokey</button></div>`);
+        /* Temporarily removed due to NATOEnhancements and this needing work
         if (isNato) {
           // Clean up if we are in NATO Enhancements
           $this.closest('body.tools-page #mainbar > table.default-view-post-table > tbody > tr.answer .question').closest('tr.answer').removeClass('answer');
         }
+        */
       });
     });
   };
