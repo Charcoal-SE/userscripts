@@ -5,6 +5,7 @@
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @contributor  Makyen
+//
 // @match       *://*.stackexchange.com/*
 // @match       *://*.stackoverflow.com/*
 // @match       *://*.superuser.com/*
@@ -12,12 +13,22 @@
 // @match       *://*.askubuntu.com/*
 // @match       *://*.stackapps.com/*
 // @match       *://*.mathoverflow.net/*
+//
 // @exclude     *://stackexchange.com/*
-// @exclude     *://chat.stackexchange.com/*
-// @exclude     *://chat.meta.stackexchange.com/*
-// @exclude     *://chat.stackoverflow.com/*
-// @exclude     *://blog.stackoverflow.com/*
-// @exclude     *://*.area51.stackexchange.com/*
+// @exclude     *://api.*
+// @exclude     *://blog.*
+// @exclude     *://chat.*
+// @exclude     *://data.*
+// @exclude     *://*.area51.stackexchange.com*
+// @exclude     *://stackoverflow.com/advertising*
+// @exclude     *://stackoverflow.com/jobs*
+// @exclude     *://stackoverflow.com/talent*
+// @exclude     *://stackoverflow.com/teams*
+// @exclude     *://stackoverflow.com/c/*
+// @exclude     *://*/revisions/*
+// @exclude     *://*/posts/*/revisions
+// @exclude     */tour
+//
 // @grant        none
 // @updateURL    https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // @downloadURL  https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
@@ -26,13 +37,8 @@
 /* globals StackExchange, $ */
 
 (() => {
-  if (window.location.pathname.indexOf('/c/') === 0) {
-    // Don't run on Teams
-    return;
-  }
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
-
-  const isNato = location.pathname === '/tools/new-answers-old-questions';
+  const isNato = window.location.pathname === '/tools/new-answers-old-questions';
 
   const getCurrentSiteAPIParam = () => {
     const regex = /((?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
