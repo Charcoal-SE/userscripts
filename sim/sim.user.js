@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.6.1
+// @version      0.6.2
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @contributor  Makyen
+//
 // @match       *://*.stackexchange.com/*
 // @match       *://*.stackoverflow.com/*
 // @match       *://*.superuser.com/*
@@ -12,12 +13,22 @@
 // @match       *://*.askubuntu.com/*
 // @match       *://*.stackapps.com/*
 // @match       *://*.mathoverflow.net/*
+//
 // @exclude     *://stackexchange.com/*
-// @exclude     *://chat.stackexchange.com/*
-// @exclude     *://chat.meta.stackexchange.com/*
-// @exclude     *://chat.stackoverflow.com/*
-// @exclude     *://blog.stackoverflow.com/*
-// @exclude     *://*.area51.stackexchange.com/*
+// @exclude     *://api.*
+// @exclude     *://blog.*
+// @exclude     *://chat.*
+// @exclude     *://data.*
+// @exclude     *://*.area51.stackexchange.com*
+// @exclude     *://stackoverflow.com/advertising*
+// @exclude     *://stackoverflow.com/jobs*
+// @exclude     *://stackoverflow.com/talent*
+// @exclude     *://stackoverflow.com/teams*
+// @exclude     *://stackoverflow.com/c/*
+// @exclude     *://*/revisions/*
+// @exclude     *://*/posts/*/revisions
+// @exclude     */tour
+//
 // @grant        none
 // @updateURL    https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // @downloadURL  https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
@@ -26,16 +37,11 @@
 /* globals StackExchange, $ */
 
 (() => {
-  if (window.location.pathname.indexOf('/c/') === 0) {
-    // Don't run on Teams
-    return;
-  }
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
-
-  const isNato = location.pathname === '/tools/new-answers-old-questions';
+  const isNato = window.location.pathname === '/tools/new-answers-old-questions';
 
   const getCurrentSiteAPIParam = () => {
-    const regex = /((?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
+    const regex = /((?:(?:es|ja|pt|ru)\.)?(?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
     const exceptions = {
       'meta.stackoverflow': 'meta.stackoverflow',
       'meta.superuser': 'meta.superuser',
@@ -57,7 +63,7 @@
   };
 
   const getPostMenu = $e => {
-    return $e.find('.post-menu:not(.preview-options)').map(function () {
+    return $e.find('.js-post-menu:not(.preview-options) > .d-flex').map(function () {
       // SE has used a .post-menu-container within the .post-menu. It was there for a while and then removed.
       //   It's not clear if it will come back. This is just playing it safe in case SE puts it back in.
       const container = $(this).children('.post-menu-container');
@@ -100,20 +106,24 @@
   };
 
   const attachToPosts = () => {
-    let posts = $('.question, .answer');
+    const posts = $('.question, .answer');
+    /* Temporarily removed due to NATOEnhancements and this needing work
     if (posts.length === 0 && isNato) {
       $('body.tools-page #mainbar > table.default-view-post-table > tbody > tr').addClass('answer');
       posts = $('.question, .answer');
     }
+    */
     posts.each((i, e) => {
       const $e = $(e);
 
       // Get the element which contains the menu
-      let postMenu = getPostMenu($e);
+      const postMenu = getPostMenu($e);
+      /* Temporarily removed due to NATOEnhancements and this needing work
       if (postMenu.length === 0 && isNato) {
         $e.find('> td:last-of-type').append($('<div class="post-menu simFakePostMenu"></div>'));
         postMenu = getPostMenu($e);
       }
+      */
       postMenu.filter(function () {
         // Don't re-add the smokey button if it's already there.
         return !$(this).find('.sim-get-info').length;
@@ -127,11 +137,13 @@
         const apiParam = getCurrentSiteAPIParam();
         const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
         const $this = $(this);
-        $this.append(`<span class="lsep">|</span><a href="#" class="sim-get-info" data-request="${msUri}">smokey</a>`);
+        $this.append(`<div class="flex--item"><button class="s-btn s-btn__link sim-get-info" data-request="${msUri}">Smokey</button></div>`);
+        /* Temporarily removed due to NATOEnhancements and this needing work
         if (isNato) {
           // Clean up if we are in NATO Enhancements
           $this.closest('body.tools-page #mainbar > table.default-view-post-table > tbody > tr.answer .question').closest('tr.answer').removeClass('answer');
         }
+        */
       });
     });
   };
@@ -148,7 +160,7 @@
   const displayDialog = postData => {
     const modal = stacksModal.clone();
     const contentSpace = modal.find('.sim--modal-content');
-    contentSpace.append(`<div class="grid grid__fl1"><div class="grid--cell5 sim--left-content"></div><div class="grid--cell7 sim--right-content"></div></div>`);
+    contentSpace.append(`<div class="d-flex"><div class="flex--item5 sim--left-content"></div><div class="flex--item7 sim--right-content"></div></div>`);
 
     const header = modal.find('.sim--modal-header');
     header.text(postData.caught ? postData.feedback : 'Not Caught');
@@ -244,6 +256,22 @@
     displayDialog(postData);
   };
 
+  if (isNato) {
+    const rows = $('body.tools-page #mainbar > table.default-view-post-table > tbody > tr');
+    rows.each(function () {
+      const $this = $(this);
+      $this.addClass('answer');
+      const answerId = $('.answer-hyperlink', $this).first().attr('href').replace(/^.*#(\d+)$/, '$1');
+      $this.attr('data-answerid', answerId);
+      const lastCellWithoutPostMenu = $this.children('td:last-of-type').filter(function () {
+        return !$(this).find('.post-menu, .js-post-menu').length;
+      });
+      lastCellWithoutPostMenu
+        .append($('<div class="js-post-menu pt2 simFakePostMenu"><div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap"></div></div>')) // The .js-post-menu should be given a data-post-id attribute with the current post number.
+        .find('.js-post-menu')
+        .attr('data-post-id', answerId);
+    });
+  }
   attachToPosts();
   $(document).ready(() => {
     attachToPosts();
