@@ -63,7 +63,7 @@
   };
 
   const getPostMenu = $e => {
-    return $e.find('.post-menu:not(.preview-options)').map(function () {
+    return $e.find('.js-post-menu:not(.preview-options) > .d-flex').map(function () {
       // SE has used a .post-menu-container within the .post-menu. It was there for a while and then removed.
       //   It's not clear if it will come back. This is just playing it safe in case SE puts it back in.
       const container = $(this).children('.post-menu-container');
@@ -133,7 +133,7 @@
         const apiParam = getCurrentSiteAPIParam();
         const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
         const $this = $(this);
-        $this.append(`<span class="lsep">|</span><a href="#" class="sim-get-info" data-request="${msUri}">smokey</a>`);
+        $this.append(`<div class="flex--item"><button class="s-btn s-btn__link sim-get-info" data-request="${msUri}">Smokey</button></div>`);
         if (isNato) {
           // Clean up if we are in NATO Enhancements
           $this.closest('body.tools-page #mainbar > table.default-view-post-table > tbody > tr.answer .question').closest('tr.answer').removeClass('answer');
@@ -154,7 +154,7 @@
   const displayDialog = postData => {
     const modal = stacksModal.clone();
     const contentSpace = modal.find('.sim--modal-content');
-    contentSpace.append(`<div class="grid grid__fl1"><div class="grid--cell5 sim--left-content"></div><div class="grid--cell7 sim--right-content"></div></div>`);
+    contentSpace.append(`<div class="d-flex"><div class="flex--item5 sim--left-content"></div><div class="flex--item7 sim--right-content"></div></div>`);
 
     const header = modal.find('.sim--modal-header');
     header.text(postData.caught ? postData.feedback : 'Not Caught');
