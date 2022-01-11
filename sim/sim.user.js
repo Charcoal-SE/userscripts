@@ -41,7 +41,7 @@
   const isNato = window.location.pathname === '/tools/new-answers-old-questions';
 
   const getCurrentSiteAPIParam = () => {
-    const regex = /((?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
+    const regex = /((?:(?:es|ja|pt|ru)\.)?(?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
     const exceptions = {
       'meta.stackoverflow': 'meta.stackoverflow',
       'meta.superuser': 'meta.superuser',
