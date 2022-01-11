@@ -250,6 +250,22 @@
     displayDialog(postData);
   };
 
+  if (isNato) {
+    const rows = $('body.tools-page #mainbar > table.default-view-post-table > tbody > tr');
+    rows.each(function () {
+      const $this = $(this);
+      $this.addClass('answer');
+      const answerId = $('.answer-hyperlink', $this).first().attr('href').replace(/^.*#(\d+)$/, '$1');
+      $this.attr('data-answerid', answerId);
+      const lastCellWithoutPostMenu = $this.children('td:last-of-type').filter(function () {
+        return !$(this).find('.post-menu, .js-post-menu').length;
+      });
+      lastCellWithoutPostMenu
+        .append($('<div class="js-post-menu pt2 simFakePostMenu"><div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap"></div></div>')) // The .js-post-menu should be given a data-post-id attribute with the current post number.
+        .find('.js-post-menu')
+        .attr('data-post-id', answerId);
+    });
+  }
   attachToPosts();
   $(document).ready(() => {
     attachToPosts();
