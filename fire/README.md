@@ -121,6 +121,7 @@ installed. In order to fully reset, you would need to run this in the browser co
 
 |1.5    ||
 | ---   |---
+|1.5.1  |Handle SD using bold for post URLs.
 |1.5.0  |Make short links more visible. Recognize "obfuscated" as a type of number detection. Improve detection of bare URLs in parts of `why` data.
 
 |1.4    ||

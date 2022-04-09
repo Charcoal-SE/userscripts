@@ -2,10 +2,9 @@
 // @name        🔥 FIRE: Feedback Instantly, Rapidly, Effortlessly
 // @namespace   https://github.com/Charcoal-SE/
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
-// @author      Cerbrus
+// @author      Cerbrus [attribution: Michiel Dommerholt (https://github.com/Cerbrus)]
 // @contributor Makyen
-// @attribution Michiel Dommerholt (https://github.com/Cerbrus)
-// @version     1.5.0
+// @version     1.5.1
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -1127,8 +1126,13 @@
         reportedUrl = reportLink[0].href.split('url=')[1];
         isReportedUrlValid = Boolean(reportedUrl);
       }
-      if ((!urlOnReportLink || !isReportedUrlValid) && reportLink.nextAll('a')[0]) {
-        reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
+      const anchorsAfterReportLink = reportLink
+        .nextAll()
+        .find('a')
+        .addBack()
+        .filter('a');
+      if ((!urlOnReportLink || !isReportedUrlValid) && anchorsAfterReportLink.length > 0) {
+        reportedUrl = anchorsAfterReportLink[0].href.replace(/https?:/, '');
         isReportedUrlValid = !(reportedUrl.startsWith('//github.com') ||
           reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
           reportedUrl.includes('/users/') ||
