@@ -1127,8 +1127,13 @@
         reportedUrl = reportLink[0].href.split('url=')[1];
         isReportedUrlValid = Boolean(reportedUrl);
       }
-      if ((!urlOnReportLink || !isReportedUrlValid) && reportLink.nextAll('a')[0]) {
-        reportedUrl = reportLink.nextAll('a')[0].href.replace(/https?:/, '');
+      const anchorsAfterReportLink = reportLink
+        .nextAll()
+        .find('a')
+        .addBack()
+        .filter('a');
+      if ((!urlOnReportLink || !isReportedUrlValid) && anchorsAfterReportLink.length > 0) {
+        reportedUrl = anchorsAfterReportLink[0].href.replace(/https?:/, '');
         isReportedUrlValid = !(reportedUrl.startsWith('//github.com') ||
           reportedUrl.includes('erwaysoftware.com') || // Don't show FIRE button on feedback.
           reportedUrl.includes('/users/') ||
