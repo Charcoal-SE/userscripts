@@ -38,7 +38,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
 - Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account _and_ the configuration setting for flagging is enabled:
   - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network.
   - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network.
-  - Those buttons will still work for providing feedback when the configureation setting for flagging is disabled.
+  - Those buttons will still work for providing feedback when the configuration setting for flagging is disabled.
 - The popup modal's blur can be toggled with <kbd>B</kbd>
 - The popup can be closed by pressing <kbd>Esc</kbd>, clicking outside of the popup, or clicking the `[Close]` button at the top-right of the popup.
 
@@ -64,7 +64,8 @@ To open the reported post on its site:
 2. <kbd>7</kbd> - Open the post.
 
 ## Authorize FIRE with Stack Exchange
-
+#### First, authorize FIRE from chat.stackexchange.com (chat.SE)
+You will need to do this from chat.SE, commonly from [Charcoal HQ](https://chat.stackexchange.com/rooms/11540/charcoal-hq).
 1. Open the settings window.
 2. Click "Authorize" button.
 3. A new window opens where you "accept"
@@ -72,16 +73,12 @@ To open the reported post on its site:
 5. Fire sees the hash, saves your token, then closes the new window.
 6. You go back to the old window, it detects a token, and shows you a "success" message.
 
-You will need to do this from chat.stackexchange.com (chat.SE), commonly from [Charcoal HQ](https://chat.stackexchange.com/rooms/11540/charcoal-hq).
-Once you have chat.SE configured as you desire, you can manually transfer that configuration, including the tokens for authorizing with
-Stack Exchange and metasmoke by:
+#### Manually transfer FIRE's settings to [chat.stackoverflow.com](https://chat.stackoverflow.com) (chat.SO) and/or [chat.meta.stackexchange.com](https://chat.meta.stackexchange.com) (chat.MSE) 
+Once you have FIRE authorized and configured as you desire on chat.SE, you can manually transfer that configuration, including the tokens for authorizing with Stack Exchange and metasmoke, by:
 1. In Charcoal HQ, enter the following into the browser console for the tab:
 
        (function(){var userData = localStorage['fire-user-data']; console.log(`(function(){localStorage['fire-user-data'] = '${userData}';})()`);})()
-2. Copy the entirety of the output from that command and paste it into the browser console for a tab in chat.stackoverflow.com (chat.SO)
-(e.g. [SOCVR](https://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers)). Then reload all tabs on chat.SO that are using FIRE.
-This will overwrite the FIRE settings on chat.SO with the FIRE settings on chat.SE. If you also paste the same console output into a tab on
-chat.meta.stackexchange.com, you'll have the same FIRE settings on all three chat servers.
+2. Copy the entirety of the output from that command and paste it into the browser console for a tab in chat.SO and/or chat.MSE. You then need to reload all tabs on chat.SO and/or chat.MSE that are using FIRE. This will overwrite the FIRE settings on chat.SO with the FIRE settings on chat.SE. If you paste the same console output into a tab on both chat.SO and chat.MSE, you'll have the same FIRE settings on all three chat servers. If you don't immediately reload any tabs which are running FIRE, you may loose the configuration you just wrote, as a running instance of FIRE may overwrite the configuration you just saved.  
 
 ## Loading from a bookmarklet (e.g. on mobile)
 
