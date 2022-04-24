@@ -37,6 +37,7 @@
 
   const isConversation = /^\/rooms\/\d+\/conversation\/.+$/.test(window.location.pathname);
   const isChat = !isConversation && /^\/rooms\/\d+\/[^/]*$/.test(window.location.pathname);
+  let minContentHeight = 15;
 
   function doWhenRoomReadyIfMainChat(toCall) {
     // This should probably change to looking at window.location.
@@ -64,7 +65,7 @@
   $(document.head).append(`<style type="text/css" id="AIM-autoflagging-main-css">
 .ai-information:not(.inline) {
   position: absolute;
-  right: 4px;
+  right: 3px;
   bottom: 0;
   /* This 'inherit' makes sure the autoflagging information
   is readable *over* the chat message itself, but uses the default background
@@ -73,6 +74,14 @@
   the theme in dark-transparent rooms (The Restaurant at the End of the Universe)
   to be messed up.*/
   background: inherit;
+}
+/* Resolve overlap with timestamp */
+body:not(#chat-body) .messages.ai-short-message-after-timestamp .timestamp + .message.ai-message:not(.highlight) .ai-information:not(.inline),
+.messages.ai-short-message-after-timestamp .timestamp + .message.ai-message:not(.highlight):not(:hover) .ai-information:not(.inline) {
+  bottom: -4px;
+}
+.messages.ai-short-message-after-timestamp .timestamp {
+  top: -4px
 }
 .reply-parent .ai-information:not(.inline) {
   background: silver;
@@ -93,19 +102,42 @@
 .ai-information > :last-child > :last-child {
   margin-right: 0;
 }
-.ai-deleted, .ai-flag-count.ai-not-autoflagged {
-  transition: opacity 0.4s;
-}
-.ai-deleted:not(:hover), .ai-flag-count.ai-not-autoflagged {
+.ai-flag-count.ai-not-autoflagged {
   opacity: 0.5;
 }
-.ai-deleted {
-    max-height: 1.5em;
-    overflow: hidden;
-    transition: all 0.5s ease;
+/*Complete requests transition for low opacity and shrunk.*/
+body:not(.aim-disable-deleted-format) .message.ai-deleted {
+  transition: transform cubic-bezier(.165, .84, .44, 1) .15s, opacity cubic-bezier(.165, .84, .44, 1) .15s;
 }
-.ai-deleted:hover {
-    max-height: 3em;
+/*Have a delay in the translation when moving from fully visible to shrunk/fade.*/
+body:not(.aim-disable-deleted-format) .message.ai-deleted:not(:hover):not(.reply-parent):not(.reply-child) {
+  transition-delay: 1s;
+}
+/*A delay in the translation when moving from shrunk/fade to fully visible.
+    This allows mouse movement over the page without triggering the expansion and contraction of the message.*/
+body:not(.aim-disable-deleted-format) .message.ai-deleted:hover:not(.reply-parent):not(.reply-child) {
+  transition-delay: .3s;
+}
+/*Deleted requests low opacity to combo with scale*/
+body:not(.aim-disable-deleted-format) .message.ai-deleted:not(:hover):not(.fireComplete-temp-disable):not(.reply-parent):not(.reply-child) {
+  opacity: .4;
+}
+body:not(.aim-disable-deleted-format) .message.ai-deleted:hover .timestamp.timestamp.timestamp:hover + .message {
+  opacity: 1;
+  transform: scale(1) translate(0%,0%);
+  transition-delay: 0s;
+}
+/*Deleted requests scale*/
+body:not(.aim-disable-deleted-format) .message.ai-deleted:not(:hover):not(.fireComplete-temp-disable):not(.reply-parent):not(.reply-child) {
+  transform: scale(0.85) translate(-8.25%,-8%);
+}
+/*Deleted requests prevent a popup from adjusting*/
+body:not(.aim-disable-deleted-format) .message.ai-deleted:not(:hover):not(.fireComplete-temp-disable):not(.reply-parent):not(.reply-child) .popup {
+  opacity: 1;
+  transform: scale(1) translate(0%,0%);
+}
+.message .content {
+  display: inline;
 }
 .ai-flag-count {
   color: inherit;
@@ -232,6 +264,12 @@
         `)}
       </style>
     `);
+    minContentHeight = Math.min.apply(null, $(".message .content")
+      .map(function () {
+        return $(this).height();
+      })
+      .toArray()
+      .filter(height => height > 5)) || minContentHeight;
   });
 
   // Constants
@@ -557,15 +595,13 @@
    * Decorates a DOM element with a spinner. Don't call this method directly,
    * use addSpinnerToMessage instead.
    */
-  autoflagging.addSpinner = function ($element, inline) {
-    $element.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
+  autoflagging.addSpinner = function ($message, inline) {
+    $message.append("<span class=\"ai-information" + (inline ? " inline" : "") + "\">" +
       "<img class=\"ai-spinner\" src=\"//i.stack.imgur.com/icRVf.gif\" title=\"Loading autoflagging information ...\" />" +
       "</span>");
-    if ($element.parent().children(":first-child").hasClass("timestamp") && $element.is(":nth-child(2)")) {
-      // don’t overlap the timestamp
-      $element.css({
-        clear: "both"
-      });
+    const contentHeight = $message.children(".content").height();
+    if ($message.parent().children(":first-child").hasClass("timestamp") && $message.is(":nth-child(2)") && contentHeight < minContentHeight + 5) {
+      $message.parent().addClass("ai-short-message-after-timestamp");
     }
   };
 
@@ -628,15 +664,16 @@
 
       // Loop over all Smokey reports and decorate them
       $(autoflagging.selector).each(function () {
-        var $element = $(this);
-        var postURL = autoflagging.getPostURL(this);
-        var postData = autoflagData[postURL];
+        // this is a .message
+        const $element = $(this);
+        const postURL = autoflagging.getPostURL(this);
+        const postData = autoflagData[postURL];
         if (typeof postData === "undefined") {
           return;
         }
         // Post deleted?
         if (postData.deleted_at != null) {
-          $(this).find(".content").toggleClass("ai-deleted");
+          $element.addClass("ai-deleted");
         }
 
         if (postData.autoflagged === true) {
@@ -837,7 +874,7 @@
             // Deletion log
             debug.ws("deleted:", deletionLog);
             let selector = autoflagging.selector + "a[href^='" + deletionLog.post_link + "']";
-            $(selector).parents(".content").addClass("ai-deleted");
+            $(selector).closest(".message").addClass("ai-deleted");
           } else if (typeof feedback !== "undefined") {
             // Feedback
             debug.ws(feedback.user, "posted", feedback.symbol, "on", feedback.post_link, feedback); // feedback_type
@@ -916,4 +953,22 @@
   if (typeof CHAT === "object" && CHAT && typeof CHAT.addEventHandlerHook === "function") {
     CHAT.addEventHandlerHook(aimChatListener);
   }
+
+  let resizeDebounceTimer;
+  function debounceResize() {
+    clearTimeout(resizeDebounceTimer);
+    resizeDebounceTimer = setTimeout(resizeHandler, 50);
+  }
+
+  function resizeHandler() {
+    const messages = $(autoflagging.selector);
+    $(".messages").each(function () {
+      const messagesContainer = $(this);
+      const aiMessageContentAfterTimestamp = messagesContainer.children(".timestamp + .message.ai-message").find(".content");
+      const contentHeight = aiMessageContentAfterTimestamp.height();
+      messagesContainer.toggleClass("ai-short-message-after-timestamp", contentHeight && contentHeight < minContentHeight + 5);
+    });
+  }
+
+  $(window).on("resize", debounceResize);
 })();
