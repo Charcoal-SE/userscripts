@@ -572,7 +572,9 @@ body:not(.aim-disable-deleted-format) .message.ai-deleted:not(:hover):not(.fireC
       const titles = Object.keys(simpleFeedbacksByType)
         .filter(feedbackType => feedbackType !== defaultFeedbackType)
         .map(feedbackType => feedbackType + ": " + simpleFeedbacksByType[feedbackType].join(", "));
-      titles.unshift(defaultFeedbackTitle);
+      if (defaultFeedbackTitle) {
+        titles.unshift(defaultFeedbackTitle);
+      }
       $feedback.append(
         $("<span/>").addClass("ai-feedback-info")
           .addClass("ai-feedback-info-" + defaultFeedbackType)
