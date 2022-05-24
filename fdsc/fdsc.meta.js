@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.19
+// @version     1.19.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -24,6 +24,10 @@
 // @exclude     *://chat.stackoverflow.com/*
 // @exclude     *://blog.stackoverflow.com/*
 // @exclude     *://*.area51.stackexchange.com/*
+// @exclude     *://stackexchange.com/*
+// @exclude     *://api.stackexchange.com/*
+// @exclude     *://data.stackexchange.com/*
+// @exclude     *://winterbash*.stackexchange.com/*
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // @require     https://charcoal-se.org/userscripts/vendor/debug.min.js
 // @grant       none
