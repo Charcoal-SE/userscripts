@@ -37,6 +37,9 @@
         }
       }
     ],
+    "globals": [
+      "GM"
+    ],
     "rules": {
       "quotes": [
         0,
