@@ -80,6 +80,7 @@
           "MemberExpression": 0
         }
       ],
+      "no-constant-binary-expression": 0,
       "padding-line-between-statements": 0,
       "prefer-destructuring": 0,
       "unicorn/prefer-add-event-listener": 0,
