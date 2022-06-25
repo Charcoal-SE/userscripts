@@ -29,16 +29,149 @@
 // @exclude     *://*/posts/*/revisions
 // @exclude     */tour
 //
-// @grant        none
+// @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
+//
+// @connect      chat.stackexchange.com
+//
+// @require      https://github.com/SO-Close-Vote-Reviewers/UserScripts/raw/master/gm4-polyfill.js
+// @require      https://cdn.jsdelivr.net/gh/makyen/extension-and-userscript-utilities@94cbac04cb446d35dd025974a7575b25b9e134ca/executeInPage.js
+//
 // @updateURL    https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // @downloadURL  https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
 // ==/UserScript==
 
-/* globals StackExchange, $ */
+/* globals StackExchange, $, makyenUtilities, unsafeWindow, GM */ // eslint-disable-line no-redeclare
 
 (() => {
   const msAPIKey = '5a70b21ec1dd577d6ce36d129df3b0262b7cec2cd82478bbd8abdc532d709216';
   const isNato = window.location.pathname === '/tools/new-answers-old-questions';
+
+  // Copied from SOCVR's Request Generator by Makyen, the original author.
+  // Message number, just a number used to start, which is not
+  // guaranteed to be unique (i.e. it could have collisions with other
+  // in-page/userscript uses).
+  // This would probably be better as just straight CSS, rather than an Object.
+  const executeInPage = makyenUtilities.executeInPage;
+  var notifyInt = Date.now();
+  const notifyCSS = {
+    success: {
+      'background-color': 'green',
+    },
+    info: {
+      'background-color': '#0095ff',
+    },
+    error: {
+      'background-color': 'red',
+      'font-weight': 'bold',
+    },
+  };
+
+  const notify = (message_, time_, notifyCss_) => {
+    // Display a SE notification for a number of milliseconds (optional).
+    time_ = (typeof time_ === 'number') ? time_ : 0;
+
+    function inPageNotify(messageId, message, time, notifyCss) {
+      // Function executed in the page context to use SE.notify to display the
+      //   notification.
+      if (typeof unsafeWindow !== 'undefined') {
+        // Prevent this running when not in the page context.
+        return;
+      }
+      var div = $('#notify-' + messageId);
+      if (div.length) {
+        // The notification already exists. Close it.
+        StackExchange.notify.close(messageId);
+      }
+      $('#cvrq-notify-css-' + messageId).remove();
+      if (typeof notifyCss === 'object' && notifyCss) {
+        $(document.documentElement).append('<style id="#cvrq-notify-css-' + messageId + '" type="text/css">\n#notify-container #notify-' + messageId + ' {\n'
+          + Object.keys(notifyCss).reduce((text, key) => (text + key + ':' + notifyCss[key] + ';\n'), '') + '\n}\n</style>');
+      }
+      StackExchange.ready(function () {
+        function waitUtilVisible() {
+          return new Promise(resolve => {
+            function visibilityListener() {
+              if (!document.hidden) {
+                $(window).off('visibilitychange', visibilityListener);
+                resolve();
+              } // Else
+            }
+            $(window).on('visibilitychange', visibilityListener);
+            visibilityListener();
+          });
+        }
+        // If something goes wrong, fallback to alert().
+        try {
+          StackExchange.notify.show(message, messageId);
+        } catch (_) {
+          console.log('Notification:', message);
+          alert('Notification: ' + message); // eslint-disable-line no-alert
+        }
+        if (time) {
+          waitUtilVisible().then(() => {
+            setTimeout(function () {
+              StackExchange.notify.close(messageId);
+              $('#cvrq-notify-css-' + messageId).remove();
+              $('#cvrg-inPageNotify-' + messageId).remove();
+            }, time);
+          });
+        } else {
+          $('#cvrg-inPageNotify-' + messageId).remove();
+        }
+      });
+    }
+    executeInPage(inPageNotify, true, 'cvrg-inPageNotify-' + notifyInt, notifyInt++, message_, time_, notifyCss_);
+    return notifyInt - 1;
+  };
+
+  /* The postMessageToCharcoalHQ function was largely copied from SOCVR's Request Generator, which is under an MIT license. */
+  const postMessageToCharcoalHQ = (message, successNoticeText = "Mesage sent.", delayToRemoveSuccessNotice = 3000) => {
+    return new Promise((resolve, reject) => {
+      function handleError(errorMessage, error) {
+        const seeConsole = '<br/>See the console for more details.';
+        console.error(errorMessage, error);
+        alert(`${errorMessage}\n\n${message}\n\n${seeConsole}`); // eslint-disable-line no-alert
+        reject();
+      }
+
+      GM.xmlHttpRequest({
+        method: 'GET',
+        url: 'https://chat.stackexchange.com/rooms/11540/charcoal-hq',
+        onload: function (response) {
+          var matches = response.responseText.match(/hidden" value="([\dabcdef]{32})/);
+          var fkey = matches ? matches[1] : '';
+          if (!fkey) {
+            handleError('responseText did not contain fkey. Is the room URL valid?', response);
+          } // Else
+          GM.xmlHttpRequest({
+            method: 'POST',
+            url: 'https://chat.stackexchange.com/chats/11540/messages/new',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            data: 'text=' + encodeURIComponent(message) + '&fkey=' + fkey,
+            onload: function (newMessageResponse) {
+              if (newMessageResponse.status === 200) {
+                notify(successNoticeText, delayToRemoveSuccessNotice, notifyCSS.success);
+                resolve();
+              } else {
+                const responseText = newMessageResponse.responseText;
+                const shownResponseText = responseText.length < 100 ? ' ' + responseText : '';
+                handleError('Failed sending chat message.' + shownResponseText, newMessageResponse);
+              }
+            },
+            onerror: function (error) {
+              handleError('Got an error when sending chat message.', error);
+            },
+          });
+        },
+        onerror: function (response) {
+          handleError('Failed to retrieve fkey from chat. (Error Code: ' + response.status + ')', response);
+        },
+      });
+    });
+  };
 
   const getCurrentSiteAPIParam = () => {
     const regex = /((?:(?:es|ja|pt|ru)\.)?(?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
@@ -191,8 +324,37 @@
         });
         manuals.append(users);
       }
+    } else if (postData.postIsDeleted) {
+      // Post not caught, but is deleted
+      contentSpace.append(`<p>Undelete this post to enable reporting it to SmokeDetector.</p>`);
+    } else {
+      // Post not caught, and is not deleted
+      contentSpace.append(`
+      <div class="s-prose sim-report-post-div">
+        <h4>Report post<span style="font-weight: normal;font-size: 80%;"> (will post a <code>!!/report</code> message from you in <a href="https://chat.stackexchange.com/rooms/11540/charcoal-hq">Charcoal HQ</a>)</span>:</h4>
+        <div class="sim-report-post-indented-div" style="padding-left:15px;">
+          Reason (optional):<br/>
+          <input type="text" class="sim-optional-report-reason" spellcheck="true" style="width:100%;"><br/>
+          <button style="float:right;" class="sim-report-post-button">Report post</button>
+        </div>
+      </div>`)
+        .find('.sim-report-post-button')
+        .on('click', () => {
+          let reason = contentSpace.find('.sim-optional-report-reason').val().trim();
+          if (reason) {
+            reason = reason.replace(/^"(.*)"$/, "$1").replaceAll('"', "'");
+            reason = ` "${reason}"`;
+          } else {
+            reason = '';
+          }
+          const message = `!!/report ${postData.postUrl}${reason}`;
+          contentSpace.find('.sim-report-post-button, .sim-optional-report-reason').disable();
+          const successMessage = `Message sent. Please wait a few seconds for SmokeDetector to fetch the ${postData.postIsAnswer ? 'answer' : 'question'}'s data.`;
+          postMessageToCharcoalHQ(message, successMessage, 5000).then(() => {
+            contentSpace.find('.sim-report-post-indented-div').append(`<br/>${successMessage}`);
+          });
+        });
     }
-
     StackExchange.helpers.showModal(modal);
   };
 
@@ -201,12 +363,17 @@
 
     const $tgt = $(ev.target);
     $tgt.addSpinner();
+    const postId = getPostId($tgt);
+    const post = $tgt.closest('.answer, .question');
+    const postIsAnswer = post.is('.answer');
+    const postIsDeleted = post.is('.deleted-answer');
+    const postUrl = `${window.location.origin}/${postIsAnswer ? 'a' : 'q'}/${postId}`;
 
     const uri = $tgt.data('request');
     const resp = await fetch(uri);
     const json = await resp.json();
 
-    const postData = {};
+    const postData = {postId, postIsAnswer, postUrl, postIsDeleted};
     if (json && json.items && json.items.length >= 1) {
       postData.caught = true;
       postData.metasmokeURI = `https://metasmoke.erwaysoftware.com/post/${json.items[0].id}`;
