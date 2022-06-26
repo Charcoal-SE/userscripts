@@ -1,6 +1,6 @@
 {
   "name": "sim",
-  "version": "0.0.1",
+  "version": "0.7.0",
   "description": "Dig up information on how SmokeDetector handled a post.",
   "scripts": {
     "test": "xo"
@@ -36,6 +36,9 @@
           "camelcase": 0
         }
       }
+    ],
+    "globals": [
+      "GM"
     ],
     "rules": {
       "quotes": [
