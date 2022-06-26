@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/Charcoal-SE/userscripts#readme",
   "devDependencies": {
-    "eslint": "^8.13.0",
+    "eslint": "^8.18.0",
     "eslint-plugin-promise": "^6.0.0",
     "webpack": "^5.38.1",
-    "xo": "^0.48.0"
+    "xo": "^0.50.0"
   },
   "//": "FIRE overrides",
   "xo": {
@@ -215,6 +215,7 @@
       "unicorn/prefer-dom-node-append": 0,
       "unicorn/prefer-dom-node-remove": 0,
       "unicorn/prefer-module": 0,
+      "unicorn/prefer-native-coercion-functions": 0,
       "unicorn/prefer-optional-catch-binding": 0,
       "unicorn/prefer-ternary": 0,
       "unicorn/prevent-abbreviations": 0
