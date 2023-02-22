@@ -360,7 +360,10 @@
   };
 
   const getInfo = async ev => {
-    if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+    if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) {
+      return;
+    }
+
     ev.preventDefault();
 
     const $tgt = $(ev.target);
