@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.7.0
+// @version      0.7.1
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @contributor  Makyen
@@ -267,10 +267,11 @@
         if (!id) {
           return;
         }
+        const type = $e.hasClass('question') ? 'questions' : 'a';
         const apiParam = getCurrentSiteAPIParam();
         const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
         const $this = $(this);
-        $this.append(`<div class="flex--item"><button class="s-btn s-btn__link sim-get-info" data-request="${msUri}">Smokey</button></div>`);
+        $this.append(`<div class="flex--item"><a href="https://metasmoke.erwaysoftware.com/posts/by-url?url=//${location.host}/${type}/${id}" class="sim-get-info" data-request="${msUri}">Smokey</button></div>`);
         /* Temporarily removed due to NATOEnhancements and this needing work
         if (isNato) {
           // Clean up if we are in NATO Enhancements
@@ -359,6 +360,10 @@
   };
 
   const getInfo = async ev => {
+    if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) {
+      return;
+    }
+
     ev.preventDefault();
 
     const $tgt = $(ev.target);
