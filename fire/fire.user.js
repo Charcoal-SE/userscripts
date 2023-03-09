@@ -1550,6 +1550,10 @@
   // Many of the attributes permitted here are not permitted in Markdown for SE, but are delivered by SE in the HTML for the post body.
   //   SE adds the additional attributes.
   // For <a>, 'rel' is not permitted in Markdown, but is in SE's HTML.
+  // The Comprehensive Formatting Test:
+  //   https://chat.stackexchange.com/transcript/message/63128026#63128026
+  //   https://metasmoke.erwaysoftware.com/posts/by-url?url=//meta.stackexchange.com/a/325826
+  //   https://meta.stackexchange.com/a/325826
   const whitelistedTags = {
     withAttributes: {
       blockquote: ['class'], // 'data-spoiler'], // data-spoiler is used on SE sites, but isn't in the HTML delivered by SE.
@@ -1566,9 +1570,9 @@
     },
     specialCases: {
       a: {
-        general: ['title', 'rel', 'alt'],
+        general: ['title', 'rel', 'alt', 'aria-label', 'aria-labelledby'],
         specificValues: {
-          class: ['post-tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
+          class: ['post-tag', 'post-tag required-tag', 'post-tag moderator-tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
           // rel probably has a limited set of values, but that really hasn't been explored, yet.
           // rel: ['tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
         },
@@ -1769,8 +1773,8 @@
     return new RegExp(fullRegexText, 'gi');
   })();
   /* The whitelisted RegExp is currently:
-    2021-10-13 (https://regex101.com/r/kNMJZY/1):
-      &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span|h1|h2|h3|h4|h5|h6)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*)|(?:h1\b(?: +(?:id)="[^"<>]*")*)|(?:h2\b(?: +(?:id)="[^"<>]*")*)|(?:h3\b(?: +(?:id)="[^"<>]*")*)|(?:h4\b(?: +(?:id)="[^"<>]*")*)|(?:h5\b(?: +(?:id)="[^"<>]*")*)|(?:h6\b(?: +(?:id)="[^"<>]*")*))\s*|\/(?:a|iframe|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt)="[^"<>]*"|class="(?:post-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:iframe\b(?:(?: +(?:(?:width|height)="[^"<>]*"|src="https:\/\/(?:www\.)?youtube\.com\/embed\/[^" ]+"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
+    2023-03-08:(https://regex101.com/r/6b7QBz/1)
+      /&lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span|h1|h2|h3|h4|h5|h6)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*)|(?:h1\b(?: +(?:id)="[^"<>]*")*)|(?:h2\b(?: +(?:id)="[^"<>]*")*)|(?:h3\b(?: +(?:id)="[^"<>]*")*)|(?:h4\b(?: +(?:id)="[^"<>]*")*)|(?:h5\b(?: +(?:id)="[^"<>]*")*)|(?:h6\b(?: +(?:id)="[^"<>]*")*))\s*|\/(?:a|iframe|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt|aria-label|aria-labelledby)="[^"<>]*"|class="(?:post-tag|post-tag required-tag|post-tag moderator-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:iframe\b(?:(?: +(?:(?:width|height)="[^"<>]*"|src="https:\/\/(?:www\.)?youtube\.com\/embed\/[^" ]+"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;/gi
   */
 
   /**
@@ -1800,7 +1804,7 @@
   }
 
   /**
-   * generatePostBodyDivFromText - Generate a <div> containing the HTML for a post body from HTML text.
+   * generatePostBodyDivFromHtmlText - Generate a <div> containing the HTML for a post body from HTML text.
    *
    * @private
    * @memberof module:fire
@@ -3557,8 +3561,12 @@ img.fire-emoji-large {
       .fire-popup .fire-popup-body .fire-reported-post img {
         max-width: 100%;
       }
-        .fire-popup .fire-popup-body .fire-reported-post img[src^='http://placehold.it'] {
+        .fire-popup .fire-popup-body .fire-reported-post img[src^='https://via.placeholder.com'] {
           cursor: pointer;
+          box-shadow: 0 0 10px -2px #646464;
+        }
+        .fire-popup .fire-popup-body .fire-reported-post a img[src^='https://via.placeholder.com'] {
+          box-shadow: unset;
         }
       .fire-popup .fire-popup-body .fire-reported-post a {
         font-weight: bold;
@@ -3715,11 +3723,6 @@ img.fire-emoji-large {
         padding: 1px 5px;
       }
       .fire-popup .fire-popup-body .fire-reported-post a.post-tag {
-        color: #39739d;
-        background-color: #e1ecf4;
-        border-color: transparent;
-      }
-      .fire-popup .fire-popup-body .fire-reported-post a.post-tag {
         display: inline-block;
         padding: .4em .5em;
         margin: 2px 2px 2px 0;
@@ -3731,6 +3734,39 @@ img.fire-emoji-large {
         border-width: 1px;
         border-style: solid;
         border-radius: 3px;
+        box-shadow: unset;
+        font-weight: unset;
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag {
+        color: rgb(44, 88, 119);
+        background-color: rgb(225, 236, 244);
+        border-color: rgb(225, 236, 244);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag:hover {
+        color: rgb(57, 115, 157);
+        background-color: rgb(208, 227, 241);
+        border-color: rgb(208, 227, 241);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.required-tag {
+        color: rgb(59, 64, 69);
+        background-color: rgb(227, 230, 232);
+        border-color: rgb(186, 191, 196);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.required-tag:hover {
+        color: rgb(35, 38, 41);
+        background-color: rgb(214, 217, 220);
+        border-color: rgb(159, 166, 173);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.moderator-tag {
+        color: rgb(194, 46, 50);
+        background-color: rgb(253, 242, 242);
+        border-color: rgb(249, 210, 211);
+
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.moderator-tag:hover {
+        color: rgb(171, 38, 42);
+        background-color: rgb(249, 210, 211);
+        border-color: rgb(244, 180, 182);
       }
       .fire-popup .fire-popup-body .fire-reported-post blockquote {
         quotes: none;
@@ -3856,6 +3892,22 @@ img.fire-emoji-large {
         .fire-popup .fire-popup-body .fire-reported-post .s-table tbody + tbody {
           border-top: 2px solid var(--black-100);
         }
+      .fire-popup .fire-popup-body .fire-reported-post kbd {
+        border: 1px solid rgb(159, 166, 173);
+        border-top-color: rgb(159, 166, 173);
+        box-shadow: rgba(12, 13, 14, 0.15) 0px 1px 1px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset;
+        background-color: rgb(227, 230, 232);
+        border-radius: 3px;
+        color: rgb(35, 38, 41);
+        display: inline-block;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Adjusted", "Segoe UI", "Liberation Sans", sans-serif;
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0 .1em;
+        overflow-wrap: break-word;
+        padding: .1em .6em;
+        text-shadow: rgb(255, 255, 255) 0px 1px 0px;
+      }
   .fire-popup .fire-version-link {
     margin: 2px 2px -14px 0;
     float: right;
@@ -3980,13 +4032,25 @@ body,
   --black-025: #fafafb;
   --black-100: #d6d9dc;
   --red-075: #f9d3d780;
+  --fc-dark: hsl(210, 8%, 5%);
+  --fc-medium: hsl(210, 8%, 25%);
+  --fc-light: hsl(210, 8%, 45%);
+  --scrollbar: hsla(0, 0%, 0%, 0.2);
+
 }
 
 @media (prefers-color-scheme: dark) {
   body.theme-system {
     --black-025: #393939;
     --black-100: #4a4e51;
+    --black-500: hsl(210, 8%, 70%);
+    --black-700: hsl(210, 8%, 82.5%);
+    --black-900: hsl(210, 4%, 95%);
     --red-075: #72373880;
+    --fc-dark: var(--black-900);
+    --fc-medium: var(--black-700);
+    --fc-light: var(--black-500);
+
   }
 }
 
@@ -3994,7 +4058,13 @@ body.theme-dark,
 .theme-dark__forced {
   --black-025: #393939;
   --black-100: #4a4e51;
+  --black-500: hsl(210, 8%, 70%);
+  --black-700: hsl(210, 8%, 82.5%);
+  --black-900: hsl(210, 4%, 95%);
   --red-075: #72373880;
+  --fc-dark: var(--black-900);
+  --fc-medium: var(--black-700);
+  --fc-light: var(--black-500);
 }
 
 /*The CSS for Search pages results in a different font-family, margin, padding, and line-height for h2. */
