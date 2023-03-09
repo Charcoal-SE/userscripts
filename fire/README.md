@@ -118,6 +118,7 @@ installed. In order to fully reset, you would need to run this in the browser co
 
 |1.5    ||
 | ---   |---
+|1.5.2  |Posts display: render required and moderator tags; Adjust some post CSS, including kbd and tags.  
 |1.5.1  |Handle SD using bold for post URLs.
 |1.5.0  |Make short links more visible. Recognize "obfuscated" as a type of number detection. Improve detection of bare URLs in parts of `why` data.
 
