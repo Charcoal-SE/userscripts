@@ -1570,9 +1570,9 @@
     },
     specialCases: {
       a: {
-        general: ['title', 'rel', 'alt', 'aria-label', 'aria-labelledby'],
+        general: ['title', 'rel', 'alt', 'aria-label', 'aria-labelledby', 'data-onebox-id'],
         specificValues: {
-          class: ['post-tag', 'post-tag required-tag', 'post-tag moderator-tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
+          class: ['post-tag', 'post-tag required-tag', 'post-tag moderator-tag', 'onebox-link'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
           // rel probably has a limited set of values, but that really hasn't been explored, yet.
           // rel: ['tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
         },
@@ -1773,8 +1773,8 @@
     return new RegExp(fullRegexText, 'gi');
   })();
   /* The whitelisted RegExp is currently:
-    2023-03-08:(https://regex101.com/r/6b7QBz/1)
-      /&lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span|h1|h2|h3|h4|h5|h6)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*)|(?:h1\b(?: +(?:id)="[^"<>]*")*)|(?:h2\b(?: +(?:id)="[^"<>]*")*)|(?:h3\b(?: +(?:id)="[^"<>]*")*)|(?:h4\b(?: +(?:id)="[^"<>]*")*)|(?:h5\b(?: +(?:id)="[^"<>]*")*)|(?:h6\b(?: +(?:id)="[^"<>]*")*))\s*|\/(?:a|iframe|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt|aria-label|aria-labelledby)="[^"<>]*"|class="(?:post-tag|post-tag required-tag|post-tag moderator-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:iframe\b(?:(?: +(?:(?:width|height)="[^"<>]*"|src="https:\/\/(?:www\.)?youtube\.com\/embed\/[^" ]+"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;/gi
+    2023-03-10:(https://regex101.com/r/YCHmek/1)
+      &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span|h1|h2|h3|h4|h5|h6)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*)|(?:h1\b(?: +(?:id)="[^"<>]*")*)|(?:h2\b(?: +(?:id)="[^"<>]*")*)|(?:h3\b(?: +(?:id)="[^"<>]*")*)|(?:h4\b(?: +(?:id)="[^"<>]*")*)|(?:h5\b(?: +(?:id)="[^"<>]*")*)|(?:h6\b(?: +(?:id)="[^"<>]*")*))\s*|\/(?:a|iframe|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt|aria-label|aria-labelledby|data-onebox-id)="[^"<>]*"|class="(?:post-tag|post-tag required-tag|post-tag moderator-tag|onebox-link)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:iframe\b(?:(?: +(?:(?:width|height)="[^"<>]*"|src="https:\/\/(?:www\.)?youtube\.com\/embed\/[^" ]+"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
   */
 
   /**
@@ -3565,9 +3565,6 @@ img.fire-emoji-large {
           cursor: pointer;
           box-shadow: 0 0 10px -2px #646464;
         }
-        .fire-popup .fire-popup-body .fire-reported-post a img[src^='https://via.placeholder.com'] {
-          box-shadow: unset;
-        }
       .fire-popup .fire-popup-body .fire-reported-post a {
         font-weight: bold;
         text-decoration: underline;
@@ -3577,6 +3574,19 @@ img.fire-emoji-large {
         display: inline-block;
         word-wrap: anywhere;
       }
+        .fire-popup .fire-popup-body .fire-reported-post a.onebox-link[data-onebox-id] {
+          position: relative;
+        }
+        .fire-popup .fire-popup-body .fire-reported-post a.onebox-link[data-onebox-id][href*="github.com/"]:after {
+          content: "GitHub onebox link";
+          position: absolute;
+          right: 0;
+          top: -1.25em;
+          font-size: 80%;
+        }
+        .fire-popup .fire-popup-body .fire-reported-post a img[src^='https://via.placeholder.com'] {
+          box-shadow: unset;
+        }
       .fire-popup .fire-popup-body .fire-reported-post li {
         margin-left: 10px;
       }
