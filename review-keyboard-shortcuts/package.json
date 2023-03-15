@@ -19,7 +19,7 @@
   "devDependencies": {
     "eslint": "^8.18.0",
     "eslint-plugin-promise": "^6.0.0",
-    "webpack": "^5.38.1",
+    "webpack": "^5.76.0",
     "xo": "^0.50.0"
   },
   "xo": {
