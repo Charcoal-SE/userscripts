@@ -440,28 +440,6 @@
     msWebSocket = null;
   };
 
-  const getCurrentSiteAPIParam = () => {
-    const regex = /((?:(?:es|ja|pt|ru)\.)?(?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
-    const exceptions = {
-      'meta.stackoverflow': 'meta.stackoverflow',
-      'meta.superuser': 'meta.superuser',
-      'meta.serverfault': 'meta.serverfault',
-      'meta.askubuntu': 'meta.askubuntu',
-      mathoverflow: 'mathoverflow.net',
-      'meta.mathoverflow': 'meta.mathoverflow.net',
-      'meta.stackexchange': 'meta'
-    };
-    const match = regex.exec(location.hostname);
-    if (match && exceptions[match[1]]) {
-      return exceptions[match[1]];
-    }
-    else if (match) {
-      return match[1];
-    }
-
-    return null;
-  };
-
   const getPostMenu = $e => {
     return $e.find('.js-post-menu:not(.preview-options) > .d-flex').map(function () {
       // SE has used a .post-menu-container within the .post-menu. It was there for a while and then removed.
@@ -535,8 +513,7 @@
           return;
         }
         const type = $e.hasClass('question') ? 'questions' : 'a';
-        const apiParam = getCurrentSiteAPIParam();
-        const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
+        const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls/?key=${msAPIKey}&filter=&urls=//${window.location.hostname}/${type}/${id}`;
         const $this = $(this);
         $this.append(`<div class="flex--item"><a href="https://metasmoke.erwaysoftware.com/posts/by-url?url=//${location.host}/${type}/${id}" class="sim-get-info" data-request="${msUri}">Smokey</button></div>`);
         /* Temporarily removed due to NATOEnhancements and this needing work
