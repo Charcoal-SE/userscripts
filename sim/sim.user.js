@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      0.8.0
+// @version      1.8.1
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @contributor  Makyen
@@ -35,7 +35,7 @@
 // @connect      chat.stackexchange.com
 //
 // @require      https://github.com/SO-Close-Vote-Reviewers/UserScripts/raw/master/gm4-polyfill.js
-// @require      https://cdn.jsdelivr.net/gh/makyen/extension-and-userscript-utilities@94cbac04cb446d35dd025974a7575b25b9e134ca/executeInPage.js
+// @require      https://cdn.jsdelivr.net/gh/makyen/extension-and-userscript-utilities@3b1b0aeae424bfca448d72d60a3dc998d5c53406/executeInPage.js
 // @require      https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 //
 // @updateURL    https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
@@ -440,28 +440,6 @@
     msWebSocket = null;
   };
 
-  const getCurrentSiteAPIParam = () => {
-    const regex = /((?:(?:es|ja|pt|ru)\.)?(?:meta\.)?(?:(?:(?:math|stack)overflow|askubuntu|superuser|serverfault)|\w+)(?:\.meta)?)\.(?:stackexchange\.com|com|net)/g;
-    const exceptions = {
-      'meta.stackoverflow': 'meta.stackoverflow',
-      'meta.superuser': 'meta.superuser',
-      'meta.serverfault': 'meta.serverfault',
-      'meta.askubuntu': 'meta.askubuntu',
-      mathoverflow: 'mathoverflow.net',
-      'meta.mathoverflow': 'meta.mathoverflow.net',
-      'meta.stackexchange': 'meta'
-    };
-    const match = regex.exec(location.hostname);
-    if (match && exceptions[match[1]]) {
-      return exceptions[match[1]];
-    }
-    else if (match) {
-      return match[1];
-    }
-
-    return null;
-  };
-
   const getPostMenu = $e => {
     return $e.find('.js-post-menu:not(.preview-options) > .d-flex').map(function () {
       // SE has used a .post-menu-container within the .post-menu. It was there for a while and then removed.
@@ -535,10 +513,9 @@
           return;
         }
         const type = $e.hasClass('question') ? 'questions' : 'a';
-        const apiParam = getCurrentSiteAPIParam();
-        const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/uid/${apiParam}/${id}?key=${msAPIKey}`;
+        const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls/?key=${msAPIKey}&filter=&urls=//${window.location.hostname}/${type}/${id}`;
         const $this = $(this);
-        $this.append(`<div class="flex--item"><a href="https://metasmoke.erwaysoftware.com/posts/by-url?url=//${location.host}/${type}/${id}" class="sim-get-info" data-request="${msUri}">Smokey</button></div>`);
+        $this.append(`<div class="flex--item"><a href="https://metasmoke.erwaysoftware.com/posts/by-url?url=//${location.host}/${type}/${id}" class="sim-get-info" data-request="${msUri}">Smokey</a></div>`);
         /* Temporarily removed due to NATOEnhancements and this needing work
         if (isNato) {
           // Clean up if we are in NATO Enhancements
@@ -708,14 +685,13 @@
         buttons = buttons.add(reportPostButton);
       }
       if (!postData.postIsDeleted || isModerator) {
-        const indentedDiv = contentSpace.append(`
-      <div class="s-prose sim-report-post-div">
-          <h4>${heading}:</br><span style="font-weight: normal;font-size: 80%;"> (will post a <code>!!/report</code> message from you in <a href="https://chat.stackexchange.com/rooms/11540/charcoal-hq">Charcoal HQ</a>)</span></h4>
-        <div class="sim-report-post-indented-div" style="padding-left:15px;">
-          Reason (optional):<br/>
-          <input type="text" class="sim-optional-report-reason" spellcheck="true" style="width:100%;"><br/>
-        </div>
-      </div>`)
+        const indentedDiv = contentSpace.append(`<div class="s-prose sim-report-post-div">
+  <h4>${heading}:</br><span style="font-weight: normal;font-size: 80%;"> (will post a <code>!!/report</code> message from you in <a href="https://chat.stackexchange.com/rooms/11540/charcoal-hq">Charcoal HQ</a>)</span></h4>
+  <div class="sim-report-post-indented-div" style="padding-left:15px;">
+    Reason (optional):<br/>
+    <input type="text" class="sim-optional-report-reason" spellcheck="true" style="width:100%;"><br/>
+  </div>
+</div>`)
           .find('.sim-report-post-indented-div');
         buttons.each(function () {
           indentedDiv
