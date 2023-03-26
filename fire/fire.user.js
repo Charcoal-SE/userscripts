@@ -152,9 +152,9 @@
     if (CHAT && CHAT.addEventHandlerHook) {
       CHAT.addEventHandlerHook(fireChatListener);
     }
-
     checkHashForWriteToken();
     registerPopupMoveMouseDownListener();
+    registerReportedPostsMousedownListenerForInputSelection();
   })(window);
 
   /**
@@ -2102,6 +2102,154 @@
       height: values.height || '',
       maxHeight: values['max-height'] || '',
     };
+  }
+
+  /**
+   * registerPopupMoveMouseDownListener - Add the reportedPostsMousedownListenerForInputSelection.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function registerReportedPostsMousedownListenerForInputSelection() {
+    $(document).on('mousedown', '.fire-popup-body', reportedPostsMousedownListenerForInputSelection);
+    const inputEl = $('textarea#input');
+    if (window.location.href.startsWith('https://chat.stackexchange.com/rooms/11540/') && inputEl.length > 0) {
+      $(window).on('storage', (event) => {
+        if (event.originalEvent.key === 'fire-post-report-selection') {
+          const addText = event.originalEvent.newValue;
+          appendTextWithUndoPoint(inputEl, addText, '\n', false, false);
+        }
+      });
+    }
+  }
+
+  /**
+   * appendTextWithUndoPoint - Append text to a textarea with adding an undo point to the textarea's native undo stack.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery|element}         element                    The element with a text .value to change
+   * @param   {string}                 addText                    The new content of the element.value
+   * @param   {string}                 separator                  Text to separate any existing text unless there is no existing text.
+   * @param   {number|truthy|falsy}    setOrRetainInsertOffset    The number to set the element.selectionEnd or truthy/falsy to indicate the current value should be retained.
+   * @param   {number|truthy|falsy}    setOrRetainScrollTop       The number to set the element.scrollTop or truthy/falsy to indicate the current value should be retained.
+   *
+   * Developed simultaniously with similar code in OpenAI Detector and a personal userscript.
+   */
+  function appendTextWithUndoPoint(element, addText, separator, setOrRetainInsertOffset, setOrRetainScrollTop) {
+    if (!addText) {
+      return;
+    }
+    if (typeof jQuery !== 'undefined') {
+      element = $(element)[0];
+    }
+    const currentText = element.value;
+    let newText = '';
+    if (currentText) {
+      // Append if there's already text.
+      newText = `${currentText}${separator}${addText}`;
+    } else {
+      newText = addText;
+    }
+    setTextWithUndoPoint(element, newText, setOrRetainInsertOffset, setOrRetainScrollTop);
+  }
+
+  /**
+   * setTextWithUndoPoint - Set the text in a textarea with adding an undo point to the textarea's native undo stack.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery|element}         element                    The element with a text .value to change
+   * @param   {string}                 newText                    The new content of the element.value
+   * @param   {number|truthy|falsy}    setOrRetainInsertOffset    The number to set the element.selectionEnd or truthy/falsy to indicate the current value should be retained.
+   * @param   {number|truthy|falsy}    setOrRetainScrollTop       The number to set the element.scrollTop or truthy/falsy to indicate the current value should be retained.
+   *
+   * Developed simultaniously with similar code in OpenAI Detector and a personal userscript.
+   */
+  function setTextWithUndoPoint(element, newText, setOrRetainInsertOffset, setOrRetainScrollTop) {
+    if (typeof jQuery !== 'undefined') {
+      element = $(element)[0];
+    }
+    const origSelectionEnd = typeof setOrRetainInsertOffset === 'number' ? setOrRetainInsertOffset : element.selectionEnd || 0;
+    const origScrollTop = typeof setOrRetainScrollTop === 'number' ? setOrRetainScrollTop : element.scrollTop || 0;
+    element.select();
+    try {
+      // This will put the replacement in the textbox's "undo" stack.
+      document.execCommand('insertText', false, newText);
+    } catch (error) {
+      element.value = newText;
+    }
+    if (element.value !== newText) {
+      element.value = newText;
+    }
+    if (typeof setOrRetainInsertOffset === 'number' || setOrRetainInsertOffset) {
+      // This isn't perfect, but it's probably closer to what a user expects.
+      element.selectionEnd = origSelectionEnd;
+    }
+    if (typeof setOrRetainScrollTop === 'number' || setOrRetainScrollTop) {
+      // A setTimeout is needed here.  If the textbox.scrollTop is not delayed, then it's
+      // ineffective, at least in Firefox.
+      // The process does result in a flash movement, but the disruption is minimal and it
+      // does end up mostly where it was.  If we wanted to get fancy, we'd determine how
+      // much of the text is being changed prior to the insert and scroll locations and
+      // adjust the values based on that.
+      setTimeout(() => {
+        element.scrollTop = origScrollTop;
+      }, 0);
+    }
+  }
+
+  /**
+   * reportedPostsMousedownListenerForInputSelection - This listens for mousedown events and copies the selection or link href to the #input.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQueryEvent}     mousedownEvent     The jQuery Event Object
+   */
+  function reportedPostsMousedownListenerForInputSelection(mousedownEvent) {
+    if (!mousedownEvent.altKey) {
+      return;
+    }
+    mousedownEvent.preventDefault();
+    const inputEl = $('textarea#input');
+    const target = $(mousedownEvent.target);
+    const closestA = target.closest('a[href]:not([href=""])');
+
+    /* The code to get the selected text on multiple platforms is from [this SO answer](https://stackoverflow.com/a/5379408)
+     * by [Tim Down](https://stackoverflow.com/users/96100/tim-down) et al. from 2017.
+     * It is under a [CC BY-SA 3.0 license](https://creativecommons.org/licenses/by-sa/3.0/).
+     */
+
+    let text = '';
+    let textType = 'selected text';
+    const activeEl = document.activeElement;
+    const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
+    if ((activeElTagName == 'textarea' || activeElTagName == 'input') && /^(?:text|textarea|search|password|tel|url)$/i.test(activeEl.type) && (typeof activeEl.selectionStart == 'number')) { // eslint-disable-line eqeqeq
+      text = activeEl.value.slice(activeEl.selectionStart, activeEl.selectionEnd);
+    } else if (window.getSelection) {
+      text = window.getSelection().toString();
+    }
+
+    if (!text && closestA.length > 0) {
+      text = closestA.data('orighref') || closestA[0].href;
+      textType = 'URL';
+    }
+    if (!text) {
+      return;
+    }
+    if (inputEl.length === 0) {
+      // Clear the localStorage item, so there is always a change. If there's no actual change, then other tabs aren't notified.
+      localStorage.setItem('fire-post-report-selection', '');
+      localStorage.setItem('fire-post-report-selection', text);
+      toastr.info(`Passed ${textType} to Charcoal HQ: "${text}"`);
+    } else {
+      appendTextWithUndoPoint(inputEl, text, '\n', false, false);
+      toastr.info(`Added ${textType} to input: "${text}"`);
+    }
   }
 
   /**
