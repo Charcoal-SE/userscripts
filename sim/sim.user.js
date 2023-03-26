@@ -35,7 +35,7 @@
 // @connect      chat.stackexchange.com
 //
 // @require      https://github.com/SO-Close-Vote-Reviewers/UserScripts/raw/master/gm4-polyfill.js
-// @require      https://cdn.jsdelivr.net/gh/makyen/extension-and-userscript-utilities@94cbac04cb446d35dd025974a7575b25b9e134ca/executeInPage.js
+// @require      https://cdn.jsdelivr.net/gh/makyen/extension-and-userscript-utilities@3b1b0aeae424bfca448d72d60a3dc998d5c53406/executeInPage.js
 // @require      https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 //
 // @updateURL    https://github.com/Charcoal-SE/userscripts/raw/master/sim/sim.user.js
