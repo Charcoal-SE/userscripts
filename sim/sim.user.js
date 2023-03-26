@@ -515,7 +515,7 @@
         const type = $e.hasClass('question') ? 'questions' : 'a';
         const msUri = `https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls/?key=${msAPIKey}&filter=&urls=//${window.location.hostname}/${type}/${id}`;
         const $this = $(this);
-        $this.append(`<div class="flex--item"><a href="https://metasmoke.erwaysoftware.com/posts/by-url?url=//${location.host}/${type}/${id}" class="sim-get-info" data-request="${msUri}">Smokey</button></div>`);
+        $this.append(`<div class="flex--item"><a href="https://metasmoke.erwaysoftware.com/posts/by-url?url=//${location.host}/${type}/${id}" class="sim-get-info" data-request="${msUri}">Smokey</a></div>`);
         /* Temporarily removed due to NATOEnhancements and this needing work
         if (isNato) {
           // Clean up if we are in NATO Enhancements
