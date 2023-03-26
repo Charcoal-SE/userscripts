@@ -35,6 +35,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
     - If selected (configurable setting), the post's images are hidden behind a placeholder image that can be clicked to show the image included in the post. If this option is set, then the post's images are not downloaded from their source until you click on the placeholder. This is to prevent potentially NSFW images from being downloaded to your machine.
   - At the bottom right of the popup, is a ⚙️, which opens the settings popup when clicked.
   - Just to the left of the ⚙️ is the currently running version number of FIRE. It's a link to download the most recent released version from GitHub.
+  - An <kbd>Alt</kbd>-<kbd>Click</kbd> in the popup will copy the currently selected text to the chat room's input textarea. If there's no selection and the <kbd>Alt</kbd>-<kbd>Click</kbd> is on a link, then the link's URL is copied to the chat room's input textarea. If the current page is not a chat room (e.g. it's a transcript or other page), then those values are passed to any currently open tab showing the [Charcoal HQ char room](https://chat.stackexchange.com/rooms/11540/charcoal-hq).
 - Provided you [have authorized metasmoke](https://metasmoke.erwaysoftware.com/authentication/status) to cast flags from your account _and_ the configuration setting for flagging is enabled:
   - When you submit `spam` feedback, the post will _also_ be flagged as "spam" on the SE network.
   - When you submit `rude` feedback, the post will _also_ be flagged as "rude/abusive" on the SE network.
@@ -115,6 +116,10 @@ installed. In order to fully reset, you would need to run this in the browser co
  - Flagging will fail if you are not registered on the particular site.
 
 ## Version History
+
+|1.6    ||
+| ---   |---
+|1.6.0  |Copying to chat input upon <kbd>Alt</kbd>-<kbd>Click</kbd>. See above for a more detailed description.
 
 |1.5    ||
 | ---   |---
