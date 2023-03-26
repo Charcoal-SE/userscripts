@@ -1871,9 +1871,17 @@
     // Not doing that here would result in the browser making fetches for each image's URL, which
     // could be bad for NSFW images in some situations (e.g. someone using this from work).
     // We could do this in the HTML text, but we want a DOM anyway, and it's easier to do it as DOM.
+    const placeholder = 'https://via.placeholder.com/550x100//ffffff?text=Click+to+show+image.';
     containingDiv.querySelectorAll('img').forEach((image) => {
-      image.dataset.src = image.src;
-      image.src = 'https://via.placeholder.com/550x100//ffffff?text=Click+to+show+image.';
+      const src = image.src;
+      image.dataset.src = src;
+      image.src = placeholder;
+      // Also change the immediately containing link, as links are pre-fetched under some conditions.
+      const parent = image.parentElement;
+      if (parent.nodeName === 'A' && parent.getAttribute('href') === src) {
+        parent.setAttribute('href', placeholder);
+        parent.dataset.orighref = src;
+      }
     });
     return $(containingDiv);
   }
@@ -2513,18 +2521,52 @@
    *
    */
   function handleReportImages() {
+    /**
+     * restoreOriginalAttributesEventHandler - This handles click events on images which have had the src attribute replaced.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {jQueryEvent}     event     The jQuery Event Object
+     * @param   {DOM_node}        this      The target of the event
+     */
+    function restoreOriginalAttributesEventHandler(event) {
+      const img = $(this);
+      if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+        img.one('click', restoreOriginalAttributesEventHandler);
+        return;
+      }
+      restoreOriginalAttributes(img);
+      event.preventDefault();
+    }
+
+    /**
+     * restoreOriginalAttributes - This restores the original src value for images with placeholders and the original href atribute for their conaining <a>, if existing.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {jQuery}     img     A jQuery Object which is the <img> for which to restore the original src attribute.
+     */
+    function restoreOriginalAttributes(img) {
+      img.attr('src', img.data('src'));
+      // Also restore the immediately containing link, as links are pre-fetched under some conditions.
+      const parent = img.parent('a');
+      const origHref = parent.data('orighref');
+      if (origHref) {
+        parent.attr('href', origHref);
+      }
+    }
+
     if (fire.userData.hideImages) {
       $('.fire-reported-post img').each((i, element) => {
         const img = $(element);
-        img.one('click', (event) => {
-          img.attr('src', img.data('src'));
-          event.preventDefault();
-        });
+        img.one('click', restoreOriginalAttributesEventHandler);
       });
     } else {
       // Restore the original image src attribute.
       $('.fire-reported-post img').each((i, element) => {
-        element.src = $(element).data('src');
+        restoreOriginalAttributes($(element));
       });
     }
   }
@@ -4656,8 +4698,8 @@ body.outside .fire-popup h2 {
    *
    */
   function expandLinksOnHover() {
-    $('.fire-popup-body a').each((i, element) =>
-      $(element).attr('fire-tooltip', element)
+    $('.fire-popup-body a[href]:not([href=""]):not(.post-tag)').each((i, element) =>
+      $(element).attr('fire-tooltip', element.dataset.orighref || element.href)
     );
   }
 
