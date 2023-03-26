@@ -685,14 +685,13 @@
         buttons = buttons.add(reportPostButton);
       }
       if (!postData.postIsDeleted || isModerator) {
-        const indentedDiv = contentSpace.append(`
-      <div class="s-prose sim-report-post-div">
-          <h4>${heading}:</br><span style="font-weight: normal;font-size: 80%;"> (will post a <code>!!/report</code> message from you in <a href="https://chat.stackexchange.com/rooms/11540/charcoal-hq">Charcoal HQ</a>)</span></h4>
-        <div class="sim-report-post-indented-div" style="padding-left:15px;">
-          Reason (optional):<br/>
-          <input type="text" class="sim-optional-report-reason" spellcheck="true" style="width:100%;"><br/>
-        </div>
-      </div>`)
+        const indentedDiv = contentSpace.append(`<div class="s-prose sim-report-post-div">
+  <h4>${heading}:</br><span style="font-weight: normal;font-size: 80%;"> (will post a <code>!!/report</code> message from you in <a href="https://chat.stackexchange.com/rooms/11540/charcoal-hq">Charcoal HQ</a>)</span></h4>
+  <div class="sim-report-post-indented-div" style="padding-left:15px;">
+    Reason (optional):<br/>
+    <input type="text" class="sim-optional-report-reason" spellcheck="true" style="width:100%;"><br/>
+  </div>
+</div>`)
           .find('.sim-report-post-indented-div');
         buttons.each(function () {
           indentedDiv
