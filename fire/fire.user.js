@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus [attribution: Michiel Dommerholt (https://github.com/Cerbrus)]
 // @contributor Makyen
-// @version     1.5.1
+// @version     1.6.0
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -152,9 +152,9 @@
     if (CHAT && CHAT.addEventHandlerHook) {
       CHAT.addEventHandlerHook(fireChatListener);
     }
-
     checkHashForWriteToken();
     registerPopupMoveMouseDownListener();
+    registerReportedPostsMousedownListenerForInputSelection();
   })(window);
 
   /**
@@ -1550,6 +1550,10 @@
   // Many of the attributes permitted here are not permitted in Markdown for SE, but are delivered by SE in the HTML for the post body.
   //   SE adds the additional attributes.
   // For <a>, 'rel' is not permitted in Markdown, but is in SE's HTML.
+  // The Comprehensive Formatting Test:
+  //   https://chat.stackexchange.com/transcript/message/63128026#63128026
+  //   https://metasmoke.erwaysoftware.com/posts/by-url?url=//meta.stackexchange.com/a/325826
+  //   https://meta.stackexchange.com/a/325826
   const whitelistedTags = {
     withAttributes: {
       blockquote: ['class'], // 'data-spoiler'], // data-spoiler is used on SE sites, but isn't in the HTML delivered by SE.
@@ -1566,9 +1570,9 @@
     },
     specialCases: {
       a: {
-        general: ['title', 'rel', 'alt'],
+        general: ['title', 'rel', 'alt', 'aria-label', 'aria-labelledby', 'data-onebox-id'],
         specificValues: {
-          class: ['post-tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
+          class: ['post-tag', 'post-tag required-tag', 'post-tag moderator-tag', 'onebox-link'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
           // rel probably has a limited set of values, but that really hasn't been explored, yet.
           // rel: ['tag'], // example post with tags: https://chat.stackexchange.com/transcript/11540?m=54674140#54674140
         },
@@ -1769,8 +1773,8 @@
     return new RegExp(fullRegexText, 'gi');
   })();
   /* The whitelisted RegExp is currently:
-    2021-10-13 (https://regex101.com/r/kNMJZY/1):
-      &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span|h1|h2|h3|h4|h5|h6)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*)|(?:h1\b(?: +(?:id)="[^"<>]*")*)|(?:h2\b(?: +(?:id)="[^"<>]*")*)|(?:h3\b(?: +(?:id)="[^"<>]*")*)|(?:h4\b(?: +(?:id)="[^"<>]*")*)|(?:h5\b(?: +(?:id)="[^"<>]*")*)|(?:h6\b(?: +(?:id)="[^"<>]*")*))\s*|\/(?:a|iframe|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt)="[^"<>]*"|class="(?:post-tag)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:iframe\b(?:(?: +(?:(?:width|height)="[^"<>]*"|src="https:\/\/(?:www\.)?youtube\.com\/embed\/[^" ]+"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
+    2023-03-10:(https://regex101.com/r/YCHmek/1)
+      &lt;((?:br|hr)\s*\/?|\/?(?:b|code|dd|del|dl|dt|em|i|kbd|li|p|s|strike|strong|sub|sup|tbody|thead|tr|ul)\s*|\/(?:blockquote|div|ol|pre|span|h1|h2|h3|h4|h5|h6)\s*|(?:(?:blockquote\b(?: +(?:class)="[^"<>]*")*)|(?:div\b(?: +(?:class|data-lang|data-hide|data-console|data-babel)="[^"<>]*")*)|(?:ol\b(?: +(?:start)="[^"<>]*")*)|(?:pre\b(?: +(?:class)="[^"<>]*")*)|(?:span\b(?: +(?:class|dir)="[^"<>]*")*)|(?:h1\b(?: +(?:id)="[^"<>]*")*)|(?:h2\b(?: +(?:id)="[^"<>]*")*)|(?:h3\b(?: +(?:id)="[^"<>]*")*)|(?:h4\b(?: +(?:id)="[^"<>]*")*)|(?:h5\b(?: +(?:id)="[^"<>]*")*)|(?:h6\b(?: +(?:id)="[^"<>]*")*))\s*|\/(?:a|iframe|img|table|td|th)\s*|(?:(?:a\b(?:(?: +(?:(?:title|rel|alt|aria-label|aria-labelledby|data-onebox-id)="[^"<>]*"|class="(?:post-tag|post-tag required-tag|post-tag moderator-tag|onebox-link)"|href="(?:https?:)?\/\/?[^" ]*"))*)\s*)|(?:iframe\b(?:(?: +(?:(?:width|height)="[^"<>]*"|src="https:\/\/(?:www\.)?youtube\.com\/embed\/[^" ]+"))*)\s*)|(?:img\b(?:(?: +src="[^"<>]*")?(?: +width="[^"<>]*")?(?: +height="[^"<>]*")?(?: +alt="[^"<>]*")?(?: +title="[^"<>]*")?)\s*\/?)|(?:table\b(?:(?: +(?:class="(?:s-table)"))*)\s*)|(?:td\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)|(?:th\b(?:(?: +(?:style="(?:text-align: right;|text-align: left;|text-align: center;)"))*)\s*)))&gt;
   */
 
   /**
@@ -1800,7 +1804,7 @@
   }
 
   /**
-   * generatePostBodyDivFromText - Generate a <div> containing the HTML for a post body from HTML text.
+   * generatePostBodyDivFromHtmlText - Generate a <div> containing the HTML for a post body from HTML text.
    *
    * @private
    * @memberof module:fire
@@ -1867,9 +1871,17 @@
     // Not doing that here would result in the browser making fetches for each image's URL, which
     // could be bad for NSFW images in some situations (e.g. someone using this from work).
     // We could do this in the HTML text, but we want a DOM anyway, and it's easier to do it as DOM.
+    const placeholder = 'https://via.placeholder.com/550x100//ffffff?text=Click+to+show+image.';
     containingDiv.querySelectorAll('img').forEach((image) => {
-      image.dataset.src = image.src;
-      image.src = 'https://via.placeholder.com/550x100//ffffff?text=Click+to+show+image.';
+      const src = image.src;
+      image.dataset.src = src;
+      image.src = placeholder;
+      // Also change the immediately containing link, as links are pre-fetched under some conditions.
+      const parent = image.parentElement;
+      if (parent.nodeName === 'A' && parent.getAttribute('href') === src) {
+        parent.setAttribute('href', placeholder);
+        parent.dataset.orighref = src;
+      }
     });
     return $(containingDiv);
   }
@@ -2090,6 +2102,154 @@
       height: values.height || '',
       maxHeight: values['max-height'] || '',
     };
+  }
+
+  /**
+   * registerPopupMoveMouseDownListener - Add the reportedPostsMousedownListenerForInputSelection.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   */
+  function registerReportedPostsMousedownListenerForInputSelection() {
+    $(document).on('mousedown', '.fire-popup-body', reportedPostsMousedownListenerForInputSelection);
+    const inputEl = $('textarea#input');
+    if (window.location.href.startsWith('https://chat.stackexchange.com/rooms/11540/') && inputEl.length > 0) {
+      $(window).on('storage', (event) => {
+        if (event.originalEvent.key === 'fire-post-report-selection') {
+          const addText = event.originalEvent.newValue;
+          appendTextWithUndoPoint(inputEl, addText, '\n', false, false);
+        }
+      });
+    }
+  }
+
+  /**
+   * appendTextWithUndoPoint - Append text to a textarea with adding an undo point to the textarea's native undo stack.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery|element}         element                    The element with a text .value to change
+   * @param   {string}                 addText                    The new content of the element.value
+   * @param   {string}                 separator                  Text to separate any existing text unless there is no existing text.
+   * @param   {number|truthy|falsy}    setOrRetainInsertOffset    The number to set the element.selectionEnd or truthy/falsy to indicate the current value should be retained.
+   * @param   {number|truthy|falsy}    setOrRetainScrollTop       The number to set the element.scrollTop or truthy/falsy to indicate the current value should be retained.
+   *
+   * Developed simultaniously with similar code in OpenAI Detector and a personal userscript.
+   */
+  function appendTextWithUndoPoint(element, addText, separator, setOrRetainInsertOffset, setOrRetainScrollTop) {
+    if (!addText) {
+      return;
+    }
+    if (typeof jQuery !== 'undefined') {
+      element = $(element)[0];
+    }
+    const currentText = element.value;
+    let newText = '';
+    if (currentText) {
+      // Append if there's already text.
+      newText = `${currentText}${separator}${addText}`;
+    } else {
+      newText = addText;
+    }
+    setTextWithUndoPoint(element, newText, setOrRetainInsertOffset, setOrRetainScrollTop);
+  }
+
+  /**
+   * setTextWithUndoPoint - Set the text in a textarea with adding an undo point to the textarea's native undo stack.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQuery|element}         element                    The element with a text .value to change
+   * @param   {string}                 newText                    The new content of the element.value
+   * @param   {number|truthy|falsy}    setOrRetainInsertOffset    The number to set the element.selectionEnd or truthy/falsy to indicate the current value should be retained.
+   * @param   {number|truthy|falsy}    setOrRetainScrollTop       The number to set the element.scrollTop or truthy/falsy to indicate the current value should be retained.
+   *
+   * Developed simultaniously with similar code in OpenAI Detector and a personal userscript.
+   */
+  function setTextWithUndoPoint(element, newText, setOrRetainInsertOffset, setOrRetainScrollTop) {
+    if (typeof jQuery !== 'undefined') {
+      element = $(element)[0];
+    }
+    const origSelectionEnd = typeof setOrRetainInsertOffset === 'number' ? setOrRetainInsertOffset : element.selectionEnd || 0;
+    const origScrollTop = typeof setOrRetainScrollTop === 'number' ? setOrRetainScrollTop : element.scrollTop || 0;
+    element.select();
+    try {
+      // This will put the replacement in the textbox's "undo" stack.
+      document.execCommand('insertText', false, newText);
+    } catch (error) {
+      element.value = newText;
+    }
+    if (element.value !== newText) {
+      element.value = newText;
+    }
+    if (typeof setOrRetainInsertOffset === 'number' || setOrRetainInsertOffset) {
+      // This isn't perfect, but it's probably closer to what a user expects.
+      element.selectionEnd = origSelectionEnd;
+    }
+    if (typeof setOrRetainScrollTop === 'number' || setOrRetainScrollTop) {
+      // A setTimeout is needed here.  If the textbox.scrollTop is not delayed, then it's
+      // ineffective, at least in Firefox.
+      // The process does result in a flash movement, but the disruption is minimal and it
+      // does end up mostly where it was.  If we wanted to get fancy, we'd determine how
+      // much of the text is being changed prior to the insert and scroll locations and
+      // adjust the values based on that.
+      setTimeout(() => {
+        element.scrollTop = origScrollTop;
+      }, 0);
+    }
+  }
+
+  /**
+   * reportedPostsMousedownListenerForInputSelection - This listens for mousedown events and copies the selection or link href to the #input.
+   *
+   * @private
+   * @memberof module:fire
+   *
+   * @param   {jQueryEvent}     mousedownEvent     The jQuery Event Object
+   */
+  function reportedPostsMousedownListenerForInputSelection(mousedownEvent) {
+    if (!mousedownEvent.altKey) {
+      return;
+    }
+    mousedownEvent.preventDefault();
+    const inputEl = $('textarea#input');
+    const target = $(mousedownEvent.target);
+    const closestA = target.closest('a[href]:not([href=""])');
+
+    /* The code to get the selected text on multiple platforms is from [this SO answer](https://stackoverflow.com/a/5379408)
+     * by [Tim Down](https://stackoverflow.com/users/96100/tim-down) et al. from 2017.
+     * It is under a [CC BY-SA 3.0 license](https://creativecommons.org/licenses/by-sa/3.0/).
+     */
+
+    let text = '';
+    let textType = 'selected text';
+    const activeEl = document.activeElement;
+    const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
+    if ((activeElTagName == 'textarea' || activeElTagName == 'input') && /^(?:text|textarea|search|password|tel|url)$/i.test(activeEl.type) && (typeof activeEl.selectionStart == 'number')) { // eslint-disable-line eqeqeq
+      text = activeEl.value.slice(activeEl.selectionStart, activeEl.selectionEnd);
+    } else if (window.getSelection) {
+      text = window.getSelection().toString();
+    }
+
+    if (!text && closestA.length > 0) {
+      text = closestA.data('orighref') || closestA[0].href;
+      textType = 'URL';
+    }
+    if (!text) {
+      return;
+    }
+    if (inputEl.length === 0) {
+      // Clear the localStorage item, so there is always a change. If there's no actual change, then other tabs aren't notified.
+      localStorage.setItem('fire-post-report-selection', '');
+      localStorage.setItem('fire-post-report-selection', text);
+      toastr.info(`Passed ${textType} to Charcoal HQ: "${text}"`);
+    } else {
+      appendTextWithUndoPoint(inputEl, text, '\n', false, false);
+      toastr.info(`Added ${textType} to input: "${text}"`);
+    }
   }
 
   /**
@@ -2509,18 +2669,52 @@
    *
    */
   function handleReportImages() {
+    /**
+     * restoreOriginalAttributesEventHandler - This handles click events on images which have had the src attribute replaced.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {jQueryEvent}     event     The jQuery Event Object
+     * @param   {DOM_node}        this      The target of the event
+     */
+    function restoreOriginalAttributesEventHandler(event) {
+      const img = $(this);
+      if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+        img.one('click', restoreOriginalAttributesEventHandler);
+        return;
+      }
+      restoreOriginalAttributes(img);
+      event.preventDefault();
+    }
+
+    /**
+     * restoreOriginalAttributes - This restores the original src value for images with placeholders and the original href atribute for their conaining <a>, if existing.
+     *
+     * @private
+     * @memberof module:fire
+     *
+     * @param   {jQuery}     img     A jQuery Object which is the <img> for which to restore the original src attribute.
+     */
+    function restoreOriginalAttributes(img) {
+      img.attr('src', img.data('src'));
+      // Also restore the immediately containing link, as links are pre-fetched under some conditions.
+      const parent = img.parent('a');
+      const origHref = parent.data('orighref');
+      if (origHref) {
+        parent.attr('href', origHref);
+      }
+    }
+
     if (fire.userData.hideImages) {
       $('.fire-reported-post img').each((i, element) => {
         const img = $(element);
-        img.one('click', (event) => {
-          img.attr('src', img.data('src'));
-          event.preventDefault();
-        });
+        img.one('click', restoreOriginalAttributesEventHandler);
       });
     } else {
       // Restore the original image src attribute.
       $('.fire-reported-post img').each((i, element) => {
-        element.src = $(element).data('src');
+        restoreOriginalAttributes($(element));
       });
     }
   }
@@ -3557,8 +3751,9 @@ img.fire-emoji-large {
       .fire-popup .fire-popup-body .fire-reported-post img {
         max-width: 100%;
       }
-        .fire-popup .fire-popup-body .fire-reported-post img[src^='http://placehold.it'] {
+        .fire-popup .fire-popup-body .fire-reported-post img[src^='https://via.placeholder.com'] {
           cursor: pointer;
+          box-shadow: 0 0 10px -2px #646464;
         }
       .fire-popup .fire-popup-body .fire-reported-post a {
         font-weight: bold;
@@ -3569,6 +3764,19 @@ img.fire-emoji-large {
         display: inline-block;
         word-wrap: anywhere;
       }
+        .fire-popup .fire-popup-body .fire-reported-post a.onebox-link[data-onebox-id] {
+          position: relative;
+        }
+        .fire-popup .fire-popup-body .fire-reported-post a.onebox-link[data-onebox-id][href*="github.com/"]:after {
+          content: "GitHub onebox link";
+          position: absolute;
+          right: 0;
+          top: -1.25em;
+          font-size: 80%;
+        }
+        .fire-popup .fire-popup-body .fire-reported-post a img[src^='https://via.placeholder.com'] {
+          box-shadow: unset;
+        }
       .fire-popup .fire-popup-body .fire-reported-post li {
         margin-left: 10px;
       }
@@ -3715,11 +3923,6 @@ img.fire-emoji-large {
         padding: 1px 5px;
       }
       .fire-popup .fire-popup-body .fire-reported-post a.post-tag {
-        color: #39739d;
-        background-color: #e1ecf4;
-        border-color: transparent;
-      }
-      .fire-popup .fire-popup-body .fire-reported-post a.post-tag {
         display: inline-block;
         padding: .4em .5em;
         margin: 2px 2px 2px 0;
@@ -3731,6 +3934,39 @@ img.fire-emoji-large {
         border-width: 1px;
         border-style: solid;
         border-radius: 3px;
+        box-shadow: unset;
+        font-weight: unset;
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag {
+        color: rgb(44, 88, 119);
+        background-color: rgb(225, 236, 244);
+        border-color: rgb(225, 236, 244);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag:hover {
+        color: rgb(57, 115, 157);
+        background-color: rgb(208, 227, 241);
+        border-color: rgb(208, 227, 241);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.required-tag {
+        color: rgb(59, 64, 69);
+        background-color: rgb(227, 230, 232);
+        border-color: rgb(186, 191, 196);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.required-tag:hover {
+        color: rgb(35, 38, 41);
+        background-color: rgb(214, 217, 220);
+        border-color: rgb(159, 166, 173);
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.moderator-tag {
+        color: rgb(194, 46, 50);
+        background-color: rgb(253, 242, 242);
+        border-color: rgb(249, 210, 211);
+
+      }
+      .fire-popup .fire-popup-body .fire-reported-post a.post-tag.moderator-tag:hover {
+        color: rgb(171, 38, 42);
+        background-color: rgb(249, 210, 211);
+        border-color: rgb(244, 180, 182);
       }
       .fire-popup .fire-popup-body .fire-reported-post blockquote {
         quotes: none;
@@ -3856,6 +4092,22 @@ img.fire-emoji-large {
         .fire-popup .fire-popup-body .fire-reported-post .s-table tbody + tbody {
           border-top: 2px solid var(--black-100);
         }
+      .fire-popup .fire-popup-body .fire-reported-post kbd {
+        border: 1px solid rgb(159, 166, 173);
+        border-top-color: rgb(159, 166, 173);
+        box-shadow: rgba(12, 13, 14, 0.15) 0px 1px 1px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset;
+        background-color: rgb(227, 230, 232);
+        border-radius: 3px;
+        color: rgb(35, 38, 41);
+        display: inline-block;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Adjusted", "Segoe UI", "Liberation Sans", sans-serif;
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0 .1em;
+        overflow-wrap: break-word;
+        padding: .1em .6em;
+        text-shadow: rgb(255, 255, 255) 0px 1px 0px;
+      }
   .fire-popup .fire-version-link {
     margin: 2px 2px -14px 0;
     float: right;
@@ -3980,13 +4232,25 @@ body,
   --black-025: #fafafb;
   --black-100: #d6d9dc;
   --red-075: #f9d3d780;
+  --fc-dark: hsl(210, 8%, 5%);
+  --fc-medium: hsl(210, 8%, 25%);
+  --fc-light: hsl(210, 8%, 45%);
+  --scrollbar: hsla(0, 0%, 0%, 0.2);
+
 }
 
 @media (prefers-color-scheme: dark) {
   body.theme-system {
     --black-025: #393939;
     --black-100: #4a4e51;
+    --black-500: hsl(210, 8%, 70%);
+    --black-700: hsl(210, 8%, 82.5%);
+    --black-900: hsl(210, 4%, 95%);
     --red-075: #72373880;
+    --fc-dark: var(--black-900);
+    --fc-medium: var(--black-700);
+    --fc-light: var(--black-500);
+
   }
 }
 
@@ -3994,7 +4258,13 @@ body.theme-dark,
 .theme-dark__forced {
   --black-025: #393939;
   --black-100: #4a4e51;
+  --black-500: hsl(210, 8%, 70%);
+  --black-700: hsl(210, 8%, 82.5%);
+  --black-900: hsl(210, 4%, 95%);
   --red-075: #72373880;
+  --fc-dark: var(--black-900);
+  --fc-medium: var(--black-700);
+  --fc-light: var(--black-500);
 }
 
 /*The CSS for Search pages results in a different font-family, margin, padding, and line-height for h2. */
@@ -4576,8 +4846,8 @@ body.outside .fire-popup h2 {
    *
    */
   function expandLinksOnHover() {
-    $('.fire-popup-body a').each((i, element) =>
-      $(element).attr('fire-tooltip', element)
+    $('.fire-popup-body a[href]:not([href=""]):not(.post-tag)').each((i, element) =>
+      $(element).attr('fire-tooltip', element.dataset.orighref || element.href)
     );
   }
 
