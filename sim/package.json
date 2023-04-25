@@ -21,7 +21,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "jquery": "^3.6.0",
     "webpack": "^5.38.1",
-    "xo": "^0.50.0"
+    "xo": "^0.54.1"
   },
   "xo": {
     "space": true,
