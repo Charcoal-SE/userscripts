@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus [attribution: Michiel Dommerholt (https://github.com/Cerbrus)]
 // @contributor Makyen
-// @version     1.6.0
+// @version     1.6.1
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -182,9 +182,15 @@
    */
   function checkHashForWriteToken() {
     if (location.hash && location.hash.length > 0) {
-      const result = location.hash.match(/#+access_token=(.+)/);
-      if (result) {
-        setValue('stackexchangeWriteToken', result[1]);
+      const params = new URLSearchParams(location.hash);
+      const token = params.get('#access_token');
+      if (token) {
+        /* 2023-08-11 SE is now providing the hash as:
+         *   #access_token=<token>&scope=write_access%20no_expiry
+         * It should be (https://api.stackexchange.com/docs/authentication):
+         *   #access_token=<token>
+         */
+        setValue('stackexchangeWriteToken', token);
         window.close();
       }
       // Clear hash
