@@ -182,9 +182,15 @@
    */
   function checkHashForWriteToken() {
     if (location.hash && location.hash.length > 0) {
-      const result = location.hash.match(/#+access_token=(.+)/);
-      if (result) {
-        setValue('stackexchangeWriteToken', result[1]);
+      const params = new URLSearchParams(location.hash);
+      const token = params.get('#access_token');
+      if (token) {
+        /* 2023-08-11 SE is now providing the hash as:
+         *   #access_token=<token>&scope=write_access%20no_expiry
+         * It should be (https://api.stackexchange.com/docs/authentication):
+         *   #access_token=<token>
+         */
+        setValue('stackexchangeWriteToken', token);
         window.close();
       }
       // Clear hash
