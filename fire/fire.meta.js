@@ -30,3 +30,4 @@
 // @require     https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js
 // @require     https://cdn.jsdelivr.net/gh/joewalnes/reconnecting-websocket@5c66a7b0e436815c25b79c5579c6be16a6fd76d2/reconnecting-websocket.js
 // @grant       none
+// ==/UserScript==
