@@ -28,6 +28,7 @@ As of this moment, the userscript posts flags _and_ MS feedback.
       - A ✏️ is displayed if the post has more than one revision (i.e. it has been edited, but not including edits made during the edit grace period).
 <!--      - A 🏳️ is displayed if you have manually flagged the post.-->
 <!--      - A 🏴 is displayed if you have auto-flagged the post.-->
+    - A click while this popup is open will "lock" the popup open, so you can select text inside the popup. A click outside the "locked-open" popup will unlock it.
   - The username of the post author and their reputation on that site.
   - The reported post's contents.
     - All links in a post will show a tooltip with their target URL when you hover your mouse over them. This is in addition to the browser's default display of hovered URLs.
@@ -119,8 +120,8 @@ installed. In order to fully reset, you would need to run this in the browser co
 
 |1.6    ||
 | ---   |---
-|1.6.0  |Copying to chat input upon <kbd>Alt</kbd>-<kbd>Click</kbd>. See above for a more detailed description.
 |1.6.1  |Adapt to SE supplying unexpected data when using the implicit OAuth 2.0 flow.
+|1.6.0  |Copying to chat input upon <kbd>Alt</kbd>-<kbd>Click</kbd>. See above for a more detailed description.
 
 |1.5    ||
 | ---   |---
