@@ -120,6 +120,7 @@ installed. In order to fully reset, you would need to run this in the browser co
 
 |1.6    ||
 | ---   |---
+|1.6.2  |Remove use of `DOMSubtreeModified` event , as it will be removed from Chrome shortly.
 |1.6.1  |Adapt to SE supplying unexpected data when using the implicit OAuth 2.0 flow.
 |1.6.0  |Copying to chat input upon <kbd>Alt</kbd>-<kbd>Click</kbd>. See above for a more detailed description.
 
