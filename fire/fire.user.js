@@ -4,7 +4,7 @@
 // @description FIRE adds a button to SmokeDetector reports that allows you to provide feedback & flag, all from chat.
 // @author      Cerbrus [attribution: Michiel Dommerholt (https://github.com/Cerbrus)]
 // @contributor Makyen
-// @version     1.6.1
+// @version     1.6.2
 // @icon        https://raw.githubusercontent.com/Ranks/emojione-assets/master/png/32/1f525.png
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fire/fire.user.js
@@ -4741,9 +4741,17 @@ body.outside .fire-popup h2 {
    *
    */
   function showFireOnExistingMessages() {
-    $('#getmore, #getmore-mine')
-      .click(() => decorateExistingMessages(fire.constants.loadAllMessagesDelay));
+    $(document).ajaxComplete((event, jqXHR, ajaxSettings) => {
+      if (/^\/chats\/\d+\/events/i.test(ajaxSettings.url)) {
+        // By the time this gets called, the messages are in the DOM.
+        // The URL for getting message events is /chats/<room #>/events.
+        // This works in chat rooms for both the intial load of messages and
+        // getting additional messages.
+        decorateExistingMessages(0);
+      }
+    });
 
+    // This is needed in any other chat pages, other than actual chat rooms.
     decorateExistingMessages(0);
 
     // Load report data on fire button hover
@@ -4753,7 +4761,7 @@ body.outside .fire-popup h2 {
   }
 
   /**
-   * decorateExistingMessages - Decorate messages that exist on page load.
+   * decorateExistingMessages - Decorate any appropriate messages in the page which are not already decorated.
    *
    * @private
    * @memberof module:fire
@@ -4763,26 +4771,22 @@ body.outside .fire-popup h2 {
   function decorateExistingMessages(timeout) {
     const chat = $(/^\/(?:search|users)/.test(window.location.pathname) ? '#content' : '#chat,#transcript');
 
-    chat.one('DOMSubtreeModified', () => {
-      // We need another timeout here, because the first modification occurs before
-      // the new (old) chat messages are loaded.
-      setTimeout(() => {
-        if (chat.html().length === 0) { // Too soon
-          setTimeout(decorateExistingMessages, timeout, timeout);
-        } else { // Chat messages have loaded
-          $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
+    setTimeout(() => {
+      if (chat.html().length === 0) { // Too soon
+        setTimeout(decorateExistingMessages, timeout || fire.constants.millisecondsInSecond, timeout);
+      } else { // Chat messages have loaded
+        $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
 
-          fire.log('Decorated existing messages.');
+        fire.log('Decorated existing messages.');
 
-          /* eslint-disable no-warning-comments */
-          /*
-          TODO: Load Stack Exchange data for each report
-          updateReportCache();
-          */
-          /* eslint-enable no-warning-comments */
-        }
-      }, timeout);
-    });
+        /* eslint-disable no-warning-comments */
+        /*
+        TODO: Load Stack Exchange data for each report
+        updateReportCache();
+        */
+        /* eslint-enable no-warning-comments */
+      }
+    }, timeout);
     $(fire.SDMessageSelector).each((i, element) => decorateMessage(element));
   }
 
