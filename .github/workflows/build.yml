@@ -21,7 +21,7 @@ jobs:
 
       - name: Setup cache
         id: cache-node
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
