@@ -35,6 +35,6 @@ callback(
     },
     {
       name: "[Q,A] [Russian] This is spam. Please flag as such",
-      description: "Я рассматриваю это как спам. Пожалуйста, отметьте как спам."
+      description: "Это спам. Пожалуйста, поставьте соответствующую тревогу."
     },
   ]);
