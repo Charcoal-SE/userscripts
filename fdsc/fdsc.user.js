@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.20
+// @version     1.20.1
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -502,11 +502,11 @@
   };
   sourceEl.src = "https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js";
   document.body.appendChild(sourceEl);
-})();
 
-// Wait for flag link (works when in review queue)
-// Somehow, I am not able to trigger waitForKeyElements from within the main script ...
-waitForKeyElements(".js-flag-post-link", function (flagLinkNode) {
-  // Let's hope the script is already initalized:
-  flagLinkNode.on("click", fdsc.flagPopupTrigger);
-});
+  // Wait for flag link (works when in review queue)
+  // Somehow, I am not able to trigger waitForKeyElements from within the main script ...
+  waitForKeyElements(".review-task-page .js-flag-post-link", function (flagLinkNode) {
+    // Let's hope the script is already initalized:
+    flagLinkNode.on("click", fdsc.flagPopupTrigger);
+  });
+})();
