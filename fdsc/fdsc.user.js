@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.19.1
+// @version     1.20
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -30,10 +30,11 @@
 // @exclude     *://winterbash*.stackexchange.com/*
 // @require     https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js
 // @require     https://charcoal-se.org/userscripts/vendor/debug.min.js
+// @require     https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @grant       none
 // ==/UserScript==
 
-/* global fdsc, $, xdLocalStorage, confirm, unsafeWindow */
+/* global fdsc, $, xdLocalStorage, unsafeWindow, StackExchange, waitForKeyElements */
 /* eslint-disable max-nested-callbacks */
 
 (function () {
@@ -81,7 +82,7 @@
       $("body").loadPopup({
         lightbox: false,
         target: $("body"),
-        html: "<div class='popup fdsc-popup' id='fdsc-popup-prompt'><p>" + blurb + "</p><input type='text' id='fdsc-popup-input' /><br/><button id='fdsc-popup-submit'>OK</button></div>",
+        html: "<div class='popup fdsc-popup' id='fdsc-popup-prompt' style='z-index: 9999'><p>" + blurb + "</p><input type='text' id='fdsc-popup-input' /><br/><button id='fdsc-popup-submit'>OK</button></div>",
         loaded: loaded
       });
     };
@@ -134,15 +135,15 @@
             xdLocalStorage.setItem("fdsc_msWriteToken", data.token, function () {
               callback();
             });
-          }).error(function (jqXHR) {
+          }).fail(function (jqXHR) {
             if (jqXHR.status === 404) {
-              StackExchange.helpers.showErrorMessage($(".topbar"), "metasmoke could not find a write token - did you authorize the app?", {
+              StackExchange.helpers.showErrorMessage($(".js-top-bar"), "metasmoke could not find a write token - did you authorize the app?", {
                 position: "toast",
                 transient: true,
                 transientTimeout: 10000
               });
             } else {
-              StackExchange.helpers.showErrorMessage($(".topbar"), "An unknown error occurred during OAuth with metasmoke.", {
+              StackExchange.helpers.showErrorMessage($(".js-top-bar"), "An unknown error occurred during OAuth with metasmoke.", {
                 position: "toast",
                 transient: true,
                 transientTimeout: 10000
@@ -189,7 +190,7 @@
           token: token
         }
       }).done(function (data) {
-        StackExchange.helpers.showSuccessMessage($(".topbar"), "Fed back " + feedbackType + " to metasmoke.", {
+        StackExchange.helpers.showSuccessMessage($(".js-top-bar"), "Fed back " + feedbackType + " to metasmoke.", {
           position: "toast",
           transient: true,
           transientTimeout: 10000
@@ -197,9 +198,9 @@
         debug("feedback sent:", data);
         $(window.event.target).attr("data-fdsc-ms-id", null);
         fdsc.postFound = null;
-      }).error(function (jqXHR) {
+      }).fail(function (jqXHR) {
         if (jqXHR.status === 401) {
-          StackExchange.helpers.showErrorMessage($(".topbar"), "Can't send feedback to metasmoke - not authenticated.", {
+          StackExchange.helpers.showErrorMessage($(".js-top-bar"), "Can't send feedback to metasmoke - not authenticated.", {
             position: "toast",
             transient: true,
             transientTimeout: 10000
@@ -213,7 +214,7 @@
             }
           });
         } else {
-          StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred sending post feedback to metasmoke.", {
+          StackExchange.helpers.showErrorMessage($(".js-top-bar"), "An error occurred sending post feedback to metasmoke.", {
             position: "toast",
             transient: true,
             transientTimeout: 10000
@@ -252,15 +253,15 @@
           token: token
         }
       }).done(function (data) {
-        StackExchange.helpers.showSuccessMessage($(".topbar"), "Reported post to metasmoke.", {
+        StackExchange.helpers.showSuccessMessage($(".js-top-bar"), "Reported post to metasmoke.", {
           position: "toast",
           transient: true,
           transientTimeout: 10000
         });
         debug("post reported", data);
-      }).error(function (jqXHR) {
+      }).fail(function (jqXHR) {
         if (jqXHR.status === 401) {
-          StackExchange.helpers.showErrorMessage($(".topbar"), "Can't report post to metasmoke - not authenticated.", {
+          StackExchange.helpers.showErrorMessage($(".js-top-bar"), "Can't report post to metasmoke - not authenticated.", {
             position: "toast",
             transient: true,
             transientTimeout: 10000
@@ -274,7 +275,7 @@
             }
           });
         } else {
-          StackExchange.helpers.showErrorMessage($(".topbar"), "An error occurred while reporting the post to metasmoke.", {
+          StackExchange.helpers.showErrorMessage($(".js-top-bar"), "An error occurred while reporting the post to metasmoke.", {
             position: "toast",
             transient: true,
             transientTimeout: 10000
@@ -295,143 +296,144 @@
           debug("write token", data.value);
         });
 
-        $(".js-flag-post-link").on("click", function (clickEvent) {
-          $(document).on("DOMNodeInserted", function (nodeEvent) {
-            var container;
-            if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") === "popup-flag-post") {
-              container = $(clickEvent.target).parents(".question, .answer").first();
-              fdsc.ajaxPromise = $.ajax({
-                type: "GET",
-                url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls",
-                data: {
-                  urls: fdsc.constructUrl(container),
-                  filter: "HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ",
-                  key: fdsc.metasmokeKey
-                }
-              }).done(function (data_) {
-                data_ = data_.items;
+        fdsc.flagPopupTrigger = function (clickEvent) {
+          const popupContainer = $(this).parents(".js-post-menu").find(".js-menu-popup-container")[0];
 
-                function registerFeedbackButton(buttonSelector, feedback, logMessage) {
-                  $(buttonSelector).on("click", function (ev) {
-                    debug("feedback clicked:", logMessage);
-                    ev.preventDefault();
-                    if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
-                      fdsc.getWriteToken(true, function () {
-                        fdsc.sendFeedback(feedback, $(nodeEvent.target).attr("data-fdsc-ms-id"));
-                      });
-                    } else {
-                      fdsc.sendFeedback(feedback, $(nodeEvent.target).attr("data-fdsc-ms-id"));
-                    }
-                    StackExchange.helpers.closePopups("#popup-flag-post");
-                    $(buttonSelector).off("click");
-                  });
-                }
+          const observer = new MutationObserver(mutationList => {
+            // Trigger on loading of flag popup
+            const addedNode = $(mutationList[0].addedNodes[0]);
+            if (!addedNode.hasClass("popup") || addedNode.attr("id") !== "popup-flag-post") {
+              return;
+            }
 
-                if (data_.length > 0 && data_[0].id) {
-                  $(nodeEvent.target).attr("data-fdsc-ms-id", data_[0].id);
-                  fdsc.postFound = true;
-                  var isAutoflagged = data_[0].autoflagged.flagged === true;
-                  var isFlagged = $(".popup .already-flagged").length > 0;
-                  if (isAutoflagged) {
-                    fdsc.autoflagged = "autoflagged";
+            const container = $(clickEvent.target).parents(".question, .answer").first();
+            fdsc.ajaxPromise = $.ajax({
+              type: "GET",
+              url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/urls",
+              data: {
+                urls: fdsc.constructUrl(container),
+                filter: "HFHNHJFMGNKNFFFIGGOJLNNOFGNMILLJ",
+                key: fdsc.metasmokeKey
+              }
+            }).done(function (data_) {
+              data_ = data_.items;
+
+              function registerFeedbackButton(buttonSelector, feedback, logMessage) {
+                $(buttonSelector).on("click", function (ev) {
+                  debug("feedback clicked:", logMessage);
+                  ev.preventDefault();
+                  if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
+                    fdsc.getWriteToken(true, function () {
+                      fdsc.sendFeedback(feedback, addedNode.attr("data-fdsc-ms-id"));
+                    });
                   } else {
-                    fdsc.autoflagged = "not autoflagged";
+                    fdsc.sendFeedback(feedback, addedNode.attr("data-fdsc-ms-id"));
+                  }
+                  StackExchange.helpers.closePopups("#popup-flag-post");
+                  $(buttonSelector).off("click");
+                });
+              }
+
+              if (data_.length > 0 && data_[0].id) {
+                addedNode.attr("data-fdsc-ms-id", data_[0].id);
+                fdsc.postFound = true;
+                var isAutoflagged = data_[0].autoflagged.flagged === true;
+                var isFlagged = $(".popup .already-flagged").length > 0;
+                if (isAutoflagged) {
+                  fdsc.autoflagged = "autoflagged";
+                } else {
+                  fdsc.autoflagged = "not autoflagged";
+                }
+
+                // Retrieve feedback
+                $.get("https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/" + data_[0].id +
+                      "?key=" + fdsc.metasmokeKey, function (data) {
+                  console.log(data);
+                  // Determine # of feedbacks for each type
+                  var tps = 0;
+                  var fps = 0;
+                  var naa = 0;
+                  for (var i = 0; i < data.items.length; i++) {
+                    switch (data.items[0].feedback_type.charAt(0)) {
+                      case "t":
+                        tps++;
+                        break;
+                      case "f":
+                        fps++;
+                        break;
+                      case "n":
+                        naa++;
+                        break;
+                      default:
+                        break;
+                    }
                   }
 
-                  // Retrieve feedback
-                  $.get("https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/" + data_[0].id +
-                        "?key=" + fdsc.metasmokeKey, function (data) {
-                    console.log(data);
-                    // Determine # of feedbacks for each type
-                    var tps = 0;
-                    var fps = 0;
-                    var naa = 0;
-                    for (var i = 0; i < data.items.length; i++) {
-                      switch (data.items[0].feedback_type.charAt(0)) {
-                        case "t":
-                          tps++;
-                          break;
-                        case "f":
-                          fps++;
-                          break;
-                        case "n":
-                          naa++;
-                          break;
-                        default:
-                          break;
-                      }
-                    }
+                  var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
+                  var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
 
-                    var fpButtonStyle = "style='color:rgba(255,0,0,0.5);' onMouseOver='this.style.color=\"rgba(255,0,0,1)\"' onMouseOut='this.style.color=\"rgba(255,0,0,0.5)\"'";
-                    var tpButtonStyle = "style='color:rgba(0,100,0,0.5);' onMouseOver='this.style.color=\"rgba(0,100,0,1)\"' onMouseOut='this.style.color=\"rgba(0,100,0,0.5)\"'";
+                  var isAnswer = $(".popup-actions").parents(".answer").length !== 0;
 
-                    var isAnswer = $(".popup-actions").parents(".answer").length !== 0;
+                  // Build status
+                  var status = "<div id='smokey-report'><strong>Smokey report: ";
+                  status += "<span style='color:darkgreen'>" + tps + " tp</span>, ";
+                  status += "<span style='color:red'>" + fps + " fp</span>, ";
 
-                    // Build status
-                    var status = "<div style='float:left' id='smokey-report'><strong>Smokey report: ";
-                    status += "<span style='color:darkgreen'>" + tps + " tp</span>, ";
-                    status += "<span style='color:red'>" + fps + " fp</span>, ";
+                  // Don't add naa if the dialog opened for a question
+                  if (isAnswer) {
+                    status += "<span style='color:#7c5500'>" + naa + " naa</span>, ";
+                  }
 
-                    // Don't add naa if the dialog opened for a question
-                    if (isAnswer) {
-                      status += "<span style='color:#7c5500'>" + naa + " naa</span>, ";
-                    }
+                  status += fdsc.autoflagged + "</strong>";
 
-                    status += fdsc.autoflagged + "</strong>";
+                  var writeTokenButton = false;
 
-                    var writeTokenButton = false;
+                  if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
+                    status += " - <a href='#' id='get-write-token'>get write token</a></div>";
+                    writeTokenButton = true;
+                  }
 
-                    if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
-                      status += " - <a href='#' id='get-write-token'>get write token</a></div>";
-                      writeTokenButton = true;
-                    }
+                  if (isFlagged || isAutoflagged) {
+                    status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
+                  }
 
-                    if (isFlagged || isAutoflagged) {
-                      status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
-                    }
+                  if (tps === 0) {
+                    status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a></div>";
+                  } else {
+                    // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
+                    // Hence, do not display the false positive button
+                    status += "</div>";
+                  }
+                  $(".popup-actions").prepend(status);
+                  // On click of the false positive button
+                  registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
+                  // On click of the confirm autoflag
+                  registerFeedbackButton("#autoflag-tp", "tpu-", "Reporting as true positive");
 
-                    if (tps === 0) {
-                      status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a></div>";
-                    } else {
-                      // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
-                      // Hence, do not display the false positive button
-                      status += "</div>";
-                    }
-                    $(".popup-actions").prepend(status);
-                    // On click of the false positive button
-                    registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
-                    // On click of the confirm autoflag
-                    registerFeedbackButton("#autoflag-tp", "tpu-", "Reporting as true positive");
+                  if (writeTokenButton) {
+                    $("#get-write-token").on("click", function (ev) {
+                      ev.preventDefault();
+                      fdsc.getWriteToken(false, function () {
+                        debug("click event", clickEvent);
 
-                    if (writeTokenButton) {
-                      $("#get-write-token").on("click", function (ev) {
-                        ev.preventDefault();
-                        fdsc.getWriteToken(false, function () {
-                          debug("click event", clickEvent);
-
-                          $(".popup-close a").click();
-                          $(clickEvent.currentTarget).click();
-                        }); // Add a "Get write token" link.
-                      });
-                    }
-                  });
-                } else {
-                  fdsc.postFound = false;
-                }
-              }).error(function (jqXHR) {
-                StackExchange.helpers.showMessage($(".topbar"), "An error occurred fetching post from metasmoke - has the post been reported by Smokey?", {
-                  position: "toast",
-                  transient: true,
-                  transientTimeout: 10000,
-                  type: "warning"
+                        $(".popup-close a").click();
+                        $(clickEvent.currentTarget).click();
+                      }); // Add a "Get write token" link.
+                    });
+                  }
                 });
-                console.error(jqXHR.status, jqXHR.responseText);
+              } else {
+                fdsc.postFound = false;
+              }
+            }).fail(function (jqXHR) {
+              StackExchange.helpers.showMessage($(".js-top-bar"), "An error occurred fetching post from metasmoke - has the post been reported by Smokey?", {
+                position: "toast",
+                transient: true,
+                transientTimeout: 10000,
+                type: "warning"
               });
-
-              // We should remove the DOMNodeInserted handler when we're done with it to avoid multiple fires of
-              // the same handler caused by re-adding it each time you click the flag link.
-              $(document).off("DOMNodeInserted");
-            }
+              console.error(jqXHR.status, jqXHR.responseText);
+            });
 
             $(".js-popup-submit").on("click", function () {
               var selected = $("input[name=top-form]").filter(":checked");
@@ -443,14 +445,14 @@
               }
 
               fdsc.ajaxPromise.then(function () {
-                if (feedbackType && $(nodeEvent.target).attr("data-fdsc-ms-id")) {
+                if (feedbackType && addedNode.attr("data-fdsc-ms-id")) {
                   // because it looks like xdls returns null as a string for some reason
                   if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                     fdsc.getWriteToken(true, function () {
-                      fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
+                      fdsc.sendFeedback(feedbackType, addedNode.attr("data-fdsc-ms-id"));
                     });
                   } else {
-                    fdsc.sendFeedback(feedbackType, $(nodeEvent.target).attr("data-fdsc-ms-id"));
+                    fdsc.sendFeedback(feedbackType, addedNode.attr("data-fdsc-ms-id"));
                   }
                 } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
                   if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
@@ -466,8 +468,15 @@
               // Likewise, remove this handler when it's finished to avoid multiple fires.
               $(".js-popup-submit").off("click");
             });
+
+            observer.disconnect();
           });
-        });
+          observer.observe(popupContainer, {childList: true});
+        };
+
+        // Regular (Q&A pages) - flag link is loaded right away
+        $(".js-flag-post-link").on("click", fdsc.flagPopupTrigger);
+
         $(".popup-close").on("click", function () {
           fdsc.postFound = null;
         });
@@ -494,3 +503,10 @@
   sourceEl.src = "https://cdn.rawgit.com/ofirdagan/cross-domain-local-storage/d779a81a6383475a1bf88595a98b10a8bd5bb4ae/dist/scripts/xdLocalStorage.min.js";
   document.body.appendChild(sourceEl);
 })();
+
+// Wait for flag link (works when in review queue)
+// Somehow, I am not able to trigger waitForKeyElements from within the main script ...
+waitForKeyElements(".js-flag-post-link", function (flagLinkNode) {
+  // Let's hope the script is already initalized:
+  flagLinkNode.on("click", fdsc.flagPopupTrigger);
+});
