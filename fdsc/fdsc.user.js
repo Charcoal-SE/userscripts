@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.20.1
+// @version     1.20.2
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -233,7 +233,7 @@
     */
     fdsc.reportPost = function (postUrl) {
       if (StackExchange.options.user.isModerator) {
-        return;
+        return; // the post will be deleted and Smokey can't fetch it via the API
       }
       debug("entering reportPost");
       debug("write token:", fdsc.msWriteToken);
@@ -389,21 +389,21 @@
                   var writeTokenButton = false;
 
                   if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
-                    status += " - <a href='#' id='get-write-token'>get write token</a></div>";
+                    status += " - <a href='#' id='get-write-token'>get write token</a>";
                     writeTokenButton = true;
                   }
 
                   if (isFlagged || isAutoflagged) {
-                    status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a></div>";
+                    status += " - <a href='#' id='autoflag-tp' " + tpButtonStyle + ">tpu-</a>";
                   }
 
                   if (tps === 0) {
-                    status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a></div>";
-                  } else {
-                    // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
-                    // Hence, do not display the false positive button
-                    status += "</div>";
+                    status += " - <a href='#' id='feedback-fp' " + fpButtonStyle + ">false positive?</a>";
                   }
+                  // If someone else has already marked as tp, you should mark it as fp in chat where you can discuss with others.
+                  // Hence, do not display the false positive button
+
+                  status += "</div>";
                   $(".popup-actions").prepend(status);
                   // On click of the false positive button
                   registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
@@ -457,10 +457,10 @@
                 } else if (feedbackType === "tpu-" && fdsc.postFound === false) {
                   if (!fdsc.msWriteToken || fdsc.msWriteToken === "null") {
                     fdsc.getWriteToken(true, function () {
-                      fdsc.reportPost(fdsc.constructUrl(fdsc.container)); // container variable defined on line 299
+                      fdsc.reportPost(fdsc.constructUrl(container));
                     });
                   } else {
-                    fdsc.reportPost(fdsc.constructUrl(fdsc.container));
+                    fdsc.reportPost(fdsc.constructUrl(container));
                   }
                 }
               });
