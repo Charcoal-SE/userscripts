@@ -8,7 +8,7 @@
 // @contributor J F
 // @contributor Glorfindel
 // @attribution Brock Adams (https://github.com/BrockA)
-// @version     1.20.2
+// @version     1.20.3
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/fdsc/fdsc.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues
@@ -248,7 +248,7 @@
         type: "POST",
         url: "https://metasmoke.erwaysoftware.com/api/v2.0/posts/report",
         data: {
-          post_link: postUrl, // eslint-disable-line camelcase
+          url: postUrl, // eslint-disable-line camelcase
           key: fdsc.metasmokeKey,
           token: token
         }
@@ -404,6 +404,7 @@
                   // Hence, do not display the false positive button
 
                   status += "</div>";
+                  $("#smokey-report").remove(); // otherwise, we'll get duplicate reports
                   $(".popup-actions").prepend(status);
                   // On click of the false positive button
                   registerFeedbackButton("#feedback-fp", "fp-", "Reporting as false positive");
