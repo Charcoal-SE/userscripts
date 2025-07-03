@@ -507,7 +507,7 @@
       (response) => {
         if (response && response.items) {
           report.se.revisions = response.items;
-          report.revision_count = response.items.length;
+          report.revision_count = response.items.filter((item) => item.revision_type === 'single_user').length;
 
           if (report.revision_count > 1) {
             showEditedIcon();
