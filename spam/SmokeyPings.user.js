@@ -3,7 +3,8 @@
 // @description Play the ping sound if Smokey has a message at the bottom of the SOCVR chat.
 // @author      Henders
 // @attribution Andy Henderson (https://github.com/SulphurDioxide)
-// @version     0.2.1
+// @license     MIT OR Apache-2.0
+// @version     0.2.2
 // @match       *://chat.stackexchange.com/rooms/11540/charcoal-hq*
 // @match       *://chat.stackoverflow.com/rooms/41570/so-close-vote-reviewers*
 // @match       *://chat.meta.stackexchange.com/rooms/89/tavern-on-the-meta*

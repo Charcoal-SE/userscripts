@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         SIM - SmokeDetector Info for Moderators
 // @namespace    https://charcoal-se.org/
-// @version      1.8.1
+// @license      MIT OR Apache-2.0
+// @version      1.8.2
 // @description  Dig up information about how SmokeDetector handled a post.
 // @author       ArtOfCode
 // @contributor  Makyen

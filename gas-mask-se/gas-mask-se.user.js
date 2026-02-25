@@ -14,7 +14,8 @@
 // @include       *://*stackapps.com/*
 // @include       *://*askubuntu.com/*
 // @exclude       *://*stackoverflow.com/c/*
-// @version       1.3
+// @license       MIT OR Apache-2.0
+// @version       1.4
 // ==/UserScript==
 
 var style = document.createElement("style");

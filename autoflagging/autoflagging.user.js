@@ -8,7 +8,8 @@
 // @contributor ArtOfCode
 // @contributor Cerbrus
 // @contributor Makyen
-// @version     0.31
+// @version     0.32
+// @license     MIT OR Apache-2.0
 // @updateURL   https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.meta.js
 // @downloadURL https://raw.githubusercontent.com/Charcoal-SE/Userscripts/master/autoflagging/autoflagging.user.js
 // @supportURL  https://github.com/Charcoal-SE/Userscripts/issues

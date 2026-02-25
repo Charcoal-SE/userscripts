@@ -16,6 +16,7 @@
 // @exclude     *://chat.stackoverflow.com/*
 // @exclude     *://blog.stackoverflow.com/*
 // @exclude     *://*.area51.stackexchange.com/*
-// @version     1.0
+// @license     MIT OR Apache-2.0
+// @version     1.1
 // @grant       none
 // ==/UserScript==
